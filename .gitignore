@@ -363,3 +363,13 @@ MigrationBackup/
 FodyWeavers.xsd
 /Intermediate
 /Product
+/editor/jbl.bin
+/editor/jbl.fbx
+/editor/jbl.glb
+/editor/jbl.gltf
+/editor/MeteorEditor.txt
+/editor/picsa.txt
+/editor/RobotoCondensed-Bold.ttf
+/editor/Shader.hlsl
+/editor/ShaderPX.hlsl
+/editor/imgui.ini
