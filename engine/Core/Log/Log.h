@@ -20,14 +20,15 @@ enum ESeverity
 	Fatal /** Very dangerous situation, this will terminate the app.*/
 };
 
+class String;
 
 struct LogPart
 {
 	friend class Logger;
 
-	LogPart(String Category, ESeverity DisplayTitle, String Message, ...);
+	LogPart(String Category, ESeverity DisplayTitle, String Message, String location, String function,...);
 
-	LogPart(String Category, ESeverity DisplayTitle, String Message);
+	//LogPart(String Category, ESeverity DisplayTitle, String Message);
 		
 private:
 
@@ -40,6 +41,10 @@ private:
 	String message;
 
 	String rawMessage;
+
+	String func;
+
+	String file;
 
 	constexpr const wchar_t* formatSeverity(ESeverity Severity) const noexcept;
 };
@@ -87,3 +92,25 @@ private:
 };
 
 
+constexpr const wchar_t* Logger::getMessageName(unsigned int code) const noexcept
+{
+	switch (code)
+	{
+	case WM_CREATE:
+		return L"WM_CREATE";
+	case WM_DESTROY:
+		return L"WM_DESTROY";
+	case WM_CLOSE:
+		return L"WM_CLOSE";
+	case WM_SIZING:
+		return L"WM_SIZING";
+	case WM_WINDOWPOSCHANGING:
+		return L"WM_WINDOWPOSCHANGING";
+	case WM_WINDOWPOSCHANGED:
+		return L"WM_WINDOWPOSCHANGED";
+	default:
+		return L"";
+	}
+
+	return L"";
+}

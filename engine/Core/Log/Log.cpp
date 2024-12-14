@@ -1,7 +1,7 @@
 /* Copyright 2020 - 2024, Saxon Software. All rights reserved. */
 
 #include "Log.h"
-//#include <sstream>
+#include <Types/String.h>
 #include <fcntl.h>
 #include <io.h>
 //#include <iostream>
@@ -26,7 +26,7 @@ Logger& Logger::Get()
 
 void Logger::firstStartLogger()
 {
-    String appName = Application::Get().getAppInfo()->appName;
+    String appName = Application::Get()->getAppInfo()->appName;
 
     appName = appName + L".txt";
 
@@ -50,20 +50,25 @@ void Logger::shutdownLogger()
 
 void Logger::printCollectedLogs()
 {
+    MR_LOG(LogApplication, Log, TEXT("Broadcasting collected logs. (From startup)"));
     for (LogPart Log : critialLogs)
     {
-
+        logMessage(Log, Log.func.Chr(), Log.file.Chr());
     }
 }
 
 void Logger::logMessage(LogPart Log, const wchar_t* Function, const wchar_t* File)
 {
-    //if (Application::Get())
+    if (!Application::Get())
+    {
+        critialLogs.push_back(Log);
+        return;
+    }
 
     setColorBySeverity(Log.displayTitle);
 
     if (Log.displayTitle > 3)
-        Application::Get().drawAttention();
+        Application::Get()->drawAttention();
 
     if (Log.displayTitle == Fatal)
     {
@@ -113,7 +118,7 @@ void Logger::logAssert(const wchar_t* Function, const wchar_t* File, const wchar
         File
     );
 
-    Application::Get().drawAttention();
+    Application::Get()->drawAttention();
 
     setColorBySeverity(Error);
     writeToOutput(fullBuffer, true);
@@ -246,13 +251,13 @@ constexpr const void Logger::setColorBySeverity(ESeverity Severity) const noexce
     }
 }
 
-LogPart::LogPart(String Category, ESeverity DisplayTitle, String Message, ...)
-    : category(Category), displayTitle(DisplayTitle), message(Message)
+LogPart::LogPart(String Category, ESeverity DisplayTitle, String Message, String location, String function, ...)
+    : category(Category), displayTitle(DisplayTitle), message(Message), file(location), func(function)
 {
     time = Timer::Now();
 
     va_list variadicCount;
-    va_start(variadicCount, Message);
+    va_start(variadicCount, function);
     const uint32 needForVariadic = vswprintf(NULL, 0, Message.Chr(), variadicCount);
     va_end(variadicCount);
 
@@ -260,7 +265,7 @@ LogPart::LogPart(String Category, ESeverity DisplayTitle, String Message, ...)
     rawMessage = variadicBuffer;
 
     va_list args;
-    va_start(args, Message);
+    va_start(args, function);
     vswprintf(variadicBuffer, needForVariadic + 1, Message.Chr(), args);
     va_end(args);
 
@@ -275,20 +280,20 @@ LogPart::LogPart(String Category, ESeverity DisplayTitle, String Message, ...)
     mrfree(messageBlock);
 }
 
-LogPart::LogPart(String Category, ESeverity DisplayTitle, String Message)
-{
-    time = Timer::Now();
-
-    const uint32 needSuper = swprintf(NULL, 0, L"[%s] %s: %s: %s\n", time.Chr(), category.Chr(), formatSeverity(DisplayTitle), Message.Chr());
-
-    wchar_t* messageBlock = (wchar_t*)mrmalloc((needSuper + 1) * sizeof(wchar_t));
-    swprintf(messageBlock, needSuper + 1, L"[%s] %s: %s: %s\n", time.Chr(), category.Chr(), formatSeverity(DisplayTitle), Message.Chr());
-
-    rawMessage = messageBlock;
-    message = messageBlock;
-
-    mrfree(messageBlock);
-}
+//LogPart::LogPart(String Category, ESeverity DisplayTitle, String Message)
+//{
+//    time = Timer::Now();
+//
+//    const uint32 needSuper = swprintf(NULL, 0, L"[%s] %s: %s: %s\n", time.Chr(), category.Chr(), formatSeverity(DisplayTitle), Message.Chr());
+//
+//    wchar_t* messageBlock = (wchar_t*)mrmalloc((needSuper + 1) * sizeof(wchar_t));
+//    swprintf(messageBlock, needSuper + 1, L"[%s] %s: %s: %s\n", time.Chr(), category.Chr(), formatSeverity(DisplayTitle), Message.Chr());
+//
+//    rawMessage = messageBlock;
+//    message = messageBlock;
+//
+//    mrfree(messageBlock);
+//}
 
 constexpr const wchar_t* LogPart::formatSeverity(ESeverity Severity) const noexcept
 {
@@ -311,25 +316,3 @@ constexpr const wchar_t* LogPart::formatSeverity(ESeverity Severity) const noexc
     return L"???";
 }
 
-constexpr const wchar_t* Logger::getMessageName(unsigned int code) const noexcept
-{
-    switch (code)
-    {
-    case WM_CREATE:
-        return L"WM_CREATE";
-    case WM_DESTROY:
-        return L"WM_DESTROY";
-    case WM_CLOSE:
-        return L"WM_CLOSE";
-    case WM_SIZING:
-        return L"WM_SIZING";
-    case WM_WINDOWPOSCHANGING:
-        return L"WM_WINDOWPOSCHANGING";
-    case WM_WINDOWPOSCHANGED:
-        return L"WM_WINDOWPOSCHANGED";
-    default:
-        return L"";
-    }
-
-    return L"";
-}

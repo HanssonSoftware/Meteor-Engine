@@ -34,7 +34,7 @@ LOG_ADDCATEGORY(Temp);
 	static_assert(!std::is_same<decltype(_exception::retval), const wchar_t*>::value, "Formatting must be either TEXT() or L'Text'"); \
     static_assert(std::is_base_of<SLogEntry, CategoryName>::value, "Category must inherit from SLogEntry (Use LOG_ADDCATEGORY() macro)"); \
     do { \
-        Logger::Get().logMessage(LogPart(CategoryName::GetCategoryName(), Severity, Message), __FUNCTIONW__ , __FILEW__, __VA_ARGS__); \
+        Logger::Get().logMessage(LogPart(CategoryName::GetCategoryName(), Severity, Message, __FILEW__, __FUNCTIONW__, __VA_ARGS__), __FUNCTIONW__ , __FILEW__); \
     } while (0)
 
 #ifdef MR_DEBUG

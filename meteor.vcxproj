@@ -22,8 +22,9 @@
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{709b7964-f338-40b8-b8e2-a2898b438a1c}</ProjectGuid>
-    <RootNamespace>meteor</RootNamespace>
+    <RootNamespace>Meteor</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Meteor</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -97,7 +98,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Source\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(VULKAN_SDK)\Include\;$(SolutionDir)engine\;$(SolutionDir)engine\ThirdParty\ImGUI\;$(SolutionDir)engine\ThirdParty\FreeType\;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\Platform;$(SolutionDir)engine\Editor;$(SolutionDir)engine\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -105,6 +106,13 @@
     </Link>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib</AdditionalDependencies>
+      <Name>
+      </Name>
+      <SubSystem>
+      </SubSystem>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'">
@@ -116,7 +124,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Source\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(VULKAN_SDK)\Include\;$(SolutionDir)engine\;$(SolutionDir)engine\ThirdParty\ImGUI\;$(SolutionDir)engine\ThirdParty\FreeType\;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\Platform;$(SolutionDir)editor;$(SolutionDir)engine\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -126,6 +134,13 @@
     </Link>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib</AdditionalDependencies>
+      <Name>
+      </Name>
+      <SubSystem>
+      </SubSystem>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -135,7 +150,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Source\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(VULKAN_SDK)\Include\;$(SolutionDir)Source\;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty\FreeType\;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -143,6 +158,13 @@
     </Link>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib</AdditionalDependencies>
+      <Name>
+      </Name>
+      <SubSystem>
+      </SubSystem>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
@@ -154,7 +176,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Source\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(VULKAN_SDK)\Include\;$(SolutionDir)Source\;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty\FreeType\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -164,75 +186,233 @@
     </Link>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib</AdditionalDependencies>
+      <Name>
+      </Name>
+      <SubSystem>
+      </SubSystem>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Core\Application\Application.cpp" />
-    <ClCompile Include="Source\Core\Application\CoreSubsystem.cpp" />
-    <ClCompile Include="Source\Core\Application\Engine.cpp" />
-    <ClCompile Include="Source\Core\Application\Input.cpp" />
-    <ClCompile Include="Source\Core\Application\Subsystem.cpp" />
-    <ClCompile Include="Source\Core\Async\Thread.cpp" />
-    <ClCompile Include="Source\Core\Common\Delegate.cpp" />
-    <ClCompile Include="Source\Core\Common\MemoryManager.cpp" />
-    <ClCompile Include="Source\Core\File\Archive.cpp" />
-    <ClCompile Include="Source\Core\File\Config.cpp" />
-    <ClCompile Include="Source\Core\File\ConfigCollection.cpp" />
-    <ClCompile Include="Source\Core\File\File.cpp" />
-    <ClCompile Include="Source\Core\File\FileManager.cpp" />
-    <ClCompile Include="Source\Core\Graphics\D3D11\DX11.cpp" />
-    <ClCompile Include="Source\Core\Graphics\GraphicsDevice.cpp" />
-    <ClCompile Include="Source\Core\Graphics\Vulkan\VulkanDevice.cpp" />
-    <ClCompile Include="Source\Core\Launch\LaunchGeneric.cpp" />
-    <ClCompile Include="Source\Core\Log\Log.cpp" />
-    <ClCompile Include="Source\Core\Timer\Timer.cpp" />
-    <ClCompile Include="Source\Core\Types\String.cpp" />
-    <ClCompile Include="Source\Core\Types\Vector.cpp" />
-    <ClCompile Include="Source\Core\Widgets\Viewport.cpp" />
-    <ClCompile Include="Source\Core\Widgets\Visual.cpp" />
-    <ClCompile Include="Source\Core\Window\Window.cpp" />
-    <ClCompile Include="Source\Platform\Microsoft\File\WinFileManager.cpp" />
-    <ClCompile Include="Source\ThirdParty\TrueType\schrift.c" />
+    <ClCompile Include="engine\Core\Application\Application.cpp" />
+    <ClCompile Include="engine\Core\Application\Commandlet.cpp" />
+    <ClCompile Include="engine\Core\Application\Engine.cpp" />
+    <ClCompile Include="engine\Core\Application\InputManager.cpp" />
+    <ClCompile Include="engine\Core\Application\Layer.cpp" />
+    <ClCompile Include="engine\Core\Application\LayerManager.cpp" />
+    <ClCompile Include="engine\Core\Async\Semaphore.cpp" />
+    <ClCompile Include="engine\Core\Async\SlowTask.cpp" />
+    <ClCompile Include="engine\Core\Async\Thread.cpp" />
+    <ClCompile Include="engine\Core\Common\Array.cpp" />
+    <ClCompile Include="engine\Core\Common\Delegate.cpp" />
+    <ClCompile Include="engine\Core\Common\MemoryManager.cpp" />
+    <ClCompile Include="engine\Core\File\Archive.cpp" />
+    <ClCompile Include="engine\Core\File\Config.cpp" />
+    <ClCompile Include="engine\Core\File\ConfigCollection.cpp" />
+    <ClCompile Include="engine\Core\File\File.cpp" />
+    <ClCompile Include="engine\Core\Graphics\Camera.cpp" />
+    <ClCompile Include="engine\Core\Graphics\D3D11\Direct3DDevice.cpp" />
+    <ClCompile Include="engine\Core\Graphics\GraphicsDevice.cpp" />
+    <ClCompile Include="engine\Core\Graphics\MeshModel.cpp" />
+    <ClCompile Include="engine\Core\Graphics\QueuedRender.cpp" />
+    <ClCompile Include="engine\Core\Graphics\SceneGraph.cpp" />
+    <ClCompile Include="engine\Core\Graphics\VertexBuffer.cpp" />
+    <ClCompile Include="engine\Core\Graphics\Vulkan\VulkanDevice.cpp" />
+    <ClCompile Include="engine\Core\Launch\LaunchGeneric.cpp" />
+    <ClCompile Include="engine\Core\Log\Exception.cpp" />
+    <ClCompile Include="engine\Core\Log\Log.cpp" />
+    <ClCompile Include="engine\Core\Timer\Timer.cpp" />
+    <ClCompile Include="engine\Core\Types\String.cpp" />
+    <ClCompile Include="engine\Core\Types\Vector.cpp" />
+    <ClCompile Include="engine\Core\Widgets\Common\FontAsset.cpp" />
+    <ClCompile Include="engine\Core\Widgets\Components\TextBlock.cpp" />
+    <ClCompile Include="engine\Core\Widgets\Viewport.cpp" />
+    <ClCompile Include="engine\Core\Widgets\Visual.cpp" />
+    <ClCompile Include="engine\Core\Window\Window.cpp" />
+    <ClCompile Include="engine\Core\Window\WindowManager.cpp" />
+    <ClCompile Include="engine\Object\Object.cpp" />
+    <ClCompile Include="engine\ThirdParty\ImGUI\backends\imgui_impl_dx11.cpp" />
+    <ClCompile Include="engine\ThirdParty\ImGUI\backends\imgui_impl_vulkan.cpp" />
+    <ClCompile Include="engine\ThirdParty\ImGUI\backends\imgui_impl_win32.cpp" />
+    <ClCompile Include="engine\ThirdParty\ImGUI\imgui.cpp" />
+    <ClCompile Include="engine\ThirdParty\ImGUI\imgui_demo.cpp" />
+    <ClCompile Include="engine\ThirdParty\ImGUI\imgui_draw.cpp" />
+    <ClCompile Include="engine\ThirdParty\ImGUI\imgui_tables.cpp" />
+    <ClCompile Include="engine\ThirdParty\ImGUI\imgui_widgets.cpp" />
+    <ClCompile Include="engine\ThirdParty\OpenFBX\libdeflate.c" />
+    <ClCompile Include="engine\ThirdParty\OpenFBX\ofbx.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Resources\resource.h" />
-    <ClInclude Include="Source\Core\Application\Application.h" />
-    <ClInclude Include="Source\Core\Application\CoreSubsystem.h" />
-    <ClInclude Include="Source\Core\Application\Engine.h" />
-    <ClInclude Include="Source\Core\Application\Input.h" />
-    <ClInclude Include="Source\Core\Application\Subsystem.h" />
-    <ClInclude Include="Source\Core\Async\Thread.h" />
-    <ClInclude Include="Source\Core\Common\Delegate.h" />
-    <ClInclude Include="Source\Core\Common\MemoryManager.h" />
-    <ClInclude Include="Source\Core\File\Archive.h" />
-    <ClInclude Include="Source\Core\File\Config.h" />
-    <ClInclude Include="Source\Core\File\ConfigCollection.h" />
-    <ClInclude Include="Source\Core\File\File.h" />
-    <ClInclude Include="Source\Core\File\FileManager.h" />
-    <ClInclude Include="Source\Core\Graphics\D3D11\DX11.h" />
-    <ClInclude Include="Source\Core\Graphics\GraphicsDevice.h" />
-    <ClInclude Include="Source\Core\Graphics\Vulkan\VulkanDevice.h" />
-    <ClInclude Include="Source\Core\Log\Log.h" />
-    <ClInclude Include="Source\Core\Log\LogMacros.h" />
-    <ClInclude Include="Source\Core\Math\Conversions.h" />
-    <ClInclude Include="Source\Core\Timer\Timer.h" />
-    <ClInclude Include="Source\Core\Types\Cast.h" />
-    <ClInclude Include="Source\Core\Types\PlatformDefs.h" />
-    <ClInclude Include="Source\Core\Types\String.h" />
-    <ClInclude Include="Source\Core\Types\Vector.h" />
-    <ClInclude Include="Source\Core\Widgets\Viewport.h" />
-    <ClInclude Include="Source\Core\Widgets\Visual.h" />
-    <ClInclude Include="Source\Core\Window\Window.h" />
-    <ClInclude Include="Source\Meteor.h" />
-    <ClInclude Include="Source\Platform\Microsoft\File\WinFileManager.h" />
-    <ClInclude Include="Source\ThirdParty\TrueType\schrift.h" />
-    <ClInclude Include="Source\Version.h" />
+    <ClInclude Include="engine\Core\Application\Application.h" />
+    <ClInclude Include="engine\Core\Application\Commandlet.h" />
+    <ClInclude Include="engine\Core\Application\Engine.h" />
+    <ClInclude Include="engine\Core\Application\InputManager.h" />
+    <ClInclude Include="engine\Core\Application\Layer.h" />
+    <ClInclude Include="engine\Core\Application\LayerManager.h" />
+    <ClInclude Include="engine\Core\Async\Semaphore.h" />
+    <ClInclude Include="engine\Core\Async\SlowTask.h" />
+    <ClInclude Include="engine\Core\Async\Thread.h" />
+    <ClInclude Include="engine\Core\Common\Array.h" />
+    <ClInclude Include="engine\Core\Common\Delegate.h" />
+    <ClInclude Include="engine\Core\Common\MemoryManager.h" />
+    <ClInclude Include="engine\Core\File\Archive.h" />
+    <ClInclude Include="engine\Core\File\Config.h" />
+    <ClInclude Include="engine\Core\File\ConfigCollection.h" />
+    <ClInclude Include="engine\Core\File\File.h" />
+    <ClInclude Include="engine\Core\Graphics\Camera.h" />
+    <ClInclude Include="engine\Core\Graphics\D3D11\Direct3DDevice.h" />
+    <ClInclude Include="engine\Core\Graphics\GraphicsDevice.h" />
+    <ClInclude Include="engine\Core\Graphics\MeshModel.h" />
+    <ClInclude Include="engine\Core\Graphics\QueuedRender.h" />
+    <ClInclude Include="engine\Core\Graphics\SceneGraph.h" />
+    <ClInclude Include="engine\Core\Graphics\VertexBuffer.h" />
+    <ClInclude Include="engine\Core\Graphics\Vulkan\VulkanDevice.h" />
+    <ClInclude Include="engine\Core\Log\Exception.h" />
+    <ClInclude Include="engine\Core\Log\Log.h" />
+    <ClInclude Include="engine\Core\Log\LogMacros.h" />
+    <ClInclude Include="engine\Core\Math\Conversions.h" />
+    <ClInclude Include="engine\Core\Timer\Timer.h" />
+    <ClInclude Include="engine\Core\Types\Cast.h" />
+    <ClInclude Include="engine\Core\Types\PlatformDefs.h" />
+    <ClInclude Include="engine\Core\Types\String.h" />
+    <ClInclude Include="engine\Core\Types\Vector.h" />
+    <ClInclude Include="engine\Core\Widgets\Common\FontAsset.h" />
+    <ClInclude Include="engine\Core\Widgets\Components\TextBlock.h" />
+    <ClInclude Include="engine\Core\Widgets\Viewport.h" />
+    <ClInclude Include="engine\Core\Widgets\Visual.h" />
+    <ClInclude Include="engine\Core\Window\Window.h" />
+    <ClInclude Include="engine\Core\Window\WindowManager.h" />
+    <ClInclude Include="engine\Object\Object.h" />
+    <ClInclude Include="engine\Platform\Microsoft\MinWin.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\config\ftconfig.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\config\ftheader.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\config\ftmodule.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\config\ftoption.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\config\ftstdlib.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\config\integer-types.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\config\mac-support.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\config\public-macros.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\freetype.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftadvanc.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftbbox.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftbdf.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftbitmap.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftbzip2.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftcache.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftchapters.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftcid.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftcolor.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftdriver.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\fterrdef.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\fterrors.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftfntfmt.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftgasp.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftglyph.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftgxval.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftgzip.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftimage.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftincrem.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftlcdfil.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftlist.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftlogging.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftlzw.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftmac.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftmm.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftmodapi.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftmoderr.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftotval.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftoutln.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftparams.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftpfr.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftrender.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftsizes.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftsnames.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftstroke.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftsynth.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftsystem.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\fttrigon.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\fttypes.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftwinfnt.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\autohint.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\cffotypes.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\cfftypes.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\compiler-macros.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\ftcalc.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\ftdebug.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\ftdrv.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\ftgloadr.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\fthash.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\ftmemory.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\ftmmtypes.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\ftobjs.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\ftpsprop.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\ftrfork.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\ftserv.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\ftstream.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\fttrace.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\ftvalid.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\psaux.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\pshints.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svbdf.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svcfftl.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svcid.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svfntfmt.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svgldict.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svgxval.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svkern.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svmetric.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svmm.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svotval.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svpfr.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svpostnm.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svprop.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svpscmap.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svpsinfo.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svsfnt.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svttcmap.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svtteng.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svttglyf.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svwinfnt.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\sfnt.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\svginterface.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\t1types.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\tttypes.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\wofftypes.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\otsvg.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\t1tables.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ttnameid.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\tttables.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\freetype\tttags.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\ft2build.h" />
+    <ClInclude Include="engine\ThirdParty\ImGUI\backends\imgui_impl_dx11.h" />
+    <ClInclude Include="engine\ThirdParty\ImGUI\backends\imgui_impl_metal.h" />
+    <ClInclude Include="engine\ThirdParty\ImGUI\backends\imgui_impl_vulkan.h" />
+    <ClInclude Include="engine\ThirdParty\ImGUI\backends\imgui_impl_win32.h" />
+    <ClInclude Include="engine\ThirdParty\ImGUI\imconfig.h" />
+    <ClInclude Include="engine\ThirdParty\ImGUI\imgui.h" />
+    <ClInclude Include="engine\ThirdParty\ImGUI\imgui_internal.h" />
+    <ClInclude Include="engine\ThirdParty\ImGUI\imstb_rectpack.h" />
+    <ClInclude Include="engine\ThirdParty\ImGUI\imstb_textedit.h" />
+    <ClInclude Include="engine\ThirdParty\ImGUI\imstb_truetype.h" />
+    <ClInclude Include="engine\ThirdParty\OpenFBX\libdeflate.h" />
+    <ClInclude Include="engine\ThirdParty\OpenFBX\ofbx.h" />
+    <ClInclude Include="engine\ThirdParty\TinyGLTF\json.hpp" />
+    <ClInclude Include="engine\ThirdParty\TinyGLTF\stb_image.h" />
+    <ClInclude Include="engine\ThirdParty\TinyGLTF\stb_image_write.h" />
+    <ClInclude Include="engine\ThirdParty\TinyGLTF\tiny_gltf.h" />
+    <ClInclude Include="engine\Version.h" />
+    <ClInclude Include="Resources\EngineResources.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Resources\Resource.rc" />
+    <Image Include="Resources\icon0.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Resources\icon1.ico" />
+    <ResourceCompile Include="Resources\EngineAppTemplateResource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\d1.bin" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

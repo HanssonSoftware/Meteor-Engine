@@ -39,7 +39,7 @@ Exception::Exception(String text, int line, const wchar_t* File ,const wchar_t* 
 
 	mrfree(fullBuffer);
 	mrfree(variadicBuffer);
-	MessageBox(NULL, super.Chr(), Application::Get().getApplicationName().Chr(), MB_ICONERROR | MB_OK);
+	MessageBox(NULL, super.Chr(), Application::Get()->getApplicationName().Chr(), MB_ICONERROR | MB_OK);
 #endif // MR_DEBUG
 }
 
