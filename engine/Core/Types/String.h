@@ -1,4 +1,4 @@
-/* Copyright 2020 - 2024, Saxon Software. All rights reserved. */
+/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
@@ -38,6 +38,10 @@ public:
 	String operator+(const String& Other);
 	
 	bool operator==(const String& Other) const;
+		
+	bool operator!=(const String& Other) const;
+
+	bool operator!=(String& Other) const;
 	
 	/** Chr() is the alternative. */
 	const wchar_t* operator*();
@@ -45,11 +49,15 @@ public:
 	/** (*this) is the alternative. */
 	const wchar_t* Chr();
 
+	wchar_t* Data();
+
 	static void Narrow(const wchar_t* wideString, char*& narrowString);
 
 	const wchar_t* Chr() const;
 
 	void upper();
+
+	String Delim(const String character, bool first);
 
 	bool isEmpty() const;
 
@@ -57,6 +65,7 @@ public:
 
 	float toFloat() const;
 
+	static String Format(String format, ...);
 private:
 	wchar_t* buffer;
 public:

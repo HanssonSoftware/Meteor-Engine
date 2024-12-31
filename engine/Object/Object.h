@@ -1,10 +1,11 @@
-/* Copyright 2020 - 2024, Saxon Software. All rights reserved. */
-
+/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
+#include <DirectXMath.h>
 
 class Object
 {
+	friend class SceneGraph;
 public:
 	Object();
 	
@@ -24,6 +25,7 @@ public:
 	}
 
 private:
+	DirectX::XMMATRIX localMatrix;
 
 	bool bCanBeTicked = true;
 };

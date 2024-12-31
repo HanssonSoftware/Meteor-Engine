@@ -2,9 +2,9 @@
 
 cbuffer constant : register(b0)
 {
-    float4x4 matrices;
-    float4x4 view;
-    float4x4 projection;
+    matrix world;
+    matrix view;
+    matrix projection;
 }
 
 // Bemeneti struktúra a vertex shaderhez
@@ -32,9 +32,11 @@ VS_OUTPUT VS(VS_INPUT input)
     output.Color = input.Color; // Szín átvitele a pixel shaderhez
     output.Normal = input.Normal;
     
-    output.Pos = mul(input.Pos, matrices);
-    output.Pos = mul(output.Pos, view);
-    output.Pos = mul(output.Pos, projection);
+    float4 worldPos = mul(input.Pos, world);
+    float4 viewPos = mul(worldPos, view);
+    //output.Pos = mul(input.Pos, world);
+    output.Pos = mul(viewPos, projection);
+    //output.Pos = mul(output.Pos, projection);
     
     return output;
 }

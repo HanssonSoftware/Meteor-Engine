@@ -1,14 +1,16 @@
-/* Copyright 2020 - 2024, Saxon Software. All rights reserved. */
+/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #include "Log.h"
 #include <Types/String.h>
 #include <fcntl.h>
 #include <io.h>
 //#include <iostream>
-#include "Version.h"
 #include "LogMacros.h"
 #include <Common/MemoryManager.h>
 #include <Application/Application.h>
+#include "Version.h"
+#include <Application/Commandlet.h>
+
 
 #pragma warning(disable : 4700)
 
@@ -26,13 +28,30 @@ Logger& Logger::Get()
 
 void Logger::firstStartLogger()
 {
-    String appName = Application::Get()->getAppInfo()->appName;
+    if (ICommandlet::Get().Expected<bool>("nofilelogging"))
+    {
+        loggingState = LOGGING_LEVEL_BASIC_WO_SERIALIZATION;
+    }
+    else if (Application::Get()->getAppInfo()->flags & APPFLAG_NO_FILE_LOGGING)
+    {
+        loggingState = LOGGING_LEVEL_BASIC_WO_SERIALIZATION;
+    }
 
-    appName = appName + L".txt";
+    if (ICommandlet::Get().Expected<bool>("verbose"))
+    {
+        loggingState = LOGGING_LEVEL_MAXIMUM;
+    }
 
-    stream.open(appName.Chr(), std::ios::app);
-    stream << "Logging started at " << Timer::Now().Chr() << "\n";
-    stream.flush();
+    if (loggingState > LOGGING_LEVEL_BASIC_WO_SERIALIZATION)
+    {
+        String appName = String::Format("%s.txt", Application::Get()->getAppInfo()->appName.Chr());
+
+        stream.open(appName.Chr(), std::ios::app);
+        stream << "Logging started at " << Timer::Now().Chr() << "\n";
+        stream.flush();
+    }
+
+    printCollectedLogs();
 
 #if defined(_WIN32) && MR_DEBUG
     createConsoleW();
@@ -43,22 +62,35 @@ void Logger::firstStartLogger()
 
 void Logger::shutdownLogger()
 {
-    stream << "Logging closed at " << Timer::Now().Chr() << "\n";
-    stream.flush();
-    stream.close();
+    if (loggingState > LOGGING_LEVEL_BASIC_WO_SERIALIZATION)
+    {
+        stream << "Logging closed at " << Timer::Now().Chr() << "\n";
+        stream.flush();
+        stream.close();
+    }
 }
 
 void Logger::printCollectedLogs()
 {
-    MR_LOG(LogApplication, Log, TEXT("Broadcasting collected logs. (From startup)"));
-    for (LogPart Log : critialLogs)
+    if (critialLogs.size() == 0)
+        return;
+
+    MR_LOG(LogApplication, Log, TEXT("Broadcasting Collected Logs."));
+
+    for (const LogPart& Log : critialLogs)
     {
         logMessage(Log, Log.func.Chr(), Log.file.Chr());
     }
 }
 
-void Logger::logMessage(LogPart Log, const wchar_t* Function, const wchar_t* File)
+inline void Logger::logMessage(LogPart Log, const wchar_t* Function, const wchar_t* File)
 {
+    if (Log.displayTitle == Verbose)
+    {
+        if (loggingState != LOGGING_LEVEL_MAXIMUM)
+            return;
+    }
+
     if (!Application::Get())
     {
         critialLogs.push_back(Log);
@@ -72,9 +104,8 @@ void Logger::logMessage(LogPart Log, const wchar_t* Function, const wchar_t* Fil
 
     if (Log.displayTitle == Fatal)
     {
-        writeToOutput(formatQuickFatal(Log.message.Chr(), Function, File).Chr(), true);
-        //LogMessage(Log, L"LogWindows", nullptr, nullptr, L"Sending MessageBox to the user");
-        MessageBox(NULL, Log.rawMessage.Chr(), L"Catastrophic Error!", MB_ICONERROR | MB_OK);
+        writeToOutput(formatQuickFatal(Log.rawMessage.Chr(), Function, File).Chr(), true);
+        MessageBox(NULL, Log.rawMessage.Chr(), L"Fatal Error!", MB_ICONERROR | MB_OK);
 
         exit(-1);
     }
@@ -118,7 +149,8 @@ void Logger::logAssert(const wchar_t* Function, const wchar_t* File, const wchar
         File
     );
 
-    Application::Get()->drawAttention();
+    if (Application::Get())
+        Application::Get()->drawAttention();
 
     setColorBySeverity(Error);
     writeToOutput(fullBuffer, true);
@@ -133,18 +165,27 @@ void Logger::writeToOutput(const wchar_t* Input, bool bFiled = false)
 #ifdef _WIN32
     OutputDebugString(Input);
 #endif // _WIN32
+
     wprintf(L"%s", Input);
    
-    if (stream.is_open() && bFiled) {
-        //char* Temp[1024];
-        stream << Input;
-        stream.flush();
+    if (loggingState > LOGGING_LEVEL_BASIC_WO_SERIALIZATION)
+    {
+        if (stream.is_open() && bFiled) 
+        {
+            stream << Input;
+            stream.flush();
+        }
     }
 }
 
 Logger::~Logger()
 {
-
+    if (stream.is_open() && loggingState > LOGGING_LEVEL_BASIC_WO_SERIALIZATION)
+    {
+        stream << "Logging closed at " << Timer::Now().Chr() << "\n";
+        stream.flush();
+        stream.close();
+    }
 }
 
 String Logger::formatQuickFatal(const wchar_t* message, const wchar_t* Callstack, const wchar_t* File) const
@@ -171,7 +212,7 @@ void Logger::createConsoleW()
    freopen_s(&A,"CONOUT$", "w", stdout);
 
    const int j = _setmode(_fileno(A), _O_U8TEXT);
-   const String message = String(L"Meteor Engine console (b") + String(BUILD_NUMBER) + L")";
+   const String message = String(L"MR1 console");
 
    SetConsoleOutputCP(CP_UTF8);
    SetConsoleTitle(message.Chr());
@@ -214,19 +255,10 @@ const wchar_t* Logger::dispatchLastError(HRESULT result)
         0, NULL);
 
     MR_LOG(LogWindows, Warn, TEXT("%ls"), (wchar_t*)Temp);
-
-    //const size_t bufferSize = swprintf(NULL, 0, L"0x%x\tDescription: %ls", GetLastError(), (LPCWSTR)Temp);
-
-    //wchar_t* buffer = (wchar_t*)mrmalloc((bufferSize + 1) * sizeof(wchar_t));
-
-    //swprintf(buffer, bufferSize + 1, L"0x%x\tDescription: %ls", GetLastError(), (LPCWSTR)Temp);
-    //String formatted(buffer);
-
-    //mrfree(buffer);
     return nullptr;
 }
 
-constexpr const void Logger::setColorBySeverity(ESeverity Severity) const noexcept
+inline constexpr const void Logger::setColorBySeverity(ESeverity Severity) const noexcept
 {
     switch (Severity)
     {
@@ -262,12 +294,13 @@ LogPart::LogPart(String Category, ESeverity DisplayTitle, String Message, String
     va_end(variadicCount);
 
     wchar_t* variadicBuffer = (wchar_t*)mrmalloc((needForVariadic + 1) * sizeof(wchar_t));
-    rawMessage = variadicBuffer;
 
     va_list args;
     va_start(args, function);
     vswprintf(variadicBuffer, needForVariadic + 1, Message.Chr(), args);
     va_end(args);
+
+    rawMessage = variadicBuffer;
 
     const uint32 needSuper = swprintf(NULL, 0, L"[%s] %s: %s: %s\n", time.Chr(), category.Chr(), formatSeverity(DisplayTitle), variadicBuffer);
 
@@ -280,20 +313,6 @@ LogPart::LogPart(String Category, ESeverity DisplayTitle, String Message, String
     mrfree(messageBlock);
 }
 
-//LogPart::LogPart(String Category, ESeverity DisplayTitle, String Message)
-//{
-//    time = Timer::Now();
-//
-//    const uint32 needSuper = swprintf(NULL, 0, L"[%s] %s: %s: %s\n", time.Chr(), category.Chr(), formatSeverity(DisplayTitle), Message.Chr());
-//
-//    wchar_t* messageBlock = (wchar_t*)mrmalloc((needSuper + 1) * sizeof(wchar_t));
-//    swprintf(messageBlock, needSuper + 1, L"[%s] %s: %s: %s\n", time.Chr(), category.Chr(), formatSeverity(DisplayTitle), Message.Chr());
-//
-//    rawMessage = messageBlock;
-//    message = messageBlock;
-//
-//    mrfree(messageBlock);
-//}
 
 constexpr const wchar_t* LogPart::formatSeverity(ESeverity Severity) const noexcept
 {

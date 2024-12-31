@@ -1,4 +1,4 @@
-/* Copyright 2020 - 2024, Saxon Software. All rights reserved. */
+/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
 #include <Common/Delegate.h>
@@ -6,17 +6,20 @@
 #include "SceneGraph.h"
 #include <Log/LogMacros.h>
 #include <Types/Vector.h>
+#include <thread>
 
 
 LOG_ADDCATEGORY(GraphicsEngine);
 
-enum ESelectableDrivers
+typedef enum GraphicsEngineRunningState
 {
-	None,
-	OpenGL,
-	Vulkan,
-	D3D11
-};
+	GRAPHICS_ENGINE_STATE_NONE = 0,
+	GRAPHICS_ENGINE_STATE_INITIALIZING = 1,
+	GRAPHICS_ENGINE_STATE_PAUSED_RENDERING = 2,
+	GRAPHICS_ENGINE_STATE_RUNNING = 3,
+	GRAPHICS_ENGINE_STATE_SHUTDOWN = 4,
+	GRAPHICS_ENGINE_STATE_DIED = 5
+} GraphicsEngineRunningState;
 
 typedef struct Vertex
 {
@@ -34,9 +37,9 @@ public:
 
 	virtual ~IGraphicsDevice();
 
-	virtual bool Render(float deltaTime);
+	virtual bool Render();
 
-	virtual bool Init() = 0;
+	virtual bool Init();
 
 	virtual void cleanUp() = 0;
 
@@ -44,13 +47,13 @@ public:
 
 	virtual const bool getIsFullScreen() const { return bIsFullscreen; };
 
-	virtual void setIsFullScreen(bool NewValue);
+	virtual bool setIsFullScreen(bool NewValue);
 
-	virtual void resizeBuffers(Vector2<uint32> newSize);
+	virtual void resizeBuffers(const Vector2<uint32> newSize) = 0;
 
-	bool getDeviceReadyState() const { return bIsDriverReady; };
+	GraphicsEngineRunningState getDeviceReadyState() const { return driverState; };
 
-	void setDeviceReadyState(bool NewVal);
+	void setDeviceReadyState(GraphicsEngineRunningState NewVal);
 
 	bool getImGUIUsed() const { return bIsImGUIUsed; };
 
@@ -59,10 +62,15 @@ public:
 	Delegate<bool> imguiValueChange;
 
 	SceneGraph* graphToRender;
+
+	std::thread renderThread;
+
 protected:
+	bool bIsFullScreenSwitchEnabled = true;
+
 	std::atomic<bool> bIsImGUIUsed = false;
 
-	std::atomic<bool> bIsDriverReady = false;
+	GraphicsEngineRunningState driverState = GRAPHICS_ENGINE_STATE_NONE;
 
 	std::atomic<bool> bIsFullscreen = false;
 

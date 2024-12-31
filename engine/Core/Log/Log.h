@@ -1,4 +1,4 @@
-/* Copyright 2020 - 2024, Saxon Software. All rights reserved. */
+/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
 #include <Types/String.h>
@@ -49,9 +49,19 @@ private:
 	constexpr const wchar_t* formatSeverity(ESeverity Severity) const noexcept;
 };
 
+typedef enum LoggingLevel
+{
+	LOGGING_LEVEL_DISABLED = 0,
+	LOGGING_LEVEL_BASIC_WO_SERIALIZATION = 1,
+	LOGGING_LEVEL_BASIC = 2,
+	LOGGING_LEVEL_MAXIMUM = 3
+} LoggingLevel;
+
 class Logger
 {
 public:
+	~Logger();
+	
 	static Logger& Get();
 
 	void firstStartLogger();
@@ -61,13 +71,13 @@ public:
 	/** Prints all logs to the console window, whenever it got logged before critical.*/
 	void printCollectedLogs();
 
-	void logMessage(LogPart Log, const wchar_t* Function, const wchar_t* File);
+	inline void logMessage(LogPart Log, const wchar_t* Function, const wchar_t* File);
 
 	void logAssert(const wchar_t* Function, const wchar_t* File, const wchar_t* Input, ...);
 
 	inline void writeToOutput(const wchar_t* Input, bool bFiled);
 
-	~Logger();
+	constexpr inline LoggingLevel getLoggingLevel() const noexcept { return loggingState; }
 #ifdef _WIN32
 	const wchar_t* dispatchLastError();
 
@@ -75,15 +85,17 @@ public:
 #endif
 
 private:
+	LoggingLevel loggingState = LOGGING_LEVEL_BASIC;
+
 	Logger() {};
 
 	String formatQuickFatal(const wchar_t* message, const wchar_t* Callstack, const wchar_t* File) const;
 #ifdef _WIN32
 	void createConsoleW();
 
-	constexpr const void setColorBySeverity(ESeverity Severity) const noexcept;
+	inline constexpr const void setColorBySeverity(ESeverity Severity) const noexcept;
 public:
-	constexpr const wchar_t* getMessageName(unsigned int code) const noexcept;
+	inline constexpr const wchar_t* getMessageName(unsigned int code) const noexcept;
 private:
 #endif // _WIN32
 	std::vector<LogPart> critialLogs;

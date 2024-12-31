@@ -1,9 +1,8 @@
-/* Copyright 2020 - 2024, Saxon Software. All rights reserved. */
+/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
 #include "../GraphicsDevice.h"
 
-#define WIN32_LEAN_AND_MEAN
 #include <Platform/Microsoft/MinWin.h>
 #include <Log/LogMacros.h>
 #include <d3d11.h>
@@ -15,8 +14,8 @@ LOG_ADDCATEGORY(D3D11);
 struct constantWorld
 {
 	DirectX::XMMATRIX world;
-	DirectX::XMMATRIX proj;
-	DirectX::XMMATRIX ortho;
+	DirectX::XMMATRIX view;
+	DirectX::XMMATRIX projection;
 };
 
 constexpr const float SCREEN_DEPTH = 1000.0f;
@@ -28,7 +27,7 @@ class IDirect3DDevice : public IGraphicsDevice
 public:
 	IDirect3DDevice();
 
-	virtual bool Render(float deltaTime) override;
+	virtual bool Render() override;
 
 	virtual bool Init() override;
 	
@@ -38,7 +37,7 @@ public:
 
 	virtual void resizeBuffers(Vector2<uint32> newSize) override;
 
-	virtual void setIsFullScreen(bool NewValue) override;
+	virtual bool setIsFullScreen(bool NewValue) override;
 
 	bool buseWframe = 0;
 
@@ -100,7 +99,10 @@ public:
 
 	void setWorldMatrix(DirectX::XMMATRIX matrix) { worldMatrix = matrix; };
 
+	D3D_FEATURE_LEVEL getUsedFeatureLevel() const { return usedfeatureLevel; };
+
 private:
+	D3D_FEATURE_LEVEL usedfeatureLevel;
 
 	inline void createReferenceDevice();
 
@@ -122,7 +124,7 @@ private:
 
 	inline void createRenderTarget();
 
-	inline void createVertexBuffer();
+	//inline void createVertexBuffer();
 
 	inline void enumAdapters();
 

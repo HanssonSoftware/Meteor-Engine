@@ -1,14 +1,14 @@
-/* Copyright 2020 - 2024, Saxon Software. All rights reserved. */
+/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #include "WindowManager.h"
-#include <Log/Exception.h>
 #include <Window/Window.h>
+#include <Application/Application.h>
 #include <Graphics/D3D11/Direct3DDevice.h>
-
-
+//#include <Graphics/Vulkan/VulkanDevice.h>
 #ifdef _WIN32
-#include <../Resources/EngineResources.h>
+//#include <../Resources/EngineResources.h>
 #endif // _WIN32
+#include <Log/Exception.h>
 
 static int lastSearchIndex = -1;
 static String lastSearch = "";
@@ -46,7 +46,8 @@ Window* WindowManager::createWindow(const WindowCreateInfo* CreateInfo)
 {
 	if (CreateInfo->windowID.isEmpty())
 	{
-		THROW_EXCEPTION("CreateInfo is Empty!");
+		MR_LOG(LogWindowManager, Error, TEXT("CreateInfo->windowID is Empty!"));
+		return nullptr;
 	}
 
 	if (!bIsWinAPIClassRegistered)
@@ -57,7 +58,7 @@ Window* WindowManager::createWindow(const WindowCreateInfo* CreateInfo)
 		}
 	}
 
-	Window* newWindow = new Window();
+	Window* newWindow = new Window(this);
 	if (newWindow->createWindow(CreateInfo))
 	{
 		activeWindows.push_back(newWindow);
@@ -185,15 +186,15 @@ bool WindowManager::destroyWindow(const String ID)
 inline bool WindowManager::registerWindowClass()
 {
 	HINSTANCE instance = GetModuleHandle(NULL);
-	auto f = LoadImage(instance, MAKEINTRESOURCE(IDI_DEFAULTAPPICON), IMAGE_ICON, 32, 32, 0);
-	Logger::Get().dispatchLastError();
+	HICON ico = (HICON)LoadImage(0, L"E:\\meteor\\resources\\icon0.ico", IMAGE_ICON, 64, 64, LR_DEFAULTCOLOR | LR_LOADFROMFILE);
+	//Logger::Get().dispatchLastError();
 
 	WNDCLASSEX windowClass = {};
 	windowClass.lpszClassName = ApplicationClassName;
 	windowClass.cbSize = sizeof(WNDCLASSEX);
 	windowClass.hInstance = instance;
-	//windowClass.hIcon = /*(HICON)*/
-	//windowClass.hIconSm = (HICON)LoadIcon(instance, MAKEINTRESOURCE(IDI_QUESTION));
+	windowClass.hIcon = ico;
+	windowClass.hIconSm = ico;
 	windowClass.lpfnWndProc = WndProc;
 
 	if (!RegisterClassEx(&windowClass))

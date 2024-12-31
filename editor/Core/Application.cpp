@@ -1,4 +1,4 @@
-/* Copyright 2020 - 2024, Saxon Software. All rights reserved. */
+/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #include "Application.h"
 #include <Common/MemoryManager.h>
@@ -15,8 +15,6 @@
 #include <Common/Array.h>
 #include <Application/Commandlet.h>
 
-Commandlet Adksdm("db", "skfl", false);
-Commandlet Adksdmh("dbA", "skfl", true);
 
 EditorApplication::EditorApplication(const ApplicationInitializationInfo* aInfo) 
 	: Application(aInfo)
@@ -56,27 +54,22 @@ void EditorApplication::Init()
 	//FontAsset A("RobotoCondensed-Bold.ttf");
 
 
-	File a("picsa.txt");
-	a.Read();
+	//File a("hangya fasz.txt", OPENRULE_WRITE | OPENRULE_READ | OPENRULE_DELETE, OVERRIDERULE_JUST_OPEN);
+	//a.Read();
 	MeshModel newa;
 	try
 	{
 
-		newa.Import("jbl");
+		//newa.Import("fasz");
 
 	}
 	catch (...)
 	{
 
 	}
-
-
-
-	//Array<Object> A;
 		
-	//a.Write(L"bufos kurvasi íylehfgyuisehfg éuil ehuoyhseéouigfyhseijá-éawljd893475eá-mxf.d--.4:_:ÁÉKOPJKOIJPÉ$ß[]$£÷&@£");
+	//a.Write("bufos kurvasi íylehfgyuisehfg éuil ehuoyhseéouigfyhseijá-éawljd893475eá-mxf.d--.4:_:ÁÉKOPJKOIJPÉ$ß[]$£÷&@£");
 
-	//a.Read();
 	SceneGraph::Get().addToRoot(&newa);
 
 	Application::Run();

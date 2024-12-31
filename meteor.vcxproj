@@ -75,21 +75,29 @@
     <OutDir>$(SolutionDir)Product\</OutDir>
     <IntDir>$(SolutionDir)Intermediate\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)-engine</TargetName>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'">
     <OutDir>$(SolutionDir)Product\</OutDir>
     <IntDir>$(SolutionDir)Intermediate\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)-engine</TargetName>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)Product\</OutDir>
     <IntDir>$(SolutionDir)Intermediate\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)-engine</TargetName>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
     <OutDir>$(SolutionDir)Product\</OutDir>
     <IntDir>$(SolutionDir)Intermediate\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)-engine</TargetName>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -98,7 +106,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(VULKAN_SDK)\Include\;$(SolutionDir)engine\;$(SolutionDir)engine\ThirdParty\ImGUI\;$(SolutionDir)engine\ThirdParty\FreeType\;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\Platform;$(SolutionDir)engine\Editor;$(SolutionDir)engine\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)engine\;$(SolutionDir)engine\ThirdParty\ImGUI\;$(SolutionDir)engine\ThirdParty\FreeType\;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\Platform;$(SolutionDir)engine\Editor;$(SolutionDir)engine\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -106,8 +114,8 @@
     </Link>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib\;$(SolutionDir)engine\ThirdParty\assimp;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <Name>
       </Name>
       <SubSystem>
@@ -124,7 +132,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(VULKAN_SDK)\Include\;$(SolutionDir)engine\;$(SolutionDir)engine\ThirdParty\ImGUI\;$(SolutionDir)engine\ThirdParty\FreeType\;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\Platform;$(SolutionDir)editor;$(SolutionDir)engine\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)engine\;$(SolutionDir)engine\ThirdParty\ImGUI\;$(SolutionDir)engine\ThirdParty\FreeType\;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\Platform;$(SolutionDir)editor;$(SolutionDir)engine\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -134,8 +142,8 @@
     </Link>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <Name>
       </Name>
       <SubSystem>
@@ -150,7 +158,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(VULKAN_SDK)\Include\;$(SolutionDir)Source\;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty\FreeType\;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty\FreeType\;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -158,8 +166,8 @@
     </Link>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);$(VULKAN_SDK)\Lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies);vulkan-1.lib</AdditionalDependencies>
       <Name>
       </Name>
       <SubSystem>
@@ -176,7 +184,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(VULKAN_SDK)\Include\;$(SolutionDir)Source\;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty\FreeType\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty\FreeType\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -186,8 +194,8 @@
     </Link>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);$(VULKAN_SDK)\Lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies);vulkan-1.lib</AdditionalDependencies>
       <Name>
       </Name>
       <SubSystem>
@@ -196,6 +204,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="engine\Core\Graphics\ConstantBuffer.cpp" />
     <ClCompile Include="engine\Core\Application\Application.cpp" />
     <ClCompile Include="engine\Core\Application\Commandlet.cpp" />
     <ClCompile Include="engine\Core\Application\Engine.cpp" />
@@ -219,7 +228,6 @@
     <ClCompile Include="engine\Core\Graphics\QueuedRender.cpp" />
     <ClCompile Include="engine\Core\Graphics\SceneGraph.cpp" />
     <ClCompile Include="engine\Core\Graphics\VertexBuffer.cpp" />
-    <ClCompile Include="engine\Core\Graphics\Vulkan\VulkanDevice.cpp" />
     <ClCompile Include="engine\Core\Launch\LaunchGeneric.cpp" />
     <ClCompile Include="engine\Core\Log\Exception.cpp" />
     <ClCompile Include="engine\Core\Log\Log.cpp" />
@@ -234,7 +242,6 @@
     <ClCompile Include="engine\Core\Window\WindowManager.cpp" />
     <ClCompile Include="engine\Object\Object.cpp" />
     <ClCompile Include="engine\ThirdParty\ImGUI\backends\imgui_impl_dx11.cpp" />
-    <ClCompile Include="engine\ThirdParty\ImGUI\backends\imgui_impl_vulkan.cpp" />
     <ClCompile Include="engine\ThirdParty\ImGUI\backends\imgui_impl_win32.cpp" />
     <ClCompile Include="engine\ThirdParty\ImGUI\imgui.cpp" />
     <ClCompile Include="engine\ThirdParty\ImGUI\imgui_demo.cpp" />
@@ -243,8 +250,11 @@
     <ClCompile Include="engine\ThirdParty\ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="engine\ThirdParty\OpenFBX\libdeflate.c" />
     <ClCompile Include="engine\ThirdParty\OpenFBX\ofbx.cpp" />
+    <ClCompile Include="engine\Core\Common\Pointers.cpp" />
+    <ClCompile Include="engine\Object\GameObject.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="engine\Core\Graphics\ConstantBuffer.h" />
     <ClInclude Include="engine\Core\Application\Application.h" />
     <ClInclude Include="engine\Core\Application\Commandlet.h" />
     <ClInclude Include="engine\Core\Application\Engine.h" />
@@ -268,7 +278,6 @@
     <ClInclude Include="engine\Core\Graphics\QueuedRender.h" />
     <ClInclude Include="engine\Core\Graphics\SceneGraph.h" />
     <ClInclude Include="engine\Core\Graphics\VertexBuffer.h" />
-    <ClInclude Include="engine\Core\Graphics\Vulkan\VulkanDevice.h" />
     <ClInclude Include="engine\Core\Log\Exception.h" />
     <ClInclude Include="engine\Core\Log\Log.h" />
     <ClInclude Include="engine\Core\Log\LogMacros.h" />
@@ -286,6 +295,88 @@
     <ClInclude Include="engine\Core\Window\WindowManager.h" />
     <ClInclude Include="engine\Object\Object.h" />
     <ClInclude Include="engine\Platform\Microsoft\MinWin.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\aabb.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\ai_assert.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\anim.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Base64.hpp" />
+    <ClInclude Include="engine\ThirdParty\assimp\BaseImporter.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Bitmap.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\BlobIOSystem.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\ByteSwapper.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\camera.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\cexport.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\cfileio.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\cimport.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\ColladaMetaData.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\color4.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\commonMetaData.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Compiler\poppack1.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Compiler\pstdint.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Compiler\pushpack1.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\config.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\CreateAnimMesh.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\DefaultIOStream.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\DefaultIOSystem.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\DefaultLogger.hpp" />
+    <ClInclude Include="engine\ThirdParty\assimp\defs.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Exceptional.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Exporter.hpp" />
+    <ClInclude Include="engine\ThirdParty\assimp\fast_atof.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\GenericProperty.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\GltfMaterial.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Hash.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Importer.hpp" />
+    <ClInclude Include="engine\ThirdParty\assimp\importerdesc.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\IOStream.hpp" />
+    <ClInclude Include="engine\ThirdParty\assimp\IOStreamBuffer.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\IOSystem.hpp" />
+    <ClInclude Include="engine\ThirdParty\assimp\light.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\LineSplitter.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\LogAux.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Logger.hpp" />
+    <ClInclude Include="engine\ThirdParty\assimp\LogStream.hpp" />
+    <ClInclude Include="engine\ThirdParty\assimp\material.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\MathFunctions.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\matrix3x3.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\matrix4x4.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\MemoryIOWrapper.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\mesh.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\metadata.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\NullLogger.hpp" />
+    <ClInclude Include="engine\ThirdParty\assimp\ObjMaterial.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\ParsingUtils.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\pbrmaterial.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\port\AndroidJNI\AndroidJNIIOSystem.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\port\AndroidJNI\BundledAssetIOSystem.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\postprocess.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Profiler.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\ProgressHandler.hpp" />
+    <ClInclude Include="engine\ThirdParty\assimp\qnan.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\quaternion.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\RemoveComments.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\scene.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\SceneCombiner.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\SGSpatialSort.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\SkeletonMeshBuilder.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\SmallVector.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\SmoothingGroups.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\SpatialSort.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\StandardShapes.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\StreamReader.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\StreamWriter.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\StringComparison.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\StringUtils.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Subdivision.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\texture.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\TinyFormatter.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\types.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\vector2.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\vector3.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\version.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Vertex.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\XmlParser.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\XMLTools.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\ZipArchiveIOSystem.h" />
     <ClInclude Include="engine\ThirdParty\FreeType\freetype\config\ftconfig.h" />
     <ClInclude Include="engine\ThirdParty\FreeType\freetype\config\ftheader.h" />
     <ClInclude Include="engine\ThirdParty\FreeType\freetype\config\ftmodule.h" />
@@ -387,8 +478,6 @@
     <ClInclude Include="engine\ThirdParty\FreeType\freetype\tttags.h" />
     <ClInclude Include="engine\ThirdParty\FreeType\ft2build.h" />
     <ClInclude Include="engine\ThirdParty\ImGUI\backends\imgui_impl_dx11.h" />
-    <ClInclude Include="engine\ThirdParty\ImGUI\backends\imgui_impl_metal.h" />
-    <ClInclude Include="engine\ThirdParty\ImGUI\backends\imgui_impl_vulkan.h" />
     <ClInclude Include="engine\ThirdParty\ImGUI\backends\imgui_impl_win32.h" />
     <ClInclude Include="engine\ThirdParty\ImGUI\imconfig.h" />
     <ClInclude Include="engine\ThirdParty\ImGUI\imgui.h" />
@@ -403,16 +492,26 @@
     <ClInclude Include="engine\ThirdParty\TinyGLTF\stb_image_write.h" />
     <ClInclude Include="engine\ThirdParty\TinyGLTF\tiny_gltf.h" />
     <ClInclude Include="engine\Version.h" />
-    <ClInclude Include="Resources\EngineResources.h" />
+    <ClInclude Include="engine\Core\Common\Pointers.h" />
+    <ClInclude Include="engine\Object\GameObject.h" />
+    <ClInclude Include="resources\resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Resources\icon0.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="Resources\EngineAppTemplateResource.rc" />
-  </ItemGroup>
-  <ItemGroup>
+    <None Include="engine\ThirdParty\assimp\color4.inl" />
+    <None Include="engine\ThirdParty\assimp\material.inl" />
+    <None Include="engine\ThirdParty\assimp\matrix3x3.inl" />
+    <None Include="engine\ThirdParty\assimp\matrix4x4.inl" />
+    <None Include="engine\ThirdParty\assimp\quaternion.inl" />
+    <None Include="engine\ThirdParty\assimp\SmoothingGroups.inl" />
+    <None Include="engine\ThirdParty\assimp\vector2.inl" />
+    <None Include="engine\ThirdParty\assimp\vector3.inl" />
     <None Include="Resources\d1.bin" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resources\sampleapp.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\icon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

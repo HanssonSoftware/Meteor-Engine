@@ -1,9 +1,11 @@
-/* Copyright 2020 - 2024, Saxon Software. All rights reserved. */
+/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #include "Exception.h"
 #include <cstdarg>
 #include <Application/Application.h>
 #include <Common/MemoryManager.h>
+#include <mmsystem.h>
+#pragma comment(lib, "Winmm.lib")
 
 LOG_ADDCATEGORY(Exception);
 

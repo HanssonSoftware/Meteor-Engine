@@ -1,22 +1,20 @@
-/* Copyright 2020 - 2024, Saxon Software. All rights reserved. */
+/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #define _CRT_SECURE_NO_WARNINGS
 #include "MeshModel.h"
 #define TINYGLTF_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <ThirdParty/TinyGLTF/tiny_gltf.h>
-//#include <OpenFBX/ofbx.h>
-#include <Graphics/Camera.h>
-#include <Types/String.h>
+#define TINYGLTF_NOEXCEPTION // optional. disable exception handling.
+#include <TinyGLTF/tiny_gltf.h>
 #include <Log/Exception.h>
 #include "D3D11/Direct3DDevice.h"
-#include <DirectXMath.h>
+////#include <DirectXMath.h>
+//#include <Application/Application.h>
 #include <Application/Application.h>
-#include <Window/WindowManager.h>
-#include <Common/MemoryManager.h>
+//#include <Common/MemoryManager.h>
 
-static tinygltf::Model mdl;
+//#pragma comment(lib, "assimp-vc143-mt.lib")
 
 MeshModel::MeshModel()
 {
@@ -38,88 +36,86 @@ MeshModel::~MeshModel()
 	vertexes.clear();
 }
 
-
 static tinygltf::TinyGLTF loader;
+static tinygltf::Model mdl;
+static int sizeA = 0;
 void MeshModel::Import(String name)
 {
-	std::string er;
-	const String gltfed = name + ".gltf";
+	name = name + ".gltf";
 
-	const size_t requiredSize = wcstombs(0, gltfed.Chr(), 0);
+	const size_t& size = wcslen(name.Chr());
 
-	char* buf = (char*)mrmalloc((requiredSize + 1) * sizeof(char));
-	wcstombs(buf, gltfed.Chr(), requiredSize + 1);
+	char* buffer = (char*)mrmalloc(size + 1);
+	wcstombs(buffer, name.Chr(), size + 1);
 
-	if (!loader.LoadASCIIFromFile(&mdl, &er, 0, buf))
+	std::string error;
+	if (!loader.LoadASCIIFromFile(&mdl, &error,0, buffer))
 	{
-		mrfree(buf);
-		THROW_EXCEPTION(er);
+		mrfree(buffer);
+		THROW_EXCEPTION("Unable to load %s", name.Chr());
 	}
 
-	mrfree(buf);
-	const size_t& meshesQuantity = mdl.meshes.size();
-	for (int i = 0; i < meshesQuantity; i++)
+	mrfree(buffer);
+
+	const size_t& meshCount = mdl.meshes.size();
+	for (int i = 0; i < meshCount; i++)
 	{
 		const tinygltf::Mesh& indexedMesh = mdl.meshes[i];
-		const int& primitivesQuantity = indexedMesh.primitives.size();
 
-		for (int j = 0; j < primitivesQuantity; j++)
+		for (const tinygltf::Primitive& prim : indexedMesh.primitives)
 		{
-			const tinygltf::Primitive& indexedPrimitive2 = indexedMesh.primitives[j];
-			if (indexedPrimitive2.attributes.find("POSITION") == indexedPrimitive2.attributes.end())
-				continue;
+			size_t vertexesCount = 0;
+			const float* vertexValues = nullptr;
+			const float* normalValues = nullptr;
+			if (prim.attributes.find("POSITION") != prim.attributes.end())
+			{
+				const int& attributePositionIndex = prim.attributes.find("POSITION")->second;
+				const tinygltf::Accessor& indexedAccessor = mdl.accessors[attributePositionIndex];
 
-			if (indexedPrimitive2.indices >= 0) {
-				const tinygltf::Accessor& indexAccessor = mdl.accessors[indexedPrimitive2.indices];
-				const tinygltf::BufferView& indexBufferView = mdl.bufferViews[indexAccessor.bufferView];
-				const tinygltf::Buffer& indexBuffer = mdl.buffers[indexBufferView.buffer];
+				const tinygltf::BufferView& indexedBufferView = mdl.bufferViews[indexedAccessor.bufferView];
+				const tinygltf::Buffer& indexedBuffer = mdl.buffers[indexedBufferView.buffer];
+				vertexValues = reinterpret_cast<const float*>(&indexedBuffer.data[indexedAccessor.byteOffset + indexedBufferView.byteOffset]);
+				vertexesCount = indexedAccessor.count;
+			}
 
-				const unsigned char* indexDataPtr = indexBuffer.data.data() + indexBufferView.byteOffset + indexAccessor.byteOffset;
+			if (prim.attributes.find("NORMAL") != prim.attributes.end())
+			{
+				const int& attributePositionIndex = prim.attributes.find("NORMAL")->second;
+				const tinygltf::Accessor& indexedAccessor = mdl.accessors[attributePositionIndex];
 
-				int indexElementCount = indexAccessor.count;
-				int indexByteStride = indexBufferView.byteStride ? indexBufferView.byteStride : sizeof(uint32_t); // Alapértelmezett 32-bit indexek
+				const tinygltf::BufferView& indexedBufferView = mdl.bufferViews[indexedAccessor.bufferView];
+				const tinygltf::Buffer& indexedBuffer = mdl.buffers[indexedBufferView.buffer];
+				normalValues = reinterpret_cast<const float*>(&indexedBuffer.data[indexedAccessor.byteOffset + indexedBufferView.byteOffset]);
+			}
 
-				indicies.reserve(indexElementCount);
 
-				for (int k = 0; k < indexElementCount; k++) {
+			{
+				const tinygltf::Accessor& indexedAccessorA = mdl.accessors[prim.indices];
+				const tinygltf::BufferView& indexedBufferViewA = mdl.bufferViews[indexedAccessorA.bufferView];
+				const tinygltf::Buffer& indexedBufferA = mdl.buffers[indexedBufferViewA.buffer];
 
-					if (indexAccessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT) {
-						const uint16_t* indexValue = reinterpret_cast<const uint16_t*>(indexDataPtr + k * indexByteStride);
-						indicies.push_back(static_cast<uint32_t>(*indexValue));
-					}
-					else if (indexAccessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT) {
-						const uint32_t* indexValue = reinterpret_cast<const uint32_t*>(indexDataPtr + k * indexByteStride);
-						indicies.push_back(*indexValue);
-					}
+				const uint16_t* valueA = reinterpret_cast<const uint16_t*>(&indexedBufferA.data[indexedAccessorA.byteOffset + indexedBufferViewA.byteOffset]);
+				for (size_t h = 0; h < indexedAccessorA.count; h++)
+				{
+					indicies.push_back(valueA[h]);
 				}
 			}
 
-			const int& primitiveAttributeIndex = indexedPrimitive2.attributes.find("POSITION")->second;
+			for (size_t j = 0; j < vertexesCount; j++)
+			{
+				Vertex vtx;
+				vtx.Pos = { vertexValues[j * 3], vertexValues[j * 3], vertexValues[j * 3], 1.f };
+				vtx.Color = { 1.f };
+				vtx.Normal = { normalValues[j * 3], normalValues[j * 3], normalValues[j * 3] };
 
-			const tinygltf::Accessor& indexedAccessor = mdl.accessors[primitiveAttributeIndex];
-			const tinygltf::BufferView& indexedBufferView = mdl.bufferViews[indexedAccessor.bufferView];
-			const tinygltf::Buffer& indexedBuffer = mdl.buffers[indexedBufferView.buffer];
-
-			const unsigned char* dataPtr = indexedBuffer.data.data() + indexedBufferView.byteOffset + indexedAccessor.byteOffset;
-
-			const size_t& elementCount = indexedAccessor.count;
-			int byteStride = indexedBufferView.byteStride ? indexedBufferView.byteStride : sizeof(float) * 3;
-
-			vertexes.reserve(elementCount);
-
-			for (int k = 0; k < elementCount; k++) {
-				const float* position = reinterpret_cast<const float*>(dataPtr + k * byteStride);
-				vertexes.push_back({ { position[0], position[1], position[2], 1.f }, { 0, 0, 0, 0 }, {1, 1, 1} });
+				vertexes.emplace_back(vtx);
 			}
 		}
 	}
 
 	D3D11_BUFFER_DESC bufferInfo = {};
 	bufferInfo.ByteWidth = (UINT)(sizeof(Vertex) * vertexes.size());
-	bufferInfo.Usage = D3D11_USAGE_DEFAULT;
-	bufferInfo.CPUAccessFlags = 0;
 	bufferInfo.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bufferInfo.MiscFlags = 0;
 
 	D3D11_SUBRESOURCE_DATA resourceData = {};
 	resourceData.pSysMem = vertexes.data();
@@ -133,11 +129,8 @@ void MeshModel::Import(String name)
 	if (!indicies.empty())
 	{
 		D3D11_BUFFER_DESC bufferInfoA = {};
-		bufferInfoA.ByteWidth = (UINT)(sizeof(int) * indicies.size());
-		bufferInfoA.Usage = D3D11_USAGE_DEFAULT;
-		bufferInfoA.CPUAccessFlags = 0;
+		bufferInfoA.ByteWidth = (UINT)(sizeof(uint32_t) * indicies.size());
 		bufferInfoA.BindFlags = D3D11_BIND_INDEX_BUFFER;
-		bufferInfoA.MiscFlags = 0;
 
 		D3D11_SUBRESOURCE_DATA resourceDataA = {};
 		resourceDataA.pSysMem = indicies.data();
@@ -151,22 +144,19 @@ void MeshModel::Import(String name)
 	bWasSuccessFullyCreated = true;
 }
 
+static constexpr int stride = sizeof(Vertex);
+static constexpr int offset = 0;
 void MeshModel::Render()
 {
 	if (!bWasSuccessFullyCreated)
-		return;
-
-	if (getIsVisible() == false)
-		return;
-
-	if (!device)
-		return;
+		return; 	
+	
+	if (!getIsVisible())
+		return; 
 
 	IDirect3DDevice* castedDevice = (IDirect3DDevice*)device;
 
-	constexpr UINT stride = sizeof(Vertex);
-	constexpr UINT offset = 0;
-	castedDevice->getDeviceContext()->IASetVertexBuffers(0, 1, &data.vertexBuffer, &stride, &offset);
+	castedDevice->getDeviceContext()->IASetVertexBuffers(0, 1, &data.vertexBuffer, (UINT*)&stride, (UINT*)&offset);
 	if (data.indexBuffer) castedDevice->getDeviceContext()->IASetIndexBuffer(data.indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
 	castedDevice->getDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -179,13 +169,9 @@ void MeshModel::Render()
 	castedDevice->getDeviceContext()->RSSetState(castedDevice->buseWframe ? castedDevice->getRasterizerStateWireFrame() : castedDevice->getRasterizerState());
 
 	if (data.indexBuffer)
-	{
-		castedDevice->getDeviceContext()->DrawIndexed(indicies.size(), 0, 0);
-	}
+		castedDevice->getDeviceContext()->DrawIndexed((UINT)indicies.size(), 0, 0);
 	else
-	{
-		castedDevice->getDeviceContext()->Draw(vertexes.size(), 0);
-	}
+		castedDevice->getDeviceContext()->Draw((UINT)vertexes.size(), 0);
 }
 
 void MeshModel::bindRender()

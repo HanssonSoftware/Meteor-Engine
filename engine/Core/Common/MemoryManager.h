@@ -1,4 +1,4 @@
-/* Copyright 2020 - 2024, Saxon Software. All rights reserved. */
+/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
 #include <Log/Log.h>
@@ -9,8 +9,11 @@
  */
 class MemoryManager
 {
+	friend class Application;
 public:
 	static MemoryManager& Get();
+
+	~MemoryManager();
 
 	size_t getTotalUsedMemory() const;
 
@@ -19,6 +22,8 @@ public:
 	size_t usedMemoryInBytes = 0;
 
 	size_t usedTotalUsedMemoryInBytes = 0;
+private:
+	bool bQuickMemoryLogging = false;
 };
 
 extern void* mrmalloc(size_t size);

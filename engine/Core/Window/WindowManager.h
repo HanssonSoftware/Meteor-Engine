@@ -1,21 +1,24 @@
-/* Copyright 2020 - 2024, Saxon Software. All rights reserved. */
+/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
 #include "Window.h"
-#include <Application/Application.h>
+#include <Object/Object.h>
+#include <Log/LogMacros.h>
 #include <vector>
 
-class InputManager;
+LOG_ADDCATEGORY(WindowManager);
+
 class IGraphicsDevice;
+class InputManager;
 
 static constexpr const wchar_t* ApplicationClassName = L"MeteorApplication";
 
-typedef enum EWindowFlags : sint8
+typedef enum WindowFlags : sint8
 {
 	 WF_HIDDENDEFAULT = 1 << 0,
 	 WF_SHOWNDEFAULT = 1 << 1
 
-} EWindowFlags;
+} WindowFlags;
 
 typedef struct WindowCreateInfo
 {
@@ -34,8 +37,7 @@ typedef struct WindowCreateInfo
 
 class WindowManager : public Object
 {
-	friend class Window;
-
+	friend class IDirect3DDevice;
 public:
 	WindowManager();
 

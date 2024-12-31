@@ -1,7 +1,7 @@
-/* Copyright 2020 - 2024, Saxon Software. All rights reserved. */
+/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
-#include <d3d11.h>
+//#include <d3d11.h>
 #include <Types/PlatformDefs.h>
 #include <Types/Vector.h>
 #include <Object/Object.h>
@@ -9,6 +9,7 @@
 
 class String;
 struct Vertex;
+struct ID3D11Buffer;
 
 /** ModelData is restricted to DX11 only! */
 typedef struct ModelData
@@ -44,7 +45,7 @@ public:
 
 	std::vector<Vertex> vertexes;
 
-	std::vector<int> indicies;
+	std::vector<uint32_t> indicies;
 private:
 	bool bWasSuccessFullyCreated = false;
 

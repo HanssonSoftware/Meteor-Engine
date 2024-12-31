@@ -1,8 +1,8 @@
-/* Copyright 2020 - 2024, Saxon Software. All rights reserved. */
+/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
+#include <Window/WindowManager.h>
 #include <Platform/Microsoft/MinWin.h>
-//#include <Window/WindowManager.h>
 #include <Graphics/Camera.h>
 #include <Types/Vector.h>
 #include <Types/String.h>
@@ -15,33 +15,50 @@ class Camera;
 class LayerManager;
 struct WindowCreateInfo;
 class IGraphicsDevice; 
-class WindowManager;
 class InputManager;
 
 LOG_ADDCATEGORY(Application);
 
+typedef enum ApplicationFlags
+{
+	APPFLAG_NO_WINDOW = 1 << 0,
+	APPFLAG_HIDE_CONSOLE_DURING_DEBUG = 1 << 1,
+	APPFLAG_NO_FULLSCREEN = 1 << 2,
+	APPFLAG_DISPLAY_QUICK_INFO_ABOUT_MEMORY_USAGE = 1 << 3,
+	APPFLAG_NO_FILE_LOGGING = 1 << 4,
+	APPFLAG_ENABLE_VERBOSE_LOGGING = 1 << 5
+
+} ApplicationFlags;
 
 typedef struct ApplicationInitializationInfo
 {
-	String appName;
+	String appName = L'\0';
 
-	const WindowCreateInfo* windowCreateInfo;
+	const WindowCreateInfo* windowCreateInfo = 0;
 
-	String arguments;
+	String arguments = L'\0';
+
+	int flags = 0;
 
 } ApplicationInitializationInfo;
 
-typedef enum EApplicationState
+typedef enum ApplicationState
 {
 	Initialization,
 	Running,
 	Restarting,
 	Shutdown
 
-} EApplicationState;
+} ApplicationState;
 
 class Application
 {
+	static Application* Framework;
+
+	WindowManager* windowManager;
+
+	LayerManager* layerManager;
+
 public:
 	Application(const ApplicationInitializationInfo* Info);
 
@@ -61,27 +78,21 @@ public:
 	virtual void setAppInfo(const ApplicationInitializationInfo* appInfo);
 
 	const ApplicationInitializationInfo* getAppInfo() const { return appInfo; };
-
-	/** Sets the application name, maybe changes the title text in the future. */
-	virtual void setApplicationName(const String Name);
-
-	/** Gets the application name usually, returns what's in the title. Who knows? */
-	virtual String getApplicationName();
 	
 	/** Gets the application window size, returns the actual window size with border. Who knows, what else? */
 	virtual Vector2<uint32> getWindowSize() const;
+
+	String getApplicationName();
 
 	static Application* Get();
 
 	void drawAttention() const;
 
-	String getExecutableDir() const;
-
 	void setApplicationGetter(Application* app) { Framework = app; };
 
-	EApplicationState getAppState() const { return State; };
+	ApplicationState getAppState() const { return State; };
 
-	void setAppState(const EApplicationState newState) { State = newState; };
+	void setAppState(const ApplicationState newState) { State = newState; };
 
 	WindowManager* getWindowManager() const { return windowManager; };
 
@@ -91,9 +102,11 @@ public:
 
 	void setLayerManager(LayerManager* NewValue) { layerManager = NewValue; };
 
+	IGraphicsDevice* getRenderContext() const { return windowManager->getRenderContext(); };
+
 	Camera nc;
 protected:
-	EApplicationState State = Initialization;
+	ApplicationState State = Initialization;
 
 	const ApplicationInitializationInfo* appInfo;
 
@@ -101,12 +114,7 @@ protected:
 
 	String applicationName = L"Saxon Proprietary Game Engine";
 
-private:
-	static Application* Framework;
-
-	WindowManager* windowManager;
-
-	LayerManager* layerManager;
+	String applicationLocation;
 };
 
 #ifdef _WIN32

@@ -1,6 +1,7 @@
-/* Copyright 2020 - 2024, Saxon Software. All rights reserved. */
+/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
+#define _CRT_SECURE_NO_WARNINGS
 #include <Types/String.h>
 #include <unordered_map>
 #include <functional>
@@ -10,34 +11,9 @@ LOG_ADDCATEGORY(Commandlet);
 
 struct Commandlet
 {
-public:
-	Commandlet() = default;
-
-	Commandlet(const String Identifier, const String defaultValue, bool flag);
-
-	Commandlet operator=(const Commandlet&);
-
-	~Commandlet();
-
-	bool getIsFlag() const { return bIsFlag; };
-
-	void setIsFlag(bool NewValue) { bIsFlag = NewValue; };	
-	
-	String getName() const { return name; };
-
-	void setName(const String NewValue) { name = NewValue; };	
-
-	String getValue() const { return value; };
-
-	void setValue(const String NewValue) { value = NewValue; };
-
-private:
 	String name;
-
-	bool bIsFlag = false;
-
-	String value;
 };
+
 
 class ICommandlet
 {
@@ -49,14 +25,36 @@ public:
 
 	virtual ~ICommandlet() = default;
 
-	bool Except(String Name);
+	String Search(String Name);
+
+	template<typename T = String>
+	T Expected(const String Name);
 
 	void Parse(int Count, char* Array[]);
 
-	bool addCommand(Commandlet Value);
+	String executableLocation;
 private:
-	std::vector<Commandlet> registeredCommands;
+	std::vector<String> registeredCommands;
 
-	std::vector<Commandlet> currentQueue;
+	std::vector<String> currentQueue;
 };
 
+template<typename T>
+T ICommandlet::Expected(const String Name)
+{
+	String Temp = Search(Name);
+	if (Temp.isEmpty())
+	{
+		return strcmp(typeid(T).name(), "bool") == 0 ? false : "";
+	}
+
+	if (strcmp(typeid(T).name(), "bool") == 0)
+	{
+		return true;
+	}
+
+	wchar_t* A = const_cast<wchar_t*>(Temp.Chr());
+	wchar_t* B = wcstok(0, L" ", &A);
+
+	return A;
+};

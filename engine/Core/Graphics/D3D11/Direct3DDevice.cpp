@@ -1,12 +1,13 @@
-/* Copyright 2020 - 2024, Saxon Software. All rights reserved. */
+/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #include "Direct3DDevice.h"
 #include <Application/Application.h>
+//#include <dwmapi.h>
 #include <Log/LogMacros.h>
 //#include <Types/Cast.h>
 #include <Window/Window.h>
 //#include <Types/PlatformDefs.h>
-#include <d3d11sdklayers.h>
+//#include <d3d11sdklayers.h>
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
 #include <Log/Exception.h>
@@ -17,12 +18,13 @@
 #include "imgui.h"
 #include "backends/imgui_impl_win32.h"
 #include "backends/imgui_impl_dx11.h"
-#include <mutex>
-
+//#include <mutex>
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "D3DCompiler.lib")
 #pragma comment(lib, "dxcompiler.lib")
+
+#define HRESULT_STRINGIZE(code) #code
 
 IDirect3DDevice::IDirect3DDevice()
 {
@@ -48,38 +50,27 @@ IDirect3DDevice::IDirect3DDevice()
 
 }
 
+static DirectX::XMMATRIX world = DirectX::XMMatrixIdentity();
 static constexpr const FLOAT ClearColor[] = {0.13f , 0.14f, 0.17f, 1.f};
-static std::mutex RenderingMutex;
-bool IDirect3DDevice::Render(float deltaTime)
+//static std::mutex RenderingMutex;
+bool IDirect3DDevice::Render()
 {
-	std::lock_guard<std::mutex> lg(RenderingMutex);
-
-	if (!IGraphicsDevice::Render(deltaTime))
+	if (getDeviceReadyState() != GRAPHICS_ENGINE_STATE_RUNNING)
 		return false;
 
-	deviceContext->ClearRenderTargetView(RenderTarget, ClearColor);
+	static constexpr const FLOAT array[4] = {0.f, 0.1f, 0.1f, 1.f};
+	deviceContext->ClearRenderTargetView(RenderTarget, array);
 	//deviceContext->ClearDepthStencilView(depthStencil, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.f, UINT8(0));
 	deviceContext->OMSetRenderTargets(1, &RenderTarget, depthStencil);
 
 
-	if (getImGUIUsed())
-	{
-		ImGui_ImplDX11_NewFrame();
-		ImGui_ImplWin32_NewFrame();
-		ImGui::NewFrame();
+	//if (getImGUIUsed())
+	//{
+	//	ImGui_ImplDX11_NewFrame();
+	//	ImGui_ImplWin32_NewFrame();
+	//	ImGui::NewFrame();
 		Application::Get()->nc.initDebug();
-	}
-
-
-	{
-		constantWorld w;
-
-		w.ortho = DirectX::XMMatrixTranspose(orthoMatrix);
-		w.proj = DirectX::XMMatrixTranspose(projectionMatrix);
-		w.world = DirectX::XMMatrixTranspose(Application::Get()->nc.getViewMatrix());
-		
-		deviceContext->UpdateSubresource(worldBuffer, 0, 0, &w,0,0);
-	}
+	//}
 
 
 	for (Object* sceneObject : graphToRender->sceneList)
@@ -90,13 +81,14 @@ bool IDirect3DDevice::Render(float deltaTime)
 		}
 	}
 
-	if (getImGUIUsed())
-	{
-		ImGui::Render();
-		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-	}
 
-	HRESULT presentResult = swapChain->Present(0, 0);
+	//if (getImGUIUsed())
+	//{
+	//	ImGui::Render();
+	//	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	
+	
+	HRESULT	presentResult = swapChain->Present(0, 0);
 
 	if (presentResult == DXGI_ERROR_DEVICE_RESET)
 	{
@@ -125,42 +117,51 @@ bool IDirect3DDevice::Render(float deltaTime)
 static constexpr float fieldOfView = 3.141592654f / 4.0f;
 bool IDirect3DDevice::Init()
 {
-	//resizeBuffers.subscribe(&IDirect3DDevice::updateSize, this);
+	//std::this_thread::sleep_for(std::chrono::seconds(10));
+	IGraphicsDevice::Init();
+
 	imguiValueChange.subscribe(&IDirect3DDevice::imguiStateChanged, this);
 
 	const Vector2<uint32> defaultWindowSize = Application::Get()->getWindowSize();
 
 	screenAspect = (float)defaultWindowSize.x / (float)defaultWindowSize.y;
 
-	projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 1.f, 1000.f);
+	projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 10000.f);
 
-	orthoMatrix = DirectX::XMMatrixOrthographicLH((float)defaultWindowSize.x, (float)defaultWindowSize.y, 1.f, 1000.f);
+	orthoMatrix = DirectX::XMMatrixOrthographicLH((float)defaultWindowSize.x, (float)defaultWindowSize.y, 0.1f, 10000.f);
 
-	createFactory();
+	try
+	{
+		createFactory();
 
-	enumAdapters();
+		enumAdapters();
 
-	createReferenceDevice();
+		createReferenceDevice();
 
-	createSwapChain(defaultWindowSize);
+		createSwapChain(defaultWindowSize);
 
-	createDepthStencil(defaultWindowSize);
+		createDepthStencil(defaultWindowSize);
 
-	createRenderTarget();
+		createRenderTarget();
 
-	createViewport(defaultWindowSize);
+		createViewport(defaultWindowSize);
 
-	calculateNumerics(defaultWindowSize);
+		calculateNumerics(defaultWindowSize);
 
-	//createVertexBuffer();
+		//createVertexBuffer();
 
-	compileShader("Shader", "Shader");
+		compileShader("Shader", "Shader");
 
-	createRasterizerState();
+		createRasterizerState();
 
-	createSampler();
+		//createSampler();
 
-	setIsFullScreen(false);
+		setIsFullScreen(false);
+	}
+	catch (Exception& a)
+	{
+		MR_LOG(LogD3D11, Fatal, TEXT("%s"), a.What());
+	}
 
 	{
 		D3D11_BUFFER_DESC bf = {};
@@ -172,23 +173,21 @@ bool IDirect3DDevice::Init()
 		HRESULT A = device->CreateBuffer(&bf, 0, &worldBuffer);
 	}
 
-	bIsDriverInitialized = true;
-
-	setDeviceReadyState(true);
-
+	setDeviceReadyState(GRAPHICS_ENGINE_STATE_RUNNING);
  	return true;
 }
 
 void IDirect3DDevice::cleanUp() noexcept
 {
-	setDeviceReadyState(false);
-
-	if (getImGUIUsed())
-	{
-		ImGui_ImplDX11_Shutdown();
-		ImGui_ImplWin32_Shutdown();
-		ImGui::DestroyContext();
-	}
+	setDeviceReadyState(GRAPHICS_ENGINE_STATE_SHUTDOWN);
+//#ifdef MR_DEBUG
+//	if (getImGUIUsed())
+//	{
+//		ImGui_ImplDX11_Shutdown();
+//		ImGui_ImplWin32_Shutdown();
+//		ImGui::DestroyContext();
+//	}
+//#endif // MR_DEBUG
 
 	if (swapChain)
 	{
@@ -201,8 +200,8 @@ void IDirect3DDevice::cleanUp() noexcept
 	{
 		device->Release();
 		device = nullptr;
-	}	
-	
+	}		
+		
 	if (deviceContext)
 	{
 		deviceContext->ClearState();
@@ -264,8 +263,7 @@ const String IDirect3DDevice::getRendererSignatature() const
 static constexpr uint32 threshold = 20;
 void IDirect3DDevice::resizeBuffers(Vector2<uint32> newSize)
 {
-	if (newSize < 16)
-		return;
+	setDeviceReadyState(GRAPHICS_ENGINE_STATE_PAUSED_RENDERING);
 
 	if (deviceContext) {
 		deviceContext->OMSetRenderTargets(0, NULL, NULL);
@@ -294,43 +292,35 @@ void IDirect3DDevice::resizeBuffers(Vector2<uint32> newSize)
 	if (depthStencilState) {
 		depthStencilState->Release();
 		depthStencilState = nullptr;
-	}
+	}	
 
-	HRESULT A = swapChain->ResizeBuffers(2, newSize.x, newSize.y, DXGI_FORMAT_B8G8R8A8_UNORM, 0);
+	HRESULT A = swapChain->ResizeBuffers(2, 0, 0, DXGI_FORMAT_B8G8R8A8_UNORM, 0);
 
-	swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBuffer);
-
-#pragma warning(disable : 6387) // disable the fucking X can be 0.
-	HRESULT B = device->CreateRenderTargetView(backBuffer, 0, &RenderTarget);
 	createDepthStencil(newSize);
+
+	createRenderTarget();
 
 	deviceContext->RSSetViewports(0, 0);
 	createViewport(newSize);
 
-	if (backBuffer) {
-		backBuffer->Release();
-		backBuffer = nullptr;
-	}
-	//static Vector2<uint32> lastLoggedSize;
-
-	// Calculate the deltas
-	//const int deltaX = std::abs(static_cast<int>(newSize.x) - static_cast<int>(lastLoggedSize.x));
-	//const int deltaY = std::abs(static_cast<int>(newSize.y) - static_cast<int>(lastLoggedSize.y));
-
-	// If either delta is bigger than or lower, it will set and log the last size
-	//if (deltaX > threshold || deltaY > threshold)
-	//{
-	//	lastLoggedSize = newSize; // Lastly update the size
-	//	MR_LOG(LogD3D11, Log, TEXT("Viewport resized to: X=%d\tY=%d"), newSize.x, newSize.y);
-	//}
+	setDeviceReadyState(GRAPHICS_ENGINE_STATE_RUNNING);
 }
 
-void IDirect3DDevice::setIsFullScreen(bool NewValue)
+bool IDirect3DDevice::setIsFullScreen(bool NewValue)
 {
-	IGraphicsDevice::setIsFullScreen(NewValue);
+	if (!IGraphicsDevice::setIsFullScreen(NewValue))
+		return false;
+
+	setDeviceReadyState(GRAPHICS_ENGINE_STATE_PAUSED_RENDERING);
+
 	HWND window = (HWND)Application::Get()->getWindowManager()->getFirstWindow()->getWindowHandle();
 
 	swapChain->SetFullscreenState(NewValue ? TRUE : FALSE, NULL);
+
+	//if (NewValue)
+	//{
+	//	SetWindowTheme(window, L"", L"");
+	//}
 
 	DXGI_MODE_DESC swInfo = {};
 	swInfo.Width = NewValue ? 1920 : 1280;
@@ -338,6 +328,8 @@ void IDirect3DDevice::setIsFullScreen(bool NewValue)
 	swInfo.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 
 	swapChain->ResizeTarget(&swInfo);
+	setDeviceReadyState(GRAPHICS_ENGINE_STATE_RUNNING);
+	return true;
 }
 
 void IDirect3DDevice::changeDisplayMode()
@@ -368,9 +360,7 @@ void IDirect3DDevice::createReferenceDevice()
 	// Give a nice feature level list, it will go from top to the bottom, if neither supported it will warns the user.
 	constexpr const D3D_FEATURE_LEVEL featureLevels[]
 	{
-		D3D_FEATURE_LEVEL_11_0,
-		D3D_FEATURE_LEVEL_10_1,
-		D3D_FEATURE_LEVEL_10_0,
+		D3D_FEATURE_LEVEL_11_0
 	};
 
 	// Burn in the quantity of the list
@@ -379,20 +369,20 @@ void IDirect3DDevice::createReferenceDevice()
 	// At last, create the device.
 	HRESULT result = D3D11CreateDevice(
 		availableAdapters[selectedAdapter],
-		D3D_DRIVER_TYPE_UNKNOWN, 
-		NULL, 
+		D3D_DRIVER_TYPE_UNKNOWN,
+		NULL,
 		deviceFlags,
-		featureLevels, 
-		featureLevelsQuantity, 
-		D3D11_SDK_VERSION, 
-		&device, 
-		0, 
+		featureLevels,
+		featureLevelsQuantity,
+		D3D11_SDK_VERSION,
+		&device,
+		&usedfeatureLevel,
 		&deviceContext
 	);
 
 	if (result == DXGI_ERROR_UNSUPPORTED)
 	{
-		MR_LOG(LogD3D11, Warn, TEXT("No discrete graphics card detected, launching with WARP!")); 
+		MR_LOG(LogD3D11, Warn, TEXT("No discrete graphics card detected, launching with WARP!"));
 		result = D3D11CreateDevice(
 			availableAdapters[selectedAdapter],
 			D3D_DRIVER_TYPE_WARP,
@@ -407,25 +397,27 @@ void IDirect3DDevice::createReferenceDevice()
 		);
 	}
 
-
-	MR_ASSERT(result == S_OK, TEXT("D3D11CreateDevice failed! Check with Debug configuration!"));
-
-	static bool bIsFoundAlready = false;
-	if (!bIsFoundAlready)
+	if (result != S_OK)
 	{
-		bIsFoundAlready = true;
+		MR_LOG(LogD3D11, Fatal, TEXT("Failed to Create D3D11 Capable Device"));
+	}
+
+	static bool bWasInitiatedBefore;
+	if (Logger::Get().getLoggingLevel() >= LOGGING_LEVEL_MAXIMUM && !bWasInitiatedBefore)
+	{
+		bWasInitiatedBefore = true;
 		DXGI_ADAPTER_DESC apInfo = {};
 
 		adapter->GetDesc(&apInfo);
-		MR_LOG(LogD3D11, Info, TEXT("Found a capable GPU!"), getRendererSignatature().Chr());
-		MR_LOG(LogD3D11, Info, TEXT("\tName: %s"), apInfo.Description);
-		MR_LOG(LogD3D11, Info, TEXT("\tAvailable Memory: %d MB"), apInfo.DedicatedVideoMemory >> 20);
-		MR_LOG(LogD3D11, Info, TEXT("\tHighest Feature Level: %s"), distinguishFeatureLevel(device->GetFeatureLevel()).Chr());
+		MR_LOG(LogD3D11, Verbose, TEXT("Capable Device Found!"));
+		MR_LOG(LogD3D11, Verbose, TEXT("\tName: %s"), apInfo.Description);
+		MR_LOG(LogD3D11, Verbose, TEXT("\tAvailable Memory: %d MB"), apInfo.DedicatedVideoMemory >> 20);
+		MR_LOG(LogD3D11, Verbose, TEXT("\tHighest Feature Level: %s"), distinguishFeatureLevel(device->GetFeatureLevel()).Chr());
 	}
 
 	if (getImGUIUsed())
 	{
-		imguiStateChanged(getImGUIUsed());
+		//imguiStateChanged(getImGUIUsed());
 	}
 }
 
@@ -434,11 +426,9 @@ inline void IDirect3DDevice::createSwapChain(Vector2<uint32> newSize)
 	//MR_LOG(LogD3D11, Fatal, TEXT("Invalid D3D11 device!"));
 
 	if (newSize.x < 32/* && newSize.y < 32*/)
+	{
 		THROW_EXCEPTION("Invalid Swapchain size! X=%d Y=%d", newSize.x, newSize.y);
-
-	// Get system metrics. Output is: s=1920 | y=1080, from one of my monitors.
-	//auto s = GetSystemMetrics(SM_CXSCREEN);
-	//auto y = GetSystemMetrics(SM_CYSCREEN);
+	}
 
 	DXGI_SWAP_CHAIN_DESC scDesc = {};
 	scDesc.Windowed = true;
@@ -450,7 +440,7 @@ inline void IDirect3DDevice::createSwapChain(Vector2<uint32> newSize)
 	scDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	scDesc.BufferDesc.Width = newSize.x;
 	scDesc.BufferDesc.Height = newSize.y;
-	scDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+	scDesc.Flags = bIsFullScreenSwitchEnabled ? DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH : 0;
 
 	scDesc.SampleDesc.Quality = 0;
 	scDesc.SampleDesc.Count = 1;
@@ -458,7 +448,10 @@ inline void IDirect3DDevice::createSwapChain(Vector2<uint32> newSize)
 	scDesc.OutputWindow = (HWND)Application::Get()->getWindowManager()->getFirstWindow()->getWindowHandle();
 
 	HRESULT result = factory->CreateSwapChain(device, &scDesc, &swapChain);
-	MR_ASSERT(result == S_OK, TEXT("CreateSwapChain failed! Check with Debug configuration!"));
+	if (FAILED(result))
+	{
+		THROW_EXCEPTION("CreateSwapChain failed! Check with Debug configuration!");
+	}
 }
 
 inline void IDirect3DDevice::compileShader(String vertexShader, String pixelShader)
@@ -494,10 +487,16 @@ inline void IDirect3DDevice::compileShader(String vertexShader, String pixelShad
 	MR_LOG(LogD3D11, Log, TEXT("Compiling shader(s)!"));
 
 	HRESULT resultB = device->CreateVertexShader(vertexBlob->GetBufferPointer(), vertexBlob->GetBufferSize(), nullptr, &compiledVertexShader);
-	MR_ASSERT(resultB == S_OK, TEXT("CreateVertexShader failed! Check with Debug configuration!"));
+	if (FAILED(resultB))
+	{
+		THROW_EXCEPTION("CreateVertexShader failed! Check with Debug configuration!");
+	}
 
 	HRESULT resultC = device->CreatePixelShader(pixelBlob->GetBufferPointer(), pixelBlob->GetBufferSize(), nullptr, &compiledPixelShader);
-	MR_ASSERT(resultC == S_OK, TEXT("CreatePixelShader failed! Check with Debug configuration!"));
+	if (FAILED(resultC))
+	{
+		THROW_EXCEPTION("CreatePixelShader failed! Check with Debug configuration!");
+	}
 
 	D3D11_INPUT_ELEMENT_DESC layout[] =
 	{
@@ -509,7 +508,10 @@ inline void IDirect3DDevice::compileShader(String vertexShader, String pixelShad
 	constexpr UINT numElements = std::size(layout);
 
 	HRESULT resultD = device->CreateInputLayout(layout, numElements, vertexBlob->GetBufferPointer(), vertexBlob->GetBufferSize(), &inputLayout);
-	MR_ASSERT(resultD == S_OK, TEXT("CreateInputLayout failed! Check with Debug configuration!"));
+	if (FAILED(resultD))
+	{
+		THROW_EXCEPTION("CreateInputLayout failed! Check with Debug configuration!");
+	}
 
 	deviceContext->IASetInputLayout(inputLayout);
 
@@ -525,24 +527,33 @@ inline void IDirect3DDevice::createFactory()
 	// Aaaand disable the Alt+Enter. It doesn't work.
 	factory->MakeWindowAssociation((HWND)Application::Get()->getWindowManager()->getFirstWindow()->getWindowHandle(), DXGI_MWA_NO_ALT_ENTER);
 
-	MR_ASSERT(result == S_OK, TEXT("CreateDXGIFactory failed! Check with Debug configuration!"));
+	if (FAILED(result))
+	{
+		THROW_EXCEPTION("CreateDXGIFactory failed!Check with Debug configuration!");
+	}
 }
 
 inline void IDirect3DDevice::createRasterizerState()
 {
 	D3D11_RASTERIZER_DESC rasterizerInfo = {};
 	rasterizerInfo.FillMode = D3D11_FILL_SOLID;
-	rasterizerInfo.CullMode = D3D11_CULL_BACK;	
+	rasterizerInfo.CullMode = D3D11_CULL_NONE;	
 	
 	D3D11_RASTERIZER_DESC rasterizerInfoWire = {};
 	rasterizerInfoWire.FillMode = D3D11_FILL_WIREFRAME;
 	rasterizerInfoWire.CullMode = D3D11_CULL_NONE;
 	
 	HRESULT Result = device->CreateRasterizerState(&rasterizerInfo, &rasterizerState);
-	MR_ASSERT(Result == S_OK, TEXT("CreateRasterizerState failed! Check with Debug configuration!"));	
+	if (FAILED(Result))
+	{
+		THROW_EXCEPTION("CreateRasterizerState failed! Check with Debug configuration!");
+	}
 	
 	Result = device->CreateRasterizerState(&rasterizerInfoWire, &rasterizerStateWireFrame);
-	MR_ASSERT(Result == S_OK, TEXT("CreateRasterizerState failed! Check with Debug configuration!"));
+	if (FAILED(Result))
+	{
+		THROW_EXCEPTION("CreateRasterizerState failed! Check with Debug configuration!");
+	}
 }
 
 inline void IDirect3DDevice::InitTestScene()
@@ -557,9 +568,13 @@ inline void IDirect3DDevice::calculateNumerics(Vector2<uint32> size)
 
 inline void IDirect3DDevice::createDepthStencil(Vector2<uint32> size)
 {
+	static Vector2<uint32> cache;
+	if (size != 0)
+		cache = size;
+
 	D3D11_TEXTURE2D_DESC stencilViewInfo = {};
-	stencilViewInfo.Width = size.x;
-	stencilViewInfo.Height = size.y;
+	stencilViewInfo.Width = size.x == 0 ? cache.x : size.x;
+	stencilViewInfo.Height = size.y == 0 ? cache.y : size.y;
 	stencilViewInfo.MipLevels = 1;
 	stencilViewInfo.ArraySize = 1;
 	stencilViewInfo.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -572,7 +587,10 @@ inline void IDirect3DDevice::createDepthStencil(Vector2<uint32> size)
 
 	// FIXME: Creating Depth Stencil causes memory leak!
 	//HRESULT result = device->CreateTexture2D(&stencilViewInfo, NULL, &depthStencilTex);
-	//MR_ASSERT(result == S_OK, TEXT("CreateDepthStencilView failed! Check with Debug configuration!"));
+	//if (FAILED(result))
+	//{
+	//	THROW_EXCEPTION("CreateDepthStencilView failed! Check with Debug configuration! %s", HRESULT_STRINGIZE(result));
+	//}
 
 	//D3D11_DEPTH_STENCIL_DESC depthStencilInfo = {};
 	//depthStencilInfo.DepthEnable = true;
@@ -580,20 +598,30 @@ inline void IDirect3DDevice::createDepthStencil(Vector2<uint32> size)
 	//depthStencilInfo.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 
 	//HRESULT resultA = device->CreateDepthStencilView(depthStencilTex, 0, &depthStencil);
-	//MR_ASSERT(resultA == S_OK, TEXT("CreateDepthStencilView failed! Check with Debug configuration!"));
+	//if (FAILED(resultA))
+	//{
+	//	THROW_EXCEPTION("CreateDepthStencilView failed! Check with Debug configuration!");
+	//}
 
 
 	//HRESULT resultB = device->CreateDepthStencilState(&depthStencilInfo, &depthStencilState);
-	//MR_ASSERT(resultB == S_OK, TEXT("CreateDepthStencilState failed! Check with Debug configuration!"));
+	//if (FAILED(resultB))
+	//{
+	//	THROW_EXCEPTION("CreateDepthStencilState failed! Check with Debug configuration!");
+	//}
 }
 
 inline void IDirect3DDevice::createViewport(Vector2<uint32> size)
 {
+	static Vector2<uint32> cache;
+	if (size != 0)
+		cache = size;
+
 	D3D11_VIEWPORT vpInfo = {};
 	vpInfo.TopLeftX = 0;
 	vpInfo.TopLeftY = 0;
-	vpInfo.Width = (FLOAT)size.x;
-	vpInfo.Height = (FLOAT)size.y;
+	vpInfo.Width = size.x == 0 ? (FLOAT)cache.x : (FLOAT)size.x;
+	vpInfo.Height = size.y == 0 ? (FLOAT)cache.y : (FLOAT)size.y;
 	vpInfo.MaxDepth = 1.f;
 	vpInfo.MinDepth = 0.f;
 
@@ -605,10 +633,16 @@ inline void IDirect3DDevice::createRenderTarget()
 	MR_ASSERT(swapChain, TEXT("swapChain is invalid!"));
 
 	HRESULT result = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBuffer);
-	MR_ASSERT(result == S_OK, TEXT("CreateRenderTargetView failed! Check with Debug configuration!"));
+	if (FAILED(result))
+	{
+		THROW_EXCEPTION("CreateRenderTargetView failed! Check with Debug configuration!");
+	}
 
 	HRESULT resultA = device->CreateRenderTargetView(backBuffer, NULL, &RenderTarget);
-	MR_ASSERT(resultA == S_OK, TEXT("CreateRenderTargetView failed! Check with Debug configuration!"));
+	if (FAILED(resultA))
+	{
+		THROW_EXCEPTION("CreateRenderTargetView failed! Check with Debug configuration!");
+	}
 
 	deviceContext->OMSetRenderTargets(1, &RenderTarget, depthStencil);
 }
@@ -643,11 +677,13 @@ inline void IDirect3DDevice::imguiStateChanged(bool NewValue)
 		// Setup Platform/Renderer backends
 		if (!ImGui_ImplWin32_Init(Application::Get()->getWindowManager()->getFirstWindow()->getWindowHandle()))
 		{
+			setImGUIUsed(false);
 			THROW_EXCEPTION("Failed to Initialize ImGUI (WinAPI implementation)");
 		}
 
 		if (!ImGui_ImplDX11_Init(device, deviceContext))
 		{
+			setImGUIUsed(false);
 			THROW_EXCEPTION("Failed to Initialize ImGUI (DX11 implementation)");
 		}
 	}

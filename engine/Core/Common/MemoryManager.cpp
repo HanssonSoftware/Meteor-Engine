@@ -1,6 +1,8 @@
-/* Copyright 2020 - 2024, Saxon Software. All rights reserved. */
+/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
+
 #include "MemoryManager.h"
 #include <Log/LogMacros.h>
+#include <Application/Application.h>
 
 LOG_ADDCATEGORY(Memory);
 
@@ -8,6 +10,14 @@ MemoryManager& MemoryManager::Get()
 {
 	static MemoryManager instance;
 	return instance;
+}
+
+MemoryManager::~MemoryManager()
+{
+	if (bQuickMemoryLogging)
+	{
+		MR_LOG(LogMemory, Log, TEXT("Total used memory:\t%ld\t\tCurrently used memory (not freed up):\t%ld"), usedTotalUsedMemoryInBytes, usedMemoryInBytes);
+	}
 }
 
 size_t MemoryManager::getTotalUsedMemory() const

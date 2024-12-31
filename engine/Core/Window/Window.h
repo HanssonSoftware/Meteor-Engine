@@ -1,16 +1,18 @@
-/* Copyright 2020 - 2024, Saxon Software. All rights reserved. */
+/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
+//#include "WindowManager.h"
 #include <Platform/Microsoft/MinWin.h>
 #include <Types/Vector.h>
 
 struct WindowCreateInfo;
+class String;
 
 class Window
 {
 	friend class WindowManager;
 
-	Window();
+	Window(WindowManager* newOwner);
 
 	bool createWindow(const WindowCreateInfo* CreateInfo);
 public:
@@ -22,6 +24,8 @@ public:
 
 	void showWindow();
 
+	void setTitle(String newName);
+
 	void hideWindow();
 
 	constexpr const int evaluateFlags(int Flags) noexcept;
@@ -30,6 +34,8 @@ public:
 
 	const WindowCreateInfo* windowData;
 private:
+	WindowManager* owner;
+
 	void* Handle = nullptr;
 };
 

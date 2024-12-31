@@ -1,4 +1,4 @@
-/* Copyright 2020 - 2024, Saxon Software. All rights reserved. */
+/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
 #include <Common/Delegate.h>
@@ -6,7 +6,7 @@
 class IQueuedRender
 {
 public:
-	virtual void Render() = 0;
+	virtual void Render();
 
 	virtual void bindRender() = 0;
 

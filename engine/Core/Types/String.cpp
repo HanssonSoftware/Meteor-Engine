@@ -1,4 +1,4 @@
-/* Copyright 2020 - 2024, Saxon Software. All rights reserved. */
+/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #include "String.h"
 #include <Common/MemoryManager.h>
@@ -154,6 +154,16 @@ bool String::operator==(const String& Other) const
 	return wcscmp(buffer, Other.buffer) == 0;
 }
 
+bool String::operator!=(const String& Other) const
+{
+	return wcscmp(buffer, Other.buffer) != 0;
+}
+
+bool String::operator!=(String& Other) const
+{
+	return wcscmp(buffer, Other.buffer) != 0;
+}
+
 const wchar_t* String::operator*()
 {
 	return buffer ? buffer : L"";
@@ -162,6 +172,11 @@ const wchar_t* String::operator*()
 const wchar_t* String::Chr()
 {
 	return buffer ? buffer : L"";
+}
+
+wchar_t* String::Data()
+{
+	return buffer;
 }
 
 void String::Narrow(const wchar_t* wideString, char*& narrowString)
@@ -173,7 +188,7 @@ void String::Narrow(const wchar_t* wideString, char*& narrowString)
 	if (narrowBuffer == nullptr)
 		THROW_EXCEPTION("Unable to convert from Wide to Narrow! Buffer is null!");
 
-	const size_t converted = wcstombs(narrowBuffer, wideString, narrowSize);
+	const size_t converted = wcstombs(narrowBuffer, wideString, narrowSize + 1);
 
 	if (converted == 0)
 		THROW_EXCEPTION("No characters converted!");
@@ -198,6 +213,17 @@ void String::upper()
 	//}
 }
 
+String String::Delim(const String character, bool first)
+{
+	if (character.isEmpty())
+		return "";
+
+	wchar_t* A = buffer;
+	wchar_t* B = wcstok(A, character.Chr(), &A);
+
+	return String(first ? B : A);
+}
+
 bool String::isEmpty() const
 {
 	return buffer == nullptr || wcslen(buffer) == 0;
@@ -215,6 +241,28 @@ float String::toFloat() const
 	return wcstof(buffer, &end);
 }
 
+String String::Format(String format, ...)
+{
+	const wchar_t* formattingBuffer = format.Chr();
+
+	va_list a;
+	va_start(a, format);
+	const uint32 sizeForVA = vswprintf(0, 0, formattingBuffer, a);
+	va_end(a);	
+	
+	wchar_t* newFormattedBuffer = (wchar_t*)mrmalloc((sizeForVA + 1) * sizeof(wchar_t));
+
+	va_list b;
+	va_start(b, format);
+	vswprintf(newFormattedBuffer, sizeForVA + 1, formattingBuffer, b);
+	va_end(b);
+
+	String stringized(newFormattedBuffer);
+	
+	mrfree(newFormattedBuffer);
+	return stringized;
+}
+
 String& String::operator=(const String& other)
 {
 	if (this != &other)
@@ -229,155 +277,3 @@ String& String::operator=(const String& other)
 
 	return *this;
 }
-
-
-//String::String()
-//{
-//	buffer = L'\0';
-//}
-//
-///**
-//* So this fuck (mbstowcs), doesn't include null terminator count at the return.
-//*/
-//String::String(const char* Input)
-//{
-//	/** Recommended size, only char*!*/
-//	const size_t bufferRecommendedSize = mbstowcs(NULL, Input, 0);
-//
-//	wchar_t* bufferMemory = (wchar_t*)mrmalloc((bufferRecommendedSize + 1) * sizeof(wchar_t));
-//
-//	mbstowcs(bufferMemory, Input, strlen(Input) + 1);
-//
-//	(bufferMemory, bufferMemory + wcslen(bufferMemory) + 1);
-//
-//	mrfree(bufferMemory);
-//}
-//
-//String::String(const wchar_t* Input)
-//{
-//	buffer.assign(Input, Input + wcslen(Input));
-//	buffer.push_back(L'\0');
-//}
-//
-//String::String(int Input)
-//{
-//	const std::wstring convertedString = std::to_wstring(Input);
-//	buffer.assign(convertedString.c_str(), convertedString.c_str() + wcslen(convertedString.c_str()) + 1);
-//}
-//
-//String::String(uint32 Input)
-//{
-//	const std::wstring convertedString = std::to_wstring(Input);
-//	buffer.assign(convertedString.c_str(), convertedString.c_str() + wcslen(convertedString.c_str()) + 1);
-//}
-//
-//String::String(float Input)
-//{
-//	const std::wstring convertedString = std::to_wstring(Input);
-//	buffer.assign(convertedString.c_str(), convertedString.c_str() + wcslen(convertedString.c_str()) + 1);
-//}
-//
-//String::String(const std::string Input)
-//{
-//	const size_t bufferRecommendedSize = mbstowcs(NULL, Input.c_str(), 0);
-//	wchar_t* bufferMemory = (wchar_t*)mrmalloc((bufferRecommendedSize + 1) * sizeof(wchar_t));
-//
-//	mbstowcs(bufferMemory, Input.c_str(), bufferRecommendedSize);
-//	buffer.assign(bufferMemory, bufferMemory + bufferRecommendedSize);
-//	buffer.push_back(L'\0');
-//
-//	mrfree(bufferMemory);
-//}
-//
-//String::String(const std::wstring Input)
-//{
-//	buffer.assign(Input.c_str(), Input.c_str());
-//	buffer.push_back(L'\0');
-//}
-////
-////String::~String()
-////{
-////#pragma warning(disable : 6031)
-////	buffer.clear();
-////}
-//
-//String String::operator+(const String& Other)
-//{
-//	// Querry the buffers.
-//	const wchar_t* otherBuffer = Other.buffer.data();
-//	const wchar_t* thisBuffer = buffer.data();
-//
-//	// Copy paste from https://en.cppreference.com/w/c/string/wide/wcslen.
-//	// So I found out that wcslen() does not count in the \0.
-//	const size_t size = wcslen(thisBuffer) + wcslen(otherBuffer) + 1;
-//
-//	wchar_t* super = (wchar_t*)mrmalloc(size * sizeof(wchar_t));
-//
-//	if (super == nullptr)
-//		throw Exception("String concencation failed! Wide buffer is null!");
-//
-//	wcscpy(super, thisBuffer);
-//	wcscat(super, otherBuffer);
-//
-//	String newStringBuffer(super);
-//
-//	mrfree(super);
-//	return newStringBuffer;
-//}
-//
-//bool String::operator==(const String& Other) const
-//{
-//	return wcscmp(buffer.data(), Other.buffer.data()) == 0;
-//}
-//
-//const wchar_t* String::operator*()
-//{
-//	return buffer.data();
-//}
-//
-//const wchar_t* String::Chr()
-//{
-//	return buffer.data();
-//}
-//
-//void String::Narrow(const wchar_t* wideString, char*& narrowString)
-//{
-//	const size_t narrowSize = wcstombs(NULL, wideString, 0);
-//
-//	char* narrowBuffer = (char*)mrmalloc((narrowSize + 1) * sizeof(char));
-//
-//	if (narrowBuffer == nullptr)
-//		throw Exception("Unable to convert from Wide to Narrow! Buffer is null!");
-//
-//	const size_t converted = wcstombs(narrowBuffer, wideString, narrowSize);
-//
-//	if (converted == 0)
-//		throw Exception("No characters converted!");
-//
-//	strcpy(narrowString, narrowBuffer);
-//	mrfree(narrowBuffer);
-//}
-//
-//const wchar_t* String::Chr() const
-//{
-//	return buffer.data();
-//}
-//
-//void String::upper()
-//{
-//	//const wchar_t* charbuffer = buffer.data();
-//	//const size_t size = wcslen(charbuffer); // We don't need \0
-//
-//	//for (wchar_t& indexed : buffer)
-//	//{
-//	//	towupper(indexed);
-//	//}
-//}
-//
-//bool String::isEmpty() const
-//{
-//	if (buffer.size() <= 1)
-//		return true;
-//
-//	return false;
-//}

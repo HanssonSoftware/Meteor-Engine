@@ -1774,9 +1774,9 @@ class TinyGLTF {
 #define TINYGLTF_INTERNAL_WIN32_LEAN_AND_MEAN
 #endif
 #ifndef __MINGW32__
-#include <Platform/Microsoft/MinWin.h>  // include API for expanding a file path
+#include <Windows.h>  // include API for expanding a file path
 #else
-#include <Platform/Microsoft/MinWin.h>
+#include <Windows.h>
 #endif
 
 #ifdef TINYGLTF_INTERNAL_WIN32_LEAN_AND_MEAN

@@ -1,4 +1,4 @@
-/* Copyright 2020 - 2024, Saxon Software. All rights reserved. */
+/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #include "Application.h"
 #include <Window/Window.h>
@@ -6,16 +6,11 @@
 #include <thread>
 #include <Common/MemoryManager.h>
 #include <Widgets/Viewport.h>
-#include <Window/WindowManager.h>
-#include <Graphics/MeshModel.h>
-#include <Graphics/Vulkan/VulkanDevice.h>
 #include <Application/LayerManager.h>
 #include <imgui.h>
 #include <backends/imgui_impl_dx11.h>
 #include <backends/imgui_impl_win32.h>
-
-#include <Log/Log.h>
-#include <Log/Exception.h>
+#include <mutex>
 #include "Commandlet.h"
 
 Application* Application::Framework;
@@ -23,9 +18,11 @@ Application* Application::Framework;
 Application::Application(const ApplicationInitializationInfo* aInfo)
 	: appInfo(aInfo)
 {
+    Framework = this;
+    applicationLocation = ICommandlet::Get().executableLocation;
+
     setWindowManager(new WindowManager());
     setLayerManager(new LayerManager());
-
 }
 
 void Application::Frame(float deltaTime)
@@ -34,17 +31,9 @@ void Application::Frame(float deltaTime)
 
 Application* Application::Get()
 {
+    static std::mutex mtx;
+    std::lock_guard<std::mutex> l(mtx);
     return Framework ? Framework : nullptr;
-}
-
-String Application::getExecutableDir() const
-{
-#ifdef _WIN32
-    wchar_t Temp[2048];
-    GetModuleFileNameW(NULL, Temp, 2048);
-    return String(Temp);
-#endif // _WIN32
-
 }
 
 uint32 targetedFramesPerSecond = 60;
@@ -52,105 +41,105 @@ const std::chrono::milliseconds frameDuration(1000 / targetedFramesPerSecond);
 void Application::Init()
 {
     Logger::Get().firstStartLogger();
-    MR_LOG(LogApplication, Log, TEXT("Initializing application."));
-    Logger::Get().printCollectedLogs();
-  
-    getWindowManager()->createWindow(appInfo->windowCreateInfo);
+    MR_LOG(LogApplication, Log, TEXT("Initializing Application."));
 
+    applicationLocation = ICommandlet::Get().executableLocation;
+    MR_LOG(LogApplication, Verbose, TEXT("App Dir: %s"), applicationLocation.Chr());
 
-    // If we use Debug mode, append the current RHI signature to the window title.
-#ifdef MR_DEBUG
-    //initApplicationDebugMode(getWindowManager()->getRenderContext());
-#else
-    setApplicationName(getApplicationName());
-#endif // MR_DEBUG
-
-    getWindowManager()->getRenderContext()->graphToRender = &SceneGraph::Get();
-    getWindowManager()->getRenderContext()->setImGUIUsed(true);
-
-
-    //Viewport* ViewportSystem = Viewport();
     if (appInfo->appName.isEmpty())
     {
-        MR_LOG(LogApplication, Fatal, TEXT("AppInfo is bad, or null!"));
+        MR_LOG(LogApplication, Fatal, TEXT("AppInfo is Bad, or Null!"));
     }
+
+    if (appInfo->flags & APPFLAG_NO_WINDOW)
+    {
+        // Do nothing.
+    }
+    else if (appInfo->windowCreateInfo != nullptr)
+    {
+        getWindowManager()->createWindow(appInfo->windowCreateInfo);
+    }
+    else
+    {
+        MR_LOG(LogWindowManager, Log, TEXT("appInfo->windowCreateInfo is Null! Perhaps you didn't Need a Window?"));
+    }
+
+    if (Application::Get()->getAppInfo()->flags & APPFLAG_DISPLAY_QUICK_INFO_ABOUT_MEMORY_USAGE)
+        MemoryManager::Get().bQuickMemoryLogging = true;
+
+
+    if (getRenderContext())
+    {
+        getRenderContext()->graphToRender = &SceneGraph::Get();
+        //getRenderContext()->setImGUIUsed(true);
+    }
+
 
     setAppState(Running);
 }
 
-//void Application::initApplicationDebugMode(const IGraphicsDevice* selectedRHI)
-//{
-//    String appName = getApplicationName();
-//    const String rhiName = selectedRHI->getRendererSignatature();
-//
-//    if (appInfo->windowCreateInfo)
-//    {
-//        if (!appInfo->windowCreateInfo->windowName.isEmpty()) 
-//            appName = appInfo->windowCreateInfo->windowName;
-//    }
-//
-//
-//    if (selectedRHI == nullptr)
-//    {
-//        MR_LOG(LogApplication, Error, TEXT("Unable to append RHI's name to the title. Perhaps not initialized?"));
-//#ifdef _WIN32
-//        SetWindowText((HWND)Application::Get()->getWindowManager()->getFirstWindow()->getWindowHandle(), getApplicationName().Chr());
-//#endif // _WIN32
-//        return;
-//    }
-//
-//    const size_t calculated = swprintf(NULL, 0, L"%s <%s>", appName.Chr(), rhiName.Chr());
-//
-//    wchar_t* superBuffer = (wchar_t*)mrmalloc((calculated + 1) * sizeof(wchar_t));
-//
-//    swprintf(superBuffer, calculated + 1, L"%s <%s>", appName.Chr(), rhiName.Chr());
-//
-//#ifdef _WIN32
-//    SetWindowText((HWND)Application::Get()->getWindowManager()->getFirstWindow()->getWindowHandle(), superBuffer);
-//#endif // _WIN32
-//
-//    mrfree(superBuffer);
-//}
-
 void Application::Run()
 {
+    IGraphicsDevice* graphicsDevice = (IGraphicsDevice*)getWindowManager()->getRenderContext();
     Window* Ref = getWindowManager()->searchFor("Super");
 
-    IDirect3DDevice* D3DRef = (IDirect3DDevice*)getWindowManager()->getRenderContext();
     std::atomic<float> dt = 0.f;
 
-    HWND A = (HWND)Ref->getWindowHandle();
-    std::thread D3Thread = std::thread([&D3DRef, &dt]() { D3DRef->Render(dt); });
+    HWND windowReference = (HWND)Ref->getWindowHandle();
+
+  /*  if (getWindowManager()->getRenderContext() != nullptr)
+        graphicsDevice->renderThread = std::thread([&graphicsDevice]() 
+            { 
+                while (Application::Get()->getAppState() == ApplicationState::Running)
+                {
+                    if (graphicsDevice->getDeviceReadyState() == GRAPHICS_ENGINE_STATE_RUNNING)
+                    {
+                        graphicsDevice->Render();
+                    }
+                    else
+                    {
+                        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+                    }
+                }
+            }
+        );*/
 
     Ref->showWindow();
 
     SceneGraph::Get().addToRoot(&nc);
 
-    MSG msg;
     setAppState(Running);
 
-    while (getAppState() == EApplicationState::Running)
+    MSG msg;
+    while (getAppState() == ApplicationState::Running)
     {
         const auto calculatedNow = std::chrono::high_resolution_clock::now();
 
-        if (PeekMessage(&msg, A, 0, 0, PM_REMOVE))
+        if (PeekMessage(&msg, windowReference, 0, 0, PM_REMOVE))
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
 
-
         std::chrono::duration<float> calculated = (std::chrono::high_resolution_clock::now() - calculatedNow);
         dt = calculated.count();
 
-        D3DRef->Render(dt);
+        if (graphicsDevice->getDeviceReadyState() == GRAPHICS_ENGINE_STATE_RUNNING)
+        {
+            graphicsDevice->Render();
+        }
         SceneGraph::Get().Update(dt);
 
         Frame(dt);
         Framework->Run();
     }
 
-    D3Thread.join();
+    if (getWindowManager()->getRenderContext() != nullptr)
+    {
+        if (graphicsDevice->renderThread.joinable())
+            graphicsDevice->renderThread.join();
+    }
+
 
     WindowManager::Get().destroyWindow("Super");
     Framework->Shutdown();
@@ -158,15 +147,15 @@ void Application::Run()
 
 void Application::Shutdown()
 {
-    if (getAppState() == EApplicationState::Restarting)
+    if (getAppState() == ApplicationState::Restarting)
     {
-        MR_LOG(LogApplication, Log, TEXT("Restarting application!"));
+        MR_LOG(LogApplication, Log, TEXT("Restarting Application!"));
     
         Framework->Init();
     }
     else
     {
-        MR_LOG(LogApplication, Log, TEXT("Shutting down application!"));
+        MR_LOG(LogApplication, Log, TEXT("Shutting down Application!"));
 
         windowManager->Destroy();
 
@@ -174,44 +163,20 @@ void Application::Shutdown()
 
         Logger::Get().shutdownLogger();
     }
-
-    //auto a = MemoryManager::Get().getTotalUsedMemory();
-    //auto b = MemoryManager::Get().getUsedMemory();
-
-    //int j = 5;
 }
 
 void Application::setAppInfo(const ApplicationInitializationInfo* appInfo)
 {
     this->appInfo = appInfo;
-
-    setApplicationName(appInfo->appName);
 }
 
 Application::~Application()
 {
     if (windowManager)
-    {
         windowManager = nullptr;
-    }   
     
     if (layerManager)
-    {
-        windowManager = nullptr;
-    }
-}
-
-
-void Application::setApplicationName(const String Name)
-{
-    applicationName = Name;
-
-    if (/*true == nullptr*/true)
-        return;
-
-#ifdef _WIN32
-    SetWindowText((HWND)getWindowManager()->getFirstWindow()->getWindowHandle(), *applicationName);
-#endif // _WIN32
+        layerManager = nullptr;
 }
 
 String Application::getApplicationName()
@@ -224,7 +189,6 @@ String Application::getApplicationName()
 
     if (appInfo->appName.isEmpty())
     {
-        setApplicationName(getWindowManager()->getFirstWindow()->windowData->windowName);
         return getWindowManager()->getFirstWindow()->windowData->windowName;
     }
 
@@ -245,7 +209,10 @@ Vector2<uint32> Application::getWindowSize() const
 
 void Application::drawAttention() const
 {
-    if (getAppState() == EApplicationState::Initialization)
+    if (getAppState() == ApplicationState::Initialization)
+        return;
+
+    if (!getWindowManager()->getFirstWindow())
         return;
 
 #ifdef _WIN32
@@ -279,12 +246,12 @@ LRESULT CALLBACK WndProc(HWND wnd, UINT uint, WPARAM p1, LPARAM p2)
     //    break;
 
     case WM_SIZE:
-        if (Application::Get()->getAppState() == Running)
+        if (Application::Get()->getAppState() == Running && Application::Get()->getWindowManager()->getRenderContext()->getDeviceReadyState() == GRAPHICS_ENGINE_STATE_RUNNING)
         {
             uint32 width = LOWORD(p2);
             uint32 height = HIWORD(p2);
 
-            Application::Get()->getWindowManager()->getRenderContext()->resizeBuffers(Vector2(width, height));
+            Application::Get()->getRenderContext()->resizeBuffers(Vector2(width, height));
         }
         break;
 
@@ -323,12 +290,12 @@ LRESULT CALLBACK WndProc(HWND wnd, UINT uint, WPARAM p1, LPARAM p2)
         }        
         if (GetAsyncKeyState(0x41) & 0x01)
         {
-            Application::Get()->setAppState(EApplicationState::Restarting);
+            Application::Get()->setAppState(ApplicationState::Restarting);
         }       
         if (GetAsyncKeyState(0x42) & 0x01)
-        {
+        {/*
             IDirect3DDevice* temp = (IDirect3DDevice*)Application::Get()->getWindowManager()->getRenderContext();
-            temp->changeDisplayMode();
+            temp->changeDisplayMode();*/
         }
         break;
     case WM_MOVING:
@@ -388,5 +355,4 @@ LRESULT CALLBACK WndProc(HWND wnd, UINT uint, WPARAM p1, LPARAM p2)
 
     return DefWindowProc(wnd, uint, p1, p2);
 }
-
 

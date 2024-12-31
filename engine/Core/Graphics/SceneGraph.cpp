@@ -1,4 +1,4 @@
-/* Copyright 2020 - 2024, Saxon Software. All rights reserved. */
+/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #include "SceneGraph.h"
 #include <Graphics/D3D11/Direct3DDevice.h>
@@ -8,14 +8,13 @@
 
 SceneGraph::SceneGraph()
 {
-	worldMatrix = DirectX::XMMATRIX();
+	worldMatrix = DirectX::XMMatrixIdentity();
 	usedRHI = (IDirect3DDevice*)Application::Get()->getWindowManager()->getRenderContext();
 }
 
 void SceneGraph::Update(float deltaTime)
 {
-	worldMatrix = DirectX::XMMatrixIdentity();
-	for (Object* Obj : sceneList)
+	for (Object*& Obj : sceneList)
 	{
 		Obj->Frame(deltaTime);
 	}

@@ -1,8 +1,9 @@
-/* Copyright 2020 - 2024, Saxon Software. All rights reserved. */
+/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #include "GraphicsDevice.h"
 #include <Types/Vector.h>
 #include <thread>
+#include <Application/Application.h>
 
 IGraphicsDevice::IGraphicsDevice()
 {
@@ -13,15 +14,20 @@ IGraphicsDevice::~IGraphicsDevice()
 {
 }
 
-bool IGraphicsDevice::Render(float deltaTime)
+bool IGraphicsDevice::Render()
 {
-	if (!bIsDriverReady)
+	if (driverState == GRAPHICS_ENGINE_STATE_RUNNING)
 	{
-		if (!bIsDriverInitialized)
-			return false;
-
-		return false;
+		return true;
 	}
+
+	return false;
+}
+
+bool IGraphicsDevice::Init()
+{
+	setDeviceReadyState(GRAPHICS_ENGINE_STATE_INITIALIZING);
+	bIsFullScreenSwitchEnabled = !((Application::Get()->getAppInfo()->flags & APPFLAG_NO_FULLSCREEN));
 
 	return true;
 }
@@ -31,20 +37,18 @@ const String IGraphicsDevice::getRendererSignatature() const
 	return L"Unknown";
 }
 
-void IGraphicsDevice::setIsFullScreen(bool NewValue)
-{ 
+bool IGraphicsDevice::setIsFullScreen(bool NewValue)
+{
+	if (!bIsFullScreenSwitchEnabled)
+		return false;
+	
 	bIsFullscreen = NewValue;
+	return true;
 }
 
-void IGraphicsDevice::resizeBuffers(Vector2<uint32> newSize)
+void IGraphicsDevice::setDeviceReadyState(GraphicsEngineRunningState NewVal)
 {
-	if (!bIsDriverReady)
-		return;
-}
-
-void IGraphicsDevice::setDeviceReadyState(bool NewVal)
-{
-	bIsDriverReady = NewVal;
+	driverState = NewVal;
 }
 
 void IGraphicsDevice::setImGUIUsed(bool NewVal)
