@@ -30,7 +30,9 @@ IDirect3DDevice::IDirect3DDevice()
 {
 	device = nullptr;
 
-	deviceContext = nullptr;
+	deviceContextDEF = nullptr;
+
+	deviceContextIMM = nullptr;
 
 	factory = nullptr;
 
@@ -59,18 +61,27 @@ bool IDirect3DDevice::Render()
 		return false;
 
 	static constexpr const FLOAT array[4] = {0.f, 0.1f, 0.1f, 1.f};
-	deviceContext->ClearRenderTargetView(RenderTarget, array);
-	//deviceContext->ClearDepthStencilView(depthStencil, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.f, UINT8(0));
-	deviceContext->OMSetRenderTargets(1, &RenderTarget, depthStencil);
+	deviceContextIMM->ClearRenderTargetView(RenderTarget, array);
+	//deviceContextIMM->ClearDepthStencilView(depthStencil, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.f, UINT8(0));
+	deviceContextIMM->OMSetRenderTargets(1, &RenderTarget, depthStencil);
 
 
-	//if (getImGUIUsed())
-	//{
-	//	ImGui_ImplDX11_NewFrame();
-	//	ImGui_ImplWin32_NewFrame();
-	//	ImGui::NewFrame();
+	if (getImGUIUsed())
+	{
+		//ImGui_ImplDX11_NewFrame();
+		//ImGui_ImplWin32_NewFrame();
+		//ImGui::NewFrame();
 		Application::Get()->nc.initDebug();
-	//}
+	}
+
+	{
+		constantWorld w;
+		w.projection = DirectX::XMMatrixTranspose(projectionMatrix);
+		w.world = DirectX::XMMatrixTranspose(worldMatrix);
+		w.view = DirectX::XMMatrixTranspose(Application::Get()->nc.getViewMatrix());
+
+		deviceContextIMM->UpdateSubresource(worldBuffer, 0, 0, &w, 0, 0);
+	}
 
 
 	for (Object* sceneObject : graphToRender->sceneList)
@@ -82,12 +93,15 @@ bool IDirect3DDevice::Render()
 	}
 
 
-	//if (getImGUIUsed())
-	//{
-	//	ImGui::Render();
-	//	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	if (getImGUIUsed())
+	{
+		//ImGui::Render();
+		//ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	}
 	
-	
+	//deviceContextDEF->FinishCommandList(0, &commandList);
+	//deviceContextIMM->ExecuteCommandList(commandList, 0);
+
 	HRESULT	presentResult = swapChain->Present(0, 0);
 
 	if (presentResult == DXGI_ERROR_DEVICE_RESET)
@@ -110,7 +124,7 @@ bool IDirect3DDevice::Render()
 		//ImGui::EndFrame();
 	}
 
-	//deviceContext->OMSetRenderTargets(0, 0, 0);
+	//deviceContextIMM->OMSetRenderTargets(0, 0, 0);
 	return true;
 }
 
@@ -130,40 +144,35 @@ bool IDirect3DDevice::Init()
 
 	orthoMatrix = DirectX::XMMatrixOrthographicLH((float)defaultWindowSize.x, (float)defaultWindowSize.y, 0.1f, 10000.f);
 
-	try
-	{
-		createFactory();
 
-		enumAdapters();
+	createFactory();
 
-		createReferenceDevice();
+	enumAdapters();
 
-		createSwapChain(defaultWindowSize);
+	createReferenceDevice();
 
-		createDepthStencil(defaultWindowSize);
+	createSwapChain(defaultWindowSize);
 
-		createRenderTarget();
+	createDepthStencil(defaultWindowSize);
 
-		createViewport(defaultWindowSize);
+	createRenderTarget();
 
-		calculateNumerics(defaultWindowSize);
+	createViewport(defaultWindowSize);
 
-		//createVertexBuffer();
+	calculateNumerics(defaultWindowSize);
 
-		compileShader("Shader", "Shader");
+	//createVertexBuffer();
 
-		createRasterizerState();
+	compileShader("Shader", "Shader");
 
-		//createSampler();
+	createRasterizerState();
 
-		setIsFullScreen(false);
-	}
-	catch (Exception& a)
-	{
-		MR_LOG(LogD3D11, Fatal, TEXT("%s"), a.What());
-	}
+	//createSampler();
+
+	setIsFullScreen(false);
 
 	{
+
 		D3D11_BUFFER_DESC bf = {};
 		bf.Usage = D3D11_USAGE_DEFAULT;
 		bf.ByteWidth = sizeof(constantWorld);
@@ -173,6 +182,7 @@ bool IDirect3DDevice::Init()
 		HRESULT A = device->CreateBuffer(&bf, 0, &worldBuffer);
 	}
 
+	setImGUIUsed(true);
 	setDeviceReadyState(GRAPHICS_ENGINE_STATE_RUNNING);
  	return true;
 }
@@ -180,14 +190,13 @@ bool IDirect3DDevice::Init()
 void IDirect3DDevice::cleanUp() noexcept
 {
 	setDeviceReadyState(GRAPHICS_ENGINE_STATE_SHUTDOWN);
-//#ifdef MR_DEBUG
-//	if (getImGUIUsed())
-//	{
-//		ImGui_ImplDX11_Shutdown();
-//		ImGui_ImplWin32_Shutdown();
-//		ImGui::DestroyContext();
-//	}
-//#endif // MR_DEBUG
+	
+	if (getImGUIUsed())
+	{
+		//ImGui_ImplDX11_Shutdown();
+		//ImGui_ImplWin32_Shutdown();
+		//ImGui::DestroyContext();
+	}
 
 	if (swapChain)
 	{
@@ -202,11 +211,11 @@ void IDirect3DDevice::cleanUp() noexcept
 		device = nullptr;
 	}		
 		
-	if (deviceContext)
+	if (deviceContextIMM)
 	{
-		deviceContext->ClearState();
-		deviceContext->Release();
-		deviceContext = nullptr;
+		deviceContextIMM->ClearState();
+		deviceContextIMM->Release();
+		deviceContextIMM = nullptr;
 	}	
 
 	if (factory)
@@ -265,8 +274,8 @@ void IDirect3DDevice::resizeBuffers(Vector2<uint32> newSize)
 {
 	setDeviceReadyState(GRAPHICS_ENGINE_STATE_PAUSED_RENDERING);
 
-	if (deviceContext) {
-		deviceContext->OMSetRenderTargets(0, NULL, NULL);
+	if (deviceContextIMM) {
+		deviceContextIMM->OMSetRenderTargets(0, NULL, NULL);
 	}
 
 	if (RenderTarget) {
@@ -300,7 +309,7 @@ void IDirect3DDevice::resizeBuffers(Vector2<uint32> newSize)
 
 	createRenderTarget();
 
-	deviceContext->RSSetViewports(0, 0);
+	deviceContextIMM->RSSetViewports(0, 0);
 	createViewport(newSize);
 
 	setDeviceReadyState(GRAPHICS_ENGINE_STATE_RUNNING);
@@ -377,7 +386,7 @@ void IDirect3DDevice::createReferenceDevice()
 		D3D11_SDK_VERSION,
 		&device,
 		&usedfeatureLevel,
-		&deviceContext
+		&deviceContextIMM
 	);
 
 	if (result == DXGI_ERROR_UNSUPPORTED)
@@ -393,7 +402,7 @@ void IDirect3DDevice::createReferenceDevice()
 			D3D11_SDK_VERSION,
 			&device,
 			0,
-			&deviceContext
+			&deviceContextIMM
 		);
 	}
 
@@ -414,6 +423,16 @@ void IDirect3DDevice::createReferenceDevice()
 		MR_LOG(LogD3D11, Verbose, TEXT("\tAvailable Memory: %d MB"), apInfo.DedicatedVideoMemory >> 20);
 		MR_LOG(LogD3D11, Verbose, TEXT("\tHighest Feature Level: %s"), distinguishFeatureLevel(device->GetFeatureLevel()).Chr());
 	}
+
+
+	MR_ASSERT(device != nullptr, TEXT("device is Invalid!"));
+
+	//D3D11_FEATURE_DATA_THREADING thrd = {};
+	//HRESULT chk = device->CheckFeatureSupport(D3D11_FEATURE_THREADING, &thrd, sizeof(thrd));
+	//if (thrd.DriverConcurrentCreates == 1)
+	//{
+	//	chk = device->CreateDeferredContext(0, &deviceContextDEF);
+	//}
 
 	if (getImGUIUsed())
 	{
@@ -513,7 +532,7 @@ inline void IDirect3DDevice::compileShader(String vertexShader, String pixelShad
 		THROW_EXCEPTION("CreateInputLayout failed! Check with Debug configuration!");
 	}
 
-	deviceContext->IASetInputLayout(inputLayout);
+	deviceContextIMM->IASetInputLayout(inputLayout);
 
 	vertexBlob->Release();
 	pixelBlob->Release();
@@ -625,7 +644,7 @@ inline void IDirect3DDevice::createViewport(Vector2<uint32> size)
 	vpInfo.MaxDepth = 1.f;
 	vpInfo.MinDepth = 0.f;
 
-	deviceContext->RSSetViewports(1, &vpInfo);
+	deviceContextIMM->RSSetViewports(1, &vpInfo);
 }
 
 inline void IDirect3DDevice::createRenderTarget()
@@ -644,7 +663,7 @@ inline void IDirect3DDevice::createRenderTarget()
 		THROW_EXCEPTION("CreateRenderTargetView failed! Check with Debug configuration!");
 	}
 
-	deviceContext->OMSetRenderTargets(1, &RenderTarget, depthStencil);
+	deviceContextIMM->OMSetRenderTargets(1, &RenderTarget, depthStencil);
 }
 
 
@@ -664,35 +683,35 @@ inline void IDirect3DDevice::enumAdapters()
 
 inline void IDirect3DDevice::imguiStateChanged(bool NewValue)
 {
-	if (NewValue)
-	{
-		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
-		ImGuiIO& io = ImGui::GetIO();
-		io.DisplaySize = ImGui::GetMainViewport()->Size;
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-		//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // IF using Docking Branch
+	//if (NewValue)
+	//{
+	//	IMGUI_CHECKVERSION();
+	//	ImGui::CreateContext();
+	//	ImGuiIO& io = ImGui::GetIO();
+	//	io.DisplaySize = ImGui::GetMainViewport()->Size;
+	//	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+	//	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+	//	//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // IF using Docking Branch
 
-		// Setup Platform/Renderer backends
-		if (!ImGui_ImplWin32_Init(Application::Get()->getWindowManager()->getFirstWindow()->getWindowHandle()))
-		{
-			setImGUIUsed(false);
-			THROW_EXCEPTION("Failed to Initialize ImGUI (WinAPI implementation)");
-		}
+	//	// Setup Platform/Renderer backends
+	//	if (!ImGui_ImplWin32_Init(Application::Get()->getWindowManager()->getFirstWindow()->getWindowHandle()))
+	//	{
+	//		setImGUIUsed(false);
+	//		THROW_EXCEPTION("Failed to Initialize ImGUI (WinAPI implementation)");
+	//	}
 
-		if (!ImGui_ImplDX11_Init(device, deviceContext))
-		{
-			setImGUIUsed(false);
-			THROW_EXCEPTION("Failed to Initialize ImGUI (DX11 implementation)");
-		}
-	}
-	else if (getImGUIUsed())
-	{
-		ImGui_ImplDX11_Shutdown();
-		ImGui_ImplWin32_Shutdown();
-		ImGui::DestroyContext();
-	}
+	//	if (!ImGui_ImplDX11_Init(device, deviceContextIMM))
+	//	{
+	//		setImGUIUsed(false);
+	//		THROW_EXCEPTION("Failed to Initialize ImGUI (DX11 implementation)");
+	//	}
+	//}
+	//else if (getImGUIUsed())
+	//{
+	//	ImGui_ImplDX11_Shutdown();
+	//	ImGui_ImplWin32_Shutdown();
+	//	ImGui::DestroyContext();
+	//}
 }
 
 inline void IDirect3DDevice::createInputLayout()

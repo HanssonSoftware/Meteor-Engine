@@ -20,18 +20,19 @@ typedef enum FileOverrideRules
 	OVERRIDERULE_OPEN_ONLY_IF_EXISTS,
 	OVERRIDERULE_CREATE_NEW_IF_NOT_EXISTS,
 	OVERRIDERULE_CREATE_NEW_DONT_MIND
+
 } FileOverrideRules;
 
-class File
+class FMFile
 {
 public:
-	File(const File&) = delete;
+	FMFile(const FMFile&) = delete;
 
-	File() = delete;
+	FMFile() = delete;
 
-	~File();
+	~FMFile();
 
-	File(const String Name, int openRules, FileOverrideRules overrideRules);
+	FMFile(const String Name, int openRules, FileOverrideRules overrideRules);
 
 	void Write(const String buffer) const;
 
@@ -59,3 +60,4 @@ private:
 
 	inline constexpr const int evaluateOverrideRules(FileOverrideRules flags);
 };
+

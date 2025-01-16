@@ -6,7 +6,7 @@
 #include <Graphics/D3D11/Direct3DDevice.h>
 //#include <Graphics/Vulkan/VulkanDevice.h>
 #ifdef _WIN32
-//#include <../Resources/EngineResources.h>
+#include <../Resources/resource.h>
 #endif // _WIN32
 #include <Log/Exception.h>
 
@@ -28,6 +28,7 @@ WindowManager::~WindowManager()
 	if (renderContext)
 	{
 		renderContext->cleanUp();
+		delete renderContext;
 		renderContext = nullptr;
 	}
 
@@ -186,8 +187,7 @@ bool WindowManager::destroyWindow(const String ID)
 inline bool WindowManager::registerWindowClass()
 {
 	HINSTANCE instance = GetModuleHandle(NULL);
-	HICON ico = (HICON)LoadImage(0, L"E:\\meteor\\resources\\icon0.ico", IMAGE_ICON, 64, 64, LR_DEFAULTCOLOR | LR_LOADFROMFILE);
-	//Logger::Get().dispatchLastError();
+	HICON ico = (HICON)LoadImage(instance, MAKEINTRESOURCE(IDI_DEFAULTAPPICON), IMAGE_ICON, 64, 64, LR_DEFAULTCOLOR);
 
 	WNDCLASSEX windowClass = {};
 	windowClass.lpszClassName = ApplicationClassName;

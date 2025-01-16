@@ -54,13 +54,14 @@ void mrfree(void* ptr)
 	}
 
 	MemoryManager::Get().usedMemoryInBytes -= sizeof(ptr);
-	return free(ptr);
+	free(ptr);
+	ptr = nullptr;
 }
 
 void* operator new(size_t size)
 {
 	void* occupiedLocation = malloc(size);
-	if (occupiedLocation == nullptr)
+	if (occupiedLocation == NULL)
 	{
 		MR_LOG(LogMemory, Error, TEXT("Unable to allocate memory!"));
 		return nullptr;

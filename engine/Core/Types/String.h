@@ -61,12 +61,18 @@ public:
 
 	bool isEmpty() const;
 
+	bool endsWith(const String string) const;
+
 	int toInt() const;
 
 	float toFloat() const;
 
-	static String Format(String format, ...);
+	static String Format(const String format, ...);
 private:
 	wchar_t* buffer;
+
+#ifdef MR_DEBUG
+	bool bIsInited = false;
+#endif // MR_DEBUG
 public:
 };

@@ -63,9 +63,6 @@
     <ClCompile Include="engine\Core\File\File.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Graphics\D3D11\Direct3DDevice.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\Core\Graphics\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -123,33 +120,6 @@
     <ClCompile Include="engine\Object\Object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\ThirdParty\ImGUI\imgui.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\ThirdParty\ImGUI\imgui_demo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\ThirdParty\ImGUI\imgui_draw.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\ThirdParty\ImGUI\imgui_tables.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\ThirdParty\ImGUI\imgui_widgets.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\ThirdParty\OpenFBX\libdeflate.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\ThirdParty\OpenFBX\ofbx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\ThirdParty\ImGUI\backends\imgui_impl_dx11.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\ThirdParty\ImGUI\backends\imgui_impl_win32.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\Core\Common\Pointers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -157,6 +127,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Graphics\ConstantBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\AssetLoader\Mesh\StaticMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\Graphics\D3D11\Direct3DDevice.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -207,9 +183,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\File\File.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Core\Graphics\D3D11\Direct3DDevice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Graphics\Camera.h">
@@ -279,342 +252,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Platform\Microsoft\MinWin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\config\ftconfig.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\config\ftheader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\config\ftmodule.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\config\ftoption.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\config\ftstdlib.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\config\integer-types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\config\mac-support.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\config\public-macros.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svbdf.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svcfftl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svcid.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svfntfmt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svgldict.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svgxval.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svkern.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svmetric.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svmm.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svotval.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svpfr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svpostnm.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svprop.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svpscmap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svpsinfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svsfnt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svttcmap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svtteng.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svttglyf.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\services\svwinfnt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\autohint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\cffotypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\cfftypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\compiler-macros.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\ftcalc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\ftdebug.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\ftdrv.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\ftgloadr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\fthash.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\ftmemory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\ftmmtypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\ftobjs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\ftpsprop.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\ftrfork.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\ftserv.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\ftstream.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\fttrace.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\ftvalid.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\psaux.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\pshints.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\sfnt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\svginterface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\t1types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\tttypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\internal\wofftypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\freetype.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftadvanc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftbbox.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftbdf.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftbitmap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftbzip2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftcache.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftchapters.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftcid.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftcolor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftdriver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\fterrdef.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\fterrors.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftfntfmt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftgasp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftglyph.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftgxval.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftgzip.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftimage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftincrem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftlcdfil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftlist.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftlogging.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftlzw.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftmac.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftmm.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftmodapi.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftmoderr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftotval.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftoutln.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftparams.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftpfr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftrender.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftsizes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftsnames.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftstroke.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftsynth.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftsystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\fttrigon.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ftwinfnt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\fttypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\otsvg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\t1tables.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\ttnameid.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\tttables.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\freetype\tttags.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\ft2build.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\ImGUI\imconfig.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\ImGUI\imgui.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\ImGUI\imgui_internal.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\ImGUI\imstb_rectpack.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\ImGUI\imstb_textedit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\ImGUI\imstb_truetype.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\OpenFBX\libdeflate.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\OpenFBX\ofbx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\TinyGLTF\json.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\TinyGLTF\stb_image.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\TinyGLTF\stb_image_write.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\TinyGLTF\tiny_gltf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Version.h">
@@ -866,12 +503,6 @@
     <ClInclude Include="engine\ThirdParty\assimp\ZipArchiveIOSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\ThirdParty\ImGUI\backends\imgui_impl_dx11.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\ImGUI\backends\imgui_impl_win32.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\Core\Common\Pointers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -882,6 +513,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resources\resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\AssetLoader\Mesh\StaticMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Graphics\D3D11\Direct3DDevice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -913,6 +550,8 @@
     <None Include="engine\ThirdParty\assimp\vector3.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="engine\Core\Window\Window.mrbuild" />
+    <None Include="engine\Core\File\File.mrbuild" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\sampleapp.rc">
@@ -920,7 +559,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="resources\icon.ico">
+    <Image Include="resources\mr1.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

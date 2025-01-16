@@ -26,25 +26,25 @@ struct LogPart
 {
 	friend class Logger;
 
-	LogPart(String Category, ESeverity DisplayTitle, String Message, String location, String function,...);
+	inline LogPart(String Category, ESeverity DisplayTitle, String Message, String location, String function,...);
 
 	//LogPart(String Category, ESeverity DisplayTitle, String Message);
 		
 private:
 
-	String time;
+	String time = "";
 
-	String category;
+	String category = "";
+
+	String message = "";
+
+	String rawMessage = "";
+
+	String func = "";
+
+	String file = "";
 
 	ESeverity displayTitle = Log;
-
-	String message;
-
-	String rawMessage;
-
-	String func;
-
-	String file;
 
 	constexpr const wchar_t* formatSeverity(ESeverity Severity) const noexcept;
 };

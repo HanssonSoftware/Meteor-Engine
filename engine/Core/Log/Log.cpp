@@ -212,7 +212,7 @@ void Logger::createConsoleW()
    freopen_s(&A,"CONOUT$", "w", stdout);
 
    const int j = _setmode(_fileno(A), _O_U8TEXT);
-   const String message = String(L"MR1 console");
+   const String message = String::Format(L"MR console %s b%d", BUILD_DATE,BUILD_NUMBER);
 
    SetConsoleOutputCP(CP_UTF8);
    SetConsoleTitle(message.Chr());
@@ -286,6 +286,12 @@ inline constexpr const void Logger::setColorBySeverity(ESeverity Severity) const
 LogPart::LogPart(String Category, ESeverity DisplayTitle, String Message, String location, String function, ...)
     : category(Category), displayTitle(DisplayTitle), message(Message), file(location), func(function)
 {
+    if (displayTitle == Verbose)
+    {
+        if (Logger::Get().getLoggingLevel() != LOGGING_LEVEL_MAXIMUM)
+            return;
+    }
+
     time = Timer::Now();
 
     va_list variadicCount;

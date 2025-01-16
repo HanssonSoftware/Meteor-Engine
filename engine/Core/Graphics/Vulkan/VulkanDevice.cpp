@@ -70,7 +70,6 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 
 	createCommandBuffer();
 
-	bIsDriverInitialized = true;
 	setDeviceReadyState(GRAPHICS_ENGINE_STATE_RUNNING);
 	return true;
 }
@@ -78,15 +77,21 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 void IVulkanDevice::cleanUp()
 {
 	setDeviceReadyState(GRAPHICS_ENGINE_STATE_SHUTDOWN);
-	vkDestroySwapchainKHR(device, swapChain, 0);
 
 	vkDestroyFence(device, renderFence, 0);
 	vkDestroySemaphore(device, renderSemaphore, 0);
 	vkDestroySemaphore(device, acquireSemaphore, 0);
+	
+	for (auto& sw : swapChainImageViews)
+	{
+		vkDestroyImageView(device, sw, 0);
+	}
 
-	vkDestroySurfaceKHR(instance, surface, 0);
+	vkDestroySwapchainKHR(device, swapChain, 0);
 
 	vkDestroyDevice(device, 0);
+
+	vkDestroySurfaceKHR(instance, surface, 0);
 
 #ifdef MR_DEBUG
 	PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessengerEXT =
@@ -207,16 +212,16 @@ inline void IVulkanDevice::initInstance()
 #ifdef MR_DEBUG
 void IVulkanDevice::createDebugMessenger()
 {
-	VkDebugUtilsMessengerCreateInfoEXT dbInfoE = { VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT };
-	dbInfoE.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-	dbInfoE.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT;
-	dbInfoE.pfnUserCallback = debugCallback;
+	VkDebugUtilsMessengerCreateInfoEXT dbInfo = { VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT };
+	dbInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+	dbInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT;
+	dbInfo.pfnUserCallback = debugCallback;
 
 	PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessengerEXT =
 		(PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
 
 	if (vkCreateDebugUtilsMessengerEXT) {
-		vkCreateDebugUtilsMessengerEXT(instance, &dbInfoE, NULL, &dbman);
+		vkCreateDebugUtilsMessengerEXT(instance, &dbInfo, NULL, &dbman);
 		return;
 	}
 
@@ -226,11 +231,11 @@ void IVulkanDevice::createDebugMessenger()
 
 inline void IVulkanDevice::selectDevice()
 {
-	VkPhysicalDevice devices[8];
 	uint32 devicesCount = 0;
-
 	vkEnumeratePhysicalDevices(instance, &devicesCount, 0);
-	vkEnumeratePhysicalDevices(instance, &devicesCount, devices);
+
+	std::vector<VkPhysicalDevice> devices(devicesCount);
+	vkEnumeratePhysicalDevices(instance, &devicesCount, devices.data());
 
 	for (uint32 i = 0; i < devicesCount; i++)
 	{
@@ -242,8 +247,10 @@ inline void IVulkanDevice::selectDevice()
 		VkPhysicalDeviceFeatures deviceFeatures;
 		vkGetPhysicalDeviceFeatures(indexedDevice, &deviceFeatures);
 		
-		if (deviceFeatures.geometryShader == 0 && deviceProps.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+		if (deviceFeatures.geometryShader == 0)
 			continue;
+
+		uint32 usedQueueCounts = 0;
 
 		uint32 queueFamilyPropertiesCount = 0;
 		vkGetPhysicalDeviceQueueFamilyProperties(indexedDevice, &queueFamilyPropertiesCount, 0);
@@ -251,28 +258,67 @@ inline void IVulkanDevice::selectDevice()
 		std::vector<VkQueueFamilyProperties> familyProperties(queueFamilyPropertiesCount);
 		vkGetPhysicalDeviceQueueFamilyProperties(indexedDevice, &queueFamilyPropertiesCount, familyProperties.data());
 
+		if (queueFamilyPropertiesCount == 0)
+			THROW_EXCEPTION("Failed to Find Any Available Queue Families!");
+
 		for (uint32 j = 0; j < queueFamilyPropertiesCount; j++)
 		{
 			VkQueueFamilyProperties indexedFamilyProperties = familyProperties[j];
+			usedQueueCounts = indexedFamilyProperties.queueCount;
 
-			if (indexedFamilyProperties.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+			bool bFailed = false;
+			while (usedQueueCounts != 0 && !bFailed)
 			{
-				selectedPhysicalDevice = indexedDevice;
-				queues.graphicsQueueIndex = j;
-			}
+				if (indexedFamilyProperties.queueFlags == 0)
+				{
+					MR_LOG(LogVulkan, Verbose, TEXT("Queue #%d Cannot Be Used Because No Flags Applied!"), j);
+					bFailed = true;
+					continue;
+				}
 
-			VkBool32 bIsTrue = 0;
-			vkGetPhysicalDeviceSurfaceSupportKHR(indexedDevice, j, surface, &bIsTrue);
+				if (indexedFamilyProperties.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+				{
+					queues.graphicsQueueIndex = j;
+					selectedPhysicalDevice = indexedDevice;
+					usedQueueCounts--;
 
-			if (bIsTrue)
-			{
-				queues.presentingQueueIndex = j;
-				return;
+					if (checkIfPresentationIsSupported(indexedDevice, j) && !queues.presentingSupported)
+					{
+						queues.presentingSupported = true;
+						queues.presentingSupportedFamilyIndex = j;
+					}
+
+					if (usedQueueCounts == 0) continue;
+				}				
+
+				if (indexedFamilyProperties.queueFlags & VK_QUEUE_COMPUTE_BIT)
+				{
+					queues.calculationQueueIndex = j;
+					usedQueueCounts--;
+					if (usedQueueCounts == 0) continue;
+				}				
+				
+				if (indexedFamilyProperties.queueFlags & VK_QUEUE_TRANSFER_BIT)
+				{
+					queues.transferQueueIndex = j;
+					usedQueueCounts--;
+					if (usedQueueCounts == 0) continue;
+				}				
+				
+				if (indexedFamilyProperties.queueFlags & VK_QUEUE_VIDEO_DECODE_BIT_KHR)
+				{
+					usedQueueCounts--;
+					if (usedQueueCounts == 0) continue;
+				}
 			}
 		}
 	}
 
-	MR_LOG(LogVulkan, Fatal, TEXT("Unable to found any capable gpu(s)!"));
+	if (selectedPhysicalDevice == nullptr)
+	{
+		MR_LOG(LogVulkan, Fatal, TEXT("No Capable GPU(s) Found!"));
+	}
+	
 }
 
 inline void IVulkanDevice::initDevices()
@@ -283,10 +329,28 @@ inline void IVulkanDevice::initDevices()
 	}
 
 	static constexpr const float Priority = 1.f;
-	VkDeviceQueueCreateInfo queueInfo = { VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO };
-	queueInfo.queueCount = 1;
-	queueInfo.queueFamilyIndex = queues.graphicsQueueIndex;
-	queueInfo.pQueuePriorities = &Priority;
+
+	std::vector<VkDeviceQueueCreateInfo> queueInfos;
+
+	// Graphics Queue
+	{
+		VkDeviceQueueCreateInfo queueInfo = { VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO };
+		queueInfo.queueCount = 1;
+		queueInfo.queueFamilyIndex = queues.graphicsQueueIndex;
+		queueInfo.pQueuePriorities = &Priority;
+
+		queueInfos.emplace_back(queueInfo);
+	}	
+	
+	// Presenting Queue
+	{
+		VkDeviceQueueCreateInfo queueInfo = { VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO };
+		queueInfo.queueCount = 1;
+		//queueInfo.queueFamilyIndex = queues.presentingQueueIndex;
+		queueInfo.pQueuePriorities = &Priority;
+
+		//queueInfos.emplace_back(queueInfo);
+	}
 
 	static constexpr const char* deviceExtensions[]
 	{
@@ -297,10 +361,8 @@ inline void IVulkanDevice::initDevices()
 	VkDeviceCreateInfo createInfo = { VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
 	createInfo.enabledExtensionCount = deviceExtensionsSize;
 	createInfo.ppEnabledExtensionNames = deviceExtensions;
-	createInfo.enabledLayerCount = requiredMinimalLayersCount;
-	createInfo.ppEnabledLayerNames = requiredMinimalLayers;
-	createInfo.pQueueCreateInfos = &queueInfo;
-	createInfo.queueCreateInfoCount = 1;
+	createInfo.pQueueCreateInfos = queueInfos.data();
+	createInfo.queueCreateInfoCount = (uint32_t)queueInfos.size();
 
 
 	VkResult Result = vkCreateDevice(selectedPhysicalDevice, &createInfo, 0, &device);
@@ -311,9 +373,6 @@ inline void IVulkanDevice::initDevices()
 
 	if (queues.graphicsQueueIndex != -1)
 		vkGetDeviceQueue(device, queues.graphicsQueueIndex, 0, &queues.graphicsQueue);
-
-	if (queues.presentingQueueIndex != -1)
-		vkGetDeviceQueue(device, queues.presentingQueueIndex, 0, &queues.presentingQueue);
 }
 
 inline void IVulkanDevice::createSurface()
@@ -350,18 +409,13 @@ inline void IVulkanDevice::createSwapChain()
 	VkSurfaceCapabilitiesKHR capabilities;
 	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(selectedPhysicalDevice, surface, &capabilities);
 
-	VkSurfaceFormatKHR selectedSurfaceFormat = {};
 	uint32 surfaceFormatCount = 0;
 	vkGetPhysicalDeviceSurfaceFormatsKHR(selectedPhysicalDevice, surface, &surfaceFormatCount, 0);
 
 	std::vector<VkSurfaceFormatKHR> formats(surfaceFormatCount);
 	vkGetPhysicalDeviceSurfaceFormatsKHR(selectedPhysicalDevice, surface, &surfaceFormatCount, formats.data());
 
-	for (const auto& indexedFormat : formats)
-	{
-		if (indexedFormat.format == VK_FORMAT_B8G8R8A8_SRGB && indexedFormat.colorSpace == VK_COLORSPACE_SRGB_NONLINEAR_KHR)
-			selectedSurfaceFormat = indexedFormat;
-	}	
+	VkSurfaceFormatKHR selectedSurfaceFormat = selectSurfaceFormat(formats);
 
 	VkSwapchainCreateInfoKHR swapChainInfo = { VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR };
 	swapChainInfo.surface = surface;
@@ -369,14 +423,30 @@ inline void IVulkanDevice::createSwapChain()
 	swapChainInfo.minImageCount = 2;
 	swapChainInfo.imageFormat = selectedSurfaceFormat.format;
 	swapChainInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+
 	swapChainInfo.presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+
 	swapChainInfo.imageExtent = capabilities.currentExtent;
 	swapChainInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 	swapChainInfo.imageArrayLayers = 1;
 	swapChainInfo.preTransform = capabilities.currentTransform;
-	swapChainInfo.minImageCount = capabilities.minImageCount;
-	swapChainInfo.queueFamilyIndexCount = 1;
+	swapChainInfo.minImageCount = capabilities.minImageCount + 1;
 	swapChainInfo.imageColorSpace = selectedSurfaceFormat.colorSpace;
+
+	const uint32 queueFamilies[] = { queues.graphicsQueueIndex, queues.presentingSupportedFamilyIndex };
+
+	if (queues.graphicsQueueIndex != queues.presentingSupportedFamilyIndex)
+	{
+		swapChainInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+		swapChainInfo.queueFamilyIndexCount = 2;
+		swapChainInfo.pQueueFamilyIndices = queueFamilies;
+	}
+	else
+	{
+		swapChainInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		swapChainInfo.queueFamilyIndexCount = 0;
+		swapChainInfo.pQueueFamilyIndices = nullptr;
+	}
 
 	VkResult Result = vkCreateSwapchainKHR(device, &swapChainInfo, 0, &swapChain);
 	if (Result != VK_SUCCESS)
@@ -391,15 +461,22 @@ inline void IVulkanDevice::createSwapChain()
 	swapChainImageViews.resize(swapChainImagesCount);
 	vkGetSwapchainImagesKHR(device, swapChain, &swapChainImagesCount, swapChainImages.data());
 
-	VkImageViewCreateInfo viewInfo = { VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
-	viewInfo.format = selectedSurfaceFormat.format;
-	viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-	viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-	viewInfo.subresourceRange.levelCount = 1;
-	viewInfo.subresourceRange.layerCount = 1;
-	for (uint32_t i = 0; i < swapChainImagesCount; i++)
+	for (uint32 i = 0; i < swapChainImagesCount; i++)
 	{
+		VkImageViewCreateInfo viewInfo = { VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
+		viewInfo.format = selectedSurfaceFormat.format;
+		viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		viewInfo.subresourceRange.levelCount = 1;
+		viewInfo.subresourceRange.baseArrayLayer = 0;
+		viewInfo.subresourceRange.baseMipLevel = 0;
+		viewInfo.subresourceRange.layerCount = 1;
+		viewInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+		viewInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+		viewInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+		viewInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
 		viewInfo.image = swapChainImages[i];
+
 		vkCreateImageView(device, &viewInfo, 0, &swapChainImageViews[i]);
 	}
 }
@@ -429,6 +506,29 @@ inline void IVulkanDevice::createSemaphoresAndFences()
 	{
 		THROW_EXCEPTION("vkCreateFence failed with: %s", evaluateResultToText(Result));
 	}
+}
+
+inline VkSurfaceFormatKHR IVulkanDevice::selectSurfaceFormat(const std::vector<VkSurfaceFormatKHR> formats)
+{
+	for (const auto& indexedFormat : formats)
+	{
+		if (indexedFormat.format == VK_FORMAT_B8G8R8A8_SRGB && indexedFormat.colorSpace == VK_COLORSPACE_SRGB_NONLINEAR_KHR)
+			return indexedFormat;
+	}
+
+	return formats[0];
+}
+
+inline bool IVulkanDevice::checkIfPresentationIsSupported(VkPhysicalDevice virtualDevice, const int Index) const
+{
+	MR_ASSERT(virtualDevice, TEXT("virtualDevice is Invalid!"));
+	MR_ASSERT(surface, TEXT("surface is Invalid!"));
+
+	VkBool32 bIs;
+	vkGetPhysicalDeviceSurfaceSupportKHR(virtualDevice, Index, surface, &bIs);
+
+
+	return bIs == VK_TRUE ? true : false;
 }
 
 const String IVulkanDevice::evaluateResultToText(VkResult Result) noexcept

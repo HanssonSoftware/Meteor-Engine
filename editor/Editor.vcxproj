@@ -92,7 +92,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG;UNICODE;MR_DEBUG</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(VULKAN_SDK)\Include\;$(SolutionDir)Source\;$(SolutionDir)Source\ThirdParty\FreeType\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);$(SolutionDir)Source\ThirdParty\ImGUI\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\Core;$(VULKAN_SDK)\Include\;$(SolutionDir)Source\;$(SolutionDir)Source\ThirdParty\FreeType\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);$(SolutionDir)Source\ThirdParty\ImGUI\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -104,6 +104,9 @@
       <ShaderType>
       </ShaderType>
     </FxCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)resources;$(SolutionDir)engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -111,7 +114,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG;UNICODE;MR_DEBUG</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty\ImGUI\;$(VULKAN_SDK)\Include\;$(SolutionDir)Source\;$(SolutionDir)Source\ThirdParty\FreeType\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);$(SolutionDir)Source\ThirdParty\ImGUI\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty\ImGUI\;$(VULKAN_SDK)\Include\;$(SolutionDir)Source\;$(SolutionDir)Source\ThirdParty\FreeType\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);$(SolutionDir)Source\ThirdParty\ImGUI\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -123,10 +126,13 @@
       <ShaderType>
       </ShaderType>
     </FxCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)resources;$(SolutionDir)engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine;$(SolutionDir)engine\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>;UNICODE</PreprocessorDefinitions>
     </ClCompile>
@@ -138,10 +144,13 @@
       <ShaderType>
       </ShaderType>
     </FxCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)resources;$(SolutionDir)engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine;$(SolutionDir)engine\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>;UNICODE</PreprocessorDefinitions>
     </ClCompile>
@@ -153,6 +162,9 @@
       <ShaderType>
       </ShaderType>
     </FxCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)resources;$(SolutionDir)engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ProjectReference Include="..\meteor.vcxproj">

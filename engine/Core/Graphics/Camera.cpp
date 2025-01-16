@@ -2,7 +2,7 @@
 
 #include "Camera.h"
 //#include <Graphics/D3D11/Direct3DDevice.h>
-#include <ThirdParty/ImGUI/imgui.h>
+//#include <ThirdParty/ImGUI/imgui.h>
 #include <Application/Application.h>
 #include <Window/WindowManager.h>
 
@@ -20,7 +20,16 @@ Camera::~Camera()
 
 void Camera::Render()
 {
+	DirectX::XMFLOAT3 currentEyePos = { currentPosition.x, currentPosition.y, currentPosition.z };
+	DirectX::XMVECTOR currentEyePosVec = DirectX::XMLoadFloat3(&currentEyePos);
+	DirectX::XMMATRIX B = DirectX::XMMatrixRotationRollPitchYaw(currentRotation.x, currentRotation.y, currentRotation.z);
 
+	DirectX::XMVECTOR targetDirectory = DirectX::XMVector3TransformCoord(DEFAULT_FORWARD, B);
+	targetDirectory += currentEyePosVec;
+
+	DirectX::XMVECTOR upDirectroy = DirectX::XMVector3TransformCoord(DEFAULT_UP, B);
+
+	viewMX = DirectX::XMMatrixLookAtLH(currentEyePosVec, targetDirectory, upDirectroy);
 }
 
 void Camera::Frame(float deltaTime)

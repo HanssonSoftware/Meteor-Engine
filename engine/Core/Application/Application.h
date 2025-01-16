@@ -44,10 +44,10 @@ typedef struct ApplicationInitializationInfo
 
 typedef enum ApplicationState
 {
-	Initialization,
-	Running,
-	Restarting,
-	Shutdown
+	APPLICATIONSTATE_INITIALIZATION,
+	APPLICATIONSTATE_RUNNING,
+	APPLICATIONSTATE_RESTARTING,
+	APPLICATIONSTATE_SHUTDOWN
 
 } ApplicationState;
 
@@ -79,6 +79,8 @@ public:
 
 	const ApplicationInitializationInfo* getAppInfo() const { return appInfo; };
 	
+	String getApplicationDirectory() const { return applicationLocation; };
+
 	/** Gets the application window size, returns the actual window size with border. Who knows, what else? */
 	virtual Vector2<uint32> getWindowSize() const;
 
@@ -106,7 +108,7 @@ public:
 
 	Camera nc;
 protected:
-	ApplicationState State = Initialization;
+	ApplicationState State = APPLICATIONSTATE_INITIALIZATION;
 
 	const ApplicationInitializationInfo* appInfo;
 
@@ -115,11 +117,13 @@ protected:
 	String applicationName = L"Saxon Proprietary Game Engine";
 
 	String applicationLocation;
+
+	String configurationsLocation;
 };
 
 #ifdef _WIN32
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+//extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 #endif // _WIN32
 
 

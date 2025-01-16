@@ -6,7 +6,7 @@
 #include <Log/Exception.h>
 #include <Common/MemoryManager.h>
 
-File::~File()
+FMFile::~FMFile()
 {
 #ifdef _WIN32
 
@@ -24,7 +24,7 @@ File::~File()
 	}
 }
 
-File::File(const String Name, int openRules, FileOverrideRules overrideRules)
+FMFile::FMFile(const String Name, int openRules, FileOverrideRules overrideRules)
 {
 	if (Name.isEmpty())
 	{
@@ -57,7 +57,7 @@ File::File(const String Name, int openRules, FileOverrideRules overrideRules)
 	bWasInitSucceded = true;
 }
 
-void File::Write(const String buffer) const
+void FMFile::Write(const String buffer) const
 {
 	if (!bWasInitSucceded)
 		return;
@@ -77,7 +77,7 @@ void File::Write(const String buffer) const
 #ifdef _WIN32
 	DWORD charsWritten = 0;
 
-	const int& requestedNarrowQuantity = WideCharToMultiByte(CP_UTF8, 0, buffer.Chr(), -1, 0, 0, 0, 0);
+	const int requestedNarrowQuantity = WideCharToMultiByte(CP_UTF8, 0, buffer.Chr(), -1, 0, 0, 0, 0);
 	char* bufferA = (char*)mrmalloc(requestedNarrowQuantity);
 
 	WideCharToMultiByte(CP_UTF8, 0, buffer.Chr(), -1, bufferA, requestedNarrowQuantity, 0, 0);
@@ -97,7 +97,7 @@ void File::Write(const String buffer) const
 #endif // _WIN32
 }
 
-void File::Read()
+void FMFile::Read()
 {
 	if (!bWasInitSucceded)
 		return;
@@ -124,7 +124,7 @@ void File::Read()
 		Logger::Get().dispatchLastError();
 	}
 
-	const int& requiredAmount = MultiByteToWideChar(CP_UTF8, 0, narrowBuffer, -1, 0, 0);
+	const int requiredAmount = MultiByteToWideChar(CP_UTF8, 0, narrowBuffer, -1, 0, 0);
 	buffer = (wchar_t*)mrmalloc((requiredAmount) * sizeof(wchar_t));
 	
 	MultiByteToWideChar(CP_UTF8, 0, narrowBuffer, -1, buffer, requiredAmount);
@@ -135,7 +135,7 @@ void File::Read()
 }
 
 
-void File::setName(String content)
+void FMFile::setName(String content)
 {
 	if (content.isEmpty())
 	{
@@ -167,7 +167,7 @@ void File::setName(String content)
 #endif // _WIN32
 }
 
-inline constexpr const int File::evaluateOverrideRules(FileOverrideRules flags)
+inline constexpr const int FMFile::evaluateOverrideRules(FileOverrideRules flags)
 {
 	switch (flags)
 	{
@@ -205,3 +205,5 @@ inline constexpr const int File::evaluateOverrideRules(FileOverrideRules flags)
 
 	return -1;
 }
+
+

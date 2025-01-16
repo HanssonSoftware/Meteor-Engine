@@ -41,6 +41,7 @@ String ICommandlet::Search(String Name)
 void ICommandlet::Parse(int Count, char* Array[])
 {
 	executableLocation = Array[0];
+	currentQueue.resize(Count);
 
 	// Create a background, if parameter is found 
 	char* indexedParameterBefore = Array[0];

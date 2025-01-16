@@ -39,6 +39,10 @@ public:
 
 	virtual bool setIsFullScreen(bool NewValue) override;
 
+	bool getIsMultiThreadSupported() { return bIsMultiThreadSupported; };
+
+	void setIsMultiThreadSupported(bool newValue) { bIsMultiThreadSupported = newValue; };
+
 	bool buseWframe = 0;
 
 	void changeDisplayMode();
@@ -47,7 +51,10 @@ public:
 	ID3D11Device* getDevice() const { return device; };
 
 	/** Gets the Direct3D 11 device context, primarily used for rendering commands. */
-	ID3D11DeviceContext* getDeviceContext() const { return deviceContext; };
+	ID3D11DeviceContext* getDeviceContext() const 
+	{ 
+		return deviceContextDEF == nullptr ? deviceContextIMM : deviceContextDEF; 
+	};
 
 	/** Gets the compiled vertex shader, which handles vertex transformation logic. */
 	ID3D11VertexShader* getCompiledVertexShader() const { return compiledVertexShader; };
@@ -103,6 +110,8 @@ public:
 
 private:
 	D3D_FEATURE_LEVEL usedfeatureLevel;
+
+	bool bIsMultiThreadSupported = false;
 
 	inline void createReferenceDevice();
 
@@ -173,7 +182,11 @@ private:
 
 	ID3D11Texture2D* backBuffer;
 
-	ID3D11DeviceContext* deviceContext;
+	ID3D11CommandList* commandList;
+
+	ID3D11DeviceContext* deviceContextIMM;
+
+	ID3D11DeviceContext* deviceContextDEF;
 
 	ID3D11Buffer* worldBuffer;
 

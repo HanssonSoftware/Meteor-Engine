@@ -48,8 +48,8 @@ typedef struct UsedQueues
 	VkQueue graphicsQueue;
 	int graphicsQueueIndex = -1;	
 	
-	VkQueue presentingQueue;
-	int presentingQueueIndex = -1;
+	bool presentingSupported;
+	int presentingSupportedFamilyIndex = -1;
 
 	VkQueue transferQueue;
 	int transferQueueIndex = -1;
@@ -100,6 +100,10 @@ private:
 	inline void createSwapChain();
 
 	inline void createSemaphoresAndFences();
+
+	inline VkSurfaceFormatKHR selectSurfaceFormat(const std::vector<VkSurfaceFormatKHR> formats);
+
+	inline bool checkIfPresentationIsSupported(VkPhysicalDevice virtualDevice, const int Index) const;
 	
 	/** "Converts" the result code to text, which can be pasted to log or assertion error message.*/
 	const String evaluateResultToText(VkResult Result) noexcept;

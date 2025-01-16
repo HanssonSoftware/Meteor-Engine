@@ -13,6 +13,11 @@ public:
 	
 	~ScopedPtr();
 
+	T* Get()
+	{
+		return *(this->ptr);
+	}
+
 	T* operator->()
 	{
 		return ptr;
@@ -28,7 +33,11 @@ public:
 			ptr = (T*)mrmalloc(sizeof(T));
 		}
 
-		memmove(this->ptr, other.ptr, sizeof(other.ptr));
+		wmemmove(this->ptr, other.ptr, sizeof(other.ptr));
+		if (other.ptr != nullptr)
+		{
+			mrfree(other.ptr);
+		}
 	}
 
 private:

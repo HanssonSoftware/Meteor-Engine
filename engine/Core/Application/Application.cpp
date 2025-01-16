@@ -7,11 +7,16 @@
 #include <Common/MemoryManager.h>
 #include <Widgets/Viewport.h>
 #include <Application/LayerManager.h>
-#include <imgui.h>
-#include <backends/imgui_impl_dx11.h>
-#include <backends/imgui_impl_win32.h>
+//#include <imgui.h>
+//#include <backends/imgui_impl_dx11.h>
+//#include <backends/imgui_impl_win32.h>
 #include <mutex>
 #include "Commandlet.h"
+
+#ifdef MR_DEBUG
+#include <crtdbg.h>
+#endif // MR_DEBUG
+
 
 Application* Application::Framework;
 
@@ -40,6 +45,10 @@ uint32 targetedFramesPerSecond = 60;
 const std::chrono::milliseconds frameDuration(1000 / targetedFramesPerSecond);
 void Application::Init()
 {
+#ifdef MR_DEBUG
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF);
+#endif // MR_DEBUG
+
     Logger::Get().firstStartLogger();
     MR_LOG(LogApplication, Log, TEXT("Initializing Application."));
 
@@ -75,7 +84,7 @@ void Application::Init()
     }
 
 
-    setAppState(Running);
+    setAppState(APPLICATIONSTATE_RUNNING);
 }
 
 void Application::Run()
@@ -108,10 +117,10 @@ void Application::Run()
 
     SceneGraph::Get().addToRoot(&nc);
 
-    setAppState(Running);
+    setAppState(APPLICATIONSTATE_RUNNING);
 
     MSG msg;
-    while (getAppState() == ApplicationState::Running)
+    while (getAppState() == ApplicationState::APPLICATIONSTATE_RUNNING)
     {
         const auto calculatedNow = std::chrono::high_resolution_clock::now();
 
@@ -147,7 +156,7 @@ void Application::Run()
 
 void Application::Shutdown()
 {
-    if (getAppState() == ApplicationState::Restarting)
+    if (getAppState() == APPLICATIONSTATE_RESTARTING)
     {
         MR_LOG(LogApplication, Log, TEXT("Restarting Application!"));
     
@@ -209,7 +218,7 @@ Vector2<uint32> Application::getWindowSize() const
 
 void Application::drawAttention() const
 {
-    if (getAppState() == ApplicationState::Initialization)
+    if (getAppState() == APPLICATIONSTATE_INITIALIZATION)
         return;
 
     if (!getWindowManager()->getFirstWindow())
@@ -229,8 +238,8 @@ void Application::drawAttention() const
 
 LRESULT CALLBACK WndProc(HWND wnd, UINT uint, WPARAM p1, LPARAM p2)
 {
-    if (ImGui_ImplWin32_WndProcHandler(wnd, uint, p1, p2))
-        return true;
+    //if (ImGui_ImplWin32_WndProcHandler(wnd, uint, p1, p2))
+    //    return true;
 
     if (Logger::Get().getMessageName(uint) != L"" && false) {
         MR_LOG(LogApplication, Verbose, TEXT("%s"), Logger::Get().getMessageName(uint));
@@ -246,7 +255,7 @@ LRESULT CALLBACK WndProc(HWND wnd, UINT uint, WPARAM p1, LPARAM p2)
     //    break;
 
     case WM_SIZE:
-        if (Application::Get()->getAppState() == Running && Application::Get()->getWindowManager()->getRenderContext()->getDeviceReadyState() == GRAPHICS_ENGINE_STATE_RUNNING)
+        if (Application::Get()->getAppState() == APPLICATIONSTATE_RUNNING && Application::Get()->getWindowManager()->getRenderContext()->getDeviceReadyState() == GRAPHICS_ENGINE_STATE_RUNNING)
         {
             uint32 width = LOWORD(p2);
             uint32 height = HIWORD(p2);
@@ -262,7 +271,7 @@ LRESULT CALLBACK WndProc(HWND wnd, UINT uint, WPARAM p1, LPARAM p2)
 
     case WM_CLOSE:
          // OutputDebugString(L"Close\n");
-        Application::Get()->setAppState(Shutdown);
+        Application::Get()->setAppState(APPLICATIONSTATE_SHUTDOWN);
         break;
     
     case WM_SIZING:
@@ -290,7 +299,7 @@ LRESULT CALLBACK WndProc(HWND wnd, UINT uint, WPARAM p1, LPARAM p2)
         }        
         if (GetAsyncKeyState(0x41) & 0x01)
         {
-            Application::Get()->setAppState(ApplicationState::Restarting);
+            Application::Get()->setAppState(APPLICATIONSTATE_RESTARTING);
         }       
         if (GetAsyncKeyState(0x42) & 0x01)
         {/*
