@@ -32,11 +32,11 @@ typedef enum ApplicationFlags
 
 typedef struct ApplicationInitializationInfo
 {
-	String appName = L'\0';
+	String appName;
 
-	const WindowCreateInfo* windowCreateInfo = 0;
+	const WindowCreateInfo* windowCreateInfo = nullptr;
 
-	String arguments = L'\0';
+	String arguments;
 
 	int flags = 0;
 
@@ -107,6 +107,10 @@ public:
 	IGraphicsDevice* getRenderContext() const { return windowManager->getRenderContext(); };
 
 	Camera nc;
+
+private:
+	inline void instantiateWindow();
+
 protected:
 	ApplicationState State = APPLICATIONSTATE_INITIALIZATION;
 

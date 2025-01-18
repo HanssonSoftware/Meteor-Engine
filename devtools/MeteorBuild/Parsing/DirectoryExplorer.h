@@ -4,21 +4,6 @@
 #include <Types/String.h>
 #include <vector>
 
-//typedef struct ModuleProperty
-//{
-//	ModuleProperty(const String path, const String name)
-//		: path(path)
-//		, name(name)
-//	{
-//
-//	};
-//
-//	String path;
-//
-//	String name;
-//
-//} ModuleProperty;
-
 class DirectoryExplorer
 {
 public:
@@ -29,6 +14,8 @@ public:
 	inline void goBack(String& input);
 
 	void startExpedition(String directory);
+
+	void processModules();
 
 	std::vector<String> modules;
 };

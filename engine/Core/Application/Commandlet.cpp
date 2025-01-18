@@ -21,9 +21,9 @@ T& ICommandlet::Get()
 String ICommandlet::Search(String Name)
 {
 	Name = String::Format("-%s", Name.Chr());
+	const size_t s = currentQueue.size();
 
-	const size_t queueSize = currentQueue.size();
-	for (size_t i = 0; i < queueSize; i++)
+	for (size_t i = 0; i < s; i++)
 	{
 		String Temp = currentQueue[i];
 
@@ -41,7 +41,9 @@ String ICommandlet::Search(String Name)
 void ICommandlet::Parse(int Count, char* Array[])
 {
 	executableLocation = Array[0];
-	currentQueue.resize(Count);
+
+	const String exeDirString = String::Format("-%s %s", String("exedir").Chr(), String(Array[0]).Chr());
+	currentQueue.push_back(exeDirString);
 
 	// Create a background, if parameter is found 
 	char* indexedParameterBefore = Array[0];
@@ -55,20 +57,25 @@ void ICommandlet::Parse(int Count, char* Array[])
 			char* indexed2Parameter = Array[i + 1];
 			if (indexed2Parameter == nullptr)
 			{
-				currentQueue.push_back(String::Format("%s 1", String(indexedParameter).Chr()));
-				i++;
+				const String boolizedParam = String::Format("%s 1", String(indexedParameter).Chr());
+				currentQueue.push_back(boolizedParam);
 				continue;
 			}
 
 			if (strcmp(strtok(indexed2Parameter, "-"), indexed2Parameter) == 0)
 			{
-				currentQueue.push_back(String::Format("%s %s", String(indexedParameter).Chr(), String(indexed2Parameter).Chr()));
-				i++;
+				const String param2 = String::Format("%s %s", String(indexedParameter).Chr(), String(indexed2Parameter).Chr());
+				currentQueue.push_back(param2);
 				continue;
 			}
 		}
 
 		currentQueue.push_back(indexedParameter);
 	}
+
+	//for (int j = 0; j < Count; j++)
+	//{
+	//	MR_LOG(LogTemp,Log,TEXT("%s"), currentQueue[j].Chr());
+	//}
 }
 

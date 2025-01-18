@@ -6,9 +6,9 @@
 #include <Common/Pointers.h>
 
 
-String::String()
+String::String() noexcept
 {
-	buffer = new wchar_t[sizeof(wchar_t)];
+	
 }
 
 /**
@@ -26,7 +26,7 @@ String::String(const char* Input)
 	if (bufferRecommendedSize == 0)
 		return;
 
-	buffer = new wchar_t[bufferRecommendedSize + 1];
+	buffer = new wchar_t[(bufferRecommendedSize + 1) * sizeof(wchar_t)]();
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
@@ -49,7 +49,7 @@ String::String(wchar_t* buffer)
 	if (requiredSize == 0)
 		return;
 
-	this->buffer = new wchar_t[(requiredSize + 1) * sizeof(wchar_t)];
+	this->buffer = new wchar_t[(requiredSize + 1) * sizeof(wchar_t)]();
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
@@ -72,7 +72,7 @@ String::String(const wchar_t* Input)
 	if (length == 0)
 		return;
 
-	buffer = new wchar_t[length * sizeof(wchar_t)];
+	buffer = new wchar_t[length * sizeof(wchar_t)]();
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
@@ -86,7 +86,7 @@ String::String(const wchar_t* Input)
 String::String(int Input)
 {
 	const std::wstring convertedString = std::to_wstring(Input);
-	buffer = new wchar_t[(wcslen(convertedString.c_str()) + 1) * sizeof(wchar_t)];
+	buffer = new wchar_t[(wcslen(convertedString.c_str()) + 1) * sizeof(wchar_t)]();
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
@@ -96,7 +96,7 @@ String::String(int Input)
 String::String(uint32 Input)
 {
 	const std::wstring convertedString = std::to_wstring(Input);
-	buffer = new wchar_t[(wcslen(convertedString.c_str()) + 1) * sizeof(wchar_t)];
+	buffer = new wchar_t[(wcslen(convertedString.c_str()) + 1) * sizeof(wchar_t)]();
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
@@ -106,7 +106,7 @@ String::String(uint32 Input)
 String::String(float Input)
 {
 	const std::wstring convertedString = std::to_wstring(Input);
-	buffer = new wchar_t[(wcslen(convertedString.c_str()) + 1) * sizeof(wchar_t)];
+	buffer = new wchar_t[(wcslen(convertedString.c_str()) + 1) * sizeof(wchar_t)]();
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
@@ -116,7 +116,7 @@ String::String(float Input)
 String::String(const std::string Input)
 {
 	const size_t bufferRecommendedSize = mbstowcs(NULL, Input.c_str(), 0);
-	buffer = new wchar_t[(bufferRecommendedSize + 1) * sizeof(wchar_t)];
+	buffer = new wchar_t[(bufferRecommendedSize + 1) * sizeof(wchar_t)]();
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
@@ -126,7 +126,7 @@ String::String(const std::string Input)
 String::String(const std::wstring Input)
 {
 	const size_t recommendedSize = wcslen(Input.c_str()) + 1;
-	buffer = new wchar_t[recommendedSize * sizeof(wchar_t)];
+	buffer = new wchar_t[recommendedSize * sizeof(wchar_t)]();
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
@@ -135,8 +135,11 @@ String::String(const std::wstring Input)
 
 String::String(String&& other) noexcept
 {
+	if (other.buffer == nullptr)
+		return;
+
 	const size_t recommendedSize = wcslen(other.buffer) + 1;
-	buffer = new wchar_t[recommendedSize * sizeof(wchar_t)];
+	buffer = new wchar_t[recommendedSize * sizeof(wchar_t)]();
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
@@ -146,7 +149,7 @@ String::String(String&& other) noexcept
 String::String(const String& other)
 {
 	const size_t recommendedSize = wcslen(other.buffer) + 1;
-	buffer = new wchar_t[recommendedSize * sizeof(wchar_t)];
+	buffer = new wchar_t[recommendedSize * sizeof(wchar_t)]();
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
@@ -158,6 +161,7 @@ String::~String()
 	if (buffer != nullptr)
 	{
 		delete[] buffer;
+
 		buffer = nullptr;
 #ifdef MR_DEBUG
 		bIsInited = false;
@@ -175,7 +179,7 @@ String String::operator+(const String& Other)
 	// So I found out that wcslen() does not count in the \0.
 	const size_t size = wcslen(thisBuffer) + wcslen(otherBuffer) + 1;
 
-	wchar_t* super = new wchar_t[size * sizeof(wchar_t)];
+	wchar_t* super = new wchar_t[size * sizeof(wchar_t)]();
 
 	if (super == nullptr)
 	{
@@ -307,7 +311,7 @@ String String::Format(const String format, ...)
 	const uint32 sizeForVA = vswprintf(0, 0, formattingBuffer, a);
 	va_end(a);
 
-	wchar_t* newFormattedBuffer = new wchar_t[(sizeForVA + 1) * sizeof(wchar_t)];
+	wchar_t* newFormattedBuffer = new wchar_t[(sizeForVA + 1) * sizeof(wchar_t)]();
 
 	va_list b;
 	va_start(b, format);
@@ -326,11 +330,12 @@ String& String::operator=(const String& other)
 	{
 		if (buffer)
 		{
-			mrfree(buffer);
+			delete[] buffer;
+			buffer = nullptr;
 		};
 
 		const size_t otherBuffSize = wcslen(other.buffer) + 1;
-		buffer = (wchar_t*)mrmalloc(otherBuffSize * sizeof(wchar_t));
+		buffer = new wchar_t[otherBuffSize * sizeof(wchar_t)]();
 		wcsncpy(buffer, other.buffer, otherBuffSize);
 	}
 

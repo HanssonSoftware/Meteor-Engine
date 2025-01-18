@@ -32,17 +32,17 @@ struct LogPart
 		
 private:
 
-	String time = "";
+	String time;
 
-	String category = "";
+	String category;
 
-	String message = "";
+	String message;
 
-	String rawMessage = "";
+	String rawMessage;
 
-	String func = "";
+	String func;
 
-	String file = "";
+	String file;
 
 	ESeverity displayTitle = Log;
 

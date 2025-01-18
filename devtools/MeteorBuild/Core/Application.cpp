@@ -21,21 +21,19 @@ void BuildSystemApplication::Frame(float deltaTime)
 {
 }
 
-static String sourceValue;
 void BuildSystemApplication::Init()
 {
 	Application::Init();
 
-	sourceValue = ICommandlet::Get().Expected<String>("sourcedir");
+	String sourceValue = ICommandlet::Get().Expected<String>("sourcedir");
 	if (!sourceValue.isEmpty())
 	{
 		DirectoryExplorer dxp;
 		dxp.startExpedition(sourceValue);
-		size_t jkd = dxp.modules.size();
 	}
 	else
 	{
-		MR_LOG(LogBuildSystemApplication, Fatal, TEXT("""sourcedir"" Parameter is Missing, This Must be Appended to Find the Source Directory!"));
+		MR_LOG(LogBuildSystemApplication, Fatal, TEXT("""sourcedir"" Parameter is Missing! Without This We are Unable to Find Source Directory!"));
 	}
 }
 

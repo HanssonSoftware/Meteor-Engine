@@ -1,6 +1,6 @@
 /* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 #pragma once
-#define BUILD_NUMBER 1737
+#define BUILD_NUMBER 1765
 #define MAJOR 0
 #define MINOR 1
 #define PATCH 1

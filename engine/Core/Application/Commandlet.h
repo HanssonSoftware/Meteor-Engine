@@ -45,7 +45,9 @@ T ICommandlet::Expected(const String Name)
 	String Temp = Search(Name);
 	if (Temp.isEmpty())
 	{
-		return strcmp(typeid(T).name(), "bool") == 0 ? false : "";
+		if (strcmp(typeid(T).name(), typeid(bool).name()) == 0)  return false;
+
+		if (strcmp(typeid(T).name(), typeid(String).name()) == 0)  return "";
 	}
 
 	if (strcmp(typeid(T).name(), "bool") == 0)

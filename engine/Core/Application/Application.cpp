@@ -60,19 +60,8 @@ void Application::Init()
         MR_LOG(LogApplication, Fatal, TEXT("AppInfo is Bad, or Null!"));
     }
 
-    if (appInfo->flags & APPFLAG_NO_WINDOW)
-    {
-        // Do nothing.
-    }
-    else if (appInfo->windowCreateInfo != nullptr)
-    {
-        getWindowManager()->createWindow(appInfo->windowCreateInfo);
-    }
-    else
-    {
-        MR_LOG(LogWindowManager, Log, TEXT("appInfo->windowCreateInfo is Null! Perhaps you didn't Need a Window?"));
-    }
-
+    instantiateWindow();
+    
     if (Application::Get()->getAppInfo()->flags & APPFLAG_DISPLAY_QUICK_INFO_ABOUT_MEMORY_USAGE)
         MemoryManager::Get().bQuickMemoryLogging = true;
 
@@ -120,7 +109,7 @@ void Application::Run()
     setAppState(APPLICATIONSTATE_RUNNING);
 
     MSG msg;
-    while (getAppState() == ApplicationState::APPLICATIONSTATE_RUNNING)
+    while (getAppState() == APPLICATIONSTATE_RUNNING)
     {
         const auto calculatedNow = std::chrono::high_resolution_clock::now();
 
@@ -236,6 +225,21 @@ void Application::drawAttention() const
 #endif // _WIN32
 }
 
+inline void Application::instantiateWindow()
+{
+    if (appInfo->flags & APPFLAG_NO_WINDOW)
+        return;
+
+    if (appInfo->windowCreateInfo != nullptr)
+    {
+        getWindowManager()->createWindow(appInfo->windowCreateInfo);
+    }
+    else
+    {
+        MR_LOG(LogWindowManager, Log, TEXT("appInfo->windowCreateInfo is Null! Perhaps you didn't Need a Window?"));
+    }
+}
+
 LRESULT CALLBACK WndProc(HWND wnd, UINT uint, WPARAM p1, LPARAM p2)
 {
     //if (ImGui_ImplWin32_WndProcHandler(wnd, uint, p1, p2))
@@ -255,7 +259,7 @@ LRESULT CALLBACK WndProc(HWND wnd, UINT uint, WPARAM p1, LPARAM p2)
     //    break;
 
     case WM_SIZE:
-        if (Application::Get()->getAppState() == APPLICATIONSTATE_RUNNING && Application::Get()->getWindowManager()->getRenderContext()->getDeviceReadyState() == GRAPHICS_ENGINE_STATE_RUNNING)
+        if (Application::Get()->getAppState() == APPLICATIONSTATE_RUNNING && Application::Get()->getRenderContext()->getDeviceReadyState() == GRAPHICS_ENGINE_STATE_RUNNING)
         {
             uint32 width = LOWORD(p2);
             uint32 height = HIWORD(p2);

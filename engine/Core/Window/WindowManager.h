@@ -28,7 +28,7 @@ typedef struct WindowCreateInfo
 	/** Distinguish between the ID, the ID is for searching purposes.*/
 	String windowName;
 
-	Vector2<uint32> size;
+	Vector2<uint32> size = 0;
 
 	int flags = -1;
 

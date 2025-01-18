@@ -9,7 +9,7 @@
 class String
 {
 public:
-	String();
+	String() noexcept;
 
 	String(const char* Input);
 
@@ -69,7 +69,7 @@ public:
 
 	static String Format(const String format, ...);
 private:
-	wchar_t* buffer;
+	wchar_t* buffer = nullptr;
 
 #ifdef MR_DEBUG
 	bool bIsInited = false;

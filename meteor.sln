@@ -7,10 +7,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Meteor", "meteor.vcxproj", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Editor", "editor\Editor.vcxproj", "{13CDFF27-4E0F-4C92-92EC-F6D925CD8D09}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeteorBuild", "devtools\buildsystem\MeteorBuild.vcxproj", "{D079A506-652D-4733-A188-44959F3F151D}"
-	ProjectSection(ProjectDependencies) = postProject
-		{709B7964-F338-40B8-B8E2-A2898B438A1C} = {709B7964-F338-40B8-B8E2-A2898B438A1C}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeteorBuild", "devtools\MeteorBuild\MeteorBuild.vcxproj", "{E75C5354-0747-4518-9E9B-B4FDFF214314}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,10 +23,10 @@ Global
 		{13CDFF27-4E0F-4C92-92EC-F6D925CD8D09}.Debug|x64.Build.0 = Debug|x64
 		{13CDFF27-4E0F-4C92-92EC-F6D925CD8D09}.Shipping|x64.ActiveCfg = Shipping|x64
 		{13CDFF27-4E0F-4C92-92EC-F6D925CD8D09}.Shipping|x64.Build.0 = Shipping|x64
-		{D079A506-652D-4733-A188-44959F3F151D}.Debug|x64.ActiveCfg = Debug|x64
-		{D079A506-652D-4733-A188-44959F3F151D}.Debug|x64.Build.0 = Debug|x64
-		{D079A506-652D-4733-A188-44959F3F151D}.Shipping|x64.ActiveCfg = Shipping|x64
-		{D079A506-652D-4733-A188-44959F3F151D}.Shipping|x64.Build.0 = Shipping|x64
+		{E75C5354-0747-4518-9E9B-B4FDFF214314}.Debug|x64.ActiveCfg = Debug|x64
+		{E75C5354-0747-4518-9E9B-B4FDFF214314}.Debug|x64.Build.0 = Debug|x64
+		{E75C5354-0747-4518-9E9B-B4FDFF214314}.Shipping|x64.ActiveCfg = Debug|x64
+		{E75C5354-0747-4518-9E9B-B4FDFF214314}.Shipping|x64.Build.0 = Debug|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

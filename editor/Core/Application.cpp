@@ -49,10 +49,14 @@ void EditorApplication::Init()
 {
 	Application::Init();
 
+	String f("jancsi123");
+	std::vector<String> fg;
 	// Insert app specific Initialization here.
-
 	//FontAsset A("RobotoCondensed-Bold.ttf");
-
+	for (int i = 0; i < 20; i++)
+	{
+		fg.push_back(f);
+	}
 
 	//File a("hangya fasz.txt", OPENRULE_WRITE | OPENRULE_READ | OPENRULE_DELETE, OVERRIDERULE_JUST_OPEN);
 	//a.Read();
