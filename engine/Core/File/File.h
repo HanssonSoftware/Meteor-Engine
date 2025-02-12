@@ -23,16 +23,26 @@ typedef enum FileOverrideRules
 
 } FileOverrideRules;
 
+typedef enum FileStatus
+{
+	FILESTATUS_NONE,
+	FILESTATUS_PROCESSING,
+	FILESTATUS_NOT_FOUND,
+	FILESTATUS_ALREADY_EXISTS,
+	FILESTATUS_GOOD,
+	FILESTATUS_ERROR,
+	FILESTATUS_DIED
+
+} FileStatus;
+
 class FMFile
 {
 public:
-	FMFile(const FMFile&) = delete;
-
-	FMFile() = delete;
+	FMFile();
 
 	~FMFile();
 
-	FMFile(const String Name, int openRules, FileOverrideRules overrideRules);
+	FileStatus Open(const String Name, int openRules, FileOverrideRules overrideRules);
 
 	void Write(const String buffer) const;
 
@@ -40,24 +50,45 @@ public:
 
 	String getName() const { return fileName; };
 
+	String getExtension() const { return extension; };
+
 	void setName(String content);
+
+	bool isValid() const
+	{
+		return bWasInitSucceded;
+	}
+		
+	/** Returns true, if the file was "created" from the hard disk. */
+	bool isPersistent() const
+	{
+		return !bWasCreatedByProgramatically;
+	}
+
+	void Delete();
+
+	const wchar_t* getBuffer() const noexcept
+	{
+		return buffer;
+	}
+
+private:
+	bool bWasCreatedByProgramatically = false;
+
 protected:
+	bool bWasInitSucceded = false;
+
 	uint32 size = 0;
 
-#ifdef _WIN32
-	HANDLE fileHandle;
-#else
 	void* fileHandle;
-#endif // DEBUG
 
 	wchar_t* buffer;
-
-	bool bWasInitSucceded = false;
 private:
+
 	String fileName;
 
 	String extension;
 
-	inline constexpr const int evaluateOverrideRules(FileOverrideRules flags);
+	constexpr int evaluateOverrideRules(FileOverrideRules flags);
 };
 

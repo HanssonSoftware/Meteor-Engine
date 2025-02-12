@@ -163,7 +163,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine\Graphics;$(SolutionDir)engine\Graphics\GraphicsEngine;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
     </ClCompile>
     <Link>
@@ -181,7 +181,9 @@
       <SuppressStartupBanner>false</SuppressStartupBanner>
     </Lib>
     <PreBuildEvent>
-      <Command>$(SolutionDir)Scripts\IncrementVer.bat</Command>
+      <Command>$(SolutionDir)Scripts\IncrementVer.bat /Q</Command>
+      <Message>
+      </Message>
     </PreBuildEvent>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)resources;$(SolutionDir)engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -196,7 +198,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine\Graphics;$(SolutionDir)engine\Graphics\GraphicsEngine;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
     </ClCompile>
     <Link>
@@ -216,23 +218,27 @@
       <SuppressStartupBanner>false</SuppressStartupBanner>
     </Lib>
     <PreBuildEvent>
-      <Command>$(SolutionDir)Scripts\IncrementVer.bat</Command>
+      <Command>$(SolutionDir)Scripts\IncrementVer.bat /Q</Command>
+      <Message>
+      </Message>
     </PreBuildEvent>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)resources;$(SolutionDir)engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="engine\Core\Graphics\ConstantBuffer.cpp" />
+    <ClCompile Include="engine\Async\Semaphore.cpp" />
+    <ClCompile Include="engine\Async\SlowTask.cpp" />
+    <ClCompile Include="engine\Async\Thread.cpp" />
+    <ClCompile Include="engine\Core\Object\GameObject.cpp" />
+    <ClCompile Include="engine\Core\Object\Object.cpp" />
+    <ClCompile Include="engine\Graphics\GraphicsEngine\ConstantBuffer.cpp" />
     <ClCompile Include="engine\Core\Application\Application.cpp" />
     <ClCompile Include="engine\Core\Application\Commandlet.cpp" />
     <ClCompile Include="engine\Core\Application\Engine.cpp" />
     <ClCompile Include="engine\Core\Application\InputManager.cpp" />
     <ClCompile Include="engine\Core\Application\Layer.cpp" />
     <ClCompile Include="engine\Core\Application\LayerManager.cpp" />
-    <ClCompile Include="engine\Core\Async\Semaphore.cpp" />
-    <ClCompile Include="engine\Core\Async\SlowTask.cpp" />
-    <ClCompile Include="engine\Core\Async\Thread.cpp" />
     <ClCompile Include="engine\Core\Common\Array.cpp" />
     <ClCompile Include="engine\Core\Common\Delegate.cpp" />
     <ClCompile Include="engine\Core\Common\MemoryManager.cpp" />
@@ -240,41 +246,44 @@
     <ClCompile Include="engine\Core\File\Config.cpp" />
     <ClCompile Include="engine\Core\File\ConfigCollection.cpp" />
     <ClCompile Include="engine\Core\File\File.cpp" />
-    <ClCompile Include="engine\Core\Graphics\Camera.cpp" />
-    <ClCompile Include="engine\Core\Graphics\D3D11\Direct3DDevice.cpp" />
-    <ClCompile Include="engine\Core\Graphics\GraphicsDevice.cpp" />
-    <ClCompile Include="engine\Core\Graphics\MeshModel.cpp" />
-    <ClCompile Include="engine\Core\Graphics\QueuedRender.cpp" />
-    <ClCompile Include="engine\Core\Graphics\SceneGraph.cpp" />
-    <ClCompile Include="engine\Core\Graphics\VertexBuffer.cpp" />
-    <ClCompile Include="engine\Core\Launch\LaunchGeneric.cpp" />
+    <ClCompile Include="engine\Graphics\GraphicsEngine\Camera.cpp" />
+    <ClCompile Include="engine\Graphics\GraphicsEngine\MeshModel.cpp" />
+    <ClCompile Include="engine\Launch\LaunchGeneric.cpp" />
     <ClCompile Include="engine\Core\Log\Exception.cpp" />
     <ClCompile Include="engine\Core\Log\Log.cpp" />
     <ClCompile Include="engine\Core\Timer\Timer.cpp" />
     <ClCompile Include="engine\Core\Types\String.cpp" />
     <ClCompile Include="engine\Core\Types\Vector.cpp" />
-    <ClCompile Include="engine\Core\Widgets\Common\FontAsset.cpp" />
-    <ClCompile Include="engine\Core\Widgets\Components\TextBlock.cpp" />
-    <ClCompile Include="engine\Core\Widgets\Viewport.cpp" />
-    <ClCompile Include="engine\Core\Widgets\Visual.cpp" />
+    <ClCompile Include="engine\Graphics\Widgets\Common\FontAsset.cpp" />
+    <ClCompile Include="engine\Graphics\Widgets\Components\TextBlock.cpp" />
+    <ClCompile Include="engine\Graphics\Widgets\Viewport.cpp" />
+    <ClCompile Include="engine\Graphics\Widgets\Visual.cpp" />
     <ClCompile Include="engine\Core\Window\Window.cpp" />
     <ClCompile Include="engine\Core\Window\WindowManager.cpp" />
-    <ClCompile Include="engine\Object\Object.cpp" />
+    <ClCompile Include="engine\Graphics\GraphicsEngine\D3D11\Direct3DDevice.cpp" />
+    <ClCompile Include="engine\Graphics\GraphicsEngine\GraphicsDevice.cpp" />
+    <ClCompile Include="engine\Graphics\GraphicsEngine\QueuedRender.cpp" />
+    <ClCompile Include="engine\Graphics\GraphicsEngine\SceneGraph.cpp" />
+    <ClCompile Include="engine\Graphics\GraphicsEngine\VertexBuffer.cpp" />
+    <ClCompile Include="engine\Graphics\GraphicsEngine\Vulkan\VulkanDevice.cpp" />
     <ClCompile Include="engine\Core\Common\Pointers.cpp" />
-    <ClCompile Include="engine\Object\GameObject.cpp" />
     <ClCompile Include="engine\Core\AssetLoader\Mesh\StaticMesh.cpp" />
+    <ClCompile Include="engine\Core\Common\Guid.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="engine\Core\Graphics\ConstantBuffer.h" />
+    <ClInclude Include="engine\Core\Common\Conversions.h" />
+    <ClInclude Include="engine\Core\Object\GameObject.h" />
+    <ClInclude Include="engine\Core\Object\Object.h" />
+    <ClInclude Include="engine\Graphics\GraphicsEngine\ConstantBuffer.h" />
     <ClInclude Include="engine\Core\Application\Application.h" />
     <ClInclude Include="engine\Core\Application\Commandlet.h" />
     <ClInclude Include="engine\Core\Application\Engine.h" />
     <ClInclude Include="engine\Core\Application\InputManager.h" />
     <ClInclude Include="engine\Core\Application\Layer.h" />
     <ClInclude Include="engine\Core\Application\LayerManager.h" />
-    <ClInclude Include="engine\Core\Async\Semaphore.h" />
-    <ClInclude Include="engine\Core\Async\SlowTask.h" />
-    <ClInclude Include="engine\Core\Async\Thread.h" />
+    <ClInclude Include="engine\Async\Semaphore.h" />
+    <ClInclude Include="engine\Async\SlowTask.h" />
+    <ClInclude Include="engine\Async\Thread.h" />
     <ClInclude Include="engine\Core\Common\Array.h" />
     <ClInclude Include="engine\Core\Common\Delegate.h" />
     <ClInclude Include="engine\Core\Common\MemoryManager.h" />
@@ -282,13 +291,13 @@
     <ClInclude Include="engine\Core\File\Config.h" />
     <ClInclude Include="engine\Core\File\ConfigCollection.h" />
     <ClInclude Include="engine\Core\File\File.h" />
-    <ClInclude Include="engine\Core\Graphics\Camera.h" />
-    <ClInclude Include="engine\Core\Graphics\D3D11\Direct3DDevice.h" />
-    <ClInclude Include="engine\Core\Graphics\GraphicsDevice.h" />
-    <ClInclude Include="engine\Core\Graphics\MeshModel.h" />
-    <ClInclude Include="engine\Core\Graphics\QueuedRender.h" />
-    <ClInclude Include="engine\Core\Graphics\SceneGraph.h" />
-    <ClInclude Include="engine\Core\Graphics\VertexBuffer.h" />
+    <ClInclude Include="engine\Graphics\GraphicsEngine\Camera.h" />
+    <ClInclude Include="engine\Graphics\GraphicsEngine\D3D11\Direct3DDevice.h" />
+    <ClInclude Include="engine\Graphics\GraphicsEngine\GraphicsDevice.h" />
+    <ClInclude Include="engine\Graphics\GraphicsEngine\MeshModel.h" />
+    <ClInclude Include="engine\Graphics\GraphicsEngine\QueuedRender.h" />
+    <ClInclude Include="engine\Graphics\GraphicsEngine\SceneGraph.h" />
+    <ClInclude Include="engine\Graphics\GraphicsEngine\VertexBuffer.h" />
     <ClInclude Include="engine\Core\Log\Exception.h" />
     <ClInclude Include="engine\Core\Log\Log.h" />
     <ClInclude Include="engine\Core\Log\LogMacros.h" />
@@ -298,13 +307,13 @@
     <ClInclude Include="engine\Core\Types\PlatformDefs.h" />
     <ClInclude Include="engine\Core\Types\String.h" />
     <ClInclude Include="engine\Core\Types\Vector.h" />
-    <ClInclude Include="engine\Core\Widgets\Common\FontAsset.h" />
-    <ClInclude Include="engine\Core\Widgets\Components\TextBlock.h" />
-    <ClInclude Include="engine\Core\Widgets\Viewport.h" />
-    <ClInclude Include="engine\Core\Widgets\Visual.h" />
+    <ClInclude Include="engine\Graphics\Widgets\Common\FontAsset.h" />
+    <ClInclude Include="engine\Graphics\Widgets\Components\TextBlock.h" />
+    <ClInclude Include="engine\Graphics\Widgets\Viewport.h" />
+    <ClInclude Include="engine\Graphics\Widgets\Visual.h" />
     <ClInclude Include="engine\Core\Window\Window.h" />
     <ClInclude Include="engine\Core\Window\WindowManager.h" />
-    <ClInclude Include="engine\Object\Object.h" />
+    <ClInclude Include="engine\Graphics\GraphicsEngine\Vulkan\VulkanDevice.h" />
     <ClInclude Include="engine\Platform\Microsoft\MinWin.h" />
     <ClInclude Include="engine\ThirdParty\assimp\aabb.h" />
     <ClInclude Include="engine\ThirdParty\assimp\ai_assert.h" />
@@ -390,13 +399,11 @@
     <ClInclude Include="engine\ThirdParty\assimp\ZipArchiveIOSystem.h" />
     <ClInclude Include="engine\Version.h" />
     <ClInclude Include="engine\Core\Common\Pointers.h" />
-    <ClInclude Include="engine\Object\GameObject.h" />
+    <ClInclude Include="engine\Core\Common\Guid.h" />
     <ClInclude Include="resources\resource.h" />
     <ClInclude Include="engine\Core\AssetLoader\Mesh\StaticMesh.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="engine\Core\File\File.mrbuild" />
-    <None Include="engine\Core\Window\Window.mrbuild" />
     <None Include="engine\ThirdParty\assimp\color4.inl" />
     <None Include="engine\ThirdParty\assimp\material.inl" />
     <None Include="engine\ThirdParty\assimp\matrix3x3.inl" />

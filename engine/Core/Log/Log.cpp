@@ -2,14 +2,14 @@
 
 #include "Log.h"
 #include <Types/String.h>
-#include <fcntl.h>
-#include <io.h>
+//#include <fcntl.h>
 //#include <iostream>
 #include "LogMacros.h"
 #include <Common/MemoryManager.h>
 #include <Application/Application.h>
 #include "Version.h"
 #include <Application/Commandlet.h>
+#include <mutex>
 
 
 #pragma warning(disable : 4700)
@@ -22,29 +22,27 @@ LOG_ADDCATEGORY(Windows);
 
 Logger& Logger::Get()
 {
+    static std::mutex mtx;
+    std::lock_guard<std::mutex> l(mtx);
     static Logger instance;
     return instance;
 }
 
 void Logger::firstStartLogger()
 {
-    if (ICommandlet::Get().Expected<bool>("nofilelogging"))
+    if (ICommandlet::Get().Expected<bool>("nofilelogging") || Application::Get()->getAppInfo()->flags & APPFLAG_NO_FILE_LOGGING)
     {
-        loggingState = LOGGING_LEVEL_BASIC_WO_SERIALIZATION;
-    }
-    else if (Application::Get()->getAppInfo()->flags & APPFLAG_NO_FILE_LOGGING)
-    {
-        loggingState = LOGGING_LEVEL_BASIC_WO_SERIALIZATION;
+        loggingState |= LOGGING_LEVEL_NO_FILE_LOGGING;
     }
 
-    if (ICommandlet::Get().Expected<bool>("verbose"))
+    if (ICommandlet::Get().Expected<bool>("verbose") || Application::Get()->getAppInfo()->flags & APPFLAG_ENABLE_VERBOSE_LOGGING)
     {
-        loggingState = LOGGING_LEVEL_MAXIMUM;
+        loggingState |= LOGGING_LEVEL_VERBOSE_LOGGING;
     }
 
-    if (loggingState > LOGGING_LEVEL_BASIC_WO_SERIALIZATION)
+    if (!(loggingState & LOGGING_LEVEL_NO_FILE_LOGGING))
     {
-        String appName = String::Format("%s.txt", Application::Get()->getAppInfo()->appName.Chr());
+        const String appName = String::Format("%s.txt", Application::Get()->getAppInfo()->appName.Chr());
 
         stream.open(appName.Chr(), std::ios::app);
         stream << "Logging started at " << Timer::Now().Chr() << "\n";
@@ -54,7 +52,7 @@ void Logger::firstStartLogger()
     printCollectedLogs();
 
 #if defined(_WIN32) && MR_DEBUG
-    createConsoleW();
+    createConsoleWindow();
 #else defined(_WIN32)
     FreeConsole();
 #endif //
@@ -62,7 +60,7 @@ void Logger::firstStartLogger()
 
 void Logger::shutdownLogger()
 {
-    if (loggingState > LOGGING_LEVEL_BASIC_WO_SERIALIZATION)
+    if (!(loggingState & LOGGING_LEVEL_NO_FILE_LOGGING))
     {
         stream << "Logging closed at " << Timer::Now().Chr() << "\n";
         stream.flush();
@@ -87,7 +85,7 @@ inline void Logger::logMessage(LogPart Log, const wchar_t* Function, const wchar
 {
     if (Log.displayTitle == Verbose)
     {
-        if (loggingState != LOGGING_LEVEL_MAXIMUM)
+        if (!(loggingState & LOGGING_LEVEL_VERBOSE_LOGGING))
             return;
     }
 
@@ -121,7 +119,7 @@ void Logger::logAssert(const wchar_t* Function, const wchar_t* File, const wchar
     const uint32 requiredChars = vswprintf(NULL, 0, Input, args);
     va_end(args);    
     
-    wchar_t* variadicBuffer = (wchar_t*)mrmalloc((requiredChars + 1) * sizeof(wchar_t));
+    wchar_t* variadicBuffer = new wchar_t[requiredChars + 1];
 
     va_list argsA;
     va_start(argsA, Input);
@@ -138,7 +136,7 @@ void Logger::logAssert(const wchar_t* Function, const wchar_t* File, const wchar
         File
     );
 
-    wchar_t* fullBuffer = (wchar_t*)mrmalloc((requiredCharsForFullText + 1) * sizeof(wchar_t));
+    wchar_t* fullBuffer = new wchar_t[requiredCharsForFullText + 1];
 
     swprintf(fullBuffer,
         requiredCharsForFullText,
@@ -156,8 +154,8 @@ void Logger::logAssert(const wchar_t* Function, const wchar_t* File, const wchar
     writeToOutput(fullBuffer, true);
     setColorBySeverity(Log);
 
-    mrfree(fullBuffer);
-    mrfree(variadicBuffer);
+    delete[] fullBuffer;
+    delete[] variadicBuffer;
 }
 
 void Logger::writeToOutput(const wchar_t* Input, bool bFiled = false)
@@ -168,7 +166,7 @@ void Logger::writeToOutput(const wchar_t* Input, bool bFiled = false)
 
     wprintf(L"%s", Input);
    
-    if (loggingState > LOGGING_LEVEL_BASIC_WO_SERIALIZATION)
+    if (!(loggingState & LOGGING_LEVEL_NO_FILE_LOGGING))
     {
         if (stream.is_open() && bFiled) 
         {
@@ -178,9 +176,35 @@ void Logger::writeToOutput(const wchar_t* Input, bool bFiled = false)
     }
 }
 
+String Logger::getLastError() const noexcept
+{
+#ifdef _WIN32
+    if (GetLastError() == S_OK)
+        return String();
+
+    wchar_t* Temp;
+    FormatMessageW(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER |
+        FORMAT_MESSAGE_IGNORE_INSERTS |
+        FORMAT_MESSAGE_FROM_SYSTEM,
+        NULL,
+        GetLastError(),
+        0,
+        (LPWSTR)&Temp,
+        0, 
+        NULL
+    );
+
+    return String(Temp);
+#else
+    // THROW_EXCEPTION("This Function is Not Implemented or Defined in Other Platform!");
+    return String("Not Implemented!");
+#endif // _WIN32
+}
+
 Logger::~Logger()
 {
-    if (stream.is_open() && loggingState > LOGGING_LEVEL_BASIC_WO_SERIALIZATION)
+    if (stream.is_open() && !(loggingState & LOGGING_LEVEL_NO_FILE_LOGGING))
     {
         stream << "Logging closed at " << Timer::Now().Chr() << "\n";
         stream.flush();
@@ -194,68 +218,34 @@ String Logger::formatQuickFatal(const wchar_t* message, const wchar_t* Callstack
         L"=============[ Critical error ]=============\nWhere:\t\t%s\nWhen:\t\t%s\nMessage:\t%s\n\nFile:\t%s\n"
         , Callstack, Timer::Now().Chr(), message, File);
 
-    wchar_t* newBuffer = (wchar_t*)mrmalloc((requiredSize + 1) * sizeof(wchar_t));
+    wchar_t* newBuffer = new wchar_t[requiredSize + 1];
     
     swprintf(newBuffer, requiredSize + 1,
         L"=============[ Critical error ]=============\nWhere:\t\t%s\nWhen:\t\t%s\nMessage:\t%s\n\nFile:\t%s\n"
         , Callstack, Timer::Now().Chr(), message, File);
 
     const String super(newBuffer);
-    mrfree(newBuffer);
+
+    delete[] newBuffer;
     return super;
 }
 
-void Logger::createConsoleW()
+void Logger::createConsoleWindow()
 {
    AllocConsole();
    FILE* A;
    freopen_s(&A,"CONOUT$", "w", stdout);
 
-   const int j = _setmode(_fileno(A), _O_U8TEXT);
-   const String message = String::Format(L"MR console %s b%d", BUILD_DATE,BUILD_NUMBER);
+   //const int j = _setmode(_fileno(A), _O_U8TEXT);
+   const String message = String::Format(L"MR console %s b%d", BUILD_DATE, BUILD_NUMBER);
+
+   CONSOLE_CURSOR_INFO ci;
+   GetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ci);
+   ci.bVisible = 0;
+   SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ci);
 
    SetConsoleOutputCP(CP_UTF8);
    SetConsoleTitle(message.Chr());
-}
-
-const wchar_t* Logger::dispatchLastError()
-{
-    if (GetLastError() == S_OK)
-        return nullptr;
-
-    wchar_t* Temp;
-    FormatMessageW(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER |
-        FORMAT_MESSAGE_IGNORE_INSERTS |
-        FORMAT_MESSAGE_FROM_SYSTEM,
-        NULL,
-        GetLastError(),
-        0,
-        (LPWSTR)&Temp,
-        0, NULL);
-
-    MR_LOG(LogWindows, Warn, TEXT("%ls"), (wchar_t*)Temp);
-    return nullptr;
-}
-
-const wchar_t* Logger::dispatchLastError(HRESULT result)
-{
-    if (result == S_OK)
-        return nullptr;
-
-    wchar_t* Temp;
-    FormatMessageW(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER |
-        FORMAT_MESSAGE_IGNORE_INSERTS |
-        FORMAT_MESSAGE_FROM_SYSTEM,
-        NULL,
-        result,
-        0,
-        (LPWSTR)&Temp,
-        0, NULL);
-
-    MR_LOG(LogWindows, Warn, TEXT("%ls"), (wchar_t*)Temp);
-    return nullptr;
 }
 
 inline constexpr const void Logger::setColorBySeverity(ESeverity Severity) const noexcept
@@ -288,7 +278,7 @@ LogPart::LogPart(String Category, ESeverity DisplayTitle, String Message, String
 {
     if (displayTitle == Verbose)
     {
-        if (Logger::Get().getLoggingLevel() != LOGGING_LEVEL_MAXIMUM)
+        if (!(Logger::Get().getLoggingLevel() & LOGGING_LEVEL_NO_FILE_LOGGING))
             return;
     }
 
@@ -299,7 +289,7 @@ LogPart::LogPart(String Category, ESeverity DisplayTitle, String Message, String
     const uint32 needForVariadic = vswprintf(NULL, 0, Message.Chr(), variadicCount);
     va_end(variadicCount);
 
-    wchar_t* variadicBuffer = (wchar_t*)mrmalloc((needForVariadic + 1) * sizeof(wchar_t));
+    wchar_t* variadicBuffer = new wchar_t[needForVariadic + 1];
 
     va_list args;
     va_start(args, function);
@@ -310,15 +300,19 @@ LogPart::LogPart(String Category, ESeverity DisplayTitle, String Message, String
 
     const uint32 needSuper = swprintf(NULL, 0, L"[%s] %s: %s: %s\n", time.Chr(), category.Chr(), formatSeverity(DisplayTitle), variadicBuffer);
 
-    wchar_t* messageBlock = (wchar_t*)mrmalloc((needSuper + needForVariadic + 1) * sizeof(wchar_t));
+    wchar_t* messageBlock = new wchar_t[needSuper + needForVariadic + 1];
     swprintf(messageBlock, needSuper + 1, L"[%s] %s: %s: %s\n", time.Chr(), category.Chr(), formatSeverity(DisplayTitle), variadicBuffer);
 
     message = messageBlock;
 
-    mrfree(variadicBuffer);
-    mrfree(messageBlock);
+    delete[] variadicBuffer;
+    delete[] messageBlock;
 }
 
+String getLastError() noexcept
+{
+    return Logger::Get().getLastError();
+}
 
 constexpr const wchar_t* LogPart::formatSeverity(ESeverity Severity) const noexcept
 {
@@ -340,4 +334,3 @@ constexpr const wchar_t* LogPart::formatSeverity(ESeverity Severity) const noexc
 
     return L"???";
 }
-

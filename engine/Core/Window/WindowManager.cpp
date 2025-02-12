@@ -3,7 +3,7 @@
 #include "WindowManager.h"
 #include <Window/Window.h>
 #include <Application/Application.h>
-#include <Graphics/D3D11/Direct3DDevice.h>
+#include <GraphicsEngine/D3D11/Direct3DDevice.h>
 //#include <Graphics/Vulkan/VulkanDevice.h>
 #ifdef _WIN32
 #include <../Resources/resource.h>

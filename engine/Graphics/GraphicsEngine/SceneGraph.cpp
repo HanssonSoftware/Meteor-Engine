@@ -1,7 +1,7 @@
 /* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #include "SceneGraph.h"
-#include <Graphics/D3D11/Direct3DDevice.h>
+#include <GraphicsEngine/D3D11/Direct3DDevice.h>
 #include <Application/Application.h>
 #include <Window/WindowManager.h>
 

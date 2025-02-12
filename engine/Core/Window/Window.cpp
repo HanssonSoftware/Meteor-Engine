@@ -4,7 +4,7 @@
 #include <Window/WindowManager.h>
 #include <Log/Exception.h>
 #include <Types/String.h>
-#include <Graphics/GraphicsDevice.h>
+#include <GraphicsEngine/GraphicsDevice.h>
 #ifdef _WIN32
 #include <dwmapi.h>
 //#include <../Resources/resource.h>
@@ -60,13 +60,17 @@ bool Window::createWindow(const WindowCreateInfo* CreateInfo)
 		NULL
 	);
 
-	MR_ASSERT(Handle != INVALID_HANDLE_VALUE, TEXT("Failed to create WinAPI window!"));
+	if (Handle == INVALID_HANDLE_VALUE)
+	{
+		THROW_EXCEPTION("Failed to Create WinAPI Window!");
+		return false;
+	}
 
 
 	static const constexpr BOOL bCanIUseDarkWindowTitlebar = 1;
 	DwmSetWindowAttribute((HWND)Handle, DWMWA_USE_IMMERSIVE_DARK_MODE, &bCanIUseDarkWindowTitlebar, sizeof(bCanIUseDarkWindowTitlebar));
 #endif
-
+	//SetWindowTheme((HWND)Handle, L"Explorer", 0);
 	return true;
 }
 

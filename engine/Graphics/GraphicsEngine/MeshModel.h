@@ -5,7 +5,7 @@
 #include <Types/PlatformDefs.h>
 #include <Types/Vector.h>
 #include <Object/Object.h>
-#include <Graphics/QueuedRender.h>
+#include <GraphicsEngine/QueuedRender.h>
 
 class String;
 struct Vertex;

@@ -1,56 +1,29 @@
 @echo off
 setlocal enabledelayedexpansion
 
-rem Beállítások
-set "header_file=%~dp0\..\Engine\Version.h"
-set "temp_file=%~dp0\..\Engine\VersionTemp.h"
+set HEADER_FILE=%~dp0\..\Engine\Version.h
+set TEMP_FILE=%~dp0\..\Engine\Version.tmp
 
-rem Dátum lekérése
-for /f "tokens=1-3 delims=/ " %%a in ('date /t') do (
-    set "BUILD_YEAR=%%c"
-    set "BUILD_MONTH=%%a"
-    set "BUILD_DAY=%%b"
+for /f "tokens=2 delims==." %%I in ('wmic os get localdatetime /value') do set datetime=%%I
+set YEAR=%datetime:~0,4%
+set MONTH=%datetime:~4,2%
+set DAY=%datetime:~6,2%
+set HOUR=%datetime:~8,2%
+set MINUTE=%datetime:~10,2%
+
+set BUILD_NUMBER=0
+if exist %HEADER_FILE% (
+    for /f "tokens=3" %%A in ('findstr /C:"#define BUILD_NUMBER" %HEADER_FILE%') do set /A BUILD_NUMBER=%%A+1
 )
 
-rem A hónap és nap formázása 2 számjegyűre
-if %BUILD_MONTH% LSS 10 set "BUILD_MONTH=0%BUILD_MONTH%"
-if %BUILD_DAY% LSS 10 set "BUILD_DAY=0%BUILD_DAY%"
+(for /f "delims=" %%A in ('findstr /V "#define BUILD_NUMBER" %HEADER_FILE%') do echo %%A) > %TEMP_FILE%
+echo #define BUILD_NUMBER %BUILD_NUMBER% >> %TEMP_FILE%
+echo #define BUILD_YEAR %YEAR% >> %TEMP_FILE%
+echo #define BUILD_MONTH %MONTH% >> %TEMP_FILE%
+echo #define BUILD_DATE L"%MONTH%/%YEAR%" >> %TEMP_FILE%
+echo #define BUILD_DAY %DAY% >> %TEMP_FILE%
 
-rem Dátum formázása: HH/ÉÉÉÉ formátumban (pont nélkül)
-set "BUILD_DATE=L%BUILD_MONTH%/%BUILD_YEAR%"
+move /Y %TEMP_FILE% %HEADER_FILE% > nul
 
-rem BUILD_NUMBER olvasása és növelése
-set "current_number=0"
-for /f "tokens=3" %%a in ('findstr /r /c:"#define BUILD_NUMBER" "%header_file%"') do set "current_number=%%a"
-set /a "new_number=current_number + 1"
-
-rem Frissített tartalom írása
-(
-    for /f "delims=" %%i in ('type "%header_file%"') do (
-        set "line=%%i"
-        if "!line!"=="#define BUILD_NUMBER !current_number!" (
-            echo #define BUILD_NUMBER !new_number!
-        ) else if "!line!"=="#define BUILD_YEAR" (
-            echo #define BUILD_YEAR %BUILD_YEAR%
-        ) else if "!line!"=="#define BUILD_MONTH" (
-            echo #define BUILD_MONTH %BUILD_MONTH%
-        ) else if "!line!"=="#define BUILD_DAY" (
-            echo #define BUILD_DAY %BUILD_DAY%
-        ) else if "!line!"=="#define BUILD_DATE" (
-            echo #define BUILD_DATE "%BUILD_DATE%"
-        ) else (
-            echo !line!
-        )
-    )
-
-    rem Új makrók hozzáadása, ha nem léteznek
-    findstr /c:"#define BUILD_YEAR" "%header_file%" >nul || echo #define BUILD_YEAR %BUILD_YEAR%
-    findstr /c:"#define BUILD_MONTH" "%header_file%" >nul || echo #define BUILD_MONTH %BUILD_MONTH%
-    findstr /c:"#define BUILD_DAY" "%header_file%" >nul || echo #define BUILD_DAY %BUILD_DAY%
-    findstr /c:"#define BUILD_DATE" "%header_file%" >nul || echo #define BUILD_DATE "%BUILD_DATE%"
-) > "%temp_file%"
-
-rem Eredeti fájl cseréje
-move /y "%temp_file%" "%header_file%"
-
+echo Version updated: %BUILD_NUMBER% (%YEAR%-%MONTH%-%DAY% %HOUR%:%MINUTE%)
 endlocal

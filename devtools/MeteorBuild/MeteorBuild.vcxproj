@@ -44,6 +44,10 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -125,15 +129,15 @@
       <PreprocessorDefinitions>MR_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\Core</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine\Graphics;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\Core</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(CoreLibraryDependencies);$(solutionDir)product\meteor-engine.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);$(SolutionDir)product\Meteor-engine.lib</AdditionalDependencies>
     </Link>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)resources;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine;$(SolutionDir)resources;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -158,16 +162,31 @@
       <AdditionalIncludeDirectories>$(SolutionDir)resources;</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine;$(SolutionDir)resources;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <ClCompile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine\Graphics;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\Core</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>$(CoreLibraryDependencies);$(SolutionDir)product\Meteor-engine.lib</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core\Application.cpp" />
     <ClCompile Include="Parsing\DirectoryExplorer.cpp" />
     <ClCompile Include="Parsing\SolutionGenerator.cpp" />
+    <ClCompile Include="Parsing\Solution.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Application.h" />
     <ClInclude Include="Parsing\DirectoryExplorer.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Parsing\SolutionGenerator.h" />
+    <ClInclude Include="Parsing\Solution.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MeteorBuild.aps" />

@@ -3,7 +3,7 @@
 #pragma once
 #include <Object/Object.h>
 #include <DirectXMath.h>
-#include <Graphics/QueuedRender.h>
+#include <GraphicsEngine/QueuedRender.h>
 #include <Types/Vector.h>
 
 using namespace DirectX;

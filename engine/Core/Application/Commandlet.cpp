@@ -1,6 +1,7 @@
 /* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #include "Commandlet.h"
+#include <Log/Exception.h>
 
 
 ICommandlet& ICommandlet::Get()
@@ -42,40 +43,33 @@ void ICommandlet::Parse(int Count, char* Array[])
 {
 	executableLocation = Array[0];
 
-	const String exeDirString = String::Format("-%s %s", String("exedir").Chr(), String(Array[0]).Chr());
-	currentQueue.push_back(exeDirString);
+	//currentQueue.push_back(String::Format("-%s %s", String("exedir").Chr(), String(Array[0]).Chr()));
 
 	// Create a background, if parameter is found 
 	char* indexedParameterBefore = Array[0];
 	for (int i = 1; i < Count; i++)
 	{
-		// Grab a temporary alias from the array
-		char* indexedParameter = Array[i];
-		
+		char* parameter = Array[i];
 		if (i + 1 <= Count)
 		{
-			char* indexed2Parameter = Array[i + 1];
-			if (indexed2Parameter == nullptr)
-			{
-				const String boolizedParam = String::Format("%s 1", String(indexedParameter).Chr());
-				currentQueue.push_back(boolizedParam);
-				continue;
-			}
+			char* parameterSecond = Array[i + 1];
 
-			if (strcmp(strtok(indexed2Parameter, "-"), indexed2Parameter) == 0)
+			if (parameterSecond != nullptr)
 			{
-				const String param2 = String::Format("%s %s", String(indexedParameter).Chr(), String(indexed2Parameter).Chr());
-				currentQueue.push_back(param2);
-				continue;
+				if (parameterSecond[0] == '-')
+				{
+					currentQueue.push_back(parameter);
+					continue;
+				}
+				else
+				{
+					currentQueue.push_back(String::Format("%s %s", String(parameter).Chr(), String(parameterSecond).Chr()));
+
+					i++;
+					continue;
+				}
 			}
 		}
-
-		currentQueue.push_back(indexedParameter);
 	}
-
-	//for (int j = 0; j < Count; j++)
-	//{
-	//	MR_LOG(LogTemp,Log,TEXT("%s"), currentQueue[j].Chr());
-	//}
 }
 

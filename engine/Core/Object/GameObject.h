@@ -2,7 +2,7 @@
 
 #pragma once
 #include "Object.h"
-#include <Graphics/QueuedRender.h>
+#include <GraphicsEngine/QueuedRender.h>
 #include <vector>
 #include <DirectXMath.h>
 

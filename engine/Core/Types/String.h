@@ -36,7 +36,7 @@ public:
 	String& operator=(const String& other);
 
 	String operator+(const String& Other);
-	
+
 	bool operator==(const String& Other) const;
 		
 	bool operator!=(const String& Other) const;
@@ -47,7 +47,7 @@ public:
 	const wchar_t* operator*();
 
 	/** (*this) is the alternative. */
-	const wchar_t* Chr();
+	const wchar_t* Chr();	
 
 	wchar_t* Data();
 
@@ -69,10 +69,11 @@ public:
 
 	static String Format(const String format, ...);
 private:
-	wchar_t* buffer = nullptr;
-
 #ifdef MR_DEBUG
 	bool bIsInited = false;
 #endif // MR_DEBUG
-public:
+
+	wchar_t* buffer = nullptr;
 };
+
+String operator+(const String& OtherA, const String& OtherB);

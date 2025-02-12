@@ -51,10 +51,9 @@ private:
 
 typedef enum LoggingLevel
 {
-	LOGGING_LEVEL_DISABLED = 0,
-	LOGGING_LEVEL_BASIC_WO_SERIALIZATION = 1,
-	LOGGING_LEVEL_BASIC = 2,
-	LOGGING_LEVEL_MAXIMUM = 3
+	LOGGING_LEVEL_NO_FILE_LOGGING = 1 << 0,
+	LOGGING_LEVEL_VERBOSE_LOGGING = 1 << 1
+
 } LoggingLevel;
 
 class Logger
@@ -77,21 +76,18 @@ public:
 
 	inline void writeToOutput(const wchar_t* Input, bool bFiled);
 
-	constexpr inline LoggingLevel getLoggingLevel() const noexcept { return loggingState; }
-#ifdef _WIN32
-	const wchar_t* dispatchLastError();
+	constexpr inline int getLoggingLevel() const noexcept { return loggingState; }
 
-	const wchar_t* dispatchLastError(HRESULT result);
-#endif
+	String getLastError() const noexcept;
 
 private:
-	LoggingLevel loggingState = LOGGING_LEVEL_BASIC;
+	int loggingState = 0;
 
 	Logger() {};
 
 	String formatQuickFatal(const wchar_t* message, const wchar_t* Callstack, const wchar_t* File) const;
 #ifdef _WIN32
-	void createConsoleW();
+	void createConsoleWindow();
 
 	inline constexpr const void setColorBySeverity(ESeverity Severity) const noexcept;
 public:
@@ -103,6 +99,7 @@ private:
 	std::wofstream stream;
 };
 
+String getLastError() noexcept;
 
 constexpr const wchar_t* Logger::getMessageName(unsigned int code) const noexcept
 {

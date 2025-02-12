@@ -113,6 +113,8 @@ private:
 
 	bool bIsMultiThreadSupported = false;
 
+	inline String getDescriptiveError(const HRESULT result);
+
 	inline void createReferenceDevice();
 
 	inline void createSwapChain(Vector2<uint32> newSize);

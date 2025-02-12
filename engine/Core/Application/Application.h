@@ -3,7 +3,7 @@
 #pragma once
 #include <Window/WindowManager.h>
 #include <Platform/Microsoft/MinWin.h>
-#include <Graphics/Camera.h>
+#include <GraphicsEngine/Camera.h>
 #include <Types/Vector.h>
 #include <Types/String.h>
 #include <Log/LogMacros.h>

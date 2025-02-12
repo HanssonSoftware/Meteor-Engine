@@ -4,8 +4,11 @@
 #include <Types/String.h>
 #include <vector>
 
+class FMFile;
+
 class DirectoryExplorer
 {
+	friend class FMFile;
 public:
 	DirectoryExplorer();
 
@@ -13,9 +16,13 @@ public:
 
 	inline void goBack(String& input);
 
+	inline String processThatLine(const wchar_t* buffer, int A, int B);
+
 	void startExpedition(String directory);
 
-	void processModules();
+	std::vector<FMFile*> processModules();
+
+	bool processToModuleDescriptor(const wchar_t* buffer);
 
 	std::vector<String> modules;
 };

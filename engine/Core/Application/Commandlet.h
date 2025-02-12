@@ -3,8 +3,6 @@
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
 #include <Types/String.h>
-#include <unordered_map>
-#include <functional>
 #include <Log/LogMacros.h>
 
 LOG_ADDCATEGORY(Commandlet);
@@ -45,12 +43,14 @@ T ICommandlet::Expected(const String Name)
 	String Temp = Search(Name);
 	if (Temp.isEmpty())
 	{
-		if (strcmp(typeid(T).name(), typeid(bool).name()) == 0)  return false;
+		if (strcmp(typeid(T).name(), typeid(bool).name()) == 0)  
+			return false;
 
-		if (strcmp(typeid(T).name(), typeid(String).name()) == 0)  return "";
+		if (strcmp(typeid(T).name(), typeid(String).name()) == 0)  
+			return "";
 	}
 
-	if (strcmp(typeid(T).name(), "bool") == 0)
+	if (strcmp(typeid(T).name(), typeid(bool).name()) == 0)
 	{
 		return true;
 	}

@@ -196,6 +196,33 @@ String String::operator+(const String& Other)
 	return newStringBuffer;
 }
 
+
+String operator+(const String& OtherA, const String& OtherB)
+{
+	// Querry the buffers.
+	const wchar_t* otherABuffer = OtherA.Chr();
+	const wchar_t* otherBBuffer = OtherB.Chr();
+
+	const size_t size = wcslen(otherABuffer) + wcslen(otherBBuffer) + 1;
+
+	wchar_t* super = new wchar_t[size * sizeof(wchar_t)]();
+
+	if (super == nullptr)
+	{
+		delete[] super;
+		THROW_EXCEPTION("String concencation failed! Wide buffer is null!");
+	}
+
+	wcscpy(super, otherABuffer);
+	wcscat(super, otherBBuffer);
+
+	String newStringBuffer(super);
+
+	delete[] super;
+	return newStringBuffer;
+}
+
+
 bool String::operator==(const String& Other) const
 {
 	return wcscmp(buffer, Other.buffer) == 0;
@@ -328,6 +355,11 @@ String& String::operator=(const String& other)
 {
 	if (this != &other)
 	{
+		if (!other.buffer)
+		{
+			return *this;
+		}
+
 		if (buffer)
 		{
 			delete[] buffer;

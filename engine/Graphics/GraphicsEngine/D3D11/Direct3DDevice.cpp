@@ -11,8 +11,8 @@
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
 #include <Log/Exception.h>
-#include <Graphics/QueuedRender.h>
-#include <Graphics/MeshModel.h>
+#include <GraphicsEngine/QueuedRender.h>
+#include <GraphicsEngine/MeshModel.h>
 #include <Window/WindowManager.h>
 
 #include "imgui.h"
@@ -106,14 +106,14 @@ bool IDirect3DDevice::Render()
 
 	if (presentResult == DXGI_ERROR_DEVICE_RESET)
 	{
-		Logger::Get().dispatchLastError(device->GetDeviceRemovedReason());
+		getDescriptiveError(device->GetDeviceRemovedReason());
 		cleanUp();
 		Init();
 		return false;
 	}
 	else if (presentResult == DXGI_ERROR_DEVICE_REMOVED)
 	{
-		Logger::Get().dispatchLastError(device->GetDeviceRemovedReason());
+		getDescriptiveError(device->GetDeviceRemovedReason());
 		cleanUp();
 		Init();
 		return false;
@@ -356,6 +356,27 @@ void IDirect3DDevice::changeDisplayMode()
 	buseWframe = true;
 }
 
+inline String IDirect3DDevice::getDescriptiveError(const HRESULT result)
+{
+	if (GetLastError() == S_OK)
+		return String();
+
+	wchar_t* Temp;
+	FormatMessageW(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER |
+		FORMAT_MESSAGE_IGNORE_INSERTS |
+		FORMAT_MESSAGE_FROM_SYSTEM,
+		NULL,
+		GetLastError(),
+		0,
+		(LPWSTR)&Temp,
+		0,
+		NULL
+	);
+
+	return Temp;
+}
+
 void IDirect3DDevice::createReferenceDevice()
 {
 	// First insight: leave the flags 0.
@@ -412,7 +433,7 @@ void IDirect3DDevice::createReferenceDevice()
 	}
 
 	static bool bWasInitiatedBefore;
-	if (Logger::Get().getLoggingLevel() >= LOGGING_LEVEL_MAXIMUM && !bWasInitiatedBefore)
+	if (Logger::Get().getLoggingLevel() & APPFLAG_ENABLE_VERBOSE_LOGGING && !bWasInitiatedBefore)
 	{
 		bWasInitiatedBefore = true;
 		DXGI_ADAPTER_DESC apInfo = {};

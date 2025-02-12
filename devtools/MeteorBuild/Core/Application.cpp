@@ -4,6 +4,7 @@
 #include "Application.h"
 #include <string.h>
 #include "../Parsing/DirectoryExplorer.h"
+#include "../Parsing/SolutionGenerator.h"
 
 
 int main(int argc, char* argv[])
@@ -30,6 +31,17 @@ void BuildSystemApplication::Init()
 	{
 		DirectoryExplorer dxp;
 		dxp.startExpedition(sourceValue);
+
+		String slnValue = ICommandlet::Get().Expected<String>("makesln");
+		if (!slnValue.isEmpty())
+		{
+			SolutionGenerator sln(slnValue);
+
+			dxp.processModules();
+			sln.getHandle()->isPersistent() ? sln.readSolution() : sln.startSolutionFill();
+
+			int hd = 5;
+		}
 	}
 	else
 	{

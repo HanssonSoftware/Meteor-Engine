@@ -2,7 +2,7 @@
 
 #include "Application.h"
 #include <Window/Window.h>
-#include <Graphics/D3D11/Direct3DDevice.h>
+#include <D3D11/Direct3DDevice.h>
 #include <thread>
 #include <Common/MemoryManager.h>
 #include <Widgets/Viewport.h>
@@ -52,7 +52,6 @@ void Application::Init()
     Logger::Get().firstStartLogger();
     MR_LOG(LogApplication, Log, TEXT("Initializing Application."));
 
-    applicationLocation = ICommandlet::Get().executableLocation;
     MR_LOG(LogApplication, Verbose, TEXT("App Dir: %s"), applicationLocation.Chr());
 
     if (appInfo->appName.isEmpty())
