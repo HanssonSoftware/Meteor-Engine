@@ -4,7 +4,6 @@
 #include <Window/Window.h>
 #include <Application/Application.h>
 #include <GraphicsEngine/D3D11/Direct3DDevice.h>
-//#include <Graphics/Vulkan/VulkanDevice.h>
 #ifdef _WIN32
 #include <../Resources/resource.h>
 #endif // _WIN32
@@ -19,7 +18,7 @@ WindowManager::WindowManager()
 	inputManager = nullptr;
 
 #ifdef _WIN32
-
+	
 #endif // _WIN32
 }
 
@@ -28,6 +27,7 @@ WindowManager::~WindowManager()
 	if (renderContext)
 	{
 		renderContext->cleanUp();
+
 		delete renderContext;
 		renderContext = nullptr;
 	}
@@ -92,7 +92,7 @@ Window* WindowManager::searchFor(const String ID)
 	{
 		Window* Temp = activeWindows[i];
 
-		if (Temp->windowData->windowID == ID)
+		if (Temp->windowData.windowID == ID)
 		{
 			lastSearchIndex = i;
 			lastSearch = ID;
@@ -125,7 +125,7 @@ void WindowManager::showWindow(const String ID)
 	{
 		Window* Temp = activeWindows[i];
 
-		if (Temp->windowData->windowID == ID)
+		if (Temp->windowData.windowID == ID)
 		{
 			Temp->showWindow();
 
@@ -149,13 +149,38 @@ void WindowManager::hideWindow(const String ID)
 	{
 		Window* Temp = activeWindows[i];
 
-		if (Temp->windowData->windowID == ID)
+		if (Temp->windowData.windowID == ID)
 		{
 			Temp->hideWindow();
 
 			return;
 		}
 	}
+}
+
+bool WindowManager::drawAttention(const String ID)
+{
+	if (lastSearchIndex != -1 && lastSearchIndex < activeWindows.size() && lastSearch == ID)
+	{
+		activeWindows[lastSearchIndex]->drawAttention();
+		return true;
+	}
+
+	const size_t activeCount = activeWindows.size();
+
+	for (int i = 0; i < activeCount; i++)
+	{
+		Window* Temp = activeWindows[i];
+
+		if (Temp->windowData.windowID == ID)
+		{
+			Temp->drawAttention();
+
+			return true;
+		}
+	}
+
+	return false;
 }
 
 bool WindowManager::destroyWindow(const String ID)
@@ -172,7 +197,7 @@ bool WindowManager::destroyWindow(const String ID)
 	{
 		Window* Temp = activeWindows[i];
 
-		if (Temp->windowData->windowID == ID)
+		if (Temp->windowData.windowID == ID)
 		{
 			Temp->destroyWindow();
 
@@ -181,6 +206,23 @@ bool WindowManager::destroyWindow(const String ID)
 	}
 
 	return false;
+}
+
+Window* WindowManager::getFocusedWindow() const
+{
+#ifdef _WIN32
+#pragma warning(disable : 4172)
+	HWND window = GetFocus();
+
+	if (!window) return nullptr;
+
+	// TODO: Implement!
+	//Window w(window);
+	//searchFor(w)
+	return nullptr;
+#endif
+
+	return nullptr; 
 }
 
 #ifdef _WIN32
@@ -207,3 +249,26 @@ inline bool WindowManager::registerWindowClass()
 	return true;
 }
 #endif
+
+Window* WindowManager::privSearchFor(const String Name)
+{
+	if (lastSearchIndex != -1 && lastSearchIndex < activeWindows.size() && lastSearch == Name)
+	{
+		return activeWindows[lastSearchIndex];
+	}
+
+	const size_t activeCount = activeWindows.size();
+	for (int i = 0; i < activeCount; i++)
+	{
+		Window* Temp = activeWindows[i];
+
+		if (Temp->windowData.windowName == Name)
+		{
+			lastSearchIndex = i;
+			lastSearch = Name;
+			return Temp;
+		}
+	}
+
+	return nullptr;
+}

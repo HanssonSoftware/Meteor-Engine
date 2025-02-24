@@ -14,7 +14,7 @@ typedef struct LogEntry{} LogEntry;
     /* Generated log name! */ \
     struct Log##CategoryName : public LogEntry \
 	{ \
-		static const wchar_t* GetCategoryName() { return L#CategoryName; } \
+		static constexpr const wchar_t* GetCategoryName() { return L#CategoryName; } \
 	};
 
 /** Creates a static logging category which is not visible, only where you declared, do NOT insert Log before just the word (automatically appends a Log)! */
@@ -22,7 +22,7 @@ typedef struct LogEntry{} LogEntry;
     /* Generated log name! */ \
     static struct Log##CategoryName : public LogEntry \
 	{ \
-		static const wchar_t* GetCategoryName() { return L#CategoryName; } \
+		static constexpr const wchar_t* GetCategoryName() { return L#CategoryName; } \
 	}
 
 LOG_ADDCATEGORY(Temp);

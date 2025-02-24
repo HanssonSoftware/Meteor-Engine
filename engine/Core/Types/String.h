@@ -67,12 +67,19 @@ public:
 
 	float toFloat() const;
 
+	uint32 Length() const;
+
 	static String Format(const String format, ...);
+
+	/** Iterates from the given index until the next '\n', updating the index to the '\n' position. */
+	static inline String readLine(const String Line, uint32 location);
+
+	/** Iterates from the given index until the next '\n', updating the index to the '\n' position. */
+	static String readLine(const wchar_t* Line, uint32 location);
 private:
 #ifdef MR_DEBUG
 	bool bIsInited = false;
 #endif // MR_DEBUG
-
 	wchar_t* buffer = nullptr;
 };
 

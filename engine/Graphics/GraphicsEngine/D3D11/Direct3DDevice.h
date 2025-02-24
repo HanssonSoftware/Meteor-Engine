@@ -33,6 +33,8 @@ public:
 	
 	virtual void cleanUp() noexcept override;
 
+	virtual void createBuffer(void* data) override;
+
 	const virtual String getRendererSignatature() const override;
 
 	virtual void resizeBuffers(Vector2<uint32> newSize) override;
@@ -126,6 +128,8 @@ private:
 	inline void createRasterizerState();
 
 	inline void InitTestScene();
+
+	inline void handleRenderResult(const HRESULT res);
 
 	inline void calculateNumerics(Vector2<uint32> size);
 

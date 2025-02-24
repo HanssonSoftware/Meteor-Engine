@@ -98,7 +98,10 @@ inline void Logger::logMessage(LogPart Log, const wchar_t* Function, const wchar
     setColorBySeverity(Log.displayTitle);
 
     if (Log.displayTitle > 3)
-        Application::Get()->drawAttention();
+    {
+        if (Window* temp = Application::Get()->getWindowManager()->getFocusedWindow())
+            temp->drawAttention();
+    }
 
     if (Log.displayTitle == Fatal)
     {
@@ -131,7 +134,7 @@ void Logger::logAssert(const wchar_t* Function, const wchar_t* File, const wchar
         0, 
         L"=============[ Assertion error ]=============\nWhere: \t\t%s\nWhen: \t\t%s\nMessage: \t%s\n\nFile: \t%s\n", 
         Function, 
-        Timer::Now().Chr(),
+        Timer::Now("%Y-%m-%d %H:%M:%S").Chr(),
         Input,
         File
     );
@@ -142,13 +145,13 @@ void Logger::logAssert(const wchar_t* Function, const wchar_t* File, const wchar
         requiredCharsForFullText,
         L"=============[ Assertion error ]=============\nWhere: \t\t%s\nWhen: \t\t%s\nMessage: \t%s\n\nFile: \t%s\n",
         Function,
-        Timer::Now().Chr(),
+        Timer::Now("%Y-%m-%d %H:%M:%S").Chr(),
         variadicBuffer,
         File
     );
 
     if (Application::Get())
-        Application::Get()->drawAttention();
+        Application::Get()->getWindowManager()->getFirstWindow()->drawAttention();
 
     setColorBySeverity(Error);
     writeToOutput(fullBuffer, true);
@@ -216,13 +219,13 @@ String Logger::formatQuickFatal(const wchar_t* message, const wchar_t* Callstack
 {
     const uint32 requiredSize = swprintf(NULL, 0, 
         L"=============[ Critical error ]=============\nWhere:\t\t%s\nWhen:\t\t%s\nMessage:\t%s\n\nFile:\t%s\n"
-        , Callstack, Timer::Now().Chr(), message, File);
+        , Callstack, Timer::Now("%Y-%m-%d %H:%M:%S").Chr(), message, File);
 
     wchar_t* newBuffer = new wchar_t[requiredSize + 1];
     
     swprintf(newBuffer, requiredSize + 1,
         L"=============[ Critical error ]=============\nWhere:\t\t%s\nWhen:\t\t%s\nMessage:\t%s\n\nFile:\t%s\n"
-        , Callstack, Timer::Now().Chr(), message, File);
+        , Callstack, Timer::Now("%Y-%m-%d %H:%M:%S").Chr(), message, File);
 
     const String super(newBuffer);
 
@@ -230,6 +233,7 @@ String Logger::formatQuickFatal(const wchar_t* message, const wchar_t* Callstack
     return super;
 }
 
+#ifdef _WIN32
 void Logger::createConsoleWindow()
 {
    AllocConsole();
@@ -237,7 +241,7 @@ void Logger::createConsoleWindow()
    freopen_s(&A,"CONOUT$", "w", stdout);
 
    //const int j = _setmode(_fileno(A), _O_U8TEXT);
-   const String message = String::Format(L"MR console %s b%d", BUILD_DATE, BUILD_NUMBER);
+   const String message = String::Format(L"MR console b%d %s", BUILD_NUMBER, BUILD_DATE);
 
    CONSOLE_CURSOR_INFO ci;
    GetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ci);
@@ -247,6 +251,7 @@ void Logger::createConsoleWindow()
    SetConsoleOutputCP(CP_UTF8);
    SetConsoleTitle(message.Chr());
 }
+#endif
 
 inline constexpr const void Logger::setColorBySeverity(ESeverity Severity) const noexcept
 {
@@ -268,7 +273,7 @@ inline constexpr const void Logger::setColorBySeverity(ESeverity Severity) const
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 0x4);
         break;
     case Verbose:
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 0x3);
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 0x7);
         break;
     }
 }
@@ -278,11 +283,11 @@ LogPart::LogPart(String Category, ESeverity DisplayTitle, String Message, String
 {
     if (displayTitle == Verbose)
     {
-        if (!(Logger::Get().getLoggingLevel() & LOGGING_LEVEL_NO_FILE_LOGGING))
-            return;
+        //if (!(Logger::Get().getLoggingLevel() & LOGGING_LEVEL_NO_FILE_LOGGING))
+        //    return;
     }
 
-    time = Timer::Now();
+    time = Timer::Now("%Y-%m-%d %H:%M:%S");
 
     va_list variadicCount;
     va_start(variadicCount, function);

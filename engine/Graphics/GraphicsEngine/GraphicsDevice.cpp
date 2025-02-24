@@ -8,6 +8,8 @@
 IGraphicsDevice::IGraphicsDevice()
 {
 	graphToRender = nullptr;
+
+	driverState = GRAPHICS_ENGINE_STATE_NONE;
 }
 
 IGraphicsDevice::~IGraphicsDevice()
@@ -17,9 +19,7 @@ IGraphicsDevice::~IGraphicsDevice()
 bool IGraphicsDevice::Render()
 {
 	if (driverState == GRAPHICS_ENGINE_STATE_RUNNING)
-	{
 		return true;
-	}
 
 	return false;
 }

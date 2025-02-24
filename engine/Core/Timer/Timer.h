@@ -6,7 +6,6 @@
 #include <chrono>
 
 
-
 class Timer 
 {
 public:
@@ -24,8 +23,13 @@ public:
 
     bool isRunning() const;
 
-    static String Now(String Format = L"%Y-%m-%d %H:%M:%S");
+    static String Now(const String Format = L"%yyyy-mm-dd %H:%M:%S");
 private:
+#ifdef _WIN32
+    double cpuFrequency = 0.0;
+
+    uint64 clock = 0;
+#endif // _WIN32
 
     std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
 

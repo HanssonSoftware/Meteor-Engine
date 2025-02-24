@@ -24,6 +24,13 @@
 #pragma comment(lib, "D3DCompiler.lib")
 #pragma comment(lib, "dxcompiler.lib")
 
+#define RELEASE(item) \
+	if (item != nullptr) \
+	{ \
+		item->Release(); \
+		item = nullptr;	 \
+	}
+
 #define HRESULT_STRINGIZE(code) #code
 
 IDirect3DDevice::IDirect3DDevice()
@@ -52,6 +59,14 @@ IDirect3DDevice::IDirect3DDevice()
 
 }
 
+ID3D11Buffer* cubeBuffer;
+static const Vector3<float> cube[]
+{
+	{0.f, 0.5f, 0.f},
+	{0.5f, -0.5f, 0.f},
+	{-0.5f, -0.5f, 0.f}
+};
+
 static DirectX::XMMATRIX world = DirectX::XMMatrixIdentity();
 static constexpr const FLOAT ClearColor[] = {0.13f , 0.14f, 0.17f, 1.f};
 //static std::mutex RenderingMutex;
@@ -60,29 +75,22 @@ bool IDirect3DDevice::Render()
 	if (getDeviceReadyState() != GRAPHICS_ENGINE_STATE_RUNNING)
 		return false;
 
-	static constexpr const FLOAT array[4] = {0.f, 0.1f, 0.1f, 1.f};
-	deviceContextIMM->ClearRenderTargetView(RenderTarget, array);
+	constexpr const FLOAT f[]{0.f, 0.f, 0.f, 0.f};
+	deviceContextIMM->ClearRenderTargetView(RenderTarget, f);
 	//deviceContextIMM->ClearDepthStencilView(depthStencil, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.f, UINT8(0));
 	deviceContextIMM->OMSetRenderTargets(1, &RenderTarget, depthStencil);
 
-
-	if (getImGUIUsed())
+	if (cubeBuffer)
 	{
-		//ImGui_ImplDX11_NewFrame();
-		//ImGui_ImplWin32_NewFrame();
-		//ImGui::NewFrame();
-		Application::Get()->nc.initDebug();
+		constexpr UINT st = sizeof(Vector3<float>);
+		constexpr UINT wi = 0;
+		deviceContextIMM->IASetVertexBuffers(0, 1, &cubeBuffer, &st, &wi);
+		deviceContextIMM->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		deviceContextIMM->PSSetShader(compiledPixelShader, 0, 0);
+		deviceContextIMM->VSSetShader(compiledVertexShader, 0, 0);
+
+		deviceContextIMM->Draw(sizeof(cube) / sizeof(cube[0]), 0);
 	}
-
-	{
-		constantWorld w;
-		w.projection = DirectX::XMMatrixTranspose(projectionMatrix);
-		w.world = DirectX::XMMatrixTranspose(worldMatrix);
-		w.view = DirectX::XMMatrixTranspose(Application::Get()->nc.getViewMatrix());
-
-		deviceContextIMM->UpdateSubresource(worldBuffer, 0, 0, &w, 0, 0);
-	}
-
 
 	for (Object* sceneObject : graphToRender->sceneList)
 	{
@@ -92,43 +100,13 @@ bool IDirect3DDevice::Render()
 		}
 	}
 
-
-	if (getImGUIUsed())
-	{
-		//ImGui::Render();
-		//ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-	}
-	
-	//deviceContextDEF->FinishCommandList(0, &commandList);
-	//deviceContextIMM->ExecuteCommandList(commandList, 0);
-
 	HRESULT	presentResult = swapChain->Present(0, 0);
 
-	if (presentResult == DXGI_ERROR_DEVICE_RESET)
-	{
-		getDescriptiveError(device->GetDeviceRemovedReason());
-		cleanUp();
-		Init();
-		return false;
-	}
-	else if (presentResult == DXGI_ERROR_DEVICE_REMOVED)
-	{
-		getDescriptiveError(device->GetDeviceRemovedReason());
-		cleanUp();
-		Init();
-		return false;
-	}
+	handleRenderResult(presentResult);
 
-	if (getImGUIUsed())
-	{
-		//ImGui::EndFrame();
-	}
-
-	//deviceContextIMM->OMSetRenderTargets(0, 0, 0);
 	return true;
 }
 
-static constexpr float fieldOfView = 3.141592654f / 4.0f;
 bool IDirect3DDevice::Init()
 {
 	//std::this_thread::sleep_for(std::chrono::seconds(10));
@@ -140,7 +118,7 @@ bool IDirect3DDevice::Init()
 
 	screenAspect = (float)defaultWindowSize.x / (float)defaultWindowSize.y;
 
-	projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 10000.f);
+	projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(45, screenAspect, 0.1f, 10000.f);
 
 	orthoMatrix = DirectX::XMMatrixOrthographicLH((float)defaultWindowSize.x, (float)defaultWindowSize.y, 0.1f, 10000.f);
 
@@ -171,16 +149,31 @@ bool IDirect3DDevice::Init()
 
 	setIsFullScreen(false);
 
+
 	{
+		D3D11_BUFFER_DESC cb = {};
+		cb.Usage = D3D11_USAGE_DEFAULT;
+		cb.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		cb.ByteWidth = sizeof(cube);
+		cb.StructureByteStride = sizeof(Vector3<float>);
 
-		D3D11_BUFFER_DESC bf = {};
-		bf.Usage = D3D11_USAGE_DEFAULT;
-		bf.ByteWidth = sizeof(constantWorld);
-		bf.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		bf.CPUAccessFlags = 0;
+		D3D11_SUBRESOURCE_DATA sb = {};
+		sb.pSysMem = cube;
 
-		HRESULT A = device->CreateBuffer(&bf, 0, &worldBuffer);
+		HRESULT A = device->CreateBuffer(&cb, &sb, &cubeBuffer);
 	}
+
+	//{
+
+	//	D3D11_BUFFER_DESC bf = {};
+	//	bf.Usage = D3D11_USAGE_DEFAULT;
+	//	bf.ByteWidth = sizeof(w);
+	//	bf.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	//	bf.CPUAccessFlags = 0;
+	//	bf.StructureByteStride = sizeof(constantWorld);
+
+	//	HRESULT A = device->CreateBuffer(&bf, 0, &worldBuffer);
+	//}
 
 	setImGUIUsed(true);
 	setDeviceReadyState(GRAPHICS_ENGINE_STATE_RUNNING);
@@ -198,18 +191,9 @@ void IDirect3DDevice::cleanUp() noexcept
 		//ImGui::DestroyContext();
 	}
 
-	if (swapChain)
-	{
-		swapChain->SetFullscreenState(false, NULL);
-		swapChain->Release();
-		swapChain = nullptr;
-	}
+	RELEASE(swapChain);
 
-	if (device)
-	{
-		device->Release();
-		device = nullptr;
-	}		
+	RELEASE(device);
 		
 	if (deviceContextIMM)
 	{
@@ -264,9 +248,14 @@ void IDirect3DDevice::cleanUp() noexcept
 	}
 }
 
+void IDirect3DDevice::createBuffer(void* data)
+{
+
+}
+
 const String IDirect3DDevice::getRendererSignatature() const
 {
-	return L"DX11";
+	return L"Direct3D 11";
 }
 
 static constexpr uint32 threshold = 20;
@@ -432,28 +421,14 @@ void IDirect3DDevice::createReferenceDevice()
 		MR_LOG(LogD3D11, Fatal, TEXT("Failed to Create D3D11 Capable Device"));
 	}
 
-	static bool bWasInitiatedBefore;
-	if (Logger::Get().getLoggingLevel() & APPFLAG_ENABLE_VERBOSE_LOGGING && !bWasInitiatedBefore)
-	{
-		bWasInitiatedBefore = true;
-		DXGI_ADAPTER_DESC apInfo = {};
-
-		adapter->GetDesc(&apInfo);
-		MR_LOG(LogD3D11, Verbose, TEXT("Capable Device Found!"));
-		MR_LOG(LogD3D11, Verbose, TEXT("\tName: %s"), apInfo.Description);
-		MR_LOG(LogD3D11, Verbose, TEXT("\tAvailable Memory: %d MB"), apInfo.DedicatedVideoMemory >> 20);
-		MR_LOG(LogD3D11, Verbose, TEXT("\tHighest Feature Level: %s"), distinguishFeatureLevel(device->GetFeatureLevel()).Chr());
-	}
-
-
 	MR_ASSERT(device != nullptr, TEXT("device is Invalid!"));
 
-	//D3D11_FEATURE_DATA_THREADING thrd = {};
-	//HRESULT chk = device->CheckFeatureSupport(D3D11_FEATURE_THREADING, &thrd, sizeof(thrd));
-	//if (thrd.DriverConcurrentCreates == 1)
-	//{
-	//	chk = device->CreateDeferredContext(0, &deviceContextDEF);
-	//}
+	D3D11_FEATURE_DATA_THREADING thrd = {};
+	HRESULT chk = device->CheckFeatureSupport(D3D11_FEATURE_THREADING, &thrd, sizeof(thrd));
+	if (thrd.DriverConcurrentCreates == 1)
+	{
+		chk = device->CreateDeferredContext(0, &deviceContextDEF);
+	}
 
 	if (getImGUIUsed())
 	{
@@ -540,9 +515,9 @@ inline void IDirect3DDevice::compileShader(String vertexShader, String pixelShad
 
 	D3D11_INPUT_ELEMENT_DESC layout[] =
 	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		//{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		//{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
 	constexpr UINT numElements = std::size(layout);
@@ -599,6 +574,22 @@ inline void IDirect3DDevice::createRasterizerState()
 inline void IDirect3DDevice::InitTestScene()
 {
 
+}
+
+inline void IDirect3DDevice::handleRenderResult(const HRESULT res)
+{
+	if (res == DXGI_ERROR_DEVICE_RESET)
+	{
+		getDescriptiveError(device->GetDeviceRemovedReason());
+		cleanUp();
+		Init();
+	}
+	else if (res == DXGI_ERROR_DEVICE_REMOVED)
+	{
+		getDescriptiveError(device->GetDeviceRemovedReason());
+		cleanUp();
+		Init();
+	}
 }
 
 inline void IDirect3DDevice::calculateNumerics(Vector2<uint32> size)
@@ -780,5 +771,4 @@ inline const String IDirect3DDevice::distinguishFeatureLevel(D3D_FEATURE_LEVEL f
 
 	return L"???";
 }
-
 

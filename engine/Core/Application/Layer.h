@@ -2,15 +2,18 @@
 
 #pragma once
 #include <Types/String.h>
+#include <Common/Delegate.h>
+#include <Log/LogMacros.h>
+
+LOG_ADDCATEGORY(Layers);
 
 class Layer
 {
+	friend class LayerManager;
 public:
 	Layer(const String Name) noexcept;
-	
-	Layer(const Layer&) = delete;
 
-	Layer() = delete;
+	virtual ~Layer() {};
 
 	void operator=(const Layer&) = delete;
 
@@ -21,14 +24,21 @@ public:
 
 	virtual void Init() = 0;
 	
-	virtual void eventAttached() = 0;
+	virtual void Attached() = 0;
+
+	virtual void Removed() = 0;
 
 	virtual void Update() = 0;
 
 	String getName() const noexcept { return name; }
 
 	void setName(const String NewName) noexcept { name = NewName; }
+
 private:
+	const void privAttached() noexcept;
+
+	const void privRemoved() noexcept;
+
 	String name;
 };
 

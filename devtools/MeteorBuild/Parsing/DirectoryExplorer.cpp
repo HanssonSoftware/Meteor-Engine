@@ -6,7 +6,9 @@
 #include <pathcch.h>
 #include <File/File.h>
 #pragma comment(lib, "Pathcch.lib")
-
+#pragma warning(disable : 6031)
+#pragma warning(disable : 6001) // Using uninitialized memory 'tempB'.
+ 
 LOG_ADDCATEGORY(DirectoryExplorer);
 
 DirectoryExplorer::DirectoryExplorer()
@@ -61,7 +63,7 @@ void DirectoryExplorer::startExpedition(String directory)
                 const String FileNameWExtension = searchData.cFileName;
                 if (FileNameWExtension.endsWith("mrbuild"))
                 {
-                    const String newModule = String::Format("%s %s", directory.Chr(), searchData.cFileName);
+                    const String newModule = String::Format("%s\\%s", directory.Chr(), searchData.cFileName);
                     MR_LOG(LogDirectoryExplorer, Verbose, TEXT("%s"), newModule.Chr());
                     modules.push_back(newModule);
                 }
@@ -73,16 +75,11 @@ void DirectoryExplorer::startExpedition(String directory)
 
 std::vector<FMFile*> DirectoryExplorer::processModules()
 {
-    std::vector<FMFile*> files;
+    std::vector<FMFile*> files(modules.size());
     for (String temp : modules)
     {
-        wchar_t* tempA = temp.Data();
-        wchar_t* tempB;
-
-        wcstok(tempA, L" ", &tempB);
-
         FMFile newFile;
-        if (newFile.Open(String::Format("%s\\%s", tempA, tempB), OPENRULE_READ, OVERRIDERULE_JUST_OPEN) != FILESTATUS_GOOD)
+        if (newFile.Open(temp, OPENRULE_READ, OVERRIDERULE_JUST_OPEN) != FILESTATUS_GOOD)
         {
             MR_LOG(LogDirectoryExplorer, Error, TEXT("Unable to Open %s"), newFile.getName().Chr());
             continue;
@@ -97,41 +94,10 @@ std::vector<FMFile*> DirectoryExplorer::processModules()
     return files;
 }
 
-static size_t bufferLength = 0;
-inline String DirectoryExplorer::processThatLine(const wchar_t* buffer, int A, int B)
-{
-    if (!buffer)
-        return String();
-
-    if (bufferLength == 0)
-        bufferLength = wcslen(buffer);
-
-    if (A > bufferLength)
-        A = bufferLength;
-
-    if (B > bufferLength)
-        B = bufferLength;
-
-    std::vector<wchar_t> data;
-    for (int i = A; i < B; i++)
-    {
-
-    }
-
-    return String();
-}
-
 bool DirectoryExplorer::processToModuleDescriptor(const wchar_t* buffer)
 {
-    if (!buffer)
-        return false;
-
-    const wchar_t* ptr = buffer;
-
-    int index = 0;
-    while (buffer[index] != L'\n')
-        index++;
+    int sdfjk = 5;
+    String p = String::readLine(buffer, sdfjk);
 
     return false;
 }
-

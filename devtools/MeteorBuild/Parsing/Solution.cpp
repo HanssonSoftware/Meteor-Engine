@@ -135,7 +135,7 @@ Solution::Solution(const String Name)
 
 }
 
-Project::Project(String displayName, String projectNameWithExtension, const String projectTypeGUID, const String projectUniqueGUID)
+Project::Project(const String displayName, String projectNameWithExtension, const String projectTypeGUID, const String projectUniqueGUID)
 	: projectName()
 	, projectNamePath(projectNameWithExtension)
 {

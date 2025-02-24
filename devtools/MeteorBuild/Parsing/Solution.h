@@ -5,14 +5,14 @@
 #include <vector>
 #include <guiddef.h>
 
-typedef struct ProjectSection
+struct ProjectSection
 {
 
-} ProjectSection;
+};
 
 typedef struct Project
 {
-	Project(String displayName, String projectNameWithExtension, const String ProjectTypeGUID, const String ProjectUniqueGUID);
+	Project(const String displayName, String projectNameWithExtension, const String ProjectTypeGUID, const String ProjectUniqueGUID);
 
 	String projectName;
 

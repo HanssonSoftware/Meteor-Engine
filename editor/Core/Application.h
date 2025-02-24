@@ -14,8 +14,6 @@ class EditorApplication : public Application
 public:
 	EditorApplication(const ApplicationInitializationInfo* Info);
 
-	virtual void Frame(float deltaTime) override;
-
 	virtual void Init() override;
 
 	virtual void Run() override;

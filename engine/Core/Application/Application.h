@@ -3,11 +3,11 @@
 #pragma once
 #include <Window/WindowManager.h>
 #include <Platform/Microsoft/MinWin.h>
-#include <GraphicsEngine/Camera.h>
+//#include <GraphicsEngine/Camera.h>
 #include <Types/Vector.h>
 #include <Types/String.h>
 #include <Log/LogMacros.h>
-#include <ThirdParty/ImGUI/imgui.h>
+//#include <ThirdParty/ImGUI/imgui.h>
 
 class String;
 class Window;
@@ -19,7 +19,7 @@ class InputManager;
 
 LOG_ADDCATEGORY(Application);
 
-typedef enum ApplicationFlags
+enum ApplicationFlags
 {
 	APPFLAG_NO_WINDOW = 1 << 0,
 	APPFLAG_HIDE_CONSOLE_DURING_DEBUG = 1 << 1,
@@ -28,9 +28,9 @@ typedef enum ApplicationFlags
 	APPFLAG_NO_FILE_LOGGING = 1 << 4,
 	APPFLAG_ENABLE_VERBOSE_LOGGING = 1 << 5
 
-} ApplicationFlags;
+};
 
-typedef struct ApplicationInitializationInfo
+struct ApplicationInitializationInfo
 {
 	String appName;
 
@@ -40,16 +40,16 @@ typedef struct ApplicationInitializationInfo
 
 	int flags = 0;
 
-} ApplicationInitializationInfo;
+};
 
-typedef enum ApplicationState
+enum ApplicationState
 {
 	APPLICATIONSTATE_INITIALIZATION,
 	APPLICATIONSTATE_RUNNING,
 	APPLICATIONSTATE_RESTARTING,
 	APPLICATIONSTATE_SHUTDOWN
 
-} ApplicationState;
+};
 
 class Application
 {
@@ -65,9 +65,6 @@ public:
 	Application(const Application& Nah) = delete;
 
 	virtual ~Application();
-
-	/** Called every frame. */
-	virtual void Frame(float deltaTime);
 
 	virtual void Init();
 
@@ -88,8 +85,6 @@ public:
 
 	static Application* Get();
 
-	void drawAttention() const;
-
 	void setApplicationGetter(Application* app) { Framework = app; };
 
 	ApplicationState getAppState() const { return State; };
@@ -106,8 +101,7 @@ public:
 
 	IGraphicsDevice* getRenderContext() const { return windowManager->getRenderContext(); };
 
-	Camera nc;
-
+	Window* getFirstWindow() const { return windowManager ? windowManager->getFirstWindow() : nullptr; };
 private:
 	inline void instantiateWindow();
 
@@ -115,8 +109,6 @@ protected:
 	ApplicationState State = APPLICATIONSTATE_INITIALIZATION;
 
 	const ApplicationInitializationInfo* appInfo;
-
-	Application() = delete; 
 
 	String applicationName = L"Saxon Proprietary Game Engine";
 

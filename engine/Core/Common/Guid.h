@@ -1,10 +1,7 @@
 /* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
-#ifdef _WIN32 
-#include <Objbase.h>
-#pragma comment(lib, "Kernel32.lib")
-#endif
+#include <Types/String.h>
 
 class Guid
 {
@@ -13,12 +10,12 @@ public:
 
 	~Guid();
 
-	GUID getID() const
+	String getID() const
 	{
 		return id;
 	}
 
 private:
-	GUID id;
+	String id;
 };
 

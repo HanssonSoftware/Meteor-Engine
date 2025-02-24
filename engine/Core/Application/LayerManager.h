@@ -9,6 +9,7 @@ class String;
 
 class LayerManager : public Object
 {
+	friend class Layer;
 public:
 	void addLayer(Layer* Instance);
 
@@ -17,6 +18,8 @@ public:
 	void removeLayer(const String Name);
 
 	void updateLayer();
+
+	~LayerManager();
 private:
 	std::vector<Layer*> layers;
 };

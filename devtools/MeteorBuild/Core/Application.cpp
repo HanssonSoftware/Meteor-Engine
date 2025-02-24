@@ -18,10 +18,6 @@ BuildSystemApplication::BuildSystemApplication(const ApplicationInitializationIn
 
 }
 
-void BuildSystemApplication::Frame(float deltaTime)
-{
-}
-
 void BuildSystemApplication::Init()
 {
 	Application::Init();
@@ -51,6 +47,7 @@ void BuildSystemApplication::Init()
 
 void BuildSystemApplication::Run()
 {
+
 }
 
 void BuildSystemApplication::Shutdown()

@@ -32,23 +32,27 @@ Exception::Exception(String text, int line, const wchar_t* File ,const wchar_t* 
 	vswprintf(variadicBuffer, requiredVariadicAmount, text.Chr(), args);
 	va_end(args);
 
-	const uint32 requiredFullAmount = swprintf(NULL, 0, L"One or more Unhandled Exception(s) are occourred.\n\n%s\n\n\nAt: %s, Line: %d\nPress OK to close the application!", variadicBuffer, File, line) + 1;
+	const uint32 requiredFullAmount = swprintf(NULL, 0, L"One or more Unhandled Exception(s) are occourred.\n\n%s\n\n\nAt: %s, Line: %d\nDo you want to continue? (not safe)\nPress No to close the application!", variadicBuffer, File, line) + 1;
 
 	wchar_t* fullBuffer = (wchar_t*)mrmalloc((requiredFullAmount + requiredVariadicAmount) * sizeof(wchar_t));
-	swprintf(fullBuffer, (requiredFullAmount + requiredVariadicAmount), L"One or more Unhandled Exception(s) are occourred.\n\n%s\n\n\nAt: %s, Line: %d\nPress OK to close the application!", variadicBuffer, File, line);
+	swprintf(fullBuffer, (requiredFullAmount + requiredVariadicAmount), L"One or more Unhandled Exception(s) are occourred.\n\n%s\n\n\nAt: %s, Line: %d\nDo you want to continue? (not safe)\nPress No to close the application!", variadicBuffer, File, line);
 
 	String super(fullBuffer);
 
 	mrfree(fullBuffer);
 	mrfree(variadicBuffer);
-	MessageBox(NULL, super.Chr(), Application::Get()->getApplicationName().Chr(), MB_ICONERROR | MB_OK);
+	const int choice = MessageBoxW(NULL, super.Chr(), Application::Get()->getApplicationName().Chr(), MB_ICONERROR | MB_YESNO);
+	if (choice == IDYES)
+	{
+
+	}
 #endif // MR_DEBUG
 }
 
 Exception::Exception(String text) 
 	: description(text)
 {
-	MR_LOG(LogException, Error, TEXT("Exception: %s"), *description);
+	MR_LOG(LogException, Error, TEXT("Exception: %s"), description.Chr());
 }
 
 bool Exception::operator==(const Exception& other) const

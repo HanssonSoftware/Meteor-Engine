@@ -81,14 +81,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)Product\</OutDir>
     <IntDir>$(SolutionDir)Intermediate\$(ProjectName)\</IntDir>
-    <TargetName>$(ProjectName)-engine</TargetName>
+    <TargetName>crimson</TargetName>
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
     <OutDir>$(SolutionDir)Product\</OutDir>
     <IntDir>$(SolutionDir)Intermediate\$(ProjectName)\</IntDir>
-    <TargetName>$(ProjectName)-engine</TargetName>
+    <TargetName>crimson</TargetName>
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
@@ -171,9 +171,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies);vulkan-1.lib</AdditionalDependencies>
+      <OutputFile>$(OutDir)crimson$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);$(ProjectDir)engine\ThirdParty</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <Name>
       </Name>
       <SubSystem>
@@ -208,9 +208,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies);vulkan-1.lib</AdditionalDependencies>
+      <OutputFile>$(OutDir)crimson$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);$(ProjectDir)engine\ThirdParty</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <Name>
       </Name>
       <SubSystem>
@@ -227,6 +227,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="engine\Core\Serialisation\AssetManager.cpp" />
     <ClCompile Include="engine\Async\Semaphore.cpp" />
     <ClCompile Include="engine\Async\SlowTask.cpp" />
     <ClCompile Include="engine\Async\Thread.cpp" />
@@ -247,6 +248,7 @@
     <ClCompile Include="engine\Core\File\ConfigCollection.cpp" />
     <ClCompile Include="engine\Core\File\File.cpp" />
     <ClCompile Include="engine\Graphics\GraphicsEngine\Camera.cpp" />
+    <ClCompile Include="engine\Graphics\GraphicsEngine\D3D11\Direct3DDevice.cpp" />
     <ClCompile Include="engine\Graphics\GraphicsEngine\MeshModel.cpp" />
     <ClCompile Include="engine\Launch\LaunchGeneric.cpp" />
     <ClCompile Include="engine\Core\Log\Exception.cpp" />
@@ -260,17 +262,18 @@
     <ClCompile Include="engine\Graphics\Widgets\Visual.cpp" />
     <ClCompile Include="engine\Core\Window\Window.cpp" />
     <ClCompile Include="engine\Core\Window\WindowManager.cpp" />
-    <ClCompile Include="engine\Graphics\GraphicsEngine\D3D11\Direct3DDevice.cpp" />
     <ClCompile Include="engine\Graphics\GraphicsEngine\GraphicsDevice.cpp" />
     <ClCompile Include="engine\Graphics\GraphicsEngine\QueuedRender.cpp" />
     <ClCompile Include="engine\Graphics\GraphicsEngine\SceneGraph.cpp" />
     <ClCompile Include="engine\Graphics\GraphicsEngine\VertexBuffer.cpp" />
-    <ClCompile Include="engine\Graphics\GraphicsEngine\Vulkan\VulkanDevice.cpp" />
     <ClCompile Include="engine\Core\Common\Pointers.cpp" />
     <ClCompile Include="engine\Core\AssetLoader\Mesh\StaticMesh.cpp" />
     <ClCompile Include="engine\Core\Common\Guid.cpp" />
+    <ClCompile Include="engine\Core\Serialisation\FontImporter.cpp" />
+    <ClCompile Include="engine\Core\Serialisation\Importer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="engine\Core\Serialisation\AssetManager.h" />
     <ClInclude Include="engine\Core\Common\Conversions.h" />
     <ClInclude Include="engine\Core\Object\GameObject.h" />
     <ClInclude Include="engine\Core\Object\Object.h" />
@@ -313,7 +316,6 @@
     <ClInclude Include="engine\Graphics\Widgets\Visual.h" />
     <ClInclude Include="engine\Core\Window\Window.h" />
     <ClInclude Include="engine\Core\Window\WindowManager.h" />
-    <ClInclude Include="engine\Graphics\GraphicsEngine\Vulkan\VulkanDevice.h" />
     <ClInclude Include="engine\Platform\Microsoft\MinWin.h" />
     <ClInclude Include="engine\ThirdParty\assimp\aabb.h" />
     <ClInclude Include="engine\ThirdParty\assimp\ai_assert.h" />
@@ -397,9 +399,12 @@
     <ClInclude Include="engine\ThirdParty\assimp\XmlParser.h" />
     <ClInclude Include="engine\ThirdParty\assimp\XMLTools.h" />
     <ClInclude Include="engine\ThirdParty\assimp\ZipArchiveIOSystem.h" />
+    <ClInclude Include="engine\ThirdParty\FreeType\ft2build.h" />
     <ClInclude Include="engine\Version.h" />
     <ClInclude Include="engine\Core\Common\Pointers.h" />
     <ClInclude Include="engine\Core\Common\Guid.h" />
+    <ClInclude Include="engine\Core\Serialisation\FontImporter.h" />
+    <ClInclude Include="engine\Core\Serialisation\Importer.h" />
     <ClInclude Include="resources\resource.h" />
     <ClInclude Include="engine\Core\AssetLoader\Mesh\StaticMesh.h" />
   </ItemGroup>

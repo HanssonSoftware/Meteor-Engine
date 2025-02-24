@@ -8,7 +8,10 @@
 
 String::String() noexcept
 {
-	
+	buffer = new wchar_t[1];
+#ifdef MR_DEBUG
+	bIsInited = true;
+#endif // MR_DEBUG
 }
 
 /**
@@ -64,9 +67,7 @@ String::String(wchar_t* buffer)
 String::String(const wchar_t* Input)
 {
 	if (!Input)
-	{
 		THROW_EXCEPTION("Invalid or NULL buffer!");
-	}
 
 	const size_t length = wcslen(Input) + 1;
 	if (length == 0)
@@ -329,6 +330,11 @@ float String::toFloat() const
 	return wcstof(buffer, &end);
 }
 
+uint32 String::Length() const
+{
+	return buffer != nullptr ? (uint32)wcslen(buffer) : /*(uint32)*/ 0;
+}
+
 String String::Format(const String format, ...)
 {
 	const wchar_t* formattingBuffer = format.Chr();
@@ -349,6 +355,40 @@ String String::Format(const String format, ...)
 
 	delete[] newFormattedBuffer;
 	return stringized;
+}
+
+inline String String::readLine(const String line, uint32 location)
+{
+	return readLine(line.Chr(), location);
+}
+
+String String::readLine(const wchar_t* Line, uint32 location)
+{
+	uint32 current = location;
+
+#ifdef _WIN32
+	while (Line[current] != L'\r')
+#else
+	while (Line[current] != L'\n')
+#endif // _WIN32
+	{
+		current++;
+	}
+
+	wchar_t* temp = new wchar_t[(current - location) + 1];
+	wcsncpy(temp, Line + location, current - location);
+	temp[current - location] = L'\0';
+
+#ifdef _WIN32
+	current++;
+#endif // _WIN32
+
+	String buffer(temp);
+
+	location = current;
+
+	delete[] temp;
+	return buffer;
 }
 
 String& String::operator=(const String& other)

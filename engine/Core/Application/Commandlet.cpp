@@ -43,8 +43,6 @@ void ICommandlet::Parse(int Count, char* Array[])
 {
 	executableLocation = Array[0];
 
-	//currentQueue.push_back(String::Format("-%s %s", String("exedir").Chr(), String(Array[0]).Chr()));
-
 	// Create a background, if parameter is found 
 	char* indexedParameterBefore = Array[0];
 	for (int i = 1; i < Count; i++)
@@ -68,6 +66,13 @@ void ICommandlet::Parse(int Count, char* Array[])
 					i++;
 					continue;
 				}
+			}
+			else
+			{
+				currentQueue.push_back(String::Format("%s %s", String(parameter).Chr(), L"1"));
+
+				i++;
+				continue;
 			}
 		}
 	}

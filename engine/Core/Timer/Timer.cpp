@@ -4,16 +4,31 @@
 #include <sstream>
 #include <iomanip>
 #include <Types/String.h>
+#include <Windows.h>
+#include <Log/Exception.h>
+#include <Log/Log.h>
 
 Timer::Timer() : 
     bRunning(false) 
 {
 
+
 }
 
 void Timer::Start()
 {
-    startTime = std::chrono::high_resolution_clock::now();
+#ifdef _WIN32
+    LARGE_INTEGER lg;
+    if (QueryPerformanceFrequency(&lg) == 0)
+        THROW_EXCEPTION("QueryPerformanceFrequency Error!");
+
+    cpuFrequency = lg.QuadPart / 1000.0;
+
+    if (QueryPerformanceCounter(&lg) == 0)
+        THROW_EXCEPTION("QueryPerformanceCounter Error!");
+
+    clock = lg.QuadPart;
+#endif // _WIN32
     bRunning = true;
 }
 
@@ -53,8 +68,11 @@ bool Timer::isRunning() const
     return bRunning;
 }
 
-String Timer::Now(String Format)
+String Timer::Now(const String Format)
 {
+    if (Format.isEmpty())
+        return "";
+
     time_t rawtime;
     wchar_t buffer[256];
 
@@ -63,8 +81,6 @@ String Timer::Now(String Format)
     tm* a = localtime(&rawtime);
 
     wcsftime(buffer, 256, Format.Chr(), a);
-
-
 
     return buffer;
 }

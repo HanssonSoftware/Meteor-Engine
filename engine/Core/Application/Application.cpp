@@ -30,10 +30,6 @@ Application::Application(const ApplicationInitializationInfo* aInfo)
     setLayerManager(new LayerManager());
 }
 
-void Application::Frame(float deltaTime)
-{
-}
-
 Application* Application::Get()
 {
     static std::mutex mtx;
@@ -41,8 +37,6 @@ Application* Application::Get()
     return Framework ? Framework : nullptr;
 }
 
-uint32 targetedFramesPerSecond = 60;
-const std::chrono::milliseconds frameDuration(1000 / targetedFramesPerSecond);
 void Application::Init()
 {
 #ifdef MR_DEBUG
@@ -52,11 +46,11 @@ void Application::Init()
     Logger::Get().firstStartLogger();
     MR_LOG(LogApplication, Log, TEXT("Initializing Application."));
 
-    MR_LOG(LogApplication, Verbose, TEXT("App Dir: %s"), applicationLocation.Chr());
+    //MR_LOG(LogApplication, Verbose, TEXT("App Dir: %s"), applicationLocation.Chr());
 
     if (appInfo->appName.isEmpty())
     {
-        MR_LOG(LogApplication, Fatal, TEXT("AppInfo is Bad, or Null!"));
+        MR_LOG(LogApplication, Fatal, TEXT("AppInfo is Invalid!"));
     }
 
     instantiateWindow();
@@ -103,8 +97,6 @@ void Application::Run()
 
     Ref->showWindow();
 
-    SceneGraph::Get().addToRoot(&nc);
-
     setAppState(APPLICATIONSTATE_RUNNING);
 
     MSG msg;
@@ -125,9 +117,8 @@ void Application::Run()
         {
             graphicsDevice->Render();
         }
-        SceneGraph::Get().Update(dt);
 
-        Frame(dt);
+        SceneGraph::Get().Update(dt);
         Framework->Run();
     }
 
@@ -181,12 +172,12 @@ String Application::getApplicationName()
     if (!appInfo)
     {
         MR_LOG(LogApplication, Error, TEXT("AppInfo is Null!"));
-        return String();
+        return String("");
     }
 
     if (appInfo->appName.isEmpty())
     {
-        return getWindowManager()->getFirstWindow()->windowData->windowName;
+        return getWindowManager()->getFirstWindow()->windowData.windowName;
     }
 
     return appInfo->appName;
@@ -204,26 +195,6 @@ Vector2<uint32> Application::getWindowSize() const
     return lastResort;
 }
 
-void Application::drawAttention() const
-{
-    if (getAppState() == APPLICATIONSTATE_INITIALIZATION)
-        return;
-
-    if (!getWindowManager()->getFirstWindow())
-        return;
-
-#ifdef _WIN32
-    FLASHWINFO flashInfo = {};
-    flashInfo.cbSize = sizeof(flashInfo);
-    flashInfo.hwnd = (HWND)getWindowManager()->getFirstWindow()->getWindowHandle();
-    flashInfo.dwFlags = FLASHW_TRAY;
-    flashInfo.uCount = 0;
-    flashInfo.dwTimeout = 0;
-
-    FlashWindowEx(&flashInfo);
-#endif // _WIN32
-}
-
 inline void Application::instantiateWindow()
 {
     if (appInfo->flags & APPFLAG_NO_WINDOW)
@@ -239,15 +210,9 @@ inline void Application::instantiateWindow()
     }
 }
 
+#ifdef _WIN32
 LRESULT CALLBACK WndProc(HWND wnd, UINT uint, WPARAM p1, LPARAM p2)
 {
-    //if (ImGui_ImplWin32_WndProcHandler(wnd, uint, p1, p2))
-    //    return true;
-
-    if (Logger::Get().getMessageName(uint) != L"" && false) {
-        MR_LOG(LogApplication, Verbose, TEXT("%s"), Logger::Get().getMessageName(uint));
-    }
-
     switch (uint)
     {
     case WM_CREATE:
@@ -367,4 +332,4 @@ LRESULT CALLBACK WndProc(HWND wnd, UINT uint, WPARAM p1, LPARAM p2)
 
     return DefWindowProc(wnd, uint, p1, p2);
 }
-
+#endif // _WIN32

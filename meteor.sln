@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Meteor", "meteor.vcxproj", "{709B7964-F338-40B8-B8E2-A2898B438A1C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Editor", "editor\Editor.vcxproj", "{13CDFF27-4E0F-4C92-92EC-F6D925CD8D09}"
+	ProjectSection(ProjectDependencies) = postProject
+		{709B7964-F338-40B8-B8E2-A2898B438A1C} = {709B7964-F338-40B8-B8E2-A2898B438A1C}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeteorBuild", "devtools\MeteorBuild\MeteorBuild.vcxproj", "{E75C5354-0747-4518-9E9B-B4FDFF214314}"
 EndProject

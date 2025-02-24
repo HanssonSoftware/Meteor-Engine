@@ -13,27 +13,12 @@ class InputManager;
 
 static constexpr const wchar_t* ApplicationClassName = L"MeteorApplication";
 
-typedef enum WindowFlags : sint8
+enum WindowFlags : sint8
 {
 	 WF_HIDDENDEFAULT = 1 << 0,
 	 WF_SHOWNDEFAULT = 1 << 1
 
-} WindowFlags;
-
-typedef struct WindowCreateInfo
-{
-	/** Constant ID, good for searching window.*/
-	String windowID;
-
-	/** Distinguish between the ID, the ID is for searching purposes.*/
-	String windowName;
-
-	Vector2<uint32> size = 0;
-
-	int flags = -1;
-
-} WindowCreateInfo;
-
+};
 
 class WindowManager : public Object
 {
@@ -55,8 +40,13 @@ public:
 
 	void hideWindow(const String ID);
 
+	bool drawAttention(const String ID);
+
 	bool destroyWindow(const String ID);
 
+	/** Gets the current or last focused window, can be non-engine specific. */
+	Window* getFocusedWindow() const;
+	
 	IGraphicsDevice* getRenderContext() const { return renderContext; };
 
 	InputManager* getInputManager() const { return inputManager; };
@@ -64,11 +54,13 @@ private:
 #ifdef _WIN32
 	inline bool registerWindowClass();
 #endif
+	Window* privSearchFor(const String Name);
+
 	IGraphicsDevice* renderContext;
 
 	InputManager* inputManager;
 
-	std::vector<Window*> activeWindows;
+	std::vector<Window*> activeWindows; 
 #ifdef _WIN32
 	bool bIsWinAPIClassRegistered = false;
 #endif

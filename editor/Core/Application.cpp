@@ -3,11 +3,10 @@
 #include "Application.h"
 #include <Common/MemoryManager.h>
 #include <Types/String.h>
-
 #include <Log/Exception.h>
 #include <Common/Delegate.h>
 #include <GraphicsEngine/MeshModel.h>
-//#include <Widgets/Common/FontAsset.h>
+#include <Application/LayerManager.h>
 #include <GraphicsEngine/SceneGraph.h>
 #include <Async/SlowTask.h>
 #include <iostream>
@@ -15,6 +14,8 @@
 #include <Common/Array.h>
 #include <Application/Commandlet.h>
 
+#include "EditorLayer.h"
+#include <Serialisation/FontImporter.h>
 
 EditorApplication::EditorApplication(const ApplicationInitializationInfo* aInfo) 
 	: Application(aInfo)
@@ -22,12 +23,6 @@ EditorApplication::EditorApplication(const ApplicationInitializationInfo* aInfo)
 	
 }
 
-void EditorApplication::Frame(float deltaTime)
-{
-	// Insert app tick here.
-
-	Application::Frame(deltaTime);
-}
 
 #if 0
 class Test
@@ -49,6 +44,11 @@ void EditorApplication::Init()
 {
 	Application::Init();
 
+	EditorLayer Super("geci");
+	Application::Get()->getLayerManager()->addLayer(&Super);
+
+	FontImporter font("kjng");
+
 	FMFile a;
 	a.Open("fg.txt", OPENRULE_WRITE | OPENRULE_READ | OPENRULE_DELETE, OVERRIDERULE_JUST_OPEN);
 	a.Read();
@@ -62,8 +62,8 @@ void EditorApplication::Init()
 	{
 
 	}
-		
-	a.Write("bufos kurvasi íylehfgyuisehfg éuil ehuoyhseéouigfyhseijá-éawljd893475eá-mxf.d--.4:_:ÁÉKOPJKOIJPÉ$ß[]$£÷&@£");
+	//	
+	//a.Write("bufos kurvasi íylehfgyuisehfg éuil ehuoyhseéouigfyhseijá-éawljd893475eá-mxf.d--.4:_:ÁÉKOPJKOIJPÉ$ß[]$£÷&@£");
 
 	//SceneGraph::Get().addToRoot(&newa);
 

@@ -43,6 +43,8 @@ public:
 
 	virtual void cleanUp() = 0;
 
+	virtual void createBuffer(void* data) = 0;
+
 	virtual const String getRendererSignatature() const;
 
 	virtual const bool getIsFullScreen() const { return bIsFullscreen; };
@@ -70,7 +72,7 @@ protected:
 
 	std::atomic<bool> bIsImGUIUsed = false;
 
-	GraphicsEngineRunningState driverState = GRAPHICS_ENGINE_STATE_NONE;
+	GraphicsEngineRunningState driverState;
 
 	std::atomic<bool> bIsFullscreen = false;
 

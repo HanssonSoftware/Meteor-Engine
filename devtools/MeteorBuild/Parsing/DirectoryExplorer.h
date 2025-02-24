@@ -16,8 +16,6 @@ public:
 
 	inline void goBack(String& input);
 
-	inline String processThatLine(const wchar_t* buffer, int A, int B);
-
 	void startExpedition(String directory);
 
 	std::vector<FMFile*> processModules();
