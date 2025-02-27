@@ -35,6 +35,8 @@ public:
 
 	virtual void createBuffer(void* data) override;
 
+	virtual bool compileShader(const String shaderName, Shader& data, bool pixel) override;
+
 	const virtual String getRendererSignatature() const override;
 
 	virtual void resizeBuffers(Vector2<uint32> newSize) override;
@@ -120,8 +122,6 @@ private:
 	inline void createReferenceDevice();
 
 	inline void createSwapChain(Vector2<uint32> newSize);
-
-	inline void compileShader(String vertexShader, String pixelShader);
 
 	inline void createFactory();
 

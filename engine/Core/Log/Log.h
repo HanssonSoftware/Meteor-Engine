@@ -74,7 +74,7 @@ public:
 
 	void logAssert(const wchar_t* Function, const wchar_t* File, const wchar_t* Input, ...);
 
-	inline void writeToOutput(const wchar_t* Input, bool bFiled);
+	inline void writeToOutput(wchar_t* Input, bool bFiled);
 
 	constexpr inline int getLoggingLevel() const noexcept { return loggingState; }
 

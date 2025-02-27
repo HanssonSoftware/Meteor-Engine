@@ -31,7 +31,7 @@
 		item = nullptr;	 \
 	}
 
-#define HRESULT_STRINGIZE(code) #code
+#define HRESULT_STRINGIZE(code) L#code
 
 IDirect3DDevice::IDirect3DDevice()
 {
@@ -67,6 +67,8 @@ static const Vector3<float> cube[]
 	{-0.5f, -0.5f, 0.f}
 };
 
+static Shader vertexShader;
+static Shader pixelShader;
 static DirectX::XMMATRIX world = DirectX::XMMatrixIdentity();
 static constexpr const FLOAT ClearColor[] = {0.13f , 0.14f, 0.17f, 1.f};
 //static std::mutex RenderingMutex;
@@ -82,12 +84,14 @@ bool IDirect3DDevice::Render()
 
 	if (cubeBuffer)
 	{
+		constexpr ID3D11VertexShader* vx = &vertexShader.data;
 		constexpr UINT st = sizeof(Vector3<float>);
 		constexpr UINT wi = 0;
+		deviceContextIMM->IASetInputLayout(inputLayout);
 		deviceContextIMM->IASetVertexBuffers(0, 1, &cubeBuffer, &st, &wi);
 		deviceContextIMM->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		deviceContextIMM->PSSetShader(compiledPixelShader, 0, 0);
-		deviceContextIMM->VSSetShader(compiledVertexShader, 0, 0);
+		deviceContextIMM->PSSetShader((ID3D11PixelShader*), 0, 0);
+		deviceContextIMM->VSSetShader((ID3D11VertexShader*)&vertexShader.data, 0, 0);
 
 		deviceContextIMM->Draw(sizeof(cube) / sizeof(cube[0]), 0);
 	}
@@ -139,9 +143,9 @@ bool IDirect3DDevice::Init()
 
 	calculateNumerics(defaultWindowSize);
 
-	//createVertexBuffer();
+	compileShader("Shader", vertexShader, false);
 
-	compileShader("Shader", "Shader");
+	compileShader("ShaderPX", pixelShader, true);
 
 	createRasterizerState();
 
@@ -251,6 +255,71 @@ void IDirect3DDevice::cleanUp() noexcept
 void IDirect3DDevice::createBuffer(void* data)
 {
 
+}
+
+bool IDirect3DDevice::compileShader(const String shaderName, Shader& data, bool pixel)
+{
+	ID3DBlob* object;
+	ID3DBlob* errorMsg;
+
+	if (!pixel)
+	{
+		ID3D11VertexShader* shader;
+		HRESULT result = D3DCompileFromFile(String::Format("%s.hlsl", shaderName.Chr()).Chr(), nullptr, nullptr, "VS", "vs_5_0", 0, 0, &object, &errorMsg);
+		if (result != S_OK)
+		{
+			if (errorMsg)
+			{
+				const char* message = (const char*)errorMsg->GetBufferPointer();
+				MR_LOG(LogD3D11, Error, "Compile Error! %s", String(message).Chr());
+				errorMsg->Release();
+				return false;
+			}
+		}
+
+		HRESULT resultB = device->CreateVertexShader(object->GetBufferPointer(), object->GetBufferSize(), nullptr, &shader);
+		if (FAILED(resultB))
+		{
+			MR_LOG(LogD3D11, Error, "CreateVertexShader failed! %s");
+			return false;
+		}
+
+		data.data = shader;
+		shader->Release();
+	}
+	else
+	{
+		ID3D11PixelShader* shader;
+		HRESULT result = D3DCompileFromFile(String::Format("%s.hlsl", shaderName.Chr()).Chr(), nullptr, nullptr, "PS", "ps_5_0", 0, 0, &object, &errorMsg);
+		if (SUCCEEDED(result))
+		{
+			if (errorMsg)
+			{
+				const char* message = (const char*)errorMsg->GetBufferPointer();
+				MR_LOG(LogD3D11, Error, "Compile Error! %s", String(message).Chr());
+				errorMsg->Release();
+				return false;
+			}
+		}
+		else
+		{
+			auto c = HRESULT_STRINGIZE(result);
+
+			int u = 4;
+		}
+
+		HRESULT resultB = device->CreatePixelShader(object->GetBufferPointer(), object->GetBufferSize(), nullptr, &shader);
+		if (FAILED(resultB))
+		{
+			MR_LOG(LogD3D11, Error, "CreatePixelShader failed! %s");
+			return false;
+		}
+
+		data.data = shader;
+		shader->Release();
+	}
+
+	return data.data ? true : false;
 }
 
 const String IDirect3DDevice::getRendererSignatature() const
@@ -469,71 +538,6 @@ inline void IDirect3DDevice::createSwapChain(Vector2<uint32> newSize)
 	}
 }
 
-inline void IDirect3DDevice::compileShader(String vertexShader, String pixelShader)
-{
-	ID3DBlob* vertexBlob;
-	ID3DBlob* errorMsg;
-	HRESULT result = D3DCompileFromFile((vertexShader + String(L".hlsl")).Chr(), NULL, NULL, "VS", "vs_5_0", 0, 0, &vertexBlob, &errorMsg);
-	if (result != S_OK)
-	{
-		if (errorMsg)
-		{
-			const char* message = (const char*)errorMsg->GetBufferPointer();
-			MessageBoxA(0, message, "Compile Error!", MB_ICONERROR | MB_OK);
-			errorMsg->Release();
-		}
-	}
-
-
-	ID3DBlob* pixelBlob;
-	result = D3DCompileFromFile((vertexShader + String(L"PX.hlsl")).Chr(), NULL, NULL, "PS", "ps_5_0", 0, 0, &pixelBlob, &errorMsg);
-	if (result != S_OK)
-	{
-		if (errorMsg)
-		{
-			const char* message = (const char*)errorMsg->GetBufferPointer();
-			MessageBoxA(0, message, "Compile Error!", MB_ICONERROR | MB_OK);
-			errorMsg->Release();
-		}
-	}
-	
-	
-
-	MR_LOG(LogD3D11, Log, TEXT("Compiling shader(s)!"));
-
-	HRESULT resultB = device->CreateVertexShader(vertexBlob->GetBufferPointer(), vertexBlob->GetBufferSize(), nullptr, &compiledVertexShader);
-	if (FAILED(resultB))
-	{
-		THROW_EXCEPTION("CreateVertexShader failed! Check with Debug configuration!");
-	}
-
-	HRESULT resultC = device->CreatePixelShader(pixelBlob->GetBufferPointer(), pixelBlob->GetBufferSize(), nullptr, &compiledPixelShader);
-	if (FAILED(resultC))
-	{
-		THROW_EXCEPTION("CreatePixelShader failed! Check with Debug configuration!");
-	}
-
-	D3D11_INPUT_ELEMENT_DESC layout[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		//{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		//{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	};
-
-	constexpr UINT numElements = std::size(layout);
-
-	HRESULT resultD = device->CreateInputLayout(layout, numElements, vertexBlob->GetBufferPointer(), vertexBlob->GetBufferSize(), &inputLayout);
-	if (FAILED(resultD))
-	{
-		THROW_EXCEPTION("CreateInputLayout failed! Check with Debug configuration!");
-	}
-
-	deviceContextIMM->IASetInputLayout(inputLayout);
-
-	vertexBlob->Release();
-	pixelBlob->Release();
-}
-
 inline void IDirect3DDevice::createFactory()
 {
 	// Create the factory here.
@@ -728,6 +732,20 @@ inline void IDirect3DDevice::imguiStateChanged(bool NewValue)
 
 inline void IDirect3DDevice::createInputLayout()
 {
+	D3D11_INPUT_ELEMENT_DESC layout[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		//{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		//{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	constexpr UINT numElements = std::size(layout);
+
+	HRESULT resultD = device->CreateInputLayout(layout, numElements, compiledVertexShader, sizeof(compiledVertexShader), &inputLayout);
+	if (FAILED(resultD))
+	{
+		THROW_EXCEPTION("CreateInputLayout failed! Check with Debug configuration!");
+	}
 
 }
 

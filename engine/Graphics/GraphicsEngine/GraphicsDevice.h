@@ -19,6 +19,7 @@ typedef enum GraphicsEngineRunningState
 	GRAPHICS_ENGINE_STATE_RUNNING = 3,
 	GRAPHICS_ENGINE_STATE_SHUTDOWN = 4,
 	GRAPHICS_ENGINE_STATE_DIED = 5
+
 } GraphicsEngineRunningState;
 
 typedef struct Vertex
@@ -29,6 +30,19 @@ typedef struct Vertex
 
 	Vector3<float> Normal;
 } Vertex;
+
+struct Shader
+{
+	void* data;
+
+	String path;
+
+private:
+	bool operator==(const Shader& same)
+	{
+		return path == same.path;
+	}
+};
 
 class IGraphicsDevice
 {
@@ -42,6 +56,8 @@ public:
 	virtual bool Init();
 
 	virtual void cleanUp() = 0;
+
+	virtual bool compileShader(const String shaderName, Shader& data, bool pixel) = 0;
 
 	virtual void createBuffer(void* data) = 0;
 

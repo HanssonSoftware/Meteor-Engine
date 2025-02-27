@@ -34,7 +34,7 @@ void Timer::Start()
 
 void Timer::Stop() 
 {
-    endTime = std::chrono::high_resolution_clock::now();
+    //endTime = std::chrono::high_resolution_clock::now();
     bRunning = false;
 }
 
@@ -52,10 +52,11 @@ double Timer::getElapsedMilliseconds() const
     }
     else 
     {
-        endTimePoint = endTime;
+        //endTimePoint = endTime;
     }
 
-    return std::chrono::duration<double, std::milli>(endTimePoint - startTime).count();
+    return 1;
+    //return std::chrono::duration<double, std::milli>(endTimePoint - startTime).count();
 }
 
 double Timer::getElapsedSeconds() const 

@@ -11,8 +11,8 @@
 #include <Application/Commandlet.h>
 #include <mutex>
 
-
 #pragma warning(disable : 4700)
+#pragma warning(disable : 6031) // Return value ignored: 'std::vector<LogPart,std::allocator<LogPart> >::empty'.
 
 #ifdef _WIN32
 #pragma comment(lib, "kernel32.lib")
@@ -79,6 +79,8 @@ void Logger::printCollectedLogs()
     {
         logMessage(Log, Log.func.Chr(), Log.file.Chr());
     }
+
+    critialLogs.clear();
 }
 
 inline void Logger::logMessage(LogPart Log, const wchar_t* Function, const wchar_t* File)
@@ -105,13 +107,13 @@ inline void Logger::logMessage(LogPart Log, const wchar_t* Function, const wchar
 
     if (Log.displayTitle == Fatal)
     {
-        writeToOutput(formatQuickFatal(Log.rawMessage.Chr(), Function, File).Chr(), true);
+        writeToOutput(formatQuickFatal(Log.rawMessage.Chr(), Function, File).Data(), true);
         MessageBox(NULL, Log.rawMessage.Chr(), L"Fatal Error!", MB_ICONERROR | MB_OK);
 
         exit(-1);
     }
 
-    writeToOutput(Log.message.Chr(), (Log.displayTitle == Info) ? false : true);
+    writeToOutput(Log.message.Data(), (Log.displayTitle == Info) ? false : true);
     setColorBySeverity(ESeverity::Log);
 }
 
@@ -119,18 +121,19 @@ void Logger::logAssert(const wchar_t* Function, const wchar_t* File, const wchar
 {
     va_list args;
     va_start(args, Input);
-    const uint32 requiredChars = vswprintf(NULL, 0, Input, args);
+    const uint32 requiredChars = vswprintf(0, 0, Input, args);
     va_end(args);    
     
     wchar_t* variadicBuffer = new wchar_t[requiredChars + 1];
 
     va_list argsA;
     va_start(argsA, Input);
-    vswprintf_s(variadicBuffer, requiredChars + 1, Input, argsA);
+    vswprintf(variadicBuffer, requiredChars + 1, Input, argsA);
     va_end(argsA);
     
 
-    const uint32 requiredCharsForFullText = swprintf(NULL, 
+    const uint32 requiredCharsForFullText = swprintf(
+        0, 
         0, 
         L"=============[ Assertion error ]=============\nWhere: \t\t%s\nWhen: \t\t%s\nMessage: \t%s\n\nFile: \t%s\n", 
         Function, 
@@ -141,7 +144,8 @@ void Logger::logAssert(const wchar_t* Function, const wchar_t* File, const wchar
 
     wchar_t* fullBuffer = new wchar_t[requiredCharsForFullText + 1];
 
-    swprintf(fullBuffer,
+    swprintf(
+        fullBuffer,
         requiredCharsForFullText,
         L"=============[ Assertion error ]=============\nWhere: \t\t%s\nWhen: \t\t%s\nMessage: \t%s\n\nFile: \t%s\n",
         Function,
@@ -161,11 +165,15 @@ void Logger::logAssert(const wchar_t* Function, const wchar_t* File, const wchar
     delete[] variadicBuffer;
 }
 
-void Logger::writeToOutput(const wchar_t* Input, bool bFiled = false)
+void Logger::writeToOutput(wchar_t* Input, bool bFiled = false)
 {
 #ifdef _WIN32
     OutputDebugString(Input);
 #endif // _WIN32
+
+    const size_t length = wcslen(Input);
+    if (Input[length - 2] == L'\n' && Input[length - 1] == L'\n')
+        Input[length - 1] = L'\0';
 
     wprintf(L"%s", Input);
    
