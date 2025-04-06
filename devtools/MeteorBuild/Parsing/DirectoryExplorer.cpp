@@ -5,6 +5,8 @@
 #include <Application/Application.h>
 #include <pathcch.h>
 #include <File/File.h>
+#include <Windows/MinWin.h>
+
 #pragma comment(lib, "Pathcch.lib")
 #pragma warning(disable : 6031)
 #pragma warning(disable : 6001) // Using uninitialized memory 'tempB'.

@@ -28,17 +28,12 @@ VS_OUTPUT VS(VS_INPUT input)
 {
     VS_OUTPUT output;
     
-    // Change the position vector to be 4 units for proper matrix calculations.
-    output.Pos.w = 1.f;
 
     // Calculate the position of the vertex against the world, view, and projection matrices.
-    //output.Pos = mul(float4(input.Pos, 1.f), world);
-    //output.Pos = mul(output.Pos, view);
-    //output.Pos = mul(output.Pos, projection);
+    output.Pos = mul(float4(input.Pos, 1.f), world);
+    output.Pos = mul(output.Pos, view);
+    output.Pos = mul(output.Pos, projection);
     
-    output.Pos.x = input.Pos.x;
-    output.Pos.y = input.Pos.y;
-    output.Pos.z = 0.f;
-    
+   
     return output;
 }

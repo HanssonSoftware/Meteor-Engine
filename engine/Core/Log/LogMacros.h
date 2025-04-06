@@ -29,6 +29,11 @@ LOG_ADDCATEGORY(Temp);
 
 #define LINE _CRT_WIDE(__LINE__)
 
+#define UNIMPLEMENTED(Message, ...) \
+    do { \
+        Logger::Get().formatUnimplemented(LogPart(String(), Error, Message, __FILEW__, __FUNCTIONW__, __VA_ARGS__)); \
+    } while (0)
+
 #define MR_LOG(CategoryName, Severity, Message, ...) \
 	/*static_assert(!std::is_same<decltype(_exception::retval), const wchar_t*>::value, "Formatting must be either TEXT() or L'Text'"); */\
     static_assert(std::is_base_of<LogEntry, CategoryName>::value, "Category must inherit from LogEntry (Use LOG_ADDCATEGORY() macro)"); \

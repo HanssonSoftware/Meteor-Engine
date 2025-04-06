@@ -2,7 +2,7 @@
 
 #include "File.h"
 #include <string>
-#include <Platform/Microsoft/MinWin.h>
+#include <Windows/MinWin.h>
 #include <Log/Exception.h>
 #include <Common/MemoryManager.h>
 
@@ -177,25 +177,31 @@ void FMFile::Read()
 	if (narrowBuffer)
 	{
 		if (!ReadFile(fileHandle, narrowBuffer, (DWORD)lg.QuadPart, &write, 0))
-			Logger::Get().getLastError();
+		{
+			MR_LOG(LogFileSystem, Error, TEXT("ReadFile returned: %s"), getLastError().Chr());
+		}
 
 		narrowBuffer[write] = '\0';
 
 		const int requiredAmount = MultiByteToWideChar(CP_UTF8, 0, narrowBuffer, write, 0, 0);
 		buffer = new wchar_t[requiredAmount + 1];
 
-		const int writtenAmount = MultiByteToWideChar(CP_UTF8, 0, narrowBuffer, write, buffer, requiredAmount);
-		if (writtenAmount == 0 || writtenAmount != requiredAmount)
+		if (requiredAmount > 0)
 		{
-			const String a = getLastError();
-			MR_LOG(LogFileSystem, Error, TEXT("MultiByteToWideChar returned: %s"), a.Chr());
+			const int writtenAmount = MultiByteToWideChar(CP_UTF8, 0, narrowBuffer, write, buffer, requiredAmount);
+			if (writtenAmount == 0 || writtenAmount != requiredAmount)
+			{
+				MR_LOG(LogFileSystem, Error, TEXT("MultiByteToWideChar returned: %s"), getLastError().Chr());
+			}
 		}
 
 		buffer[write] = L'\0';
 		delete[] narrowBuffer;
 	}
 	else
+	{
 		THROW_EXCEPTION("Invalid Buffer!");
+	}
 #endif
 }
 

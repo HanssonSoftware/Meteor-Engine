@@ -13,13 +13,6 @@ class InputManager;
 
 static constexpr const wchar_t* ApplicationClassName = L"MeteorApplication";
 
-enum WindowFlags : sint8
-{
-	 WF_HIDDENDEFAULT = 1 << 0,
-	 WF_SHOWNDEFAULT = 1 << 1
-
-};
-
 class WindowManager : public Object
 {
 	friend class IDirect3DDevice;
@@ -28,13 +21,15 @@ public:
 
 	virtual ~WindowManager();
 
-	static WindowManager& Get();
+	virtual void Init() override;
 
-	Window* createWindow(const WindowCreateInfo* CreateInfo);
+	virtual void Destroy() override;
 
-	Window* searchFor(const String ID);
+	virtual IWindow* createWindow(const WindowCreateInfo* CreateInfo) = 0;
 
-	Window* getFirstWindow();
+	IWindow* searchFor(const String ID);
+
+	IWindow* getFirstWindow();
 
 	void showWindow(const String ID);
 
@@ -45,24 +40,18 @@ public:
 	bool destroyWindow(const String ID);
 
 	/** Gets the current or last focused window, can be non-engine specific. */
-	Window* getFocusedWindow() const;
+	virtual IWindow* getFocusedWindow() const = 0;
 	
 	IGraphicsDevice* getRenderContext() const { return renderContext; };
 
 	InputManager* getInputManager() const { return inputManager; };
-private:
-#ifdef _WIN32
-	inline bool registerWindowClass();
-#endif
-	Window* privSearchFor(const String Name);
+protected:
+	IWindow* privSearchFor(const String Name);
 
 	IGraphicsDevice* renderContext;
 
 	InputManager* inputManager;
 
-	std::vector<Window*> activeWindows; 
-#ifdef _WIN32
-	bool bIsWinAPIClassRegistered = false;
-#endif
+	std::vector<IWindow*> activeWindows; 
 };
 

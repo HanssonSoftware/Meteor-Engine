@@ -6,7 +6,7 @@
 #include <Log/Exception.h>
 #include <Common/Delegate.h>
 #include <GraphicsEngine/MeshModel.h>
-#include <Application/LayerManager.h>
+#include <Layers/LayerManager.h>
 #include <GraphicsEngine/SceneGraph.h>
 #include <Async/SlowTask.h>
 #include <iostream>
@@ -18,7 +18,7 @@
 #include <Serialisation/FontImporter.h>
 
 EditorApplication::EditorApplication(const ApplicationInitializationInfo* aInfo) 
-	: Application(aInfo)
+	: Application(*aInfo)
 {
 	
 }

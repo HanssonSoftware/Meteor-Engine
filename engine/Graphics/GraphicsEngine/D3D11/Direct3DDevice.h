@@ -3,7 +3,7 @@
 #pragma once
 #include "../GraphicsDevice.h"
 
-#include <Platform/Microsoft/MinWin.h>
+#include <Windows/MinWin.h>
 #include <Log/LogMacros.h>
 #include <d3d11.h>
 #include <DirectXMath.h>
@@ -22,6 +22,16 @@ constexpr const float SCREEN_DEPTH = 1000.0f;
 constexpr const float SCREEN_NEAR = 0.3f;
 constexpr const FLOAT defaultClearColor[4] = { 0.f ,0.f ,0.f ,0.f };
 
+struct Shader
+{
+	ID3D11VertexShader* vtx;
+
+	ID3D11PixelShader* px;
+
+	String path;
+
+};
+
 class IDirect3DDevice : public IGraphicsDevice
 {
 public:
@@ -39,7 +49,7 @@ public:
 
 	const virtual String getRendererSignatature() const override;
 
-	virtual void resizeBuffers(Vector2<uint32> newSize) override;
+	virtual void resizeBuffers(const Vector2<uint32>& newSize) override;
 
 	virtual bool setIsFullScreen(bool NewValue) override;
 

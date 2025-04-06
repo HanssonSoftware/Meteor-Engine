@@ -2,16 +2,16 @@
 
 #pragma once
 #include <Common/Delegate.h>
-
-#include "SceneGraph.h"
+//#include "SceneGraph.h"
 #include <Log/LogMacros.h>
 #include <Types/Vector.h>
 #include <thread>
 
+class SceneGraph;
 
 LOG_ADDCATEGORY(GraphicsEngine);
 
-typedef enum GraphicsEngineRunningState
+enum GraphicsEngineRunningState
 {
 	GRAPHICS_ENGINE_STATE_NONE = 0,
 	GRAPHICS_ENGINE_STATE_INITIALIZING = 1,
@@ -19,8 +19,7 @@ typedef enum GraphicsEngineRunningState
 	GRAPHICS_ENGINE_STATE_RUNNING = 3,
 	GRAPHICS_ENGINE_STATE_SHUTDOWN = 4,
 	GRAPHICS_ENGINE_STATE_DIED = 5
-
-} GraphicsEngineRunningState;
+};
 
 typedef struct Vertex
 {
@@ -29,20 +28,11 @@ typedef struct Vertex
 	Vector4<float> Color;
 
 	Vector3<float> Normal;
+
 } Vertex;
 
-struct Shader
-{
-	void* data;
 
-	String path;
-
-private:
-	bool operator==(const Shader& same)
-	{
-		return path == same.path;
-	}
-};
+struct Shader;
 
 class IGraphicsDevice
 {
@@ -51,9 +41,9 @@ public:
 
 	virtual ~IGraphicsDevice();
 
-	virtual bool Render();
+	virtual bool Render() = 0;
 
-	virtual bool Init();
+	virtual bool Init() = 0;
 
 	virtual void cleanUp() = 0;
 
@@ -67,7 +57,7 @@ public:
 
 	virtual bool setIsFullScreen(bool NewValue);
 
-	virtual void resizeBuffers(const Vector2<uint32> newSize) = 0;
+	virtual void resizeBuffers(const Vector2<uint32>& newSize) = 0;
 
 	GraphicsEngineRunningState getDeviceReadyState() const { return driverState; };
 
@@ -78,8 +68,6 @@ public:
 	void setImGUIUsed(bool NewVal);
 
 	Delegate<bool> imguiValueChange;
-
-	SceneGraph* graphToRender;
 
 	std::thread renderThread;
 

@@ -10,7 +10,7 @@ using namespace DirectX;
 
 Camera::Camera()
 {
-	setPosition({ 0.f, 1.f, 0.f });
+	setPosition({ 5.f, 1.f, 0.f });
 }
 
 Camera::~Camera()

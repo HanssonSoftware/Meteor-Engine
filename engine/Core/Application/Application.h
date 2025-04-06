@@ -1,16 +1,20 @@
 /* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
-#include <Window/WindowManager.h>
-#include <Platform/Microsoft/MinWin.h>
-//#include <GraphicsEngine/Camera.h>
+#include <GraphicsEngine/Camera.h>
 #include <Types/Vector.h>
 #include <Types/String.h>
 #include <Log/LogMacros.h>
-//#include <ThirdParty/ImGUI/imgui.h>
+
+#ifdef _WIN32
+#include <Windows/MinWin.h>
+#include <Windows/WinWindowManager.h>
+#else
+
+#endif // _WIN32
 
 class String;
-class Window;
+class IWindow;
 class Camera;
 class LayerManager;
 struct WindowCreateInfo;
@@ -26,15 +30,16 @@ enum ApplicationFlags
 	APPFLAG_NO_FULLSCREEN = 1 << 2,
 	APPFLAG_DISPLAY_QUICK_INFO_ABOUT_MEMORY_USAGE = 1 << 3,
 	APPFLAG_NO_FILE_LOGGING = 1 << 4,
-	APPFLAG_ENABLE_VERBOSE_LOGGING = 1 << 5
-
+	APPFLAG_ENABLE_VERBOSE_LOGGING = 1 << 5,
+	APPFLAG_START_ONLY_FROM_COMMAND_LINE = 1 << 6,
+	APPFLAG_ONLY_ONE_INSTANCE_CAN_RUN = 1 << 7
 };
 
 struct ApplicationInitializationInfo
 {
 	String appName;
 
-	const WindowCreateInfo* windowCreateInfo = nullptr;
+	WindowCreateInfo windowCreateInfo;
 
 	String arguments;
 
@@ -53,6 +58,8 @@ enum ApplicationState
 
 class Application
 {
+	friend class Logger;
+
 	static Application* Framework;
 
 	WindowManager* windowManager;
@@ -60,7 +67,7 @@ class Application
 	LayerManager* layerManager;
 
 public:
-	Application(const ApplicationInitializationInfo* Info);
+	Application(const ApplicationInitializationInfo& Info);
 
 	Application(const Application& Nah) = delete;
 
@@ -72,10 +79,6 @@ public:
 
 	virtual void Shutdown();
 
-	virtual void setAppInfo(const ApplicationInitializationInfo* appInfo);
-
-	const ApplicationInitializationInfo* getAppInfo() const { return appInfo; };
-	
 	String getApplicationDirectory() const { return applicationLocation; };
 
 	/** Gets the application window size, returns the actual window size with border. Who knows, what else? */
@@ -101,26 +104,26 @@ public:
 
 	IGraphicsDevice* getRenderContext() const { return windowManager->getRenderContext(); };
 
-	Window* getFirstWindow() const { return windowManager ? windowManager->getFirstWindow() : nullptr; };
-private:
-	inline void instantiateWindow();
+	IWindow* getFirstWindow() const { return windowManager ? windowManager->getFirstWindow() : nullptr; };
 
+	Camera nc;
+private:
+	inline void instantiateWindow() const;
+
+	inline void checkIfAnotherInstanceIsRunning();
 protected:
 	ApplicationState State = APPLICATIONSTATE_INITIALIZATION;
 
-	const ApplicationInitializationInfo* appInfo;
+	ApplicationInitializationInfo appInfo;
 
 	String applicationName = L"Saxon Proprietary Game Engine";
 
 	String applicationLocation;
 
+	String applicationCodeName;
+
 	String configurationsLocation;
 };
-
-#ifdef _WIN32
-LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-//extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-#endif // _WIN32
 
 
 template<typename T>

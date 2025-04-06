@@ -4,29 +4,37 @@
 #include <Window/Window.h>
 #include <D3D11/Direct3DDevice.h>
 #include <thread>
+
 #include <Common/MemoryManager.h>
 #include <Widgets/Viewport.h>
-#include <Application/LayerManager.h>
-//#include <imgui.h>
-//#include <backends/imgui_impl_dx11.h>
-//#include <backends/imgui_impl_win32.h>
+#include <Layers/LayerManager.h>
+#include <GraphicsEngine/SceneGraph.h>
 #include <mutex>
 #include "Commandlet.h"
-
+#ifdef _WIN32
+#include <VersionHelpers.h>
+#endif // MR_DEBUG
 #ifdef MR_DEBUG
 #include <crtdbg.h>
 #endif // MR_DEBUG
+#ifdef _WIN32
 
+#endif // MR_DEBUG
 
 Application* Application::Framework;
 
-Application::Application(const ApplicationInitializationInfo* aInfo)
+Application::Application(const ApplicationInitializationInfo& aInfo)
 	: appInfo(aInfo)
 {
     Framework = this;
     applicationLocation = ICommandlet::Get().executableLocation;
 
-    setWindowManager(new WindowManager());
+#ifdef _WIN32
+    WinWindowManager* wm = new WinWindowManager();
+#endif // _WIN32
+
+
+    setWindowManager();
     setLayerManager(new LayerManager());
 }
 
@@ -43,25 +51,35 @@ void Application::Init()
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF);
 #endif // MR_DEBUG
 
+    checkIfAnotherInstanceIsRunning();
+
     Logger::Get().firstStartLogger();
     MR_LOG(LogApplication, Log, TEXT("Initializing Application."));
 
+#ifdef _WIN32
+    if (!IsWindows7OrGreater())
+    {
+        MR_LOG(LogApplication, Fatal, TEXT("This Windows Version is Not Supported!"));
+    }
+#endif // _WIN32
+
     //MR_LOG(LogApplication, Verbose, TEXT("App Dir: %s"), applicationLocation.Chr());
 
-    if (appInfo->appName.isEmpty())
+    if (appInfo.appName.isEmpty())
     {
         MR_LOG(LogApplication, Fatal, TEXT("AppInfo is Invalid!"));
     }
 
     instantiateWindow();
     
-    if (Application::Get()->getAppInfo()->flags & APPFLAG_DISPLAY_QUICK_INFO_ABOUT_MEMORY_USAGE)
+    if (Application::Get()->appInfo.flags & APPFLAG_DISPLAY_QUICK_INFO_ABOUT_MEMORY_USAGE)
         MemoryManager::Get().bQuickMemoryLogging = true;
 
 
     if (getRenderContext())
     {
-        getRenderContext()->graphToRender = &SceneGraph::Get();
+        SceneGraph::Get().addToRoot(&nc);
+        //getRenderContext()->graphToRender = &SceneGraph::Get();
         //getRenderContext()->setImGUIUsed(true);
     }
 
@@ -72,7 +90,7 @@ void Application::Init()
 void Application::Run()
 {
     IGraphicsDevice* graphicsDevice = (IGraphicsDevice*)getWindowManager()->getRenderContext();
-    Window* Ref = getWindowManager()->searchFor("Super");
+    IWindow* Ref = getWindowManager()->searchFor("Super");
 
     std::atomic<float> dt = 0.f;
 
@@ -122,14 +140,14 @@ void Application::Run()
         Framework->Run();
     }
 
-    if (getWindowManager()->getRenderContext() != nullptr)
+    if (windowManager->getRenderContext() != nullptr)
     {
         if (graphicsDevice->renderThread.joinable())
             graphicsDevice->renderThread.join();
     }
 
 
-    WindowManager::Get().destroyWindow("Super");
+    windowManager->destroyWindow("Super");
     Framework->Shutdown();
 }
 
@@ -153,11 +171,6 @@ void Application::Shutdown()
     }
 }
 
-void Application::setAppInfo(const ApplicationInitializationInfo* appInfo)
-{
-    this->appInfo = appInfo;
-}
-
 Application::~Application()
 {
     if (windowManager)
@@ -169,18 +182,12 @@ Application::~Application()
 
 String Application::getApplicationName()
 {
-    if (!appInfo)
-    {
-        MR_LOG(LogApplication, Error, TEXT("AppInfo is Null!"));
-        return String("");
-    }
-
-    if (appInfo->appName.isEmpty())
+    if (appInfo.appName.isEmpty())
     {
         return getWindowManager()->getFirstWindow()->windowData.windowName;
     }
 
-    return appInfo->appName;
+    return appInfo.appName;
 }
 
 Vector2<uint32> Application::getWindowSize() const
@@ -195,141 +202,34 @@ Vector2<uint32> Application::getWindowSize() const
     return lastResort;
 }
 
-inline void Application::instantiateWindow()
+inline void Application::instantiateWindow() const
 {
-    if (appInfo->flags & APPFLAG_NO_WINDOW)
+    if (appInfo.flags & APPFLAG_NO_WINDOW)
         return;
 
-    if (appInfo->windowCreateInfo != nullptr)
-    {
-        getWindowManager()->createWindow(appInfo->windowCreateInfo);
-    }
-    else
-    {
-        MR_LOG(LogWindowManager, Log, TEXT("appInfo->windowCreateInfo is Null! Perhaps you didn't Need a Window?"));
-    }
+    getWindowManager()->createWindow(&appInfo.windowCreateInfo);
 }
 
-#ifdef _WIN32
-LRESULT CALLBACK WndProc(HWND wnd, UINT uint, WPARAM p1, LPARAM p2)
+inline void Application::checkIfAnotherInstanceIsRunning()
 {
-    switch (uint)
+#ifdef _WIN32
+    HANDLE fakeMutex = CreateMutexW(0, 0, /*applicationCodeName.Chr()*/L"long_dick");
+    switch (GetLastError())
     {
-    case WM_CREATE:
-         // OutputDebugString(L"Create\n");
+    case ERROR_ALREADY_EXISTS:
+    {
+        const int selected = MessageBoxW(0, L"anyad", L"fa", MB_OK);
+        exit(-5);
         break;
-
-    //case WM_PAINT:
-    //    break;
-
-    case WM_SIZE:
-        if (Application::Get()->getAppState() == APPLICATIONSTATE_RUNNING && Application::Get()->getRenderContext()->getDeviceReadyState() == GRAPHICS_ENGINE_STATE_RUNNING)
-        {
-            uint32 width = LOWORD(p2);
-            uint32 height = HIWORD(p2);
-
-            Application::Get()->getRenderContext()->resizeBuffers(Vector2(width, height));
-        }
+    }   
+    case ERROR_SUCCESS:
+    {
         break;
-
-    case WM_DESTROY:
-        //WindowManager::Get().destroyWindow();
-        // Clean up window-specific data objects.
-        break;
-
-    case WM_CLOSE:
-         // OutputDebugString(L"Close\n");
-        Application::Get()->setAppState(APPLICATIONSTATE_SHUTDOWN);
-        break;
-    
-    case WM_SIZING:
-        break;  
-
-    case WM_WINDOWPOSCHANGING:
-        break;    
-    
-    case WM_WINDOWPOSCHANGED:
-        break;
-
-    //case WM_QUIT:
-    //     // OutputDebugString(L"Quit\n");
-    //    break;
-
-    //case WM_ACTIVATE:
-    //     // OutputDebugString(L"Activate\n");
-    //    break;
-
-    case WM_KEYDOWN:
-        if (GetAsyncKeyState(VK_TAB) & 0x01)
-        {
-            auto temp = Application::Get()->getWindowManager()->getRenderContext();
-            temp->setIsFullScreen(!temp->getIsFullScreen());
-        }        
-        if (GetAsyncKeyState(0x41) & 0x01)
-        {
-            Application::Get()->setAppState(APPLICATIONSTATE_RESTARTING);
-        }       
-        if (GetAsyncKeyState(0x42) & 0x01)
-        {/*
-            IDirect3DDevice* temp = (IDirect3DDevice*)Application::Get()->getWindowManager()->getRenderContext();
-            temp->changeDisplayMode();*/
-        }
-        break;
-    case WM_MOVING:
-
-        break;
-    //case WM_KEYUP:
-    //     // OutputDebugString(L"KeyUp\n");
-    //    break;
-
-    //case WM_LBUTTONDOWN:
-    //     // OutputDebugString(L"LeftButtonDown\n");
-    //    break;
-
-    //case WM_LBUTTONUP:
-    //     // OutputDebugString(L"LeftButtonUp\n");
-    //    break;
-
-    //case WM_RBUTTONDOWN:
-    //     // OutputDebugString(L"RightButtonDown\n");
-    //    break;
-
-    //case WM_RBUTTONUP:
-    //     // OutputDebugString(L"RightButtonUp\n");
-    //    break;
-
-    //case WM_MOUSEMOVE:
-    //     // OutputDebugString(L"MouseMove\n");
-    //    break;
-
-    //case WM_MOUSEWHEEL:
-    //     // OutputDebugString(L"MouseWheel\n");
-    //    break;
-
-    //case WM_SYSKEYDOWN:
-    //     // OutputDebugString(L"SysKeyDown\n");
-    //    break;
-
-    //case WM_SYSKEYUP:
-    //     // OutputDebugString(L"SysKeyUp\n");
-    //    break;
-
-    ///* Sent to a window if the mouse causes the cursor to move within a window and mouse input is not captured. */
-    ////case WM_SETCURSOR:
-    ////     // OutputDebugString(L"SetCursor\n");
-    ////    break;
-
-    //case WM_CHAR:
-    //     // OutputDebugString(L"Char\n");
-    //    break;
-
-    //case WM_KILLFOCUS:
-    //     // OutputDebugString(L"KillFocus\n");
-    //    break;
+    }
     default:
-        return DefWindowProc(wnd, uint, p1, p2);
+        break;
     }
 
-    return DefWindowProc(wnd, uint, p1, p2);
-}
+    if (fakeMutex) CloseHandle(fakeMutex);
 #endif // _WIN32
+}

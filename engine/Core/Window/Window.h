@@ -1,8 +1,6 @@
 /* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
-//#include "WindowManager.h"
-#include <Platform/Microsoft/MinWin.h>
 #include <Types/String.h>
 #include <Types/Vector.h>
 
@@ -18,41 +16,34 @@ struct WindowCreateInfo
 	Vector2<uint32> size = 0;
 
 	int flags = -1;
-
 };
 
 
-class Window
+class IWindow
 {
 	friend class WindowManager;
 
-	Window(WindowManager* newOwner);
-
-	bool createWindow(const WindowCreateInfo* CreateInfo);
 public:
-#ifdef _WIN32
-	Window(const HWND wnd);
-#endif
-	~Window();
+	IWindow(WindowManager* newOwner);
+
+	virtual ~IWindow();
 
 	Vector2<uint32> getSize() const;
 
-	void destroyWindow();
+	virtual void destroyWindow() = 0;
 
-	void showWindow();
+	virtual void showWindow() = 0;
 
-	void setTitle(const String newName);
+	virtual void setTitle(const String newName) = 0;
 
-	void hideWindow();
+	virtual void hideWindow() = 0;
 
-	bool drawAttention();
+	virtual bool drawAttention() = 0;
 
-	constexpr const int evaluateFlags(int Flags) noexcept;
-
-	void* getWindowHandle();
+	virtual void* getWindowHandle() = 0;
 
 	WindowCreateInfo windowData;
-private:
+protected:
 	WindowManager* owner;
 
 	void* Handle = nullptr;

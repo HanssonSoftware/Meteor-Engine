@@ -163,7 +163,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine\Graphics;$(SolutionDir)engine\Graphics\GraphicsEngine;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine\Platform;$(VULKAN_SDK)\Include;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine\Graphics;$(SolutionDir)engine\Graphics\GraphicsEngine;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
     </ClCompile>
     <Link>
@@ -198,7 +198,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine\Graphics;$(SolutionDir)engine\Graphics\GraphicsEngine;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine\Platform;$(VULKAN_SDK)\Include;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine\Graphics;$(SolutionDir)engine\Graphics\GraphicsEngine;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
     </ClCompile>
     <Link>
@@ -236,10 +236,9 @@
     <ClCompile Include="engine\Graphics\GraphicsEngine\ConstantBuffer.cpp" />
     <ClCompile Include="engine\Core\Application\Application.cpp" />
     <ClCompile Include="engine\Core\Application\Commandlet.cpp" />
-    <ClCompile Include="engine\Core\Application\Engine.cpp" />
     <ClCompile Include="engine\Core\Application\InputManager.cpp" />
-    <ClCompile Include="engine\Core\Application\Layer.cpp" />
-    <ClCompile Include="engine\Core\Application\LayerManager.cpp" />
+    <ClCompile Include="engine\Core\Layers\Layer.cpp" />
+    <ClCompile Include="engine\Core\Layers\LayerManager.cpp" />
     <ClCompile Include="engine\Core\Common\Array.cpp" />
     <ClCompile Include="engine\Core\Common\Delegate.cpp" />
     <ClCompile Include="engine\Core\Common\MemoryManager.cpp" />
@@ -250,7 +249,7 @@
     <ClCompile Include="engine\Graphics\GraphicsEngine\Camera.cpp" />
     <ClCompile Include="engine\Graphics\GraphicsEngine\D3D11\Direct3DDevice.cpp" />
     <ClCompile Include="engine\Graphics\GraphicsEngine\MeshModel.cpp" />
-    <ClCompile Include="engine\Launch\LaunchGeneric.cpp" />
+    <ClCompile Include="engine\Launch.cpp" />
     <ClCompile Include="engine\Core\Log\Exception.cpp" />
     <ClCompile Include="engine\Core\Log\Log.cpp" />
     <ClCompile Include="engine\Core\Timer\Timer.cpp" />
@@ -271,8 +270,11 @@
     <ClCompile Include="engine\Core\Common\Guid.cpp" />
     <ClCompile Include="engine\Core\Serialisation\FontImporter.cpp" />
     <ClCompile Include="engine\Core\Serialisation\Importer.cpp" />
+    <ClCompile Include="engine\Platform\Windows\WinWindowManager.cpp" />
+    <ClCompile Include="engine\Platform\Windows\WinWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="engine\Core\Layers\OSLayer.h" />
     <ClInclude Include="engine\Core\Serialisation\AssetManager.h" />
     <ClInclude Include="engine\Core\Common\Conversions.h" />
     <ClInclude Include="engine\Core\Object\GameObject.h" />
@@ -280,10 +282,9 @@
     <ClInclude Include="engine\Graphics\GraphicsEngine\ConstantBuffer.h" />
     <ClInclude Include="engine\Core\Application\Application.h" />
     <ClInclude Include="engine\Core\Application\Commandlet.h" />
-    <ClInclude Include="engine\Core\Application\Engine.h" />
     <ClInclude Include="engine\Core\Application\InputManager.h" />
-    <ClInclude Include="engine\Core\Application\Layer.h" />
-    <ClInclude Include="engine\Core\Application\LayerManager.h" />
+    <ClInclude Include="engine\Core\Layers\Layer.h" />
+    <ClInclude Include="engine\Core\Layers\LayerManager.h" />
     <ClInclude Include="engine\Async\Semaphore.h" />
     <ClInclude Include="engine\Async\SlowTask.h" />
     <ClInclude Include="engine\Async\Thread.h" />
@@ -316,7 +317,7 @@
     <ClInclude Include="engine\Graphics\Widgets\Visual.h" />
     <ClInclude Include="engine\Core\Window\Window.h" />
     <ClInclude Include="engine\Core\Window\WindowManager.h" />
-    <ClInclude Include="engine\Platform\Microsoft\MinWin.h" />
+    <ClInclude Include="engine\Platform\Windows\MinWin.h" />
     <ClInclude Include="engine\ThirdParty\assimp\aabb.h" />
     <ClInclude Include="engine\ThirdParty\assimp\ai_assert.h" />
     <ClInclude Include="engine\ThirdParty\assimp\anim.h" />
@@ -407,8 +408,11 @@
     <ClInclude Include="engine\Core\Serialisation\Importer.h" />
     <ClInclude Include="resources\resource.h" />
     <ClInclude Include="engine\Core\AssetLoader\Mesh\StaticMesh.h" />
+    <ClInclude Include="engine\Platform\Windows\WinWindowManager.h" />
+    <ClInclude Include="engine\Platform\Windows\WinWindow.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="engine\Platform\Windows\WindowsSpecific.mrbuild" />
     <None Include="engine\ThirdParty\assimp\color4.inl" />
     <None Include="engine\ThirdParty\assimp\material.inl" />
     <None Include="engine\ThirdParty\assimp\matrix3x3.inl" />

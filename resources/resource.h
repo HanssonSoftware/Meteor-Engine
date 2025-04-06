@@ -2,14 +2,14 @@
 // Microsoft Visual C++ generated include file.
 // Used by sampleapp.rc
 //
-#define BUILD_MONTH                     02
-#define BUILD_DAY                       07
+//#define BUILD_MONTH                     02
+//#define BUILD_DAY                       07
 #define IDI_DEFAULTAPPICON              101
 #define IDSXNAPP_ENGINESPEC             103
 #define IDD_DIALOG1                     104
 #define IDC_COMMONDIALOG1               1001
-#define BUILD_NUMBER                    1871
-#define BUILD_YEAR                      2025
+//#define BUILD_NUMBER                    1871
+//#define BUILD_YEAR                      2025
 
 // Next default values for new objects
 // 

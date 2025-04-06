@@ -21,16 +21,13 @@
     <ClCompile Include="engine\Core\Application\Commandlet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Application\Engine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\Core\Application\InputManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Application\Layer.cpp">
+    <ClCompile Include="engine\Core\Layers\Layer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Application\LayerManager.cpp">
+    <ClCompile Include="engine\Core\Layers\LayerManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Common\Array.cpp">
@@ -102,7 +99,7 @@
     <ClCompile Include="engine\Graphics\GraphicsEngine\VertexBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Launch\LaunchGeneric.cpp">
+    <ClCompile Include="engine\Launch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Graphics\Widgets\Common\FontAsset.cpp">
@@ -147,6 +144,12 @@
     <ClCompile Include="engine\Graphics\GraphicsEngine\D3D11\Direct3DDevice.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="engine\Platform\Windows\WinWindowManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Platform\Windows\WinWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\Core\Application\Application.h">
@@ -155,16 +158,13 @@
     <ClInclude Include="engine\Core\Application\Commandlet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Application\Engine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\Core\Application\InputManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Application\Layer.h">
+    <ClInclude Include="engine\Core\Layers\Layer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Application\LayerManager.h">
+    <ClInclude Include="engine\Core\Layers\LayerManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Common\Array.h">
@@ -221,7 +221,7 @@
     <ClInclude Include="engine\Core\Window\WindowManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Platform\Microsoft\MinWin.h">
+    <ClInclude Include="engine\Platform\Windows\MinWin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Version.h">
@@ -551,6 +551,15 @@
     <ClInclude Include="engine\Graphics\GraphicsEngine\D3D11\Direct3DDevice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="engine\Core\Layers\OSLayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Platform\Windows\WinWindowManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Platform\Windows\WinWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\d1.bin">
@@ -580,6 +589,7 @@
     <None Include="engine\ThirdParty\assimp\vector3.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="engine\Platform\Windows\WindowsSpecific.mrbuild" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\sampleapp.rc">

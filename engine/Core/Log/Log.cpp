@@ -30,19 +30,19 @@ Logger& Logger::Get()
 
 void Logger::firstStartLogger()
 {
-    if (ICommandlet::Get().Expected<bool>("nofilelogging") || Application::Get()->getAppInfo()->flags & APPFLAG_NO_FILE_LOGGING)
+    if (ICommandlet::Get().Expected<bool>("nofilelogging") || Application::Get()->appInfo.flags & APPFLAG_NO_FILE_LOGGING)
     {
         loggingState |= LOGGING_LEVEL_NO_FILE_LOGGING;
     }
 
-    if (ICommandlet::Get().Expected<bool>("verbose") || Application::Get()->getAppInfo()->flags & APPFLAG_ENABLE_VERBOSE_LOGGING)
+    if (ICommandlet::Get().Expected<bool>("verbose") || Application::Get()->appInfo.flags & APPFLAG_ENABLE_VERBOSE_LOGGING)
     {
         loggingState |= LOGGING_LEVEL_VERBOSE_LOGGING;
     }
 
     if (!(loggingState & LOGGING_LEVEL_NO_FILE_LOGGING))
     {
-        const String appName = String::Format("%s.txt", Application::Get()->getAppInfo()->appName.Chr());
+        const String appName = String::Format("%s.txt", Application::Get()->appInfo.appName.Chr());
 
         stream.open(appName.Chr(), std::ios::app);
         stream << "Logging started at " << Timer::Now().Chr() << "\n";
@@ -101,15 +101,16 @@ inline void Logger::logMessage(LogPart Log, const wchar_t* Function, const wchar
 
     if (Log.displayTitle > 3)
     {
-        if (Window* temp = Application::Get()->getWindowManager()->getFocusedWindow())
+        if (IWindow* temp = Application::Get()->getWindowManager()->getFocusedWindow())
             temp->drawAttention();
     }
 
     if (Log.displayTitle == Fatal)
     {
         writeToOutput(formatQuickFatal(Log.rawMessage.Chr(), Function, File).Data(), true);
+#ifdef _WIN32
         MessageBox(NULL, Log.rawMessage.Chr(), L"Fatal Error!", MB_ICONERROR | MB_OK);
-
+#endif // _WIN32
         exit(-1);
     }
 
@@ -154,8 +155,7 @@ void Logger::logAssert(const wchar_t* Function, const wchar_t* File, const wchar
         File
     );
 
-    if (Application::Get())
-        Application::Get()->getWindowManager()->getFirstWindow()->drawAttention();
+    if (Application::Get()) Application::Get()->getWindowManager()->getFirstWindow()->drawAttention();
 
     setColorBySeverity(Error);
     writeToOutput(fullBuffer, true);
@@ -168,7 +168,7 @@ void Logger::logAssert(const wchar_t* Function, const wchar_t* File, const wchar
 void Logger::writeToOutput(wchar_t* Input, bool bFiled = false)
 {
 #ifdef _WIN32
-    OutputDebugString(Input);
+    OutputDebugStringW(Input);
 #endif // _WIN32
 
     const size_t length = wcslen(Input);
@@ -213,6 +213,42 @@ String Logger::getLastError() const noexcept
 #endif // _WIN32
 }
 
+inline String Logger::formatUnimplemented(const LogPart& Log, ...)
+{
+    va_list args;
+    va_start(args, Log);
+    const uint32 requiredChars = vswprintf(0, 0, Log.rawMessage.Chr(), args);
+    va_end(args);
+
+    wchar_t* variadicBuffer = new wchar_t[requiredChars + 1];
+
+    va_list argsA;
+    va_start(argsA, Log);
+    vswprintf(variadicBuffer, requiredChars + 1, Log.rawMessage.Chr(), argsA);
+    va_end(argsA);
+
+
+    const uint32 requiredCharsForFullText = swprintf(
+        0,
+        0,
+        L"=============[ Unimplemented Function ]=============\nWhere: \t\t%s\n\nFile: \t%s\n",
+        Log.func.Chr(),
+        Log.file.Chr()
+    );
+
+    wchar_t* fullBuffer = new wchar_t[requiredCharsForFullText + 1];
+
+    swprintf(
+        fullBuffer,
+        requiredCharsForFullText,
+        L"=============[ Unimplemented Function ]=============\nWhere: \t\t%s\n\nFile: \t%s\n",
+        Log.func.Chr(),
+        Log.file.Chr()
+    );
+
+    return String();
+}
+
 Logger::~Logger()
 {
     if (stream.is_open() && !(loggingState & LOGGING_LEVEL_NO_FILE_LOGGING))
@@ -253,11 +289,12 @@ void Logger::createConsoleWindow()
 
    CONSOLE_CURSOR_INFO ci;
    GetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ci);
+
    ci.bVisible = 0;
    SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ci);
 
    SetConsoleOutputCP(CP_UTF8);
-   SetConsoleTitle(message.Chr());
+   SetConsoleTitleW(message.Chr());
 }
 #endif
 

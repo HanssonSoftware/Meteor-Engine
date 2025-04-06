@@ -7,7 +7,6 @@
 
 IGraphicsDevice::IGraphicsDevice()
 {
-	graphToRender = nullptr;
 
 	driverState = GRAPHICS_ENGINE_STATE_NONE;
 }

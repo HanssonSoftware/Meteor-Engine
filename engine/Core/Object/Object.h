@@ -1,7 +1,7 @@
 /* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
-#include <DirectXMath.h>
+//#include <DirectXMath.h>
 
 class Object
 {
@@ -25,7 +25,6 @@ public:
 	}
 
 private:
-	DirectX::XMMATRIX localMatrix;
 
 	bool bCanBeTicked = true;
 };

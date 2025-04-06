@@ -2,7 +2,7 @@
 
 #pragma once
 #include <Types/String.h>
-#include <Platform/Microsoft/MinWin.h>
+#include <Windows/MinWin.h>
 #include <Timer/Timer.h>
 #include <Common/MemoryManager.h>
 #include <cstdarg>
@@ -58,6 +58,7 @@ typedef enum LoggingLevel
 
 class Logger
 {
+	friend class Application;
 public:
 	~Logger();
 	
@@ -80,6 +81,7 @@ public:
 
 	String getLastError() const noexcept;
 
+	inline String formatUnimplemented(const LogPart& Log, ...);
 private:
 	int loggingState = 0;
 

@@ -2,12 +2,11 @@
 
 #include "WindowManager.h"
 #include <Window/Window.h>
-#include <Application/Application.h>
+//#include <Application/Application.h>
 #include <GraphicsEngine/D3D11/Direct3DDevice.h>
-#ifdef _WIN32
-#include <../Resources/resource.h>
-#endif // _WIN32
 #include <Log/Exception.h>
+
+
 
 static int lastSearchIndex = -1;
 static String lastSearch = "";
@@ -17,12 +16,18 @@ WindowManager::WindowManager()
 	renderContext = nullptr;
 	inputManager = nullptr;
 
-#ifdef _WIN32
-	
-#endif // _WIN32
+	Init();
 }
 
 WindowManager::~WindowManager()
+{
+}
+
+void WindowManager::Init()
+{
+}
+
+void WindowManager::Destroy()
 {
 	if (renderContext)
 	{
@@ -31,56 +36,9 @@ WindowManager::~WindowManager()
 		delete renderContext;
 		renderContext = nullptr;
 	}
-
-#ifdef _WIN32
-	UnregisterClass(ApplicationClassName, GetModuleHandle(NULL));
-#endif // _WIN32
 }
 
-WindowManager& WindowManager::Get()
-{
-	static WindowManager instance;
-	return instance;
-}
-
-Window* WindowManager::createWindow(const WindowCreateInfo* CreateInfo)
-{
-	if (CreateInfo->windowID.isEmpty())
-	{
-		MR_LOG(LogWindowManager, Error, TEXT("CreateInfo->windowID is Empty!"));
-		return nullptr;
-	}
-
-	if (!bIsWinAPIClassRegistered)
-	{
-		if (!registerWindowClass())
-		{
-			THROW_EXCEPTION("Failed to Register Window Class!");
-		}
-	}
-
-	Window* newWindow = new Window(this);
-	if (newWindow->createWindow(CreateInfo))
-	{
-		activeWindows.push_back(newWindow);
-
-		if (getFirstWindow() == newWindow)
-		{
-			renderContext = new IDirect3DDevice();
-			renderContext->Init();
-		}
-
-		return newWindow;
-	}
-	else
-	{
-		THROW_EXCEPTION("Failed to Create Window!");
-	}
-
-	return nullptr;
-}
-
-Window* WindowManager::searchFor(const String ID)
+IWindow* WindowManager::searchFor(const String ID)
 {
 	if (lastSearchIndex != -1 && lastSearchIndex < activeWindows.size() && lastSearch == ID)
 	{
@@ -90,7 +48,7 @@ Window* WindowManager::searchFor(const String ID)
 	const size_t activeCount = activeWindows.size();
 	for (int i = 0; i < activeCount; i++)
 	{
-		Window* Temp = activeWindows[i];
+		IWindow* Temp = activeWindows[i];
 
 		if (Temp->windowData.windowID == ID)
 		{
@@ -103,7 +61,7 @@ Window* WindowManager::searchFor(const String ID)
 	return nullptr;
 }
 
-Window* WindowManager::getFirstWindow()
+IWindow* WindowManager::getFirstWindow()
 {
 	if (activeWindows.size() > 0)
 		return activeWindows[0];
@@ -123,7 +81,7 @@ void WindowManager::showWindow(const String ID)
 
 	for (int i = 0; i < activeCount; i++)
 	{
-		Window* Temp = activeWindows[i];
+		IWindow* Temp = activeWindows[i];
 
 		if (Temp->windowData.windowID == ID)
 		{
@@ -147,7 +105,7 @@ void WindowManager::hideWindow(const String ID)
 
 	for (int i = 0; i < activeCount; i++)
 	{
-		Window* Temp = activeWindows[i];
+		IWindow* Temp = activeWindows[i];
 
 		if (Temp->windowData.windowID == ID)
 		{
@@ -170,7 +128,7 @@ bool WindowManager::drawAttention(const String ID)
 
 	for (int i = 0; i < activeCount; i++)
 	{
-		Window* Temp = activeWindows[i];
+		IWindow* Temp = activeWindows[i];
 
 		if (Temp->windowData.windowID == ID)
 		{
@@ -195,7 +153,7 @@ bool WindowManager::destroyWindow(const String ID)
 
 	for (int i = 0; i < activeCount; i++)
 	{
-		Window* Temp = activeWindows[i];
+		IWindow* Temp = activeWindows[i];
 
 		if (Temp->windowData.windowID == ID)
 		{
@@ -208,49 +166,7 @@ bool WindowManager::destroyWindow(const String ID)
 	return false;
 }
 
-Window* WindowManager::getFocusedWindow() const
-{
-#ifdef _WIN32
-#pragma warning(disable : 4172)
-	HWND window = GetFocus();
-
-	if (!window) return nullptr;
-
-	// TODO: Implement!
-	//Window w(window);
-	//searchFor(w)
-	return nullptr;
-#endif
-
-	return nullptr; 
-}
-
-#ifdef _WIN32
-inline bool WindowManager::registerWindowClass()
-{
-	HINSTANCE instance = GetModuleHandle(NULL);
-	HICON ico = (HICON)LoadImage(instance, MAKEINTRESOURCE(IDI_DEFAULTAPPICON), IMAGE_ICON, 64, 64, LR_DEFAULTCOLOR);
-
-	WNDCLASSEX windowClass = {};
-	windowClass.lpszClassName = ApplicationClassName;
-	windowClass.cbSize = sizeof(WNDCLASSEX);
-	windowClass.hInstance = instance;
-	windowClass.hIcon = ico;
-	windowClass.hIconSm = ico;
-	windowClass.lpfnWndProc = WndProc;
-
-	if (!RegisterClassEx(&windowClass))
-	{
-		THROW_EXCEPTION("Failed to register WinAPI class!");
-		return false;
-	}
-
-	bIsWinAPIClassRegistered = true;
-	return true;
-}
-#endif
-
-Window* WindowManager::privSearchFor(const String Name)
+IWindow* WindowManager::privSearchFor(const String Name)
 {
 	if (lastSearchIndex != -1 && lastSearchIndex < activeWindows.size() && lastSearch == Name)
 	{
@@ -260,7 +176,7 @@ Window* WindowManager::privSearchFor(const String Name)
 	const size_t activeCount = activeWindows.size();
 	for (int i = 0; i < activeCount; i++)
 	{
-		Window* Temp = activeWindows[i];
+		IWindow* Temp = activeWindows[i];
 
 		if (Temp->windowData.windowName == Name)
 		{

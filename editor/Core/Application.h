@@ -30,8 +30,8 @@ int launchStranger(int ArgumentCount, char* Arguments[])
 	wInfo.windowName = String("Meteor Editor");
 
 	ApplicationInitializationInfo appInfo = {};
-	appInfo.appName = String("MeteorEditor");
-	appInfo.windowCreateInfo = &wInfo;
+	appInfo.appName = "MeteorEditor";
+	appInfo.windowCreateInfo = wInfo;
 
 	ICommandlet::Get().Parse(ArgumentCount, Arguments);
 

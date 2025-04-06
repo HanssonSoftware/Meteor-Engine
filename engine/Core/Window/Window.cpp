@@ -15,74 +15,22 @@
 LOG_ADDCATEGORY(Window);
 
 
-Window::Window(WindowManager* newOwner)
+IWindow::IWindow(WindowManager* newOwner)
 	: owner(newOwner)
 {
 
 }
 
-#ifdef _WIN32
-Window::Window(const HWND wnd)
-{
-	if (!wnd) return;
-
-	wchar_t buffer[256];
-	const int length = GetWindowTextW(wnd, buffer, 256);
-}
-#endif
-
-Window::~Window()
+IWindow::~IWindow()
 {
 
 }
 
-Vector2<uint32> Window::getSize() const
+Vector2<uint32> IWindow::getSize() const
 {
 	return windowData.size;
 }
-
-bool Window::createWindow(const WindowCreateInfo* CreateInfo)
-{
-	if (!CreateInfo || !owner)
-		return false;
-
-	windowData = *CreateInfo;
-
-#ifdef _WIN32
-	HINSTANCE Inst = GetModuleHandle(NULL);
-
-	RECT windowRect = { 0, 0, (LONG)CreateInfo->size.x, (LONG)CreateInfo->size.y };
-	AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, 0);
-
-	Handle = CreateWindowEx(
-		/*WS_EX_ACCEPTFILES*/0,
-		ApplicationClassName,
-		CreateInfo->windowName.Chr(),
-		CreateInfo->flags == -1 ? WS_OVERLAPPEDWINDOW : CreateInfo->flags,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		windowRect.right - windowRect.left,
-		windowRect.bottom - windowRect.top,
-		NULL,
-		NULL,
-		Inst,
-		NULL
-	);
-
-	if (Handle == INVALID_HANDLE_VALUE)
-	{
-		THROW_EXCEPTION("Failed to Create WinAPI Window!");
-		return false;
-	}
-
-
-	static const constexpr BOOL bCanIUseDarkWindowTitlebar = 1;
-	DwmSetWindowAttribute((HWND)Handle, DWMWA_USE_IMMERSIVE_DARK_MODE, &bCanIUseDarkWindowTitlebar, sizeof(bCanIUseDarkWindowTitlebar));
-#endif
-	//SetWindowTheme((HWND)Handle, L"Explorer", 0);
-	return true;
-}
-
+#if 0
 void Window::destroyWindow()
 {
 #ifdef _WIN32
@@ -147,10 +95,6 @@ bool Window::drawAttention()
 #endif // _WIN32
 }
 
-constexpr const int Window::evaluateFlags(int Flags) noexcept
-{
-	return 0;
-}
 
 void* Window::getWindowHandle()
 {
@@ -166,3 +110,4 @@ void* Window::getWindowHandle()
 	return nullptr;
 }
 
+#endif

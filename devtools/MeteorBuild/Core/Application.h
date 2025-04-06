@@ -26,7 +26,7 @@ int launchStranger(int ArgumentCount, char* Arguments[])
 {
 	ApplicationInitializationInfo appInfo = {};
 	appInfo.appName = String("MeteorBuild");
-	appInfo.flags = APPFLAG_NO_WINDOW | APPFLAG_NO_FILE_LOGGING;
+	appInfo.flags = APPFLAG_NO_WINDOW | APPFLAG_NO_FILE_LOGGING | APPFLAG_START_ONLY_FROM_COMMAND_LINE;
 
 	ICommandlet::Get().Parse(ArgumentCount, Arguments);
 	BuildSystemApplication* App = new BuildSystemApplication(&appInfo);

@@ -15,13 +15,6 @@ public:
 
 	virtual ~Layer() {};
 
-	void operator=(const Layer&) = delete;
-
-	const bool operator==(const Layer& Layer) noexcept
-	{
-		return this->name == Layer.name;
-	}
-
 	virtual void Init() = 0;
 	
 	virtual void Attached() = 0;
@@ -33,6 +26,13 @@ public:
 	String getName() const noexcept { return name; }
 
 	void setName(const String NewName) noexcept { name = NewName; }
+
+	void operator=(const Layer&) = delete;
+
+	const bool operator==(const Layer& Layer) noexcept
+	{
+		return this->name == Layer.name;
+	}
 
 private:
 	const void privAttached() noexcept;
