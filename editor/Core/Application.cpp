@@ -1,21 +1,19 @@
-/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
+﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #include "Application.h"
 #include <Common/MemoryManager.h>
 #include <Types/String.h>
-#include <Log/Exception.h>
 #include <Common/Delegate.h>
-#include <GraphicsEngine/MeshModel.h>
 #include <Layers/LayerManager.h>
-#include <GraphicsEngine/SceneGraph.h>
-#include <Async/SlowTask.h>
 #include <iostream>
-#include <File/File.h>
+#include <Platform/File.h>
 #include <Common/Array.h>
-#include <Application/Commandlet.h>
+#include <Commandlet.h>
 
 #include "EditorLayer.h"
 #include <Serialisation/FontImporter.h>
+#include <Layers/OSLayer.h>
+#include <Platform/PerformanceTimer.h>
 
 EditorApplication::EditorApplication(const ApplicationInitializationInfo* aInfo) 
 	: Application(*aInfo)
@@ -45,25 +43,38 @@ void EditorApplication::Init()
 	Application::Init();
 
 	EditorLayer Super("geci");
-	Application::Get()->getLayerManager()->addLayer(&Super);
+	Application::Get()->GetLayerManager()->PushLayer(&Super);
 
-	FontImporter font("kjng");
 
-	FMFile a;
-	a.Open("fg.txt", OPENRULE_WRITE | OPENRULE_READ | OPENRULE_DELETE, OVERRIDERULE_JUST_OPEN);
-	a.Read();
-	try
+
+	if (Layer::GetSystemLayer()->IsRunningAnAnotherInstance())
 	{
+		MessageBoxDescriptor info = {};
+		info.Title = "Multiple Instances found!";
+		info.Description = "";
+		info.Type = MESSAGEBOXTYPE_INFORMATION | MESSAGEBOXBUTTONS_OK;
 
-		//newa.Import("fasz");
-
+		Layer::GetSystemLayer()->AddMessageBox(&info);
+		
+		Shutdown();
 	}
-	catch (...)
-	{
 
-	}
+	String fas("abcABC123éáűőúÉÁŰŐÚßçЖжПривет你好こんにちはمرحبا🙂💻!@#$%^&*()_+-=[]{};:'\",.<>/?\\|");
+	//MR_LOG(LogTemp, Log, "%s", fas.Chr());
+
+ 
+	
+	String v = Application::Get()->GetLayerManager()->GetSystemLayer()->GetMachineVersion();
+	Vector3<float> bcd = Application::Get()->GetLayerManager()->GetSystemLayer()->InspectPixel({1920, 1080});
+
+	FontImporter font("Roboto");
+
+	IFile* a = CreateFileOperation();
+	a->Open("fg.txt", OPENRULE_WRITE | OPENRULE_READ | OPENRULE_DELETE, OVERRIDERULE_JUST_OPEN);
+	a->Read();
+
 	//	
-	//a.Write("bufos kurvasi �ylehfgyuisehfg �uil ehuoyhse�ouigfyhseij�-�awljd893475e�-mxf.d--.4:_:��KOPJKOIJP�$�[]$��&@�");
+	//a.Write("bufos kurvasi íylehfgyuisehfg éuil ehuoyhseéouigfyhseijá-éawljd893475eá-mxf.d--.4:_:ÁÉKOPJKOIJPÉ$ß[]$Ł÷&@Ł");
 
 	//SceneGraph::Get().addToRoot(&newa);
 

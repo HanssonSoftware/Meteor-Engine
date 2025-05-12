@@ -1,4 +1,4 @@
-/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
+﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
 #include <Types/String.h>
@@ -12,12 +12,12 @@ public:
 
 	virtual void loadAsset(const String Name) = 0;
 
-	String getName() const
+	String GetName() const
 	{
 		return name;
 	}
 
-	void setName(const String NewValue)
+	void SetName(const String NewValue)
 	{
 		name = NewValue;
 	}

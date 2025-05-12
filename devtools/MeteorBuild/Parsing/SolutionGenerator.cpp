@@ -1,4 +1,4 @@
-/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
+﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #include "SolutionGenerator.h"
 #include <Types/String.h>
@@ -9,11 +9,11 @@ static constexpr const wchar_t* CPP_PROJECT_GUID = L"{8BC9CEB8-8B4A-11D0-8D11-00
 
 SolutionGenerator::SolutionGenerator(const String Name, const String Location)
 {
-	if (Name.isEmpty())
+	if (Name.IsEmpty())
 		THROW_EXCEPTION("SolutionGenerator (const String Name -> Empty or Null), You Must Provide a Name For The Solution!");
 
 	String max = Location + Name;
-	if (!Name.endsWith("sln"))
+	if (!Name.EndsWith("sln"))
 	{
 		max = String::Format("%s.sln", Name.Chr());
 	}
@@ -24,11 +24,11 @@ SolutionGenerator::SolutionGenerator(const String Name, const String Location)
 
 SolutionGenerator::SolutionGenerator(const String NameLoc)
 {
-	if (NameLoc.isEmpty())
+	if (NameLoc.IsEmpty())
 		THROW_EXCEPTION("SolutionGenerator (const String NameLoc -> Empty or Null!), You Must Provide a Name/Location For The Solution!");
 
 	String newName = NameLoc;
-	if (!NameLoc.endsWith("sln"))
+	if (!NameLoc.EndsWith("sln"))
 		newName = String::Format("%s.sln", NameLoc.Chr());
 
 	solutionName = newName;
@@ -37,7 +37,7 @@ SolutionGenerator::SolutionGenerator(const String NameLoc)
 
 bool SolutionGenerator::makeSolution()
 {
-	if (!newSolution.isValid())
+	if (!newSolution.IsValid())
 		THROW_EXCEPTION("Generated Solution File Somehow Invalid.");
 
 	newSolution.Write("Microsoft Visual Studio Solution File, Format Version 12.00\n# Visual Studio Version 17\nVisualStudioVersion = 17.2.32505.173\nMinimumVisualStudioVersion = 10.0.40219.1\n");
@@ -53,12 +53,12 @@ bool SolutionGenerator::startSolutionFill()
 
 bool SolutionGenerator::readSolution()
 {
-	if (!newSolution.isValid())
+	if (!newSolution.IsValid())
 		THROW_EXCEPTION("Generated Solution File Somehow Invalid.");
 
-	const String solutionName = String::Format("%s.%s", newSolution.getName().Chr(), newSolution.getExtension().Chr());
+	const String solutionName = String::Format("%s.%s", newSolution.GetName().Chr(), newSolution.getExtension().Chr());
 
-	Project(newSolution.getName(), solutionName, "", "");
+	Project(newSolution.GetName(), solutionName, "", "");
 
 	return false;
 }

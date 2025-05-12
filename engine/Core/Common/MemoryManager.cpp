@@ -1,8 +1,8 @@
 /* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #include "MemoryManager.h"
-#include <Log/LogMacros.h>
-#include <Application/Application.h>
+#include <Logging/LogMacros.h>
+#include <Core/Application.h>
 
 LOG_ADDCATEGORY(Memory);
 
@@ -43,6 +43,10 @@ void* mrmalloc(size_t size)
 	MemoryManager::Get().usedTotalUsedMemoryInBytes += size;
 
 	return occupiedLocation;
+}
+
+void mrmove(const void* source, void* target)
+{
 }
 
 void mrfree(void* ptr)

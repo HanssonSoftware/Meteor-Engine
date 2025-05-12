@@ -1,160 +1,231 @@
-/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
+﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #include "String.h"
-#include <Common/MemoryManager.h>
-#include <Log/Exception.h>
-#include <Common/Pointers.h>
-
+#include <Logging/LogMacros.h>
+#include <cstdarg>
 
 String::String() noexcept
 {
-	buffer = new wchar_t[1];
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
 }
 
-/**
-* So this fuck (mbstowcs), doesn't include null terminator count at the return.
-*/
 String::String(const char* Input)
 {
-	if (!Input)
-	{
-		THROW_EXCEPTION("Invalid or NULL buffer!");
-	}
-
-	/** Recommended size, only char*!*/
-	const size_t bufferRecommendedSize = mbstowcs(NULL, Input, 0);
-	if (bufferRecommendedSize == 0)
+	if (Input == nullptr)
 		return;
 
-	buffer = new wchar_t[(bufferRecommendedSize + 1) * sizeof(wchar_t)]();
+	const size_t inputSize = strlen(Input);
+	//if (inputSize <= MAX_STRING_SIZE)
+	//{
+	//	buffer.finite;
+	//}
+
+	buffer = new char[inputSize + 1]();
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
-	if (mbstowcs(buffer, Input, bufferRecommendedSize + 1) != bufferRecommendedSize)
+	if (buffer)
 	{
-		delete[] buffer;
-		THROW_EXCEPTION("Failed to Convert Narrow String to Wide!");
+		strncpy(buffer, Input, inputSize);
+	}
+	else
+	{
+		MR_LOG(LogTemp, Error, "Invalid Input!");
 	}
 }
 
 
-String::String(wchar_t* buffer)
+String::String(wchar_t* Input)
 {
-	if (!buffer)
-	{
-		THROW_EXCEPTION("Invalid or NULL buffer!");
-	}
+	if (Input == nullptr)
+		return;
 
-	const size_t requiredSize = wcslen(buffer);
+	const size_t requiredSize = wcslen(Input) + 1;
 	if (requiredSize == 0)
 		return;
 
-	this->buffer = new wchar_t[(requiredSize + 1) * sizeof(wchar_t)]();
+	buffer = new char[requiredSize]();
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
-	if (wcscmp(wcsncpy(this->buffer, buffer, requiredSize + 1), buffer) != 0)
+
+	if (wcstombs(buffer, Input, requiredSize - 1) == requiredSize - 1)
 	{
-		delete[] this->buffer;
-		THROW_EXCEPTION("Failed to Convert Copy Widestrings!");
+		//buffer[requiredSize] = '\0';
+	}
+	else
+	{
+		delete[] buffer;
 	}
 }
 
 
 String::String(const wchar_t* Input)
 {
-	if (!Input)
-		THROW_EXCEPTION("Invalid or NULL buffer!");
-
-	const size_t length = wcslen(Input) + 1;
-	if (length == 0)
+	if (Input == nullptr)
 		return;
 
-	buffer = new wchar_t[length * sizeof(wchar_t)]();
+	const size_t requiredSize = wcslen(Input) + 1;
+	if (requiredSize == 0)
+		return;
+
+	buffer = new char[requiredSize]();
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
-	if (wcscmp(wcsncpy(buffer, Input, length), Input) != 0)
+
+	if (wcstombs(buffer, Input, requiredSize - 1) == requiredSize - 1)
+	{
+		//buffer[requiredSize] = '\0';
+	}
+	else
 	{
 		delete[] buffer;
-		THROW_EXCEPTION("Failed to Copy Widestrings!");
 	}
 }
 
-String::String(int Input)
+String::String(const int Input)
 {
-	const std::wstring convertedString = std::to_wstring(Input);
-	buffer = new wchar_t[(wcslen(convertedString.c_str()) + 1) * sizeof(wchar_t)]();
+	const std::string fake = std::to_string(Input);
+
+	const char* convertedString = fake.c_str();
+	buffer = new char[strlen(convertedString) + 1]();
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
-	wcsncpy(buffer, convertedString.c_str(), wcslen(convertedString.c_str()) + 1);
+	if (strcmp(strcpy(buffer, convertedString), convertedString) == 0)
+	{
+		buffer[strlen(convertedString) + 1] = '\0';
+	}
+	else
+	{
+		delete[] buffer;
+	}
 }
 
-String::String(uint32 Input)
+String::String(const uint32 Input)
 {
-	const std::wstring convertedString = std::to_wstring(Input);
-	buffer = new wchar_t[(wcslen(convertedString.c_str()) + 1) * sizeof(wchar_t)]();
+	const std::string fake = std::to_string(Input);
+
+	const char* convertedString = fake.c_str();
+	const uint32 size = (uint32)fake.size();
+
+	buffer = new char[size + 1]();
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
-	wcsncpy(buffer, convertedString.c_str(), wcslen(convertedString.c_str()) + 1);
+	if (strcmp(strncpy(buffer, convertedString, size), convertedString) == 0)
+	{
+		//buffer[strlen(convertedString) + 1] = '\0';
+	}
+	else
+	{
+		delete[] buffer;
+	}
 }
 
-String::String(float Input)
+String::String(const float Input)
 {
-	const std::wstring convertedString = std::to_wstring(Input);
-	buffer = new wchar_t[(wcslen(convertedString.c_str()) + 1) * sizeof(wchar_t)]();
+	const std::string fake = std::to_string(Input);
+
+	const char* convertedString = fake.c_str();
+	buffer = new char[strlen(convertedString) + 1]();
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
-	wcsncpy(buffer, convertedString.c_str(), wcslen(convertedString.c_str()) + 1);
+	if (strcmp(strcpy(buffer, convertedString), convertedString) == 0)
+	{
+		buffer[strlen(convertedString) + 1] = '\0';
+	}
+	else
+	{
+		delete[] buffer;
+	}
+}
+
+String::String(const unsigned long Input)
+{
+	const std::string fake = std::to_string(Input);
+
+	const char* convertedString = fake.c_str();
+	buffer = new char[strlen(convertedString) + 1]();
+#ifdef MR_DEBUG
+	bIsInited = true;
+#endif // MR_DEBUG
+	if (strcmp(strcpy(buffer, convertedString), convertedString) == 0)
+	{
+		buffer[strlen(convertedString) + 1] = '\0';
+	}
+	else
+	{
+		delete[] buffer;
+	}
 }
 
 String::String(const std::string Input)
 {
-	const size_t bufferRecommendedSize = mbstowcs(NULL, Input.c_str(), 0);
-	buffer = new wchar_t[(bufferRecommendedSize + 1) * sizeof(wchar_t)]();
+	const char* convertedString = Input.c_str();
+	buffer = new char[strlen(convertedString) + 1]();
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
-	mbstowcs(buffer, Input.c_str(), bufferRecommendedSize + 1);
+	if (strcmp(strncpy(buffer, convertedString, Input.size()), convertedString) == 0)
+	{
+		//buffer[strlen(convertedString) + 1] = '\0';
+	}
+	else
+	{
+		delete[] buffer;
+	}
 }
 
 String::String(const std::wstring Input)
 {
-	const size_t recommendedSize = wcslen(Input.c_str()) + 1;
-	buffer = new wchar_t[recommendedSize * sizeof(wchar_t)]();
+	if (buffer == nullptr)
+		return;
+
+	const wchar_t* convertedString = Input.c_str();
+	const size_t requiredSize = wcslen(convertedString) + 1;
+	if (requiredSize == 0)
+		return;
+
+	buffer = new char[requiredSize]();
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
-	wmemcpy(buffer, Input.c_str(), recommendedSize);
+
+	if (wcstombs(buffer, convertedString, requiredSize) == requiredSize - 1)
+	{
+		//buffer[requiredSize] = '\0';
+	}
+	else
+	{
+		delete[] buffer;
+	}
 }
 
 String::String(String&& other) noexcept
 {
-	if (other.buffer == nullptr)
-		return;
-
-	const size_t recommendedSize = wcslen(other.buffer) + 1;
-	buffer = new wchar_t[recommendedSize * sizeof(wchar_t)]();
-#ifdef MR_DEBUG
-	bIsInited = true;
-#endif // MR_DEBUG
-	wcsncpy(buffer, other.buffer, recommendedSize);
+	
 }
 
 String::String(const String& other)
 {
-	const size_t recommendedSize = wcslen(other.buffer) + 1;
-	buffer = new wchar_t[recommendedSize * sizeof(wchar_t)]();
+	if (!other.buffer)
+		return;
+
+	const char* convertedString = other.buffer;
+	const int size = (int)strlen(convertedString) + 1;
+
+	buffer = new char[size]();
+
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
-	wcsncpy(buffer, other.buffer, recommendedSize);
+
+	strncpy(buffer, convertedString, size - 1);
 }
 
 String::~String()
@@ -172,24 +243,22 @@ String::~String()
 
 String String::operator+(const String& Other)
 {
-	// Querry the buffers.
-	const wchar_t* otherBuffer = Other.buffer;
-	const wchar_t* thisBuffer = buffer;
+	const char* otherBuffer = Other.buffer;
+	const char* thisBuffer = buffer;
 
-	// Copy paste from https://en.cppreference.com/w/c/string/wide/wcslen.
-	// So I found out that wcslen() does not count in the \0.
-	const size_t size = wcslen(thisBuffer) + wcslen(otherBuffer) + 1;
+	const size_t size = strlen(thisBuffer) + strlen(otherBuffer) + 1;
 
-	wchar_t* super = new wchar_t[size * sizeof(wchar_t)]();
+	char* super = new char[size]();
 
 	if (super == nullptr)
 	{
 		delete[] super;
-		THROW_EXCEPTION("String concencation failed! Wide buffer is null!");
+		MR_LOG(LogTemp, Error, "String concencation failed! Wide buffer is null!");
+		return String("");
 	}
 
-	wcscpy(super, thisBuffer);
-	wcscat(super, otherBuffer);
+	strcpy(super, thisBuffer);
+	strcat(super, otherBuffer);
 
 	String newStringBuffer(super);
 
@@ -201,21 +270,22 @@ String String::operator+(const String& Other)
 String operator+(const String& OtherA, const String& OtherB)
 {
 	// Querry the buffers.
-	const wchar_t* otherABuffer = OtherA.Chr();
-	const wchar_t* otherBBuffer = OtherB.Chr();
+	const char* otherABuffer = OtherA.Chr();
+	const char* otherBBuffer = OtherB.Chr();
 
-	const size_t size = wcslen(otherABuffer) + wcslen(otherBBuffer) + 1;
+	const size_t size = strlen(otherABuffer) + strlen(otherBBuffer) + 1;
 
-	wchar_t* super = new wchar_t[size * sizeof(wchar_t)]();
+	char* super = new char[size]();
 
 	if (super == nullptr)
 	{
 		delete[] super;
-		THROW_EXCEPTION("String concencation failed! Wide buffer is null!");
+		MR_LOG(LogTemp, Error, "String concencation failed!");
+		return String("");
 	}
 
-	wcscpy(super, otherABuffer);
-	wcscat(super, otherBBuffer);
+	strcpy(super, otherABuffer);
+	strcat(super, otherBBuffer);
 
 	String newStringBuffer(super);
 
@@ -226,129 +296,100 @@ String operator+(const String& OtherA, const String& OtherB)
 
 bool String::operator==(const String& Other) const
 {
-	return wcscmp(buffer, Other.buffer) == 0;
+	return strcmp(buffer, Other.buffer) == 0;
 }
 
 bool String::operator!=(const String& Other) const
 {
-	return wcscmp(buffer, Other.buffer) != 0;
+	return strcmp(buffer, Other.buffer) != 0;
 }
 
 bool String::operator!=(String& Other) const
 {
-	return wcscmp(buffer, Other.buffer) != 0;
+	return strcmp(buffer, Other.buffer) != 0;
 }
 
-const wchar_t* String::operator*()
+const char* String::operator*()
 {
-	return buffer ? buffer : L"";
+	return buffer ? buffer : "";
 }
 
-const wchar_t* String::Chr()
+const char* String::Chr()
 {
-	return buffer ? buffer : L"";
+	return buffer ? buffer : "";
 }
 
-wchar_t* String::Data()
+char* String::Data()
 {
 	return buffer;
 }
 
-void String::Narrow(const wchar_t* wideString, char*& narrowString)
+const char* String::Chr() const
 {
-	//const size_t narrowSize = wcstombs(NULL, wideString, 0);
-
-	//char* narrowBuffer = (char*)mrmalloc((narrowSize + 1) * sizeof(char));
-
-	//if (narrowBuffer == nullptr)
-	//	THROW_EXCEPTION("Unable to convert from Wide to Narrow! Buffer is null!");
-
-	//const size_t converted = wcstombs(narrowBuffer, wideString, narrowSize + 1);
-
-	//if (converted == 0)
-	//	THROW_EXCEPTION("No characters converted!");
-
-	//strncpy(narrowString, narrowBuffer, narrowSize + 1);
-	//mrfree(narrowBuffer);
-}
-
-const wchar_t* String::Chr() const
-{
-	return buffer ? buffer : L"";
-}
-
-void String::upper()
-{
-	//const wchar_t* charbuffer = buffer.data();
-	//const size_t size = wcslen(charbuffer); // We don't need \0
-
-	//for (wchar_t& indexed : buffer)
-	//{
-	//	towupper(indexed);
-	//}
+	return buffer ? buffer : "";
 }
 
 String String::Delim(const String character, bool first)
 {
-	if (character.isEmpty())
+	if (character.IsEmpty())
 		return "";
 
-	wchar_t* A = buffer;
-	wchar_t* B = wcstok(A, character.Chr(), &A);
+	char* A = buffer;
+	char* B = strtok(A, character.Chr());
 
 	return first ? B : A;
 }
 
-bool String::isEmpty() const
+bool String::IsEmpty() const
 {
-	return buffer == nullptr || wcslen(buffer) == 0;
+	return buffer == nullptr || strlen(buffer) == 0;
 }
 
-bool String::endsWith(const String string) const
+bool String::EndsWith(const String string) const
 {
-	if (string.isEmpty())
+	if (string.IsEmpty())
 		return false;
 
-	size_t suffixLength = wcslen(string.Chr());
-	size_t thisLength = wcslen(this->buffer);
+	size_t suffixLength = strlen(string.Chr());
+	size_t thisLength = strlen(this->buffer);
 
 	if (suffixLength > thisLength)
 		return false;
 
-	return wcscmp(this->Chr() + thisLength - suffixLength, string.Chr()) == 0;
+	return strcmp(this->Chr() + thisLength - suffixLength, string.Chr()) == 0;
 }
 
-int String::toInt() const
+int String::ToInt() const
 {
-	wchar_t* end;
-	return wcstol(buffer, &end, 10);
+	char* end;
+	return strtol(buffer, &end, 10);
 }
 
-float String::toFloat() const
+float String::ToFloat() const
 {
-	wchar_t* end;
-	return wcstof(buffer, &end);
+	char* end;
+	return strtof(buffer, &end);
 }
 
 uint32 String::Length() const
 {
-	return buffer != nullptr ? (uint32)wcslen(buffer) : /*(uint32)*/ 0;
+	return buffer != nullptr ? (uint32)strlen(buffer) : /*(uint32)*/ 0;
 }
 
 String String::Format(const String format, ...)
 {
-	const wchar_t* formattingBuffer = format.Chr();
+	const char* formattingBuffer = format.Chr();
 
 	va_list a;
 	va_start(a, format);
-	const uint32 sizeForVA = vswprintf(0, 0, formattingBuffer, a);
+	const uint32 sizeForVA = vsnprintf(0, 0, formattingBuffer, a);
 	va_end(a);
 
-	wchar_t* newFormattedBuffer = new wchar_t[(sizeForVA + 1) * sizeof(wchar_t)]();
+	char* newFormattedBuffer = new char[sizeForVA + 1]();
 
 	va_list b;
 	va_start(b, format);
-	vswprintf(newFormattedBuffer, sizeForVA + 1, formattingBuffer, b);
+	vsnprintf(newFormattedBuffer, sizeForVA + 1 ,formattingBuffer, b);
 	va_end(b);
 
 	String stringized(newFormattedBuffer);
@@ -357,20 +398,20 @@ String String::Format(const String format, ...)
 	return stringized;
 }
 
-inline String String::readLine(const String line, uint32 location)
+inline String String::ReadLine(const String line, uint32 location)
 {
-	return readLine(line.Chr(), location);
+	return ReadLine(line.Chr(), location);
 }
 
-String String::readLine(const wchar_t* Line, uint32 location)
+String String::ReadLine(const wchar_t* Line, uint32 location)
 {
 	uint32 current = location;
 
-#ifdef _WIN32
+#ifdef _WIN64
 	while (Line[current] != L'\r')
 #else
 	while (Line[current] != L'\n')
-#endif // _WIN32
+#endif // _WIN64
 	{
 		current++;
 	}
@@ -379,9 +420,9 @@ String String::readLine(const wchar_t* Line, uint32 location)
 	wcsncpy(temp, Line + location, current - location);
 	temp[current - location] = L'\0';
 
-#ifdef _WIN32
+#ifdef _WIN64
 	current++;
-#endif // _WIN32
+#endif // _WIN64
 
 	String buffer(temp);
 
@@ -406,9 +447,9 @@ String& String::operator=(const String& other)
 			buffer = nullptr;
 		};
 
-		const size_t otherBuffSize = wcslen(other.buffer) + 1;
-		buffer = new wchar_t[otherBuffSize * sizeof(wchar_t)]();
-		wcsncpy(buffer, other.buffer, otherBuffSize);
+		const size_t otherBuffSize = strlen(other.buffer) + 1;
+		buffer = new char[otherBuffSize]();
+		strncpy(buffer, other.buffer, otherBuffSize - 1);
 	}
 
 	return *this;

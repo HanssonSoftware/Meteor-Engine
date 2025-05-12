@@ -14,7 +14,7 @@ public:
     constexpr Delegate() {};
 
     template <class T, class Obj>
-    void subscribe(T&& Func, Obj* Object)
+    void Subscribe(T&& Func, Obj* Object)
     {
         PrivDelegate Function = [Func, Object](Args... args) {
             (Object->*Func)(args...);
@@ -23,7 +23,7 @@ public:
     }
 
     template <class Obj>
-    void unSubscribe(Obj* Object)
+    void UnSubscribe(Obj* Object)
     {
         for (PrivDelegate& cb : callbacks)
         {
@@ -34,7 +34,7 @@ public:
         }
     }
 
-    void invoke(Args... args)
+    void Invoke(Args... args)
     {
         for (PrivDelegate& a : callbacks)
         {

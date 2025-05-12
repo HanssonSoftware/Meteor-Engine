@@ -3,7 +3,7 @@
 #include <cstdint>
 
 
-#ifdef _WIN32
+#ifdef _WIN64
 /** uint32 variable size is: 16bit */
 typedef unsigned int uint32;
 typedef unsigned long long uint64;
@@ -11,7 +11,7 @@ typedef unsigned long long uint64;
 /** uint32 variable size is: 16bit */
 typedef unsigned int uint32;
 typedef unsigned long long uint64;
-#endif // _WIN32
+#endif // _WIN64
 
 typedef signed int sint32;
 typedef unsigned short uint8;

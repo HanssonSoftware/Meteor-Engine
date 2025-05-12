@@ -3337,7 +3337,7 @@ static bool UpdateImageObject(const Image &image, std::string &baseDir,
 }
 
 bool IsDataURI(const std::string &in) {
-  std::string header = "data:application/octet-stream;base64,";
+  std::string header = "data:application/octet-buffer;base64,";
   if (in.find(header) == 0) {
     return true;
   }
@@ -3377,7 +3377,7 @@ bool IsDataURI(const std::string &in) {
 
 bool DecodeDataURI(std::vector<unsigned char> *out, std::string &mime_type,
                    const std::string &in, size_t reqBytes, bool checkSize) {
-  std::string header = "data:application/octet-stream;base64,";
+  std::string header = "data:application/octet-buffer;base64,";
   std::string data;
   if (in.find(header) == 0) {
     data = base64_decode(in.substr(header.size()));  // cut mime string.
@@ -7193,7 +7193,7 @@ static void SerializeValue(const std::string &key, const Value &value,
 
 static void SerializeGltfBufferData(const std::vector<unsigned char> &data,
                                     detail::json &o) {
-  std::string header = "data:application/octet-stream;base64,";
+  std::string header = "data:application/octet-buffer;base64,";
   if (data.size() > 0) {
     std::string encodedData =
         base64_encode(&data[0], static_cast<unsigned int>(data.size()));

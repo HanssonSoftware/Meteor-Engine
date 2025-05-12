@@ -1,7 +1,6 @@
 /* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
-#include <Log/Log.h>
 
 /**
  * Memory Management system. Overrides some of the memory related 
@@ -9,7 +8,7 @@
  */
 class MemoryManager
 {
-	friend class Application;
+	friend struct Application;
 public:
 	static MemoryManager& Get();
 

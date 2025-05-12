@@ -1,4 +1,4 @@
-/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
+﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
@@ -6,20 +6,21 @@
 #include <string>
 
 /** Human readable piece of text. */
-class String
+struct String
 {
-public:
 	String() noexcept;
 
 	String(const char* Input);
 
 	String(const wchar_t* Input);
 
-	String(int Input);
+	String(const int Input);
 
-	String(float Input);
+	String(const float Input);
 
-	String(uint32 Input);
+	String(const unsigned long Input);
+
+	String(const uint32 Input);
 
 	String(const std::string Input);
 
@@ -44,43 +45,56 @@ public:
 	bool operator!=(String& Other) const;
 	
 	/** Chr() is the alternative. */
-	const wchar_t* operator*();
+	const char* operator*();
+
+	operator const char*()
+	{
+		return Chr();
+	}
 
 	/** (*this) is the alternative. */
-	const wchar_t* Chr();	
+	const char* Chr();	
 
-	wchar_t* Data();
+	char* Data();
 
-	static void Narrow(const wchar_t* wideString, char*& narrowString);
-
-	const wchar_t* Chr() const;
-
-	void upper();
+	const char* Chr() const;
 
 	String Delim(const String character, bool first);
 
-	bool isEmpty() const;
+	bool IsEmpty() const;
 
-	bool endsWith(const String string) const;
+	bool EndsWith(const String string) const;
 
-	int toInt() const;
+	int ToInt() const;
 
-	float toFloat() const;
+	float ToFloat() const;
 
 	uint32 Length() const;
 
 	static String Format(const String format, ...);
 
 	/** Iterates from the given index until the next '\n', updating the index to the '\n' position. */
-	static inline String readLine(const String Line, uint32 location);
+	static inline String ReadLine(const String Line, uint32 location);
 
 	/** Iterates from the given index until the next '\n', updating the index to the '\n' position. */
-	static String readLine(const wchar_t* Line, uint32 location);
+	static String ReadLine(const wchar_t* Line, uint32 location);
 private:
 #ifdef MR_DEBUG
 	bool bIsInited = false;
 #endif // MR_DEBUG
-	wchar_t* buffer = nullptr;
+
+	char* buffer = nullptr;
+	//static constexpr const int MAX_STRING_SIZE = 16;
+
+	//static constexpr bool USE_HEAP = false;
+	//
+	//union stb
+	//{
+	//	char* finite[MAX_STRING_SIZE + 1];
+
+	//	char* infinite = nullptr;
+
+	//} buffer;
 };
 
 String operator+(const String& OtherA, const String& OtherB);

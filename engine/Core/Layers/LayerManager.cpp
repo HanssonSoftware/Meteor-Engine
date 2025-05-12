@@ -1,9 +1,26 @@
-/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
+﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #include "LayerManager.h"
 #include "Layer.h"
+#include "OSLayer.h"
+#include <Windows/WinLayer.h>
 
-void LayerManager::addLayer(Layer* Instance)
+LayerManager::LayerManager()
+{
+
+}
+
+void LayerManager::Init()
+{
+	PushOSLayer();
+}
+
+void LayerManager::Destroy()
+{
+}
+
+
+void LayerManager::PushLayer(Layer* Instance)
 {
 	if (!Instance)
 		return;
@@ -12,7 +29,7 @@ void LayerManager::addLayer(Layer* Instance)
 	layers.push_back(Instance);
 }
 
-void LayerManager::removeLayer(const Layer* Instance)
+void LayerManager::RemoveLayer(const Layer* Instance)
 {
 	const size_t size = layers.size();
 	for (size_t i = 0; i < size; i++)
@@ -25,12 +42,12 @@ void LayerManager::removeLayer(const Layer* Instance)
 	}
 }
 
-void LayerManager::removeLayer(const String Name)
+void LayerManager::RemoveLayer(const String Name)
 {
 	const size_t size = layers.size();
 	for (size_t i = 0; i < size; i++)
 	{
-		if (layers[i]->getName() == Name)
+		if (layers[i]->GetName() == Name)
 		{
 			layers[i]->privRemoved();
 			layers[i] = nullptr;
@@ -38,12 +55,27 @@ void LayerManager::removeLayer(const String Name)
 	}
 }
 
-void LayerManager::updateLayer()
+void LayerManager::UpdateLayer()
 {
+	systemLayer->Update();
+
 	for (Layer*& indexed : layers)
 	{
 		indexed->Update();
 	}
+}
+
+static bool bWasAdded = false;
+void LayerManager::PushOSLayer()
+{
+	if (bWasAdded) return;
+
+#ifdef _WIN64
+	systemLayer = new WinLayer("Windows System Layer");
+	systemLayer->Init();
+#endif // _WIN64
+
+	bWasAdded = true;
 }
 
 LayerManager::~LayerManager()

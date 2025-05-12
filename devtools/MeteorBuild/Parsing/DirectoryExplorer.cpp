@@ -1,11 +1,12 @@
-/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
+﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #include "DirectoryExplorer.h"
-#include <Log/LogMacros.h>
-#include <Application/Application.h>
+#include <Logging/LogMacros.h>
+#include <Application.h>
 #include <pathcch.h>
-#include <File/File.h>
-#include <Windows/MinWin.h>
+#include <Generic/File.h>
+#include <Windows/WinAPI.h>
+#include <Layers/OSLayer.h>
 
 #pragma comment(lib, "Pathcch.lib")
 #pragma warning(disable : 6031)
@@ -23,9 +24,9 @@ DirectoryExplorer::~DirectoryExplorer()
 
 
 static bool bIsFirstCall = false;
-void DirectoryExplorer::startExpedition(String directory)
+void DirectoryExplorer::StartExpedition(String directory)
 {
-    if (directory.isEmpty())
+    if (directory.IsEmpty())
     {
         MR_LOG(LogDirectoryExplorer, Fatal, TEXT("directory is Empty! Consider Checking via Debugger!"));
     }
@@ -35,13 +36,19 @@ void DirectoryExplorer::startExpedition(String directory)
     {
         bIsFirstCall = true;
 
-        String formatted = Application::Get()->getApplicationDirectory();
+        String formatted = Application::Get()->GetApplicationDirectory();
 
-        PathCchRemoveFileSpec(formatted.Data(), wcslen(formatted.Chr()));
+        if (OSLayer* layer = OSLayer::GetSystemLayer())
+        {
+            wchar_t* text = layer->ConvertToWide(formatted.Data());
 
-        formatted = String::Format("%s\\%s", formatted.Chr(), directory.Chr());
-        PathCchCanonicalize(directory.Data(), wcslen(formatted.Chr()) + 1, formatted.Chr());
-        directoryLastFolder = directory;
+            PathCchRemoveFileSpec(text, wcslen(text));
+
+            formatted = String::Format("%s\\%s", formatted.Chr(), directory.Chr());
+            PathCchCanonicalize(directory.Data(), wcslen(formatted.Chr()) + 1, formatted.Chr());
+            directoryLastFolder = directory;
+
+        }
     }
 
     WIN32_FIND_DATAW searchData;
@@ -58,12 +65,12 @@ void DirectoryExplorer::startExpedition(String directory)
             {
                 const String newDir = String::Format("%s\\%s", directory.Chr(), searchData.cFileName);
                 MR_LOG(LogDirectoryExplorer, Verbose, TEXT("%s"), newDir.Chr());
-                startExpedition(newDir);
+                StartExpedition(newDir);
             }
             else if (searchData.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE)
             {
                 const String FileNameWExtension = searchData.cFileName;
-                if (FileNameWExtension.endsWith("mrbuild"))
+                if (FileNameWExtension.EndsWith("mrbuild"))
                 {
                     const String newModule = String::Format("%s\\%s", directory.Chr(), searchData.cFileName);
                     MR_LOG(LogDirectoryExplorer, Verbose, TEXT("%s"), newModule.Chr());
@@ -75,31 +82,31 @@ void DirectoryExplorer::startExpedition(String directory)
     }
 }
 
-std::vector<FMFile*> DirectoryExplorer::processModules()
+std::vector<IFile*> DirectoryExplorer::processModules()
 {
-    std::vector<FMFile*> files(modules.size());
+    std::vector<IFile*> files(modules.size());
     for (String temp : modules)
     {
-        FMFile newFile;
-        if (newFile.Open(temp, OPENRULE_READ, OVERRIDERULE_JUST_OPEN) != FILESTATUS_GOOD)
+        IFile* newFile = CreateFileOperation();
+        if (newFile->Open(temp, OPENRULE_READ, OVERRIDERULE_JUST_OPEN) != FILESTATUS_GOOD)
         {
-            MR_LOG(LogDirectoryExplorer, Error, TEXT("Unable to Open %s"), newFile.getName().Chr());
+            MR_LOG(LogDirectoryExplorer, Error, TEXT("Unable to Open %s"), *newFile->GetName());
             continue;
         }
 
-        newFile.Read();
-        processToModuleDescriptor(newFile.getBuffer());
+        newFile->Read();
+        ProcessToModuleDescriptor(newFile->GetBuffer());
 
-        files.push_back(&newFile);
+        files.push_back(newFile);
     }
 
     return files;
 }
 
-bool DirectoryExplorer::processToModuleDescriptor(const wchar_t* buffer)
+bool DirectoryExplorer::ProcessToModuleDescriptor(const char* buffer)
 {
     int sdfjk = 5;
-    String p = String::readLine(buffer, sdfjk);
+    String p = String::ReadLine(buffer, sdfjk);
 
     return false;
 }

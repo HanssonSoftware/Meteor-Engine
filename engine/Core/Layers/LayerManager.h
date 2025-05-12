@@ -1,26 +1,39 @@
-/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
+﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
 #include <vector>
 #include <Object/Object.h>
 
 class Layer;
-class String;
+struct String;
+class OSLayer;
 
 class LayerManager : public Object
 {
 	friend class Layer;
 public:
-	void addLayer(Layer* Instance);
+	LayerManager();
 
-	void removeLayer(const Layer* Instance);
+	virtual ~LayerManager();
 
-	void removeLayer(const String Name);
+	void PushLayer(Layer* Instance);
 
-	void updateLayer();
+	void RemoveLayer(const Layer* Instance);
 
-	~LayerManager();
+	void RemoveLayer(const String Name);
+
+	void UpdateLayer();
+
+	void PushOSLayer();
+
+	virtual void Init() override;
+
+	virtual void Destroy() override;
+
+	OSLayer* GetSystemLayer() const { return systemLayer; }
 private:
+	OSLayer* systemLayer;
+
 	std::vector<Layer*> layers;
 };
 

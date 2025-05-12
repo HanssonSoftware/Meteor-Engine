@@ -1,26 +1,26 @@
-/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
+﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
 #include <Types/String.h>
 #include <vector>
 
-class FMFile;
+class IFile;
 
 class DirectoryExplorer
 {
-	friend class FMFile;
+	friend class IFile;
 public:
 	DirectoryExplorer();
 
 	~DirectoryExplorer();
 
-	inline void goBack(String& input);
+	inline void GoBack(String& input);
 
-	void startExpedition(String directory);
+	void StartExpedition(String directory);
 
-	std::vector<FMFile*> processModules();
+	std::vector<IFile*> processModules();
 
-	bool processToModuleDescriptor(const wchar_t* buffer);
+	bool ProcessToModuleDescriptor(const char* buffer);
 
 	std::vector<String> modules;
 };

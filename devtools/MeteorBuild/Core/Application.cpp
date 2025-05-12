@@ -1,4 +1,4 @@
-/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
+﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #define _CRT_SECURE_NO_WARNINGS
 #include "Application.h"
@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
 }
 
 BuildSystemApplication::BuildSystemApplication(const ApplicationInitializationInfo* Info)
-	: Application(Info)
+	: Application(*Info)
 {
 
 }
@@ -23,13 +23,13 @@ void BuildSystemApplication::Init()
 	Application::Init();
 
 	String sourceValue = ICommandlet::Get().Expected<String>("sourcedir");
-	if (!sourceValue.isEmpty())
+	if (!sourceValue.IsEmpty())
 	{
 		DirectoryExplorer dxp;
-		dxp.startExpedition(sourceValue);
+		dxp.StartExpedition(sourceValue);
 
 		String slnValue = ICommandlet::Get().Expected<String>("makesln");
-		if (!slnValue.isEmpty())
+		if (!slnValue.IsEmpty())
 		{
 			SolutionGenerator sln(slnValue);
 
@@ -41,7 +41,7 @@ void BuildSystemApplication::Init()
 	}
 	else
 	{
-		MR_LOG(LogBuildSystemApplication, Fatal, TEXT("""sourcedir"" Parameter is Missing! Without This We are Unable to Find Source Directory!"));
+		MR_LOG(LogBuildSystemApplication, Fatal, """sourcedir"" Parameter is Missing! Without This We are Unable to Find Source Directory!");
 	}
 }
 

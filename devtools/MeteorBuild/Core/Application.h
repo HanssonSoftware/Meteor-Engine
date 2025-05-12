@@ -1,14 +1,14 @@
 /* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
-#include <Core/Application/Application.h>
-#include <Log/LogMacros.h>
-#include <Core/Window/WindowManager.h>
-#include <Core/Application/Commandlet.h>
+#include <Application.h>
+#include <Logging/LogMacros.h>
+#include <Generic/WindowManager.h>
+#include <Commandlet.h>
 
 LOG_ADDCATEGORY(BuildSystemApplication);
 
-class BuildSystemApplication : public Application 
+struct BuildSystemApplication : public Application 
 {
 public:
 	BuildSystemApplication(const ApplicationInitializationInfo* Info);

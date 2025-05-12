@@ -1,9 +1,11 @@
-/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
+﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
 #include <Types/String.h>
 #include <Common/Delegate.h>
-#include <Log/LogMacros.h>
+#include <Logging/LogMacros.h>
+
+class OSLayer;
 
 LOG_ADDCATEGORY(Layers);
 
@@ -11,9 +13,13 @@ class Layer
 {
 	friend class LayerManager;
 public:
+	static OSLayer* GetSystemLayer();
+
 	Layer(const String Name) noexcept;
 
-	virtual ~Layer() {};
+	Layer() = delete;
+
+	virtual ~Layer() = default;
 
 	virtual void Init() = 0;
 	
@@ -23,9 +29,9 @@ public:
 
 	virtual void Update() = 0;
 
-	String getName() const noexcept { return name; }
+	String GetName() const noexcept { return name; }
 
-	void setName(const String NewName) noexcept { name = NewName; }
+	void SetName(const String NewName) noexcept { name = NewName; }
 
 	void operator=(const Layer&) = delete;
 

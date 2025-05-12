@@ -15,13 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="engine\Core\Application\Application.cpp">
+    <ClCompile Include="engine\Core\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Application\Commandlet.cpp">
+    <ClCompile Include="engine\Core\Commandlet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Application\InputManager.cpp">
+    <ClCompile Include="engine\Core\InputManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Layers\Layer.cpp">
@@ -39,25 +39,22 @@
     <ClCompile Include="engine\Core\Common\MemoryManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\File\Archive.cpp">
+    <ClCompile Include="engine\Core\Config\Archive.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\File\Config.cpp">
+    <ClCompile Include="engine\Core\Config\Config.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\File\ConfigCollection.cpp">
+    <ClCompile Include="engine\Core\Config\ConfigCollection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\File\File.cpp">
+    <ClCompile Include="engine\Core\Platform\File.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Log\Exception.cpp">
+    <ClCompile Include="engine\Core\Logging\Log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Log\Log.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Core\Timer\Timer.cpp">
+    <ClCompile Include="engine\Core\Platform\Timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Types\String.cpp">
@@ -66,10 +63,10 @@
     <ClCompile Include="engine\Core\Types\Vector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Window\Window.cpp">
+    <ClCompile Include="engine\Core\Platform\Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Window\WindowManager.cpp">
+    <ClCompile Include="engine\Core\Platform\WindowManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Common\Pointers.cpp">
@@ -81,55 +78,25 @@
     <ClCompile Include="engine\Core\Common\Guid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Graphics\GraphicsEngine\ConstantBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Graphics\GraphicsEngine\Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Graphics\GraphicsEngine\GraphicsDevice.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Graphics\GraphicsEngine\QueuedRender.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Graphics\GraphicsEngine\SceneGraph.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Graphics\GraphicsEngine\VertexBuffer.cpp">
+    <ClCompile Include="engine\RHICore\RHI\VertexBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Launch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Graphics\Widgets\Common\FontAsset.cpp">
+    <ClCompile Include="engine\RHICore\Widgets\Common\FontAsset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Graphics\Widgets\Components\TextBlock.cpp">
+    <ClCompile Include="engine\RHICore\Widgets\Components\TextBlock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Graphics\Widgets\Viewport.cpp">
+    <ClCompile Include="engine\RHICore\Widgets\Viewport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Graphics\Widgets\Visual.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Async\Semaphore.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Async\SlowTask.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Async\Thread.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Core\Object\GameObject.cpp">
+    <ClCompile Include="engine\RHICore\Widgets\Visual.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Object\Object.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Graphics\GraphicsEngine\MeshModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Serialisation\FontImporter.cpp">
@@ -141,24 +108,72 @@
     <ClCompile Include="engine\Core\Serialisation\AssetManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Graphics\GraphicsEngine\D3D11\Direct3DDevice.cpp">
+    <ClCompile Include="engine\Core\Windows\WindowsWindowManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Platform\Windows\WinWindowManager.cpp">
+    <ClCompile Include="engine\Core\Windows\WindowsWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Platform\Windows\WinWindow.cpp">
+    <ClCompile Include="engine\Core\Layers\OSLayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\Windows\WindowsLayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\Platform\PerformanceTimer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\RHICore\RHI\RHIRegistry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\RHICore\RHI\RHILoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\RHICore\RHI\RHIOutputContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\RHICore\D3D11\D3DVertexBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\RHICore\Vulkan\VulkanRHIRegistry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\RHICore\D3D11\D3D11RHIRegistry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\RHICore\RHI\RHIBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\Windows\WindowsFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\RHICore\Vulkan\VulkanRHIOutputContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\RHICore\RHI\RHIShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\Windows\WindowsTimer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\Layers\Thread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\Layers\ThreadPool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\Windows\WindowsLog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="engine\Core\Application\Application.h">
+    <ClInclude Include="engine\Core\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Application\Commandlet.h">
+    <ClInclude Include="engine\Core\Commandlet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Application\InputManager.h">
+    <ClInclude Include="engine\Core\InputManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Layers\Layer.h">
@@ -176,31 +191,28 @@
     <ClInclude Include="engine\Core\Common\MemoryManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\File\Archive.h">
+    <ClInclude Include="engine\Core\Config\Archive.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\File\Config.h">
+    <ClInclude Include="engine\Core\Config\Config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\File\ConfigCollection.h">
+    <ClInclude Include="engine\Core\Config\ConfigCollection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\File\File.h">
+    <ClInclude Include="engine\Core\Platform\File.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Log\Exception.h">
+    <ClInclude Include="engine\Core\Logging\Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Log\Log.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Core\Log\LogMacros.h">
+    <ClInclude Include="engine\Core\Logging\LogMacros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Math\Conversions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Timer\Timer.h">
+    <ClInclude Include="engine\Core\Platform\Timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Types\Cast.h">
@@ -215,13 +227,10 @@
     <ClInclude Include="engine\Core\Types\Vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Window\Window.h">
+    <ClInclude Include="engine\Core\Platform\Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Window\WindowManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Platform\Windows\MinWin.h">
+    <ClInclude Include="engine\Core\Platform\WindowManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Version.h">
@@ -488,55 +497,22 @@
     <ClInclude Include="engine\Core\Common\Conversions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Graphics\GraphicsEngine\Camera.h">
+    <ClInclude Include="engine\RHICore\RHI\VertexBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Graphics\GraphicsEngine\ConstantBuffer.h">
+    <ClInclude Include="engine\RHICore\Widgets\Common\FontAsset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Graphics\GraphicsEngine\GraphicsDevice.h">
+    <ClInclude Include="engine\RHICore\Widgets\Components\TextBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Graphics\GraphicsEngine\MeshModel.h">
+    <ClInclude Include="engine\RHICore\Widgets\Viewport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Graphics\GraphicsEngine\QueuedRender.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Graphics\GraphicsEngine\SceneGraph.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Graphics\GraphicsEngine\VertexBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Async\Semaphore.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Async\SlowTask.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Async\Thread.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Graphics\Widgets\Common\FontAsset.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Graphics\Widgets\Components\TextBlock.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Graphics\Widgets\Viewport.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Graphics\Widgets\Visual.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Core\Object\GameObject.h">
+    <ClInclude Include="engine\RHICore\Widgets\Visual.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Object\Object.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\ThirdParty\FreeType\ft2build.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Serialisation\FontImporter.h">
@@ -548,16 +524,73 @@
     <ClInclude Include="engine\Core\Serialisation\AssetManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Graphics\GraphicsEngine\D3D11\Direct3DDevice.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\Core\Layers\OSLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Platform\Windows\WinWindowManager.h">
+    <ClInclude Include="engine\Core\Windows\WindowsWindowManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Platform\Windows\WinWindow.h">
+    <ClInclude Include="engine\Core\Windows\WindowsWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Windows\WindowsLayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Platform\PerformanceTimer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\RHICore\RHI\RHIRegistry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\RHICore\RHI\RHILoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\RHICore\RHI\RHIOutputContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\RHICore\D3D11\D3DVertexBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\RHICore\Vulkan\VulkanRHIRegistry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\RHICore\RHI\RHICommons.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\RHICore\D3D11\D3D11RHIRegistry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\RHICore\RHI\RHIBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Windows\WindowsFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\RHICore\Vulkan\VulkanRHIOutputContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\RHICore\RHI\RHIShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Windows\WindowsTimer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Layers\Thread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Layers\ThreadPool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Windows\Windows.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Windows\WindowsLog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Platform\FileHelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\ApplicationHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -589,7 +622,6 @@
     <None Include="engine\ThirdParty\assimp\vector3.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="engine\Platform\Windows\WindowsSpecific.mrbuild" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\sampleapp.rc">

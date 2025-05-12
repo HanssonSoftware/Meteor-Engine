@@ -1,7 +1,7 @@
-/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
+﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
-#include <File/File.h>
+#include <Platform/File.h>
 
 class String;
 struct Solution;
@@ -16,12 +16,12 @@ public:
 
 	bool isGood() const
 	{
-		return newSolution.isValid();
+		return newSolution->IsValid();
 	}
 
-	FMFile* getHandle()
+	IFile* getHandle()
 	{
-		return &newSolution;
+		return newSolution;
 	}
 
 	String getSolutionName() const
@@ -44,8 +44,8 @@ public:
 private:
 	String solutionName;
 
-	FMFile newSolution;
+	IFile* newSolution;
 
-	std::vector<FMFile*> projects;
+	std::vector<IFile*> projects;
 };
 

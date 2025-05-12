@@ -1,4 +1,4 @@
-/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
+﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #define _CRT_SECURE_NO_WARNINGS
 #include "Solution.h"
@@ -8,7 +8,7 @@
 #pragma warning(disable : 6001)
 #pragma warning(disable : 6387)
 
-#include <Log/LogMacros.h>
+#include <Logging/LogMacros.h>
 
 LOG_ADDCATEGORY(Project);
 
@@ -139,10 +139,10 @@ Project::Project(const String displayName, String projectNameWithExtension, cons
 	: projectName()
 	, projectNamePath(projectNameWithExtension)
 {
-	if (displayName.isEmpty())
+	if (displayName.IsEmpty())
 	{
 		String projName = projectNameWithExtension.Chr();
-		MR_LOG(LogProject, Warn, TEXT("No Display Name Provided! Appending Project Name Instead. (%s)"), wcstok(projName.Data(), L"."));
+		MR_LOG(LogProject, Warn, "No Display Name Provided! Appending Project Name Instead. (%s)", wcstok(projName.Data(), L"."));
 		projectName = projName;
 	}
 	else
@@ -151,7 +151,7 @@ Project::Project(const String displayName, String projectNameWithExtension, cons
 	}
 
 	bool bFound = false;
-	static const wchar_t* projGUID = projectTypeGUID.isEmpty() ? /* Visual C++ project. */ L"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}" : projectTypeGUID.Chr();
+	static const wchar_t* projGUID = projectTypeGUID.IsEmpty() ? /* Visual C++ project. */ L"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}" : projectTypeGUID.Chr();
 	for (const wchar_t* temp : solutionGUIDs)
 	{
 		//if (!temp) continue; // This will never be NULL!
@@ -170,14 +170,14 @@ Project::Project(const String displayName, String projectNameWithExtension, cons
 
 	if (!bFound)
 	{
-		MR_LOG(LogProject, Error, TEXT("Broken or Undefined GUID was Found!"));
+		MR_LOG(LogProject, Error, "Broken or Undefined GUID was Found!");
 	}
 }
 
 String Project::formatToOutput() const
 {
 	static String plot;
-	if (!plot.isEmpty())
+	if (!plot.IsEmpty())
 	{
 		return plot;
 	}

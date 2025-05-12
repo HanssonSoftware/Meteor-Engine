@@ -9,8 +9,7 @@ FT_Face face;
 
 FontImporter::FontImporter(const String Name)
 {
-
-
+	loadAsset(Name);
 }
 
 void FontImporter::loadAsset(const String Name)

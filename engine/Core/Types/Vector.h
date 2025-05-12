@@ -57,6 +57,13 @@ struct Vector2
 		bool A = this->x != Equal.x;
 		bool B = this->y != Equal.y;
 		return A && B;
+	}		
+	
+	constexpr const bool operator==(const float& Equal)
+	{
+		bool A = this->x == Equal;
+		bool B = this->y == Equal;
+		return A && B;
 	}	
 	
 	constexpr bool operator>(const Vector2<T>& Equal)

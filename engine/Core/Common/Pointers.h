@@ -3,43 +3,57 @@
 #pragma once
 #include <Common/MemoryManager.h>
 
+/**
+ * ScopedPtr owns a pointer, so you don’t have to think about deleting it.
+ * When this thing goes out of scope, the pointer is gone too.
+ * No magic, no bullshit.
+ */
 template<typename T>
 class ScopedPtr
 {
 public:
 	ScopedPtr();
 
-	ScopedPtr(T* newPtr);
+	explicit ScopedPtr(T* newPtr) 
+		: ptr(newPtr) 
+	{
+	
+	}
 	
 	~ScopedPtr();
 
-	T* Get()
+	T* Get() const
 	{
-		return *(this->ptr);
+		return this->ptr;
 	}
 
-	T* operator->()
+	T* operator->() const
 	{
-		return ptr;
+		return this->ptr;
 	}
 
-	void operator=(const ScopedPtr<T>& other) noexcept
-	{
-		if (this->ptr == &other.ptr)
-			return;
+	ScopedPtr(const ScopedPtr&) = delete;
 
-		if (ptr == nullptr)
+	ScopedPtr& operator=(const ScopedPtr&) = delete;
+
+	ScopedPtr(ScopedPtr&& other) noexcept
+	{
+		ptr = other.ptr;
+		other.ptr = nullptr;
+	}
+
+	ScopedPtr& operator=(ScopedPtr&& other) noexcept
+	{
+		if (this != &other)
 		{
-			ptr = (T*)mrmalloc(sizeof(T));
-		}
+			if (ptr)
+				mrfree(ptr);
 
-		wmemmove(this->ptr, other.ptr, sizeof(other.ptr));
-		if (other.ptr != nullptr)
-		{
-			mrfree(other.ptr);
+			ptr = other.ptr;
+			other.ptr = nullptr;
 		}
+		return *this;
 	}
-
 private:
 	T* ptr = nullptr;
 };
@@ -51,18 +65,11 @@ inline ScopedPtr<T>::ScopedPtr()
 }
 
 template<typename T>
-inline ScopedPtr<T>::ScopedPtr(T* newPtr)
-	: ptr(newPtr)
-{
-	
-}
-
-template<typename T>
 inline ScopedPtr<T>::~ScopedPtr()
 {
-	int i = 23;
 	if (ptr != nullptr)
 	{
 		mrfree(ptr);
+		ptr = nullptr;
 	}
 }

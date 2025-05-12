@@ -1,10 +1,10 @@
-/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
+﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
-#include <Application/Application.h>
+#include <Core/Application.h>
 #include <Types/Vector.h>
-#include <Window/WindowManager.h>
-#include <Application/Commandlet.h>
+#include <Platform/WindowManager.h>
+#include <Commandlet.h>
 #include <Common/Pointers.h>
 
 LOG_ADDCATEGORY(EditorApplication);
@@ -32,6 +32,7 @@ int launchStranger(int ArgumentCount, char* Arguments[])
 	ApplicationInitializationInfo appInfo = {};
 	appInfo.appName = "MeteorEditor";
 	appInfo.windowCreateInfo = wInfo;
+	appInfo.flags = APPFLAG_ENABLE_VERBOSE_LOGGING;
 
 	ICommandlet::Get().Parse(ArgumentCount, Arguments);
 
