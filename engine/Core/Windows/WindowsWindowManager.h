@@ -1,7 +1,7 @@
 ﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
-#include <Platform/WindowManager.h>
+#include <Platform/WindowManager/WindowManager.h>
 #include <Windows/Windows.h>
 
 class WindowsWindow;
@@ -10,6 +10,10 @@ class WindowsWindowManager : public IWindowManager
 {
 public:
 	virtual ~WindowsWindowManager();
+
+	virtual void Init() override;
+
+	virtual void Shutdown() override;
 
 	virtual IWindow* CreateNativeWindow(const WindowCreateInfo* CreateInfo) override;
 

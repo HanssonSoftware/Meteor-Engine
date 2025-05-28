@@ -6,14 +6,13 @@
 
 class WindowsFile : public IFile
 {
+	friend struct WindowsFileManager;
 public:
 	WindowsFile() = default;
 
 	virtual ~WindowsFile();
 
-	virtual void* GetFileHandle() const;
-
-	virtual FileStatus Open(const String Name, int openRules, FileOverrideRules overrideRules) override;
+	virtual void* GetFileHandle();
 
 	virtual bool ValidDirectory(const String& directory, bool bCreateIfNotExist = false) override;
 
@@ -24,7 +23,5 @@ public:
 	virtual void Close() override;
 private:
 	void* /*HANDLE*/ fileHandle;
-
-	virtual int EvaluateOverrideRules(FileOverrideRules flags) const override;
 };
 

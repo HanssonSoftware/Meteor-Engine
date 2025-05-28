@@ -33,7 +33,7 @@ inline IRHIRegistry* RHILoader::InitWindows() noexcept
 {
 	if (ICommandlet::Get().Expected<bool>("d3d11"))
 	{
-		return new D3D11RHIRegistry();
+		//return new D3D11RHIRegistry();
 	}
 
 	return new VulkanRHIRegistry();

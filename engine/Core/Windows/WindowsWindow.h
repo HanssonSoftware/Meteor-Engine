@@ -1,12 +1,13 @@
 ﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
-#include <Platform/Window.h>
+#include <Platform/WindowManager/Window.h>
 
 class WindowsWindowManager;
 
-struct WindowsWindow : public IWindow
+class WindowsWindow : public IWindow
 {
+public:
 	WindowsWindow(WindowsWindowManager* owner);
 
 	virtual void DestroyWindow() override;

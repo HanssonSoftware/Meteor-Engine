@@ -3,14 +3,14 @@
 #pragma once
 #include <Layers/OSLayer.h>
 
-class WinLayer : public OSLayer
+class WindowsLayer : public OSLayer
 {
 public:
-	WinLayer(const String Name) noexcept;
+	WindowsLayer(const String Name) noexcept;
 
-	WinLayer() = delete;
+	WindowsLayer() = delete;
 
-	virtual ~WinLayer() = default;
+	virtual ~WindowsLayer() = default;
 
 	virtual void Init() override;
 

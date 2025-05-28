@@ -1,8 +1,8 @@
 /* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
-struct String;
-struct WindowCreateInfo;
+#include <Types/String.h>
+#include <Platform/WindowManager/WindowManager.h>
 
 enum ApplicationFlags
 {
@@ -18,6 +18,8 @@ enum ApplicationFlags
 struct ApplicationInitializationInfo
 {
 	String appName;
+
+	String appCodeName;
 
 	WindowCreateInfo windowCreateInfo;
 

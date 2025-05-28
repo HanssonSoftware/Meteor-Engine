@@ -165,7 +165,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;$(SolutionDir)engine\RHICore;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)resources;$(VULKAN_SDK)\Include;$(SolutionDir)engine\RHICore;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
     </ClCompile>
     <Link>
@@ -200,7 +200,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;$(SolutionDir)engine\RHICore;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)resources;$(VULKAN_SDK)\Include;$(SolutionDir)engine\RHICore;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
     </ClCompile>
     <Link>
@@ -255,8 +255,8 @@
     <ClCompile Include="engine\RHICore\Widgets\Components\TextBlock.cpp" />
     <ClCompile Include="engine\RHICore\Widgets\Viewport.cpp" />
     <ClCompile Include="engine\RHICore\Widgets\Visual.cpp" />
-    <ClCompile Include="engine\Core\Platform\Window.cpp" />
-    <ClCompile Include="engine\Core\Platform\WindowManager.cpp" />
+    <ClCompile Include="engine\Core\Platform\WindowManager\Window.cpp" />
+    <ClCompile Include="engine\Core\Platform\WindowManager\WindowManager.cpp" />
     <ClCompile Include="engine\RHICore\RHI\VertexBuffer.cpp" />
     <ClCompile Include="engine\Core\Common\Pointers.cpp" />
     <ClCompile Include="engine\Core\AssetLoader\Mesh\StaticMesh.cpp" />
@@ -279,10 +279,18 @@
     <ClCompile Include="engine\Core\Layers\Thread.cpp" />
     <ClCompile Include="engine\Core\Layers\ThreadPool.cpp" />
     <ClCompile Include="engine\Core\Windows\WindowsLog.cpp" />
+    <ClCompile Include="engine\Core\Platform\FileManager.cpp" />
+    <ClCompile Include="engine\Core\Windows\WindowsFileManager.cpp" />
+    <ClCompile Include="engine\Core\Platform\WindowManager\WindowMenu.cpp" />
+    <ClCompile Include="engine\Core\Platform\WindowManager\WindowExtender.cpp" />
+    <ClCompile Include="engine\Core\Logging\LogAssertion.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\Core\ApplicationHelpers.h" />
+    <ClInclude Include="engine\Core\Layers\OSLayerHelper.h" />
+    <ClInclude Include="engine\Core\Logging\LogHelpers.h" />
     <ClInclude Include="engine\Core\Platform\FileHelpers.h" />
+    <ClInclude Include="engine\Core\Platform\PlatformLayout.h" />
     <ClInclude Include="engine\Core\Windows\Windows.h" />
     <ClInclude Include="engine\RHICore\D3D11\D3D11RHIRegistry.h" />
     <ClInclude Include="engine\RHICore\D3D11\D3DVertexBuffer.h" />
@@ -316,8 +324,8 @@
     <ClInclude Include="engine\RHICore\Widgets\Components\TextBlock.h" />
     <ClInclude Include="engine\RHICore\Widgets\Viewport.h" />
     <ClInclude Include="engine\RHICore\Widgets\Visual.h" />
-    <ClInclude Include="engine\Core\Platform\Window.h" />
-    <ClInclude Include="engine\Core\Platform\WindowManager.h" />
+    <ClInclude Include="engine\Core\Platform\WindowManager\Window.h" />
+    <ClInclude Include="engine\Core\Platform\WindowManager\WindowManager.h" />
     <ClInclude Include="engine\ThirdParty\assimp\aabb.h" />
     <ClInclude Include="engine\ThirdParty\assimp\ai_assert.h" />
     <ClInclude Include="engine\ThirdParty\assimp\anim.h" />
@@ -408,6 +416,9 @@
     <ClInclude Include="engine\Core\Platform\PerformanceTimer.h" />
     <ClInclude Include="engine\RHICore\RHI\RHIRegistry.h" />
     <ClInclude Include="engine\RHICore\RHI\RHIOutputContext.h" />
+    <ClInclude Include="engine\Core\Platform\FileManager.h" />
+    <ClInclude Include="engine\Core\Logging\LogAssertion.h" />
+    <ClInclude Include="resources\assertbox.h" />
     <ClInclude Include="resources\resource.h" />
     <ClInclude Include="engine\Core\AssetLoader\Mesh\StaticMesh.h" />
     <ClInclude Include="engine\Core\Windows\WindowsWindowManager.h" />
@@ -423,6 +434,9 @@
     <ClInclude Include="engine\Core\Layers\Thread.h" />
     <ClInclude Include="engine\Core\Layers\ThreadPool.h" />
     <ClInclude Include="engine\Core\Windows\WindowsLog.h" />
+    <ClInclude Include="engine\Core\Windows\WindowsFileManager.h" />
+    <ClInclude Include="engine\Core\Platform\WindowManager\WindowMenu.h" />
+    <ClInclude Include="engine\Core\Platform\WindowManager\WindowExtender.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="engine\ThirdParty\assimp\color4.inl" />
@@ -436,6 +450,7 @@
     <None Include="Resources\d1.bin" />
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="resources\assertbox.rc" />
     <ResourceCompile Include="resources\sampleapp.rc" />
   </ItemGroup>
   <ItemGroup>

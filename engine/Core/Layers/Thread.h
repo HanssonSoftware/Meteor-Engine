@@ -6,7 +6,7 @@
 
 struct ThreadTaskDescriptor
 {
-	Delegate<> Task;
+	/*Delegate<> Task; */
 
 	bool bRunOnlyOnce = false;
 };

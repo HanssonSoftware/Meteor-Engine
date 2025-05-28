@@ -3,16 +3,22 @@
 #include "VulkanRHIRegistry.h"
 #include "VulkanRHIOutputContext.h"
 #include <Logging/LogMacros.h>
+#include <Platform/PlatformLayout.h>
+#include <vulkan/vulkan.h>
 
-#ifdef _WIN64
+#ifdef MR_PLATFORM_WINDOWS
 #include <Windows/Windows.h>
-#include <vulkan/vulkan_WIN64.h>
+#include <vulkan/vulkan_win32.h>
 #endif // _WIN64
+
 #include <Core/Application.h>
 #include <Platform/PerformanceTimer.h>
 #include <Platform/File.h>
 #include <Layers/OSLayer.h>
 
+#include <Platform/FileManager.h>
+
+#define STR(x) #x
 
 LOG_ADDCATEGORY(Vulkan);
 
@@ -21,16 +27,6 @@ static constexpr const bool bIsUsingValidation = true;
 #else
 static constexpr const bool bIsUsingValidation = false;
 #endif
-
-#define APPEND_PRIV(text) \
-	L#text
-
-#define LINE_PRIV __LINE__
-#define MERGEFUNC(x, y) x##y
-#define MERGEFUNC2(x, y) MERGEFUNC(x, y)
-
-#define VK_CHECK(result, func) \
-	VkResult MERGEFUNC2(func, LINE_PRIV) = result; bool MERGEFUNC2(boolean, LINE_PRIV) = MERGEFUNC2(func, LINE_PRIV) != VK_SUCCESS; if (MERGEFUNC2(boolean, LINE_PRIV)) { MR_LOG(LogVulkan, Error, "%s returned: %s", #func, evaluateResultToText(MERGEFUNC2(func, LINE_PRIV)).Chr()); } return !MERGEFUNC2(boolean, LINE_PRIV);
 
 int VulkanRHIRegistry::GetMonitorIndex() const
 {
@@ -91,12 +87,18 @@ bool VulkanRHIRegistry::Initialize()
 
 	bError = !CreateSwapchain();
 
+	bError = !CreateImageViews();
+
+	bError = !context->CreateCommandBuffers();
+
 	if (bError) CleanUp();
 	return true;
 }
 
 void VulkanRHIRegistry::CleanUp() const
 {
+	context->CleanUp();
+
 	vkDestroyPipelineLayout(selectedDevice, pipelineLayout, 0);
 
 	vkDestroyShaderModule(selectedDevice, shaderModuleVert, 0);
@@ -136,7 +138,7 @@ void VulkanRHIRegistry::CleanUp() const
 
 bool VulkanRHIRegistry::CreateSurfaceWin32()
 {
-	VkWin32SurfaceCreateInfoKHR win32SurfaceInfo = { VK_STRUCTURE_TYPE_WIN64_SURFACE_CREATE_INFO_KHR };
+	VkWin32SurfaceCreateInfoKHR win32SurfaceInfo = { VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR };
 	if (WindowsWindowManager* windowManager = (WindowsWindowManager*)Application::Get()->GetWindowManager())
 	{
 		win32SurfaceInfo.hinstance = windowManager->GetInstance();
@@ -150,7 +152,12 @@ bool VulkanRHIRegistry::CreateSurfaceWin32()
 		win32SurfaceInfo.hwnd = GetFocus();
 	}
 
-	VK_CHECK(vkCreateWin32SurfaceKHR(instance, &win32SurfaceInfo, 0, &surface), vkCreateWin32SurfaceKHR);
+	const VkResult result = vkCreateWin32SurfaceKHR(instance, &win32SurfaceInfo, 0, &surface);
+	if (result != VK_SUCCESS)
+	{
+		MR_LOG(LogVulkan, Error, "vkCreateWin32SurfaceKHR returned: %s", STR(result));
+		return false;
+	}
 }
 
 bool VulkanRHIRegistry::CreateQueueSlots()
@@ -172,7 +179,7 @@ bool VulkanRHIRegistry::CreateQueueSlots()
 		vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &physicalDeviceQueueFamiliesCount, 0);
 		if (physicalDeviceQueueFamiliesCount == 0)
 		{
-			MR_LOG(LogVulkan, Warn, "No queue properties found on this device.");
+			MR_LOG(LogVulkan, Warn, "No queue properties found on this device!");
 			continue;
 		}
 
@@ -182,17 +189,23 @@ bool VulkanRHIRegistry::CreateQueueSlots()
 		for (uint32 i = 0; i < physicalDeviceQueueFamiliesCount; i++)
 		{
 			VkQueueFamilyProperties& queueFamilyProps = physicalDeviceQueueFamilies[i];
+
+			if (queueFamilyProps.queueCount == 0)
+				continue;
+
 			if (queueFamilyProps.queueFlags & VK_QUEUE_GRAPHICS_BIT)
 			{
-				VkBool32 bIsGood = 0;
-				vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, i, surface, &bIsGood);
-				if (bIsGood)
-				{
-					selectedVirtualDevice = physicalDevice;
-					selectedQueueIndex = i;
-					selectedQueueFamilyCount = (int)queueFamilyProps.queueCount;
-					return true;
-				}
+				selectedVirtualDevice = physicalDevice;
+				Queues.graphicsQueueFamilyIndex = i;
+			}
+
+			VkBool32 bIsGood = 0;
+			vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, i, surface, &bIsGood);
+			if (bIsGood)
+			{
+				Queues.presentationQueueFamily = i;
+
+				return true;
 			}
 		}
 	}
@@ -213,16 +226,24 @@ bool VulkanRHIRegistry::CreateDevice()
 	deviceInfo.ppEnabledExtensionNames = extensions.data();
 
 	VkDeviceQueueCreateInfo queueOne = { VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO };
-	static constexpr float priority = 1.f;
-
+	constexpr float priority = 1.f;
+		
 	queueOne.pQueuePriorities = &priority;
-	queueOne.queueCount = selectedQueueFamilyCount;
-	queueOne.queueFamilyIndex = selectedQueueIndex;
-
+	queueOne.queueCount = Queues.graphicsQueueFamily;
+	queueOne.queueFamilyIndex = Queues.graphicsQueueFamilyIndex;
+		
 	deviceInfo.pQueueCreateInfos = &queueOne;
 	deviceInfo.queueCreateInfoCount = 1;
 
-	VK_CHECK(vkCreateDevice(selectedVirtualDevice, &deviceInfo, 0, &selectedDevice), vkCreateDevice);
+	const VkResult result = vkCreateDevice(selectedVirtualDevice, &deviceInfo, 0, &selectedDevice);
+	if (result != VK_SUCCESS)
+	{
+		MR_LOG(LogVulkan, Error, "vkCreateDevice returned: %s", STR(result));
+		return false;
+	}
+
+	vkGetDeviceQueue(selectedDevice, Queues.graphicsQueueFamilyIndex, 0, &Queues.graphicsQueue);
+	vkGetDeviceQueue(selectedDevice, Queues.presentationQueueFamilyIndex, 1, &Queues.presentationQueue);
 }
 
 bool VulkanRHIRegistry::CreateSwapchain()
@@ -244,7 +265,12 @@ bool VulkanRHIRegistry::CreateSwapchain()
 	swapChainInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 	swapChainInfo.clipped = 1;
 
-	VK_CHECK(vkCreateSwapchainKHR(selectedDevice, &swapChainInfo, 0, &swapChain), vkCreateSwapchainKHR);
+	const VkResult result = vkCreateSwapchainKHR(selectedDevice, &swapChainInfo, 0, &swapChain);
+	if (result != VK_SUCCESS)
+	{
+		MR_LOG(LogVulkan, Error, "vkCreateSwapchainKHR returned: %s", STR(result));
+		return false;
+	}
 }
 
 bool VulkanRHIRegistry::CreateImageViews()
@@ -262,17 +288,16 @@ bool VulkanRHIRegistry::CreateImageViews()
 
 	vkGetSwapchainImagesKHR(selectedDevice, swapChain, &imagesCount, swapChainImages.data());
 
-	static constexpr VkComponentSwizzle COMPONENT_CONSTANT = VK_COMPONENT_SWIZZLE_IDENTITY;
 	for (uint32 i = 0; i < imagesCount; i++)
 	{
 		VkImageViewCreateInfo createInfo = { VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
 		createInfo.image = swapChainImages[i];
 		createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
 		createInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
-		createInfo.components.r = COMPONENT_CONSTANT;
-		createInfo.components.g = COMPONENT_CONSTANT;
-		createInfo.components.b = COMPONENT_CONSTANT;
-		createInfo.components.a = COMPONENT_CONSTANT;
+		createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+		createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+		createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+		createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
 		createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 		createInfo.subresourceRange.baseMipLevel = 0;
 		createInfo.subresourceRange.levelCount = 1;
@@ -288,10 +313,10 @@ bool VulkanRHIRegistry::CreateImageViews()
 bool VulkanRHIRegistry::initVK()
 {
 	{
-		IFile* shaderVert = CreateFileOperation();
-		IFile* shaderFrag = CreateFileOperation();
-		FileStatus shaderVertStatus = shaderVert->Open("E:\\meteor\\editor\\vert.spv", OPENRULE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS);
-		FileStatus shaderFragStatus = shaderFrag->Open("E:\\meteor\\editor\\frag.spv", OPENRULE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS);
+		FileStatus stat;
+
+		IFile* shaderVert = FileManager::CreateFileOperation("E:\\meteor\\editor\\vert.spv", OPENMODE_READ, SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS, stat);
+		IFile* shaderFrag = FileManager::CreateFileOperation("E:\\meteor\\editor\\frag.spv", OPENMODE_READ, SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS, stat);
 
 		shaderVert->Read();
 		shaderFrag->Read();
@@ -300,13 +325,23 @@ bool VulkanRHIRegistry::initVK()
 		createInfo.codeSize = shaderVert->GetSize();
 		createInfo.pCode = reinterpret_cast<const uint32_t*>(shaderVert->GetBuffer());
 
-		VK_CHECK(vkCreateShaderModule(selectedDevice, &createInfo, 0, &shaderModuleVert), vkCreateShaderModule);
+		const VkResult result = vkCreateShaderModule(selectedDevice, &createInfo, 0, &shaderModuleVert);
+		if (result != VK_SUCCESS)
+		{
+			MR_LOG(LogVulkan, Error, "vkCreateShaderModule (1) returned: %s", STR(result));
+			return false;
+		}
 		
 		VkShaderModuleCreateInfo createInfoA = { VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO };
 		createInfoA.codeSize = shaderFrag->GetSize();
 		createInfoA.pCode = reinterpret_cast<const uint32_t*>(shaderFrag->GetBuffer());
 
-		VK_CHECK(vkCreateShaderModule(selectedDevice, &createInfoA, 0, &shaderModuleFrag), vkCreateShaderModule);
+		const VkResult resultA = vkCreateShaderModule(selectedDevice, &createInfoA, 0, &shaderModuleFrag);
+		if (resultA != VK_SUCCESS)
+		{
+			MR_LOG(LogVulkan, Error, "vkCreateShaderModule (2) returned: %s", STR(resultA));
+			return false;
+		}
 	}
 
 	{
@@ -408,7 +443,12 @@ bool VulkanRHIRegistry::initVK()
 		dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
 		dynamicState.pDynamicStates = dynamicStates.data();
 
-		VK_CHECK(vkCreatePipelineLayout(selectedDevice, &pipelineLayoutInfo, nullptr, &pipelineLayout), vkCreatePipelineLayout);
+		const VkResult result = vkCreatePipelineLayout(selectedDevice, &pipelineLayoutInfo, nullptr, &pipelineLayout);
+		if (result != VK_SUCCESS)
+		{
+			MR_LOG(LogVulkan, Error, "vkCreatePipelineLayout returned: %s", STR(result));
+			return false;
+		}
 	}
 }
 
@@ -431,9 +471,9 @@ bool VulkanRHIRegistry::CreateInstance()
 		VK_KHR_SURFACE_EXTENSION_NAME,
 
 
-#ifdef _WIN64
-		VK_KHR_WIN64_SURFACE_EXTENSION_NAME
-#endif // MR_DEBUG
+#ifdef MR_PLATFORM_WINDOWS
+		VK_KHR_WIN32_SURFACE_EXTENSION_NAME
+#endif // MR_PLATFORM_WINDOWS
 	};
 
 	VkApplicationInfo appInfo = { VK_STRUCTURE_TYPE_APPLICATION_INFO };
@@ -451,12 +491,18 @@ bool VulkanRHIRegistry::CreateInstance()
 #endif // MR_DEBUG
 
 	instanceInfo.pApplicationInfo = &appInfo;
-	VK_CHECK(vkCreateInstance(&instanceInfo, 0, &instance), vkCreateInstance);
+
+	const VkResult result = vkCreateInstance(&instanceInfo, 0, &instance);
+	if (result != VK_SUCCESS)
+	{
+		MR_LOG(LogVulkan, Error, "vkCreateInstance returned: %s", STR(result));
+		return false;
+	};
 }
 
 bool VulkanRHIRegistry::GetInstanceLayerCompatibility()
 {
-	if (bIsUsingValidation)
+	if constexpr (bIsUsingValidation)
 	{
 		uint32 layerCount = 0;
 		vkEnumerateInstanceLayerProperties(&layerCount, 0);
@@ -494,7 +540,12 @@ bool VulkanRHIRegistry::CreateDebugMessenger()
 
 	if (vkCreateDebugUtilsEXT)
 	{
-		VK_CHECK(vkCreateDebugUtilsEXT(instance, &dbmonInfo, 0, &dbMon), vkCreateDebugUtilsMessengerEXT);
+		const VkResult result = vkCreateDebugUtilsEXT(instance, &dbmonInfo, 0, &dbMon);
+		if (result != VK_SUCCESS)
+		{
+			MR_LOG(LogVulkan, Error, "vkCreateDebugUtilsEXT (vkCreateDebugUtilsMessengerEXT) returned: %s", STR(result));
+			return false;
+		}
 	}
 	else
 	{
@@ -504,109 +555,3 @@ bool VulkanRHIRegistry::CreateDebugMessenger()
 	return true;
 }
 
-
-
-const String VulkanRHIRegistry::evaluateResultToText(VkResult Result) noexcept
-{
-	switch (Result)
-	{
-	case VK_SUCCESS:
-		return "VK_SUCCESS";
-	case VK_NOT_READY:
-		return "VK_NOT_READY";
-	case VK_TIMEOUT:
-		return "VK_TIMEOUT";
-	case VK_EVENT_SET:
-		return "VK_EVENT_SET";
-	case VK_EVENT_RESET:
-		return "VK_EVENT_RESET";
-	case VK_INCOMPLETE:
-		return "VK_INCOMPLETE";
-	case VK_ERROR_OUT_OF_HOST_MEMORY:
-		return "VK_ERROR_OUT_OF_HOST_MEMORY";
-	case VK_ERROR_OUT_OF_DEVICE_MEMORY:
-		return "VK_ERROR_OUT_OF_DEVICE_MEMORY";
-	case VK_ERROR_INITIALIZATION_FAILED:
-		return "VK_ERROR_INITIALIZATION_FAILED";
-	case VK_ERROR_DEVICE_LOST:
-		return "VK_ERROR_DEVICE_LOST";
-	case VK_ERROR_MEMORY_MAP_FAILED:
-		return "VK_ERROR_MEMORY_MAP_FAILED";
-	case VK_ERROR_LAYER_NOT_PRESENT:
-		return "VK_ERROR_LAYER_NOT_PRESENT";
-	case VK_ERROR_EXTENSION_NOT_PRESENT:
-		return "VK_ERROR_EXTENSION_NOT_PRESENT";
-	case VK_ERROR_FEATURE_NOT_PRESENT:
-		return "VK_ERROR_FEATURE_NOT_PRESENT";
-	case VK_ERROR_INCOMPATIBLE_DRIVER:
-		return "VK_ERROR_INCOMPATIBLE_DRIVER";
-	case VK_ERROR_TOO_MANY_OBJECTS:
-		return "VK_ERROR_TOO_MANY_OBJECTS";
-	case VK_ERROR_FORMAT_NOT_SUPPORTED:
-		return "VK_ERROR_FORMAT_NOT_SUPPORTED";
-	case VK_ERROR_FRAGMENTED_POOL:
-		return "VK_ERROR_FRAGMENTED_POO";
-	case VK_ERROR_UNKNOWN:
-		return "VK_ERROR_UNKNOWN";
-	case VK_ERROR_OUT_OF_POOL_MEMORY:
-		return "VK_ERROR_OUT_OF_POOL_MEMORY";
-	case VK_ERROR_INVALID_EXTERNAL_HANDLE:
-		return "VK_ERROR_INVALID_EXTERNAL_HANDLE";
-	case VK_ERROR_FRAGMENTATION:
-		return "VK_ERROR_FRAGMENTATION";
-	case VK_ERROR_INVALID_OPAQUE_CAPTURE_ADDRESS:
-		return "VK_ERROR_INVALID_OPAQUE_CAPTURE_ADDRESS";
-	case VK_PIPELINE_COMPILE_REQUIRED:
-		return "VK_PIPELINE_COMPILE_REQUIRED";
-	case VK_ERROR_SURFACE_LOST_KHR:
-		return "VK_ERROR_SURFACE_LOST_KHR";
-	case VK_ERROR_NATIVE_WINDOW_IN_USE_KHR:
-		return "VK_ERROR_NATIVE_WINDOW_IN_USE_KHR";
-	case VK_SUBOPTIMAL_KHR:
-		return "VK_SUBOPTIMAL_KHR";
-	case VK_ERROR_OUT_OF_DATE_KHR:
-		return "VK_ERROR_OUT_OF_DATE_KHR";
-	case VK_ERROR_INCOMPATIBLE_DISPLAY_KHR:
-		return "VK_ERROR_INCOMPATIBLE_DISPLAY_KHR";
-	case VK_ERROR_VALIDATION_FAILED_EXT:
-		return "VK_ERROR_VALIDATION_FAILED_EXT";
-	case VK_ERROR_INVALID_SHADER_NV:
-		return "VK_ERROR_INVALID_SHADER_NV";
-	case VK_ERROR_IMAGE_USAGE_NOT_SUPPORTED_KHR:
-		return "VK_ERROR_IMAGE_USAGE_NOT_SUPPORTED_KHR";
-	case VK_ERROR_VIDEO_PICTURE_LAYOUT_NOT_SUPPORTED_KHR:
-		return "VK_ERROR_VIDEO_PICTURE_LAYOUT_NOT_SUPPORTED_KHR";
-	case VK_ERROR_VIDEO_PROFILE_OPERATION_NOT_SUPPORTED_KHR:
-		return "VK_ERROR_VIDEO_PROFILE_OPERATION_NOT_SUPPORTED_KHR";
-	case VK_ERROR_VIDEO_PROFILE_FORMAT_NOT_SUPPORTED_KHR:
-		return "VK_ERROR_VIDEO_PROFILE_FORMAT_NOT_SUPPORTED_KHR";
-	case VK_ERROR_VIDEO_PROFILE_CODEC_NOT_SUPPORTED_KHR:
-		return "VK_ERROR_VIDEO_PROFILE_CODEC_NOT_SUPPORTED_KHR";
-	case VK_ERROR_VIDEO_STD_VERSION_NOT_SUPPORTED_KHR:
-		return "VK_ERROR_VIDEO_STD_VERSION_NOT_SUPPORTED_KHR";
-	case VK_ERROR_INVALID_DRM_FORMAT_MODIFIER_PLANE_LAYOUT_EXT:
-		return "VK_ERROR_INVALID_DRM_FORMAT_MODIFIER_PLANE_LAYOUT_EXT";
-	case VK_ERROR_NOT_PERMITTED_KHR:
-		return "VK_ERROR_NOT_PERMITTED_KHR";
-	case VK_ERROR_FULL_SCREEN_EXCLUSIVE_MODE_LOST_EXT:
-		return "VK_ERROR_FULL_SCREEN_EXCLUSIVE_MODE_LOST_EXT";
-	case VK_THREAD_IDLE_KHR:
-		return "VK_THREAD_IDLE_KHR";
-	case VK_THREAD_DONE_KHR:
-		return "VK_THREAD_DONE_KHR";
-	case VK_OPERATION_DEFERRED_KHR:
-		return "VK_OPERATION_DEFERRED_KHR";
-	case VK_OPERATION_NOT_DEFERRED_KHR:
-		return "VK_OPERATION_NOT_DEFERRED_KHR";
-	case VK_ERROR_INVALID_VIDEO_STD_PARAMETERS_KHR:
-		return "VK_ERROR_INVALID_VIDEO_STD_PARAMETERS_KHR";
-	case VK_ERROR_COMPRESSION_EXHAUSTED_EXT:
-		return "VK_ERROR_COMPRESSION_EXHAUSTED_EXT";
-	case VK_INCOMPATIBLE_SHADER_BINARY_EXT:
-		return "VK_INCOMPATIBLE_SHADER_BINARY_EXT";
-	default:
-		break;
-	}
-
-	return "Undefined Error!";
-}

@@ -25,8 +25,6 @@ public:
 
 	virtual bool Initialize() = 0;
 
-
-
 	virtual void CleanUp() const = 0;
 
 	virtual bool GetUserHasMultipleMonitors() const

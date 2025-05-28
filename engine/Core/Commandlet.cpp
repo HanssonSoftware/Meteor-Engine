@@ -2,20 +2,18 @@
 
 #include "Commandlet.h"
 
+
+static ICommandlet instance;
+
 ICommandlet& ICommandlet::Get()
 {
-	static ICommandlet instance;
+
 	return instance;
 }
 
-template <class T>
-T& ICommandlet::Get()
+void ICommandlet::InitCommandlet(char* Input[])
 {
-	static_assert(std::is_base_of<ICommandlet, T>::value);
-	static T instance;
-	return instance;
 }
-
 
 String ICommandlet::Search(String Name)
 {
@@ -39,41 +37,6 @@ String ICommandlet::Search(String Name)
 
 void ICommandlet::Parse(int Count, char* Array[])
 {
-	executableLocation = Array[0];
 
-	// Create a background, if parameter is found 
-	char* indexedParameterBefore = Array[0];
-	for (int i = 1; i < Count; i++)
-	{
-		char* parameter = Array[i];
-		if (i + 1 <= Count)
-		{
-			char* parameterSecond = Array[i + 1];
-
-			if (parameterSecond != nullptr)
-			{
-				if (parameterSecond[0] == '-')
-				{
-					currentQueue.push_back(parameter);
-					continue;
-				}
-				else
-				{
-					currentQueue.push_back(String::Format("%s %s", String(parameter).Chr(), String(parameterSecond).Chr()));
-
-					i++;
-					continue;
-				}
-			}
-			else
-			{
-				const String a = String::Format("%s %s", parameter, "1");
-				currentQueue.push_back(a);
-
-				i++;
-				continue;
-			}
-		}
-	}
 }
 

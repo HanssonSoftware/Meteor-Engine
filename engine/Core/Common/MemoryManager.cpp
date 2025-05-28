@@ -16,7 +16,7 @@ MemoryManager::~MemoryManager()
 {
 	if (bQuickMemoryLogging)
 	{
-		MR_LOG(LogMemory, Log, TEXT("Total used memory:\t%ld\t\tCurrently used memory (not freed up):\t%ld"), usedTotalUsedMemoryInBytes, usedMemoryInBytes);
+		MR_LOG(LogMemory, Log, "Total used memory:\t%ld\t\tCurrently used memory (not freed up):\t%ld", usedTotalUsedMemoryInBytes, usedMemoryInBytes);
 	}
 }
 
@@ -35,7 +35,7 @@ void* mrmalloc(size_t size)
 	void* occupiedLocation = malloc(size);
 	if (occupiedLocation == nullptr)
 	{
-		MR_LOG(LogMemory, Error, TEXT("Unable to allocate memory!"));
+		MR_LOG(LogMemory, Error, "Unable to allocate memory!");
 		return nullptr;
 	}
 
@@ -53,7 +53,7 @@ void mrfree(void* ptr)
 {
 	if (ptr == nullptr)
 	{
-		MR_LOG(LogMemory, Warn, TEXT("Unable to free memory. Perhaps it is already freed up?"));
+		MR_LOG(LogMemory, Warn, "Unable to free memory. Perhaps it is already freed up?");
 		return;
 	}
 
@@ -67,7 +67,7 @@ void* operator new(size_t size)
 	void* occupiedLocation = malloc(size);
 	if (occupiedLocation == NULL)
 	{
-		MR_LOG(LogMemory, Error, TEXT("Unable to allocate memory!"));
+		MR_LOG(LogMemory, Error, "Unable to allocate memory!");
 		return nullptr;
 	}
 
@@ -80,7 +80,7 @@ void operator delete(void* location, size_t size) noexcept
 {
 	if (location == nullptr)
 	{
-		MR_LOG(LogMemory, Error, TEXT("Unable to free memory. Perhaps it is already freed up?"));
+		MR_LOG(LogMemory, Error, "Unable to free memory. Perhaps it is already freed up?");
 		return;
 	}
 
@@ -93,7 +93,7 @@ void operator delete[](void* location, size_t size) noexcept
 {
 	if (location == nullptr)
 	{
-		MR_LOG(LogMemory, Error, TEXT("Unable to free memory. Perhaps it is already freed up?"));
+		MR_LOG(LogMemory, Error, "Unable to free memory. Perhaps it is already freed up?");
 		return;
 	}
 

@@ -3,7 +3,8 @@
 #pragma once
 #include <Types/String.h>
 #include <Types/Vector.h>
-
+#include "WindowExtender.h"
+#include <vector>
 
 struct WindowCreateInfo
 {
@@ -19,9 +20,10 @@ struct WindowCreateInfo
 };
 
 
-struct IWindow
+class IWindow
 {
-	friend struct IWindowManager;
+public:
+	friend class IWindowManager;
 
 	IWindow(IWindowManager* newOwner);
 
@@ -49,6 +51,8 @@ struct IWindow
 	WindowCreateInfo windowData;
 protected:
 	IWindowManager* owner;
+
+	std::vector<IWindowExtender*> extensions;
 
 	void* handle = nullptr;
 };

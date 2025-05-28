@@ -3,7 +3,7 @@
 #include "LayerManager.h"
 #include "Layer.h"
 #include "OSLayer.h"
-#include <Windows/WinLayer.h>
+#include <Windows/WindowsLayer.h>
 
 LayerManager::LayerManager()
 {
@@ -15,8 +15,13 @@ void LayerManager::Init()
 	PushOSLayer();
 }
 
-void LayerManager::Destroy()
+void LayerManager::Shutdown()
 {
+	for (Layer*& indexed : layers)
+	{
+		indexed->privRemoved();
+		indexed = nullptr;
+	}
 }
 
 
@@ -71,7 +76,7 @@ void LayerManager::PushOSLayer()
 	if (bWasAdded) return;
 
 #ifdef _WIN64
-	systemLayer = new WinLayer("Windows System Layer");
+	systemLayer = new WindowsLayer("Windows System Layer");
 	systemLayer->Init();
 #endif // _WIN64
 
@@ -80,9 +85,5 @@ void LayerManager::PushOSLayer()
 
 LayerManager::~LayerManager()
 {
-	for (Layer*& indexed : layers)
-	{
-		indexed->privRemoved();
-		indexed = nullptr;
-	}
+
 }

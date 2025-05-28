@@ -15,7 +15,7 @@ public:
 
 	virtual void Init();
 
-	virtual void Destroy();
+	virtual void Shutdown();
 
 	void setCanTick(bool Has);
 

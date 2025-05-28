@@ -6,8 +6,6 @@
 //#define BUILD_DAY                       07
 #define IDI_DEFAULTAPPICON              101
 #define IDSXNAPP_ENGINESPEC             103
-#define IDD_DIALOG1                     104
-#define IDC_COMMONDIALOG1               1001
 //#define BUILD_NUMBER                    1871
 //#define BUILD_YEAR                      2025
 

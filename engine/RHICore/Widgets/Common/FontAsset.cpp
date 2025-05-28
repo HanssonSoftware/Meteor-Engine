@@ -2,7 +2,7 @@
 
 #include "FontAsset.h"
 #include <Core/Application.h>
-#include <Platform/WindowManager.h>
+#include <Platform/WindowManager/WindowManager.h>
 
 static FT_Library library;
 

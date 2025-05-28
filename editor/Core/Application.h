@@ -3,16 +3,16 @@
 #pragma once
 #include <Core/Application.h>
 #include <Types/Vector.h>
-#include <Platform/WindowManager.h>
+#include <Platform/WindowManager/WindowManager.h>
 #include <Commandlet.h>
-#include <Common/Pointers.h>
+//#include <Common/Pointers.h>
 
 LOG_ADDCATEGORY(EditorApplication);
 
 class EditorApplication : public Application
 {
 public:
-	EditorApplication(const ApplicationInitializationInfo* Info);
+	EditorApplication();
 
 	virtual void Init() override;
 
@@ -30,14 +30,17 @@ int launchStranger(int ArgumentCount, char* Arguments[])
 	wInfo.windowName = String("Meteor Editor");
 
 	ApplicationInitializationInfo appInfo = {};
-	appInfo.appName = "MeteorEditor";
+	appInfo.appName = "Meteor Editor";
+	appInfo.appCodeName = "Astronaut";
 	appInfo.windowCreateInfo = wInfo;
 	appInfo.flags = APPFLAG_ENABLE_VERBOSE_LOGGING;
 
 	ICommandlet::Get().Parse(ArgumentCount, Arguments);
 
-	ScopedPtr<EditorApplication> App(new EditorApplication(&appInfo));
-	App->Init();
+	EditorApplication newEditorApp = {};
+	App::InstantiateApplication(&newEditorApp, &appInfo);
 
-	return 0;
+	newEditorApp.Init();
+
+	return App::GetRequestExitCode();
 }

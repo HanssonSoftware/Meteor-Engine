@@ -21,77 +21,11 @@ WindowsFile::~WindowsFile()
 	}
 }
 
-void* WindowsFile::GetFileHandle() const
+void* WindowsFile::GetFileHandle()
 {
     return fileHandle;
 }
 
-FileStatus WindowsFile::Open(const String Name, int openRules, FileOverrideRules overrideRules)
-{
-	IFile::Open(Name, openRules, overrideRules);
-
-	OSLayer* systemLayer = Layer::GetSystemLayer();
-
-	MR_ASSERT(systemLayer != nullptr, "System layer is not initialized!");
-
-	const wchar_t* data = systemLayer->ConvertToWide(Name.Chr());
-
-	wchar_t lookUp[MAX_PATH];
-	wcscpy_s(lookUp, data);
-	PathCchRemoveFileSpec(lookUp, MAX_PATH);
-	wchar_t currentPath[MAX_PATH] = { 0 };
-	wchar_t* context = nullptr;
-
-	wchar_t* token = wcstok_s(lookUp, L"\\/", &context);
-	while (token != nullptr)
-	{
-		if (wcslen(currentPath) > 0)
-		{
-			wcscat_s(currentPath, MAX_PATH, L"\\");
-		}
-		wcscat_s(currentPath, MAX_PATH, token);
-
-		if (!PathFileExists(currentPath))
-		{
-			CreateDirectory(currentPath, nullptr);
-		}
-
-		token = wcstok_s(nullptr, L"\\/", &context);
-	}
-
-	//PathCchRemoveFileSpec(data, wcslen(data));
-	if (!PathFileExists(data))
-	{
-		if (CreateDirectory(data, 0))
-		{
-
-		}
-	}
-
-	const int evaluatedFlags = EvaluateOverrideRules(overrideRules);
-	
-	fileHandle = CreateFile( data, GENERIC_READ | GENERIC_WRITE, openRules, 
-		nullptr, evaluatedFlags, FILE_ATTRIBUTE_NORMAL, nullptr
-	);
-
-	delete[] data;
-	if (fileHandle == INVALID_HANDLE_VALUE)
-	{
-		const String text = Layer::GetSystemLayer()->GetError();
-		return FILESTATUS_ERROR;
-	}
-
-	if (evaluatedFlags == /*OPEN_ALWAYS*/ 4)
-	{
-		bWasCreatedByProgramatically = (GetLastError() == /*ERROR_SUCCESS*/ 0);
-	}
-	else if (evaluatedFlags == /*CREATE_NEW*/ 1)
-	{
-		bWasCreatedByProgramatically = (GetLastError() != /*ERROR_FILE_EXISTS*/ 80);
-	}
-
-	return FILESTATUS_GOOD;
-}
 
 bool WindowsFile::ValidDirectory(const String& directory, bool bCreateIfNotExist)
 {
@@ -109,21 +43,6 @@ bool WindowsFile::ValidDirectory(const String& directory, bool bCreateIfNotExist
 	return false;
 }
 
-int WindowsFile::EvaluateOverrideRules(FileOverrideRules flags) const
-{
-	switch (flags)
-	{
-	case OVERRIDERULE_JUST_OPEN: return /*OPEN_ALWAYS*/ 4;
-	case OVERRIDERULE_OPEN_ONLY_IF_EXISTS:	return /*OPEN_EXISTING*/ 3;
-	case OVERRIDERULE_CREATE_NEW_IF_NOT_EXISTS:	return /*CREATE_NEW*/ 1;
-	case OVERRIDERULE_CREATE_NEW_DONT_MIND:	return /*CREATE_ALWAYS*/ 2;
-	default:
-		break;
-	}
-
-	return -1;
-}
-
 void WindowsFile::Close()
 {
 	if (fileHandle)
@@ -138,6 +57,8 @@ void WindowsFile::Close()
 		CloseHandle(fileHandle);
 		fileHandle = nullptr;
 	}
+
+	delete this;
 }
 
 void WindowsFile::Write(const String buffer) const
@@ -160,6 +81,8 @@ void WindowsFile::Write(const String buffer) const
 
 		MR_LOG(LogFileSystem, Error, "WriteFile error!");
 	}
+
+	FlushFileBuffers(fileHandle);
 }
 
 void WindowsFile::Read()

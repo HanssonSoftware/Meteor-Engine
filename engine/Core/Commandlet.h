@@ -4,7 +4,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <Logging/LogMacros.h>
 #include <Types/String.h>
-
+#include <vector>
 
 LOG_ADDCATEGORY(Commandlet);
 
@@ -19,8 +19,7 @@ class ICommandlet
 public:
 	static ICommandlet& Get();
 
-	template <class T>
-	static T& Get();
+	static void InitCommandlet(char* Input[]);
 
 	virtual ~ICommandlet() = default;
 
@@ -41,23 +40,6 @@ private:
 template<typename T>
 T ICommandlet::Expected(const String Name)
 {
-	String Temp = Search(Name);
-	if (Temp.IsEmpty())
-	{
-		//if (strcmp(typeid(T).name(), typeid(bool).name()) == 0)  
-			//return false;
 
-		//if (strcmp(typeid(T).name(), typeid(String).name()) == 0)  
-			//return "";
-	}
-
-	//if (strcmp(typeid(T).name(), typeid(bool).name()) == 0)
-	//{
-	//	return true;
-	//}
-
-	char* A = const_cast<char*>(Temp.Chr());
-	char* B = strtok_s(A, " ", &A);
-
-	return A;
+	return 0;
 };

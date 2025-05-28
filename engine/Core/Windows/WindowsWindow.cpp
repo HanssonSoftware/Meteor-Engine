@@ -1,8 +1,8 @@
 ﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
-#include "WinWindow.h"
+#include "WindowsWindow.h"
 #include <Logging/LogMacros.h>
-#include <Windows/WinWindowManager.h>
+#include <Windows/WindowsWindowManager.h>
 #include <RHI/RHIRegistry.h>
 #include <Layers/OSLayer.h>
 
@@ -29,19 +29,19 @@ WindowsWindow::WindowsWindow(WindowsWindowManager* owner)
 
 void WindowsWindow::DestroyWindow()
 {
-	if (Handle == nullptr)
+	if (handle == nullptr)
 	{
 		MR_LOG(LogWindowManager, Error, "Unable to destroy window %s", windowData.windowID.Chr());
 		return;
 	}
 
-	if (::DestroyWindow((HWND)Handle) == 0)
+	if (::DestroyWindow((HWND)handle) == 0)
 	{
 		MR_LOG(LogWindowManager, Warn, "Window does not destroyed fully: %s", Layer::GetSystemLayer()->GetError().Chr());
  		return;
 	}
 
-	Handle = nullptr;
+	handle = nullptr;
 }
 
 bool WindowsWindow::CreateNativeWindow(const WindowCreateInfo* windowData)
@@ -83,7 +83,7 @@ bool WindowsWindow::CreateNativeWindow(const WindowCreateInfo* windowData)
 		}
 	}
 
-	Handle = ::CreateWindowEx(
+	handle = ::CreateWindowEx(
 		/*WS_EX_ACCEPTFILES*/ 0,
 		className,
 		buffer,
@@ -101,7 +101,7 @@ bool WindowsWindow::CreateNativeWindow(const WindowCreateInfo* windowData)
 	if (!bIsFallback) delete[] className;
 
 	delete[] buffer;
-	if (Handle == INVALID_HANDLE_VALUE)
+	if (handle == INVALID_HANDLE_VALUE)
 	{
 		MR_LOG(LogWindowManager, Error, "Failed to create WinAPI window!");
 		return false;
@@ -109,15 +109,15 @@ bool WindowsWindow::CreateNativeWindow(const WindowCreateInfo* windowData)
 
 
 	static const constexpr BOOL bCanIUseDarkWindowTitlebar = 1;
-	DwmSetWindowAttribute((HWND)Handle, DWMWA_USE_IMMERSIVE_DARK_MODE, &bCanIUseDarkWindowTitlebar, sizeof(bCanIUseDarkWindowTitlebar));
+	DwmSetWindowAttribute((HWND)handle, DWMWA_USE_IMMERSIVE_DARK_MODE, &bCanIUseDarkWindowTitlebar, sizeof(bCanIUseDarkWindowTitlebar));
 
-	//SetWindowTheme((HWND)Handle, L"Explorer", L"");
+	//SetWindowTheme((HWND)handle, L"Explorer", L"");
 	return true;
 }
 
 void WindowsWindow::ShowWindow()
 {
-	if (Handle == nullptr)
+	if (handle == nullptr)
 	{
 		MR_LOG(LogWindowManager, Error, "Invalid window handle!");
 		return;
@@ -129,17 +129,17 @@ void WindowsWindow::ShowWindow()
 		const String titleName = String::Format(L"%s - %s", windowData.windowName.Chr(), currentDevice->GetName().Chr());
 		const wchar_t* buffer = Layer::GetSystemLayer()->ConvertToWide(titleName.Chr());
 
-		::SetWindowTextW((HWND)Handle, buffer);
+		::SetWindowTextW((HWND)handle, buffer);
 		delete[] buffer;
 	}
 #endif // MR_DEBUG
 
-	::ShowWindow((HWND)Handle, /*SW_SHOWDEFAULT*/ 10);
+	::ShowWindow((HWND)handle, /*SW_SHOWDEFAULT*/ 10);
 }
 
 void WindowsWindow::SetTitle(const String newName)
 {
-	if (Handle == nullptr)
+	if (handle == nullptr)
 	{
 		MR_LOG(LogWindowManager, Error, "Invalid window handle!");
 		return;
@@ -153,7 +153,7 @@ void WindowsWindow::SetTitle(const String newName)
 #endif
 	const wchar_t* buffer = Layer::GetSystemLayer()->ConvertToWide(windowData.windowName.Chr());
 	
-	if (::SetWindowTextW((HWND)Handle, buffer) == 0)
+	if (::SetWindowTextW((HWND)handle, buffer) == 0)
 	{
 		MR_LOG(LogWindowManager, Error, "Unable to set window title: %s", Layer::GetSystemLayer()->GetError().Chr());
 		delete[] buffer;
@@ -165,18 +165,18 @@ void WindowsWindow::SetTitle(const String newName)
 
 void WindowsWindow::HideWindow()
 {
-	if (Handle == nullptr)
+	if (handle == nullptr)
 	{
 		MR_LOG(LogWindowManager, Error, "Invalid window handle!");
 		return;
 	}
 
-	::ShowWindow((HWND)Handle, /*SW_HIDE*/ 0);
+	::ShowWindow((HWND)handle, /*SW_HIDE*/ 0);
 }
 
 void WindowsWindow::DrawAttention()
 {
-	if (Handle == nullptr)
+	if (handle == nullptr)
 	{
 		MR_LOG(LogWindowManager, Error, "Invalid window handle!");
 		return;
@@ -184,7 +184,7 @@ void WindowsWindow::DrawAttention()
 
 	FLASHWINFO flashInfo = {};
 	flashInfo.cbSize = sizeof(flashInfo);
-	flashInfo.hwnd = (HWND)Handle;
+	flashInfo.hwnd = (HWND)handle;
 	flashInfo.dwFlags = FLASHW_TRAY;
 	flashInfo.uCount = 0;
 	flashInfo.dwTimeout = 0;
@@ -194,5 +194,5 @@ void WindowsWindow::DrawAttention()
 
 void* WindowsWindow::GetWindowHandle()
 {
-	return (HWND)Handle;
+	return (HWND)handle;
 }

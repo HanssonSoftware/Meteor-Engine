@@ -1,18 +1,43 @@
 ﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
-#include "WinWindowManager.h"
+#include "WindowsWindowManager.h"
 #include <../Resources/resource.h>
 #include <Core/Application.h>
-#include "WinWindow.h"
+#include "WindowsWindow.h"
 #include <RHI/RHILoader.h>
 #include <RHI/RHIRegistry.h>
 #include <Layers/OSLayer.h>
+
+void WindowsWindowManager::Init()
+{
+    IWindowManager::Init();
+}
+
+void WindowsWindowManager::Shutdown()
+{
+    IWindowManager::Shutdown();
+
+    if (bIsWinAPIClassRegistered)
+    {
+        if (!bIsUsingFallbackClassName)
+        {
+            if (const Application* app = Application::Get())
+            {
+                UnregisterClass(Layer::GetSystemLayer()->ConvertToWide(app->GetAppInfo().appName.Chr()), instance);
+            }
+        }
+        else
+        {
+            UnregisterClass(ApplicationClassName, instance);
+        }
+    }
+}
 
 IWindow* WindowsWindowManager::CreateNativeWindow(const WindowCreateInfo* CreateInfo)
 {
 	if (CreateInfo->windowID.IsEmpty())
 	{
-		MR_LOG(LogWindowManager, Error, TEXT("CreateInfo->windowID is Empty!"));
+		MR_LOG(LogWindowManager, Error, "CreateInfo->windowID is Empty!");
 		return nullptr;
 	}
 
@@ -68,22 +93,10 @@ WindowsWindow* WindowsWindowManager::SearchForHWND(const HWND hWnd)
     return nullptr;
 }
 
+
 WindowsWindowManager::~WindowsWindowManager()
 {
-    if (bIsWinAPIClassRegistered) 
-    {
-        if (!bIsUsingFallbackClassName)
-        {
-            if (const Application* app = Application::Get())
-            {
-                UnregisterClass(Layer::GetSystemLayer()->ConvertToWide(app->GetAppInfo().appName.Chr()), instance);
-            }
-        }
-        else
-        {
-            UnregisterClass(ApplicationClassName, instance);
-        }
-    }
+
 }
 
 inline bool WindowsWindowManager::RegisterWindowClass()
@@ -160,7 +173,7 @@ LRESULT CALLBACK MeteorSpecifiedWindowProcedure(HWND wnd, UINT uint, WPARAM p1, 
 
     case WM_CLOSE:
         // OutputDebugString(L"Close\n");
-        Application::Get()->SetAppState(APPLICATIONSTATE_SHUTDOWN);
+        App::RequestExit(0);
         break;
 
     case WM_SIZING:

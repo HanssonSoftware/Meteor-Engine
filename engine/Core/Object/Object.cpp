@@ -18,7 +18,7 @@ void Object::Init()
 {
 }
 
-void Object::Destroy()
+void Object::Shutdown()
 {
 	delete this;
 }

@@ -9,34 +9,17 @@
 #include <Platform/File.h>
 #include <Common/Array.h>
 #include <Commandlet.h>
-
+#include <Platform/FileManager.h>
 #include "EditorLayer.h"
 #include <Serialisation/FontImporter.h>
 #include <Layers/OSLayer.h>
 #include <Platform/PerformanceTimer.h>
 
-EditorApplication::EditorApplication(const ApplicationInitializationInfo* aInfo) 
-	: Application(*aInfo)
+EditorApplication::EditorApplication() 
+	: Application()
 {
 	
 }
-
-
-#if 0
-class Test
-{
-public:
-	Test() {};
-
-	void Calc(/*const String& Sample, float par1, int A*/)
-	{
-		for (unsigned int i = 0; i < 2000; i++)
-		{
-			std::wcout << "Count " << i << "\n";
-		}
-	}
-};
-#endif
 
 void EditorApplication::Init()
 {
@@ -44,8 +27,6 @@ void EditorApplication::Init()
 
 	EditorLayer Super("geci");
 	Application::Get()->GetLayerManager()->PushLayer(&Super);
-
-
 
 	if (Layer::GetSystemLayer()->IsRunningAnAnotherInstance())
 	{
@@ -68,10 +49,6 @@ void EditorApplication::Init()
 	Vector3<float> bcd = Application::Get()->GetLayerManager()->GetSystemLayer()->InspectPixel({1920, 1080});
 
 	FontImporter font("Roboto");
-
-	IFile* a = CreateFileOperation();
-	a->Open("fg.txt", OPENRULE_WRITE | OPENRULE_READ | OPENRULE_DELETE, OVERRIDERULE_JUST_OPEN);
-	a->Read();
 
 	//	
 	//a.Write("bufos kurvasi íylehfgyuisehfg éuil ehuoyhseéouigfyhseijá-éawljd893475eá-mxf.d--.4:_:ÁÉKOPJKOIJPÉ$ß[]$Ł÷&@Ł");

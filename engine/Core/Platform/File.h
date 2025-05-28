@@ -9,15 +9,14 @@
 
 LOG_ADDCATEGORY(FileSystem);
 
-struct IFile
+class IFile
 {
+public:
 	IFile() = default;
 
 	virtual ~IFile();
 
-	virtual void* GetFileHandle() const = 0;
-
-	virtual FileStatus Open(const String Name, int openRules, FileOverrideRules overrideRules);
+	virtual void* GetFileHandle() = 0;
 
 	virtual void Write(const String buffer) const = 0;
 
@@ -71,9 +70,4 @@ protected:
 	char* buffer;
 
 	String fileName;
-
-	virtual int EvaluateOverrideRules(FileOverrideRules flags) const = 0;
 };
-
-IFile* CreateFileOperation();
-

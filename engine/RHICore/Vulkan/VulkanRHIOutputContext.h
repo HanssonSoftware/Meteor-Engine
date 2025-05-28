@@ -21,12 +21,20 @@ public:
 
 	virtual void Draw() override;
 
+	virtual void CleanUp() const;
+
+	virtual bool CreateCommandBuffers() override;
+	
 	virtual void CompileShader(const String name) override;
 private:
 	VkCommandBuffer cmdBuffer;
 
+	VkCommandPool cmdPool;
+
 	VkSemaphore renderWaitSemaphore;
 
 	VkSemaphore renderSharpSemaphore;
+
+	const String evaluateResultToText(VkResult Result) noexcept;
 };
 

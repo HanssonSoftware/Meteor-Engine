@@ -1,7 +1,7 @@
 ﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #include "WindowManager.h"
-#include <Platform/Window.h>
+#include <Platform/WindowManager/Window.h>
 //#include <Core/Application.h>
 #include <RHI/RHIRegistry.h>
 
@@ -15,14 +15,14 @@ IWindowManager::IWindowManager()
 	renderContext = nullptr;
 	inputManager = nullptr;
 
-	Init();
 }
 
 void IWindowManager::Init()
 {
+	
 }
 
-void IWindowManager::Destroy()
+void IWindowManager::Shutdown()
 {
 	if (renderContext)
 	{

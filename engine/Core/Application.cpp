@@ -1,10 +1,11 @@
 ﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #include "Application.h"
-#include <Platform/Window.h>
+#include <Platform/WindowManager/WindowManager.h>
 #include <RHI/RHIOutputContext.h>
 #include <RHI/RHIRegistry.h>
 #include <thread>
+#include <Platform/FileManager.h>
 
 #include <Common/MemoryManager.h>
 #include <Widgets/Viewport.h>
@@ -18,20 +19,15 @@
 #endif // MR_DEBUG
 #include <Platform/PerformanceTimer.h>
 
-static Application* appFramework;
+static Application* appFramework = nullptr;
 
-Application::Application(const ApplicationInitializationInfo& aInfo)
-	: appInfo(aInfo)
+Application::Application()
 {
-    appFramework = this;
-    //applicationLocation = ICommandlet::Get().executableLocation;
-
 #ifdef _WIN64
     WindowsWindowManager* wm = new WindowsWindowManager();
 #else
 
 #endif // _WIN64
-
     LayerManager* lm = new LayerManager();
 
     SetWindowManager(wm);
@@ -40,9 +36,22 @@ Application::Application(const ApplicationInitializationInfo& aInfo)
 
 Application* Application::Get()
 {
-    static std::mutex mtx;
-    std::lock_guard<std::mutex> l(mtx);
-    return appFramework ? appFramework : nullptr;
+    return appFramework;
+}
+
+void Application::RequestExit(int Code)
+{
+    MR_ASSERT(appFramework != nullptr, "Application class is invalid!");
+    
+    appFramework->exitCode = Code;
+    appFramework->Shutdown();
+}
+
+const int Application::GetRequestExitCode()
+{
+    MR_ASSERT(App::Get() != nullptr, "Application class is invalid!");
+
+    return App::Get()->exitCode;
 }
 
 void Application::Init()
@@ -51,14 +60,15 @@ void Application::Init()
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF);
 #endif // MR_DEBUG
 
+    windowManager->Init();
     layerManager->Init();
 
-    logger.Intialize();
-    MR_LOG(LogApplication, Log, TEXT("Initializing Application."));
+    Logger::Initialize();
+    MR_LOG(LogApplication, Log, "Initializing application.");
 
     if (appInfo.appName.IsEmpty())
     {
-        MR_LOG(LogApplication, Fatal, TEXT("AppInfo is Invalid!"));
+        MR_LOG(LogApplication, Fatal, "AppInfo is invalid!");
     }
 
     CreateNativeWindow();
@@ -73,8 +83,23 @@ void Application::Init()
         //GetRenderContext()->setImGUIUsed(true);
     }
 
-
     SetAppState(APPLICATIONSTATE_RUNNING);
+}
+
+bool Application::InstantiateApplication(Application* newInstance, const ApplicationInitializationInfo* appCreateInfo)
+{
+    if (!newInstance || !appCreateInfo)
+    {
+        App::RequestExit(-1);
+        return false;
+    }
+
+    appFramework = newInstance;
+    appFramework->appInfo = *appCreateInfo;
+
+    newInstance->Init();
+
+    return true;
 }
 
 void Application::Run()
@@ -107,8 +132,8 @@ void Application::Run()
 
         //MR_ASSERT();
 
-		//if (graphicsDevice) graphicsDevice->GetOutputContext()->Clear();
-		//if (graphicsDevice) graphicsDevice->GetOutputContext()->Draw();
+	    if (graphicsDevice) graphicsDevice->GetOutputContext()->Clear();
+		if (graphicsDevice) graphicsDevice->GetOutputContext()->Draw();
 
         tm.Stop();
 
@@ -116,7 +141,7 @@ void Application::Run()
         if (layerManager) layerManager->UpdateLayer();
 
         //SceneGraph::Get().Update(0.01f);
-        Framework->Run();
+        appFramework->Run();
     }
 
     //if (windowManager->GetRenderContext() != nullptr)
@@ -127,28 +152,28 @@ void Application::Run()
 
 
     //windowManager->DestroyWindow("Super");
-    Framework->Shutdown();
+    appFramework->Shutdown();
 }
 
 void Application::Shutdown()
 {
     if (GetAppState() == APPLICATIONSTATE_RESTARTING)
     {
-        MR_LOG(LogApplication, Log, TEXT("Restarting Application!"));
+        MR_LOG(LogApplication, Log, "Restarting Application!");
     
-        Framework->Init();
+        appFramework->Init();
     }
     else
     {
-        MR_LOG(LogApplication, Log, TEXT("Shutting down Application!"));
+        MR_LOG(LogApplication, Log, "Shutting down Application!");
 
-        windowManager->Destroy();
+        windowManager->Shutdown();
 
-        layerManager->Destroy();
+        layerManager->Shutdown();
+        
+        Logger::Shutdown();
 
-        //ILogger::Get().shutdownLogger();
-
-        exit(0);
+        exit(exitCode);
     }
 }
 
@@ -168,19 +193,19 @@ Application::~Application()
 
 String Application::GetApplicationName()
 {
-    if (appInfo.appName.IsEmpty())
+    if (appFramework->appInfo.appName.IsEmpty())
     {
-        return GetWindowManager()->GetFirstWindow()->windowData.windowName;
+        return appFramework->GetWindowManager()->GetFirstWindow()->windowData.windowName;
     }
 
-    return appInfo.appName;
+    return appFramework->appInfo.appName;
 }
 
 
-inline void Application::CreateNativeWindow() const
+void Application::CreateNativeWindow() const
 {
-    if (appInfo.flags & APPFLAG_NO_WINDOW)
+    if (appFramework->appInfo.flags & APPFLAG_NO_WINDOW)
         return;
 
-    GetWindowManager()->CreateNativeWindow(&appInfo.windowCreateInfo);
+    GetWindowManager()->CreateNativeWindow(&appFramework->appInfo.windowCreateInfo);
 }

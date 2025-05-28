@@ -208,7 +208,15 @@ String::String(const std::wstring Input)
 
 String::String(String&& other) noexcept
 {
-	
+	if (other.buffer)
+	{
+		const size_t count = strlen(other.buffer);
+
+		buffer = new char[count + 1];
+
+		strncpy(buffer, other.buffer, count);
+		buffer[count] = '\0';
+	}
 }
 
 String::String(const String& other)
@@ -396,40 +404,6 @@ String String::Format(const String format, ...)
 
 	delete[] newFormattedBuffer;
 	return stringized;
-}
-
-inline String String::ReadLine(const String line, uint32 location)
-{
-	return ReadLine(line.Chr(), location);
-}
-
-String String::ReadLine(const wchar_t* Line, uint32 location)
-{
-	uint32 current = location;
-
-#ifdef _WIN64
-	while (Line[current] != L'\r')
-#else
-	while (Line[current] != L'\n')
-#endif // _WIN64
-	{
-		current++;
-	}
-
-	wchar_t* temp = new wchar_t[(current - location) + 1];
-	wcsncpy(temp, Line + location, current - location);
-	temp[current - location] = L'\0';
-
-#ifdef _WIN64
-	current++;
-#endif // _WIN64
-
-	String buffer(temp);
-
-	location = current;
-
-	delete[] temp;
-	return buffer;
 }
 
 String& String::operator=(const String& other)

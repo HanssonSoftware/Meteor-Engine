@@ -28,9 +28,9 @@ public:
 
 	virtual void Init() override;
 
-	virtual void Destroy() override;
+	virtual void Shutdown() override;
 
-	OSLayer* GetSystemLayer() const { return systemLayer; }
+	OSLayer* GetSystemLayer() const { return systemLayer ? systemLayer : nullptr; }
 private:
 	OSLayer* systemLayer;
 

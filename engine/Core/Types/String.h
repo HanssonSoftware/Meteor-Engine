@@ -43,13 +43,23 @@ struct String
 	bool operator!=(const String& Other) const;
 
 	bool operator!=(String& Other) const;
+
+	char* operator=(const String& other) const
+	{
+		return other.buffer;
+	}
 	
 	/** Chr() is the alternative. */
 	const char* operator*();
 
 	operator const char*()
 	{
-		return Chr();
+		return buffer;
+	}
+
+	operator char*()
+	{
+		return buffer;
 	}
 
 	/** (*this) is the alternative. */
@@ -72,12 +82,6 @@ struct String
 	uint32 Length() const;
 
 	static String Format(const String format, ...);
-
-	/** Iterates from the given index until the next '\n', updating the index to the '\n' position. */
-	static inline String ReadLine(const String Line, uint32 location);
-
-	/** Iterates from the given index until the next '\n', updating the index to the '\n' position. */
-	static String ReadLine(const wchar_t* Line, uint32 location);
 private:
 #ifdef MR_DEBUG
 	bool bIsInited = false;

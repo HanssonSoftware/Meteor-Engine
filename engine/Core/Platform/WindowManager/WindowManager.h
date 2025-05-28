@@ -13,15 +13,16 @@ class InputManager;
 
 static constexpr const wchar_t* ApplicationClassName = L"MeteorApplication";
 
-struct IWindowManager
+class IWindowManager
 {
+public:
 	IWindowManager();
 
 	virtual ~IWindowManager() = default;
 
 	virtual void Init();
 
-	virtual void Destroy();
+	virtual void Shutdown();
 
 	virtual IWindow* CreateNativeWindow(const WindowCreateInfo* CreateInfo) = 0;
 

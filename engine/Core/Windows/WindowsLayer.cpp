@@ -1,9 +1,9 @@
 ﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
-#include "WinLayer.h"
+#include "WindowsLayer.h"
 
 #define _WIN64_WINNT 0x0600
-#include "WinAPI.h"
+#include "Windows.h"
 #include <Common/Pointers.h>
 #include <Core/Application.h>
 
@@ -12,13 +12,13 @@ LOG_ADDCATEGORY(WindowsLayer);
 static MSG messageForProcedure;
 static HWND focusedWindow;
 
-WinLayer::WinLayer(const String Name) noexcept
+WindowsLayer::WindowsLayer(const String Name) noexcept
     : OSLayer(Name)
 {
 
 }
 
-void WinLayer::Init()
+void WindowsLayer::Init()
 {
     const String version = GetMachineVersion();
     if (strcmp(version.Chr(), "6.1") == 0 || strcmp(version.Chr(), "6.2") == 0)
@@ -45,16 +45,16 @@ void WinLayer::Init()
         focusedWindow = (HWND)Ref->GetWindowHandle();
 }
 
-void WinLayer::Attached()
+void WindowsLayer::Attached()
 {
 
 }
 
-void WinLayer::Removed()
+void WindowsLayer::Removed()
 {
 }
 
-void WinLayer::Update()
+void WindowsLayer::Update()
 {
     if (PeekMessage(&messageForProcedure, focusedWindow, 0, 0, PM_REMOVE))
     {
@@ -63,7 +63,7 @@ void WinLayer::Update()
     }
 }
 
-String WinLayer::GetError()
+String WindowsLayer::GetError()
 {
     DWORD Num = GetLastError();
     LPVOID buffer;
@@ -81,7 +81,7 @@ String WinLayer::GetError()
     //ConvertToNarrow((LPTSTR)buffer);
 
     const int requiredSizeInBytes = WideCharToMultiByte(/*CP_UTF8*/ 65001, 0, (LPTSTR)buffer, -1, 0, 0, 0, 0);
-    if (requiredSizeInBytes == 0) return "Check!";
+    if (requiredSizeInBytes == 0) return "";
 
     char* super = new char[requiredSizeInBytes];
 
@@ -95,7 +95,7 @@ String WinLayer::GetError()
 }
 
 static String version;
-String WinLayer::GetMachineVersion()
+String WindowsLayer::GetMachineVersion()
 {
     if (!version.IsEmpty()) return version;
 
@@ -148,7 +148,7 @@ String WinLayer::GetMachineVersion()
     return version;
 }
 
-Vector3<float> WinLayer::InspectPixel(const Vector2<float> screenCoordinates)
+Vector3<float> WindowsLayer::InspectPixel(const Vector2<float> screenCoordinates)
 {
     MR_LOG(LogWindowsLayer, Error, "This function is unimplemented! %s", __FUNCTION__);
     static const Vector3<float> colors(/*GetRValue(winColor), GetGValue(winColor), GetBValue(winColor)*/0);
@@ -162,7 +162,7 @@ Vector3<float> WinLayer::InspectPixel(const Vector2<float> screenCoordinates)
     return colors;
 }
 
-String WinLayer::GetMachineName()
+String WindowsLayer::GetMachineName()
 {
     wchar_t pc[128];
 
@@ -172,11 +172,11 @@ String WinLayer::GetMachineName()
     return String(pc);
 }
 
-bool WinLayer::IsRunningAnAnotherInstance()
+bool WindowsLayer::IsRunningAnAnotherInstance()
 {
     if (const Application* app = Application::Get())
     {
-        const wchar_t* MrWide = ConvertToWide(app->GetAppInfo().appName);
+        const wchar_t* MrWide = ConvertToWide(app->GetAppInfo().appCodeName);
         HANDLE appMtx = CreateMutex(0, 1, MrWide);
 
         delete[] MrWide;
@@ -193,7 +193,7 @@ bool WinLayer::IsRunningAnAnotherInstance()
     return false;
 }
 
-MessageBoxDecision WinLayer::AddMessageBox(const MessageBoxDescriptor* Info)
+MessageBoxDecision WindowsLayer::AddMessageBox(const MessageBoxDescriptor* Info)
 {
     if (!Info) return MESSAGEBOXDECISION_INVALID;
 
@@ -217,19 +217,19 @@ MessageBoxDecision WinLayer::AddMessageBox(const MessageBoxDescriptor* Info)
     return evaluateMessageBoxReturn(returnCode);
 }
 
-wchar_t* WinLayer::ConvertToWide(const char* Buffer)
+wchar_t* WindowsLayer::ConvertToWide(const char* Buffer)
 {
     if (!Buffer)
     {
         MR_LOG(LogWindowsLayer, Error, "Attempted to convert an invalid buffer!");
-        return L'';
+        return nullptr;
     }
 
     const int requiredSize = MultiByteToWideChar(65001 /*CP_UTF8*/, 0, Buffer, -1, 0, 0);
     if (requiredSize == 0)
     {
         MR_LOG(LogWindowsLayer, Error, "MultiByteToWideChar said: %s", GetError().Chr());
-        return L'';
+        return nullptr;
     }
 
     wchar_t* super = new wchar_t[requiredSize + 1];
@@ -238,22 +238,22 @@ wchar_t* WinLayer::ConvertToWide(const char* Buffer)
         return super;
     }
 
-    return L'';
+    return nullptr;
 }
 
-char* WinLayer::ConvertToNarrow(const wchar_t* Buffer)
+char* WindowsLayer::ConvertToNarrow(const wchar_t* Buffer)
 {
     if (!Buffer)
     {
         MR_LOG(LogWindowsLayer, Error, "Attempted to convert an invalid buffer!");
-        return '\0';
+        return nullptr;
     }
 
     const int requiredSize = WideCharToMultiByte(65001 /*CP_UTF8*/, 0, Buffer, -1, 0, 0, 0, 0);
     if (requiredSize == 0)
     {
         MR_LOG(LogWindowsLayer, Error, "WideCharToMultiByte said: %s", GetError().Chr());
-        return '\0';
+        return nullptr;
     }
 
     char* super = new char[requiredSize + 1];
@@ -262,10 +262,10 @@ char* WinLayer::ConvertToNarrow(const wchar_t* Buffer)
         return super;
     }
 
-    return '\0';
+    return nullptr;
 }
 
-constexpr const int WinLayer::evaluateMessageBoxFlags(const int Code) const noexcept
+constexpr const int WindowsLayer::evaluateMessageBoxFlags(const int Code) const noexcept
 {
     int flags = 0;
 
@@ -280,17 +280,14 @@ constexpr const int WinLayer::evaluateMessageBoxFlags(const int Code) const noex
     }
     else if (Code & MESSAGEBOXBUTTONS_YES)
     {
-        MR_LOG(LogWindowsLayer, Verbose, "Button Yes supplied only, appending No");
         flags |= MB_YESNO;
     }
     else if (Code & MESSAGEBOXBUTTONS_NO)
     {
-        MR_LOG(LogWindowsLayer, Verbose, "Button No supplied only, appending Yes");
         flags |= MB_YESNO;
     }
     else if (Code & MESSAGEBOXBUTTONS_CANCEL)
     {
-        MR_LOG(LogWindowsLayer, Verbose, "Button Cancel supplied only, appending Ok");
         flags |= MB_OKCANCEL;
     }
     else
@@ -301,7 +298,7 @@ constexpr const int WinLayer::evaluateMessageBoxFlags(const int Code) const noex
     return flags;
 }
 
-constexpr const MessageBoxDecision WinLayer::evaluateMessageBoxReturn(const int Code) const noexcept
+constexpr const MessageBoxDecision WindowsLayer::evaluateMessageBoxReturn(const int Code) const noexcept
 {
     switch (Code)
     {

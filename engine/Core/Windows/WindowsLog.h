@@ -3,11 +3,27 @@
 #pragma once
 #include <Logging/Log.h>
 
-class WindowsLog : public ILogger
-{
-public:
-	virtual void Intialize() override;
+class IFile;
 
-	virtual void SendToOutputBuffer(const String& Buffer) override;
+struct WindowsLog : public ILogger
+{
+	WindowsLog();
+
+	virtual ~WindowsLog() noexcept;
+
+	static void Initialize();
+
+	static void Shutdown();
+
+	static inline bool IsDebuggerAttached();
+
+	static int TransmitAssertion(LogAssertion& Info);
+
+	virtual void SendToOutputBuffer(const String Buffer) override;
+
+protected:
+	IFile* consoleBuffer = nullptr;
 };
 
+
+using Logger = WindowsLog;

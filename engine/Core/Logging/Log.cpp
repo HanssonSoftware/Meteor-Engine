@@ -7,17 +7,31 @@
 #include <Platform/Timer.h>
 #include <Platform/File.h>
 #include <Layers/OSLayer.h>
+#include <Platform/FileManager.h>
+#include "LogAssertion.h"
 
 
 LOG_ADDCATEGORY(Standard);
-//
-//ILogger& ILogger::Get()
-//{
-//    static std::mutex mtx;
-//    std::lock_guard<std::mutex> l(mtx);
-//    static ILogger instance;
-//    return instance;
-//}
+
+static_assert(!std::is_same_v<Logger, ILogger>, "ILogger must be extended!");
+
+static Logger* instance = new Logger();
+
+ILogger::ILogger()
+{
+
+}
+
+ILogger* ILogger::Get()
+{
+    return instance;
+}
+
+void ILogger::Shutdown()
+{
+
+}
+
 //
 //void ILogger::firstStartLogger()
 //{
@@ -59,26 +73,26 @@ LOG_ADDCATEGORY(Standard);
     //}
 //}
 
-void ILogger::Intialize()
+void ILogger::Initialize()
 {
     if (const Application* app = Application::Get())
     {
-		app->GetAppInfo().flags & APPFLAG_ENABLE_VERBOSE_LOGGING ? bIsUsingVerbose = true : bIsUsingVerbose = false;
-		app->GetAppInfo().flags & APPFLAG_NO_FILE_LOGGING ? bIsUsingFile = false : bIsUsingFile = true;
+		app->GetAppInfo().flags & APPFLAG_ENABLE_VERBOSE_LOGGING ? instance->bIsUsingVerbose = true : instance->bIsUsingVerbose = false;
+		app->GetAppInfo().flags & APPFLAG_NO_FILE_LOGGING ? instance->bIsUsingFile = false : instance->bIsUsingFile = true;
 	}
 
-    if (!bIsUsingVerbose) bIsUsingVerbose = ICommandlet::Get().Expected<bool>("verbose");
+    if (!instance->bIsUsingVerbose) instance->bIsUsingVerbose = ICommandlet::Get().Expected<bool>("verbose");
 
     //if (bIsUsingFile) bIsUsingFile = !ICommandlet::Get().Expected<bool>("nofilelogging");
 
-    if (bIsUsingFile)
-    {   
+    if (instance->bIsUsingFile)
+    {
         if (const Application* app = Application::Get())
         {
-            buffer = CreateFileOperation();
+            FileStatus stat;
+            instance->buffer = FileManager::CreateFileOperation(String::Format("E:\\Logging\\%s-%s.txt", app->GetAppInfo().appName.Chr(), Timer::Now("%H.%M.%S").Chr()), OPENMODE_WRITE | OPENMODE_READ, SHAREMODE_READ | SHAREMODE_WRITE, OVERRIDERULE_CREATE_NEW_DONT_MIND, stat);
 
-            buffer->Open(String::Format("E:\\Logging\\%s-%s.txt", app->GetAppInfo().appName.Chr(), Timer::Now("%H.%M.%S").Chr()), OPENRULE_WRITE, OVERRIDERULE_CREATE_NEW_DONT_MIND);
-            buffer->Write(String::Format("Logging started at %s.", Timer::Now("%Y/%m/%d-%H:%M:%S").Chr()));
+            instance->buffer->Write(String::Format("Logging started at %s.", Timer::Now("%Y/%m/%d-%H:%M:%S").Chr()));
         }
     }
 }
@@ -92,85 +106,64 @@ ILogger::~ILogger() noexcept
     }
 }
 
-void ILogger::SendPreInitLogs()
+void ILogger::SetActualLog(LogDescriptor* newDescriptor)
 {
-    if (critialLogs.size() == 0)
-        return;
-
-    for (const LogDescriptor& Log : critialLogs)
-    {
-        TransmitMessage(Log);
-    }
-
-    critialLogs.clear();
+    instance->actualDescriptor = newDescriptor;
 }
 
-void ILogger::TransmitMessage(const LogDescriptor& Descriptor)
+void ILogger::TransmitMessage(LogDescriptor* Descriptor)
 {
-    if (Descriptor.severity == Verbose || bIsUsingVerbose)
-    {
-        if (!Application::Get())
-        {
-            critialLogs.push_back(Descriptor);
-            return;
-        }
-    }
+    SetActualLog(Descriptor);
 
-    if (!Application::Get())
-    {
-        critialLogs.push_back(Descriptor);
-        return;
-    }
-
-    const char* fullMessage;
-    if (Descriptor.severity == Fatal)
+    String fullMessage;
+    if (Descriptor->severity == Fatal)
     {
         fullMessage = String::Format(
             "=============[ Fatal error ]=============\nWhere:\t\t%s\nWhen:\t\t%s\nMessage:\t%s\n\nFile:\t%s\n",
-            Descriptor.function,
+            Descriptor->function,
             Timer::Now("%Y-%m-%d %H:%M:%S").Chr(),
-            Descriptor.message,
-            Descriptor.file
-        ).Chr();
+            Descriptor->message.Chr(),
+            Descriptor->file
+        );
     }
     else
     {
-        fullMessage = String::Format("[%s] %s: %s: %s\n", Timer::Now().Chr(), Descriptor.team);
+        fullMessage = String::Format("[%s] %s: %s\n", Timer::Now().Chr(), Descriptor->team, Descriptor->message.Chr());
     }
     
 
-    SendToOutputBuffer(fullMessage);
+    instance->SendToOutputBuffer(fullMessage);
 }
 
-void ILogger::TransmitAssertion(const AssertionPackage* Info)
+void ILogger::TransmitAssertion(const LogAssertion* Info)
 {
-	if (Info == nullptr)
-		return;
+	if (!Info) return;
 
     if (OSLayer* systemLayer = Layer::GetSystemLayer())
     {
-		MessageBoxDescriptor info = {};
-        info.Description = String::Format(
-            "=============[ Assertion error ]=============\nWhere:\t\t%s\nWhen:\t\t%s\nMessage:\t%s\n\nFile:\t%s:%d\n",
-            Info->Checked,
-            Timer::Now("%Y-%m-%d %H:%M:%S").Chr(),
-            Info->Message,
-            Info->File,
-			Info->Line
-		);
+        MessageBoxDescriptor mbxInfo = {};
+        mbxInfo.Description = String::Format(
+            "Assertion failed: %s\tLine: %d\tFile: %s\n",
+            Info->assertStatement,
+            Info->assertLineInFile,
+            Info->assertLocationInFile
+        );
+        mbxInfo.Title = "Assertion failed";
 
-        systemLayer->AddMessageBox(&info);
-        SendToOutputBuffer(info.Description);
-
-		// macro automatically aborts the program
+        systemLayer->AddMessageBox(&mbxInfo);
     }
 }
 
-void ILogger::SendToOutputBuffer(const String& Buffer)
+bool ILogger::IsDebuggerAttached()
 {
-    if (!Buffer.IsEmpty() && buffer)
+    return false;
+}
+
+void ILogger::SendToOutputBuffer(const String Buffer)
+{
+    if (!Buffer.IsEmpty() && instance->buffer)
     {
-        buffer->Write(Buffer);
+        instance->buffer->Write(Buffer);
     }
 }
 
