@@ -23,7 +23,7 @@ public:
 
 	virtual void CleanUp() const;
 
-	virtual bool CreateCommandBuffers() override;
+	bool CreateCommandBuffers();
 	
 	virtual void CompileShader(const String name) override;
 private:
@@ -32,6 +32,8 @@ private:
 	VkCommandPool cmdPool;
 
 	VkSemaphore renderWaitSemaphore;
+
+	VkFence renderFence;
 
 	VkSemaphore renderSharpSemaphore;
 

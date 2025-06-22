@@ -18,11 +18,18 @@ struct IFileManager
 
 	static bool IsPathExists(const String name);
 
+	static bool IsPathRelative(const String path);
+
+	static bool IsEndingWith(const String name, const String extension);
+
 	static String GetExecutableDirectory();
 
 	static String NormalizeDir(const String input);
 
 	static IFile* CreateFileOperation(const String path, int accessType, int sharingMode, int createType, FileStatus& status);
+
+private:
+	IFileManager() = default;
 };
 
 #include "PlatformLayout.h"

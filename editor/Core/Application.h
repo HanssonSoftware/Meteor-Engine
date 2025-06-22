@@ -1,7 +1,7 @@
 ﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
-#include <Core/Application.h>
+#include <Application.h>
 #include <Types/Vector.h>
 #include <Platform/WindowManager/WindowManager.h>
 #include <Commandlet.h>
@@ -35,12 +35,10 @@ int launchStranger(int ArgumentCount, char* Arguments[])
 	appInfo.windowCreateInfo = wInfo;
 	appInfo.flags = APPFLAG_ENABLE_VERBOSE_LOGGING;
 
-	ICommandlet::Get().Parse(ArgumentCount, Arguments);
+	ICommandlet::Initalize();
 
 	EditorApplication newEditorApp = {};
 	App::InstantiateApplication(&newEditorApp, &appInfo);
-
-	newEditorApp.Init();
 
 	return App::GetRequestExitCode();
 }

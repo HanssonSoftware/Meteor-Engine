@@ -165,7 +165,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)resources;$(VULKAN_SDK)\Include;$(SolutionDir)engine\RHICore;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)engine\Core\Platform;$(SolutionDir)resources;$(VULKAN_SDK)\Include;$(SolutionDir)engine\RHICore;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
     </ClCompile>
     <Link>
@@ -200,7 +200,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)resources;$(VULKAN_SDK)\Include;$(SolutionDir)engine\RHICore;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)engine\Core\Platform;$(SolutionDir)resources;$(VULKAN_SDK)\Include;$(SolutionDir)engine\RHICore;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
     </ClCompile>
     <Link>
@@ -229,8 +229,10 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="engine\RHICore\D3D11\D3D11RHISwapChain.cpp" />
+    <ClCompile Include="engine\RHICore\D3D11\D3D11RHIViewport.cpp" />
+    <ClCompile Include="engine\RHICore\D3D11\D3D11OutputContext.cpp" />
     <ClCompile Include="engine\RHICore\D3D11\D3D11RHIRegistry.cpp" />
-    <ClCompile Include="engine\RHICore\D3D11\D3DVertexBuffer.cpp" />
     <ClCompile Include="engine\Core\Layers\OSLayer.cpp" />
     <ClCompile Include="engine\Core\Serialisation\AssetManager.cpp" />
     <ClCompile Include="engine\Core\Object\Object.cpp" />
@@ -239,9 +241,8 @@
     <ClCompile Include="engine\Core\InputManager.cpp" />
     <ClCompile Include="engine\Core\Layers\Layer.cpp" />
     <ClCompile Include="engine\Core\Layers\LayerManager.cpp" />
-    <ClCompile Include="engine\Core\Common\Array.cpp" />
+    <ClCompile Include="engine\Core\Types\Array.cpp" />
     <ClCompile Include="engine\Core\Common\Delegate.cpp" />
-    <ClCompile Include="engine\Core\Common\MemoryManager.cpp" />
     <ClCompile Include="engine\Core\Config\Archive.cpp" />
     <ClCompile Include="engine\Core\Config\Config.cpp" />
     <ClCompile Include="engine\Core\Config\ConfigCollection.cpp" />
@@ -251,13 +252,15 @@
     <ClCompile Include="engine\Core\Platform\Timer.cpp" />
     <ClCompile Include="engine\Core\Types\String.cpp" />
     <ClCompile Include="engine\Core\Types\Vector.cpp" />
+    <ClCompile Include="engine\RHICore\Vulkan\VulkanQueue.cpp" />
+    <ClCompile Include="engine\RHICore\Vulkan\VulkanRHIOutputContext.cpp" />
+    <ClCompile Include="engine\RHICore\Vulkan\VulkanRHIRegistry.cpp" />
     <ClCompile Include="engine\RHICore\Widgets\Common\FontAsset.cpp" />
     <ClCompile Include="engine\RHICore\Widgets\Components\TextBlock.cpp" />
     <ClCompile Include="engine\RHICore\Widgets\Viewport.cpp" />
     <ClCompile Include="engine\RHICore\Widgets\Visual.cpp" />
     <ClCompile Include="engine\Core\Platform\WindowManager\Window.cpp" />
     <ClCompile Include="engine\Core\Platform\WindowManager\WindowManager.cpp" />
-    <ClCompile Include="engine\RHICore\RHI\VertexBuffer.cpp" />
     <ClCompile Include="engine\Core\Common\Pointers.cpp" />
     <ClCompile Include="engine\Core\AssetLoader\Mesh\StaticMesh.cpp" />
     <ClCompile Include="engine\Core\Common\Guid.cpp" />
@@ -270,13 +273,11 @@
     <ClCompile Include="engine\RHICore\RHI\RHIRegistry.cpp" />
     <ClCompile Include="engine\RHICore\RHI\RHILoader.cpp" />
     <ClCompile Include="engine\RHICore\RHI\RHIOutputContext.cpp" />
-    <ClCompile Include="engine\RHICore\Vulkan\VulkanRHIRegistry.cpp" />
     <ClCompile Include="engine\RHICore\RHI\RHIBuffer.cpp" />
     <ClCompile Include="engine\Core\Windows\WindowsFile.cpp" />
-    <ClCompile Include="engine\RHICore\Vulkan\VulkanRHIOutputContext.cpp" />
     <ClCompile Include="engine\RHICore\RHI\RHIShader.cpp" />
     <ClCompile Include="engine\Core\Windows\WindowsTimer.cpp" />
-    <ClCompile Include="engine\Core\Layers\Thread.cpp" />
+    <ClCompile Include="engine\Core\Platform\Thread\Thread.cpp" />
     <ClCompile Include="engine\Core\Layers\ThreadPool.cpp" />
     <ClCompile Include="engine\Core\Windows\WindowsLog.cpp" />
     <ClCompile Include="engine\Core\Platform\FileManager.cpp" />
@@ -284,8 +285,20 @@
     <ClCompile Include="engine\Core\Platform\WindowManager\WindowMenu.cpp" />
     <ClCompile Include="engine\Core\Platform\WindowManager\WindowExtender.cpp" />
     <ClCompile Include="engine\Core\Logging\LogAssertion.cpp" />
+    <ClCompile Include="engine\RHICore\RHI\RHIViewport.cpp" />
+    <ClCompile Include="engine\RHICore\RHI\RHISwapChain.cpp" />
+    <ClCompile Include="engine\Core\Windows\WindowsThread.cpp" />
+    <ClCompile Include="engine\Core\Platform\Thread\ThreadManager.cpp" />
+    <ClCompile Include="engine\Core\Windows\WindowsThreadManager.cpp" />
+    <ClCompile Include="engine\RHICore\Vulkan\VulkanRHISwapChain.cpp" />
+    <ClCompile Include="engine\Core\MemoryManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="engine\Core\Platform\Thread\ThreadDescriptor.h" />
+    <ClInclude Include="engine\RHICore\D3D11\D3D11RHISwapChain.h" />
+    <ClInclude Include="engine\Core\Common\Math.h" />
+    <ClInclude Include="engine\RHICore\D3D11\D3D11RHIViewport.h" />
+    <ClInclude Include="engine\RHICore\D3D11\D3D11OutputContext.h" />
     <ClInclude Include="engine\Core\ApplicationHelpers.h" />
     <ClInclude Include="engine\Core\Layers\OSLayerHelper.h" />
     <ClInclude Include="engine\Core\Logging\LogHelpers.h" />
@@ -293,7 +306,6 @@
     <ClInclude Include="engine\Core\Platform\PlatformLayout.h" />
     <ClInclude Include="engine\Core\Windows\Windows.h" />
     <ClInclude Include="engine\RHICore\D3D11\D3D11RHIRegistry.h" />
-    <ClInclude Include="engine\RHICore\D3D11\D3DVertexBuffer.h" />
     <ClInclude Include="engine\Core\Layers\OSLayer.h" />
     <ClInclude Include="engine\Core\Serialisation\AssetManager.h" />
     <ClInclude Include="engine\Core\Common\Conversions.h" />
@@ -303,23 +315,24 @@
     <ClInclude Include="engine\Core\InputManager.h" />
     <ClInclude Include="engine\Core\Layers\Layer.h" />
     <ClInclude Include="engine\Core\Layers\LayerManager.h" />
-    <ClInclude Include="engine\Core\Common\Array.h" />
+    <ClInclude Include="engine\Core\Types\Array.h" />
     <ClInclude Include="engine\Core\Common\Delegate.h" />
-    <ClInclude Include="engine\Core\Common\MemoryManager.h" />
     <ClInclude Include="engine\Core\Config\Archive.h" />
     <ClInclude Include="engine\Core\Config\Config.h" />
     <ClInclude Include="engine\Core\Config\ConfigCollection.h" />
     <ClInclude Include="engine\Core\Platform\File.h" />
     <ClInclude Include="engine\RHICore\RHI\RHICommons.h" />
-    <ClInclude Include="engine\RHICore\RHI\VertexBuffer.h" />
     <ClInclude Include="engine\Core\Logging\Log.h" />
     <ClInclude Include="engine\Core\Logging\LogMacros.h" />
     <ClInclude Include="engine\Core\Math\Conversions.h" />
     <ClInclude Include="engine\Core\Platform\Timer.h" />
     <ClInclude Include="engine\Core\Types\Cast.h" />
-    <ClInclude Include="engine\Core\Types\PlatformDefs.h" />
+    <ClInclude Include="engine\Core\Platform\PlatformDefs.h" />
     <ClInclude Include="engine\Core\Types\String.h" />
     <ClInclude Include="engine\Core\Types\Vector.h" />
+    <ClInclude Include="engine\RHICore\Vulkan\VulkanQueue.h" />
+    <ClInclude Include="engine\RHICore\Vulkan\VulkanRHIOutputContext.h" />
+    <ClInclude Include="engine\RHICore\Vulkan\VulkanRHIRegistry.h" />
     <ClInclude Include="engine\RHICore\Widgets\Common\FontAsset.h" />
     <ClInclude Include="engine\RHICore\Widgets\Components\TextBlock.h" />
     <ClInclude Include="engine\RHICore\Widgets\Viewport.h" />
@@ -418,6 +431,7 @@
     <ClInclude Include="engine\RHICore\RHI\RHIOutputContext.h" />
     <ClInclude Include="engine\Core\Platform\FileManager.h" />
     <ClInclude Include="engine\Core\Logging\LogAssertion.h" />
+    <ClInclude Include="engine\Core\MemoryManager.h" />
     <ClInclude Include="resources\assertbox.h" />
     <ClInclude Include="resources\resource.h" />
     <ClInclude Include="engine\Core\AssetLoader\Mesh\StaticMesh.h" />
@@ -425,18 +439,22 @@
     <ClInclude Include="engine\Core\Windows\WindowsWindow.h" />
     <ClInclude Include="engine\Core\Windows\WindowsLayer.h" />
     <ClInclude Include="engine\RHICore\RHI\RHILoader.h" />
-    <ClInclude Include="engine\RHICore\Vulkan\VulkanRHIRegistry.h" />
     <ClInclude Include="engine\RHICore\RHI\RHIBuffer.h" />
     <ClInclude Include="engine\Core\Windows\WindowsFile.h" />
-    <ClInclude Include="engine\RHICore\Vulkan\VulkanRHIOutputContext.h" />
     <ClInclude Include="engine\RHICore\RHI\RHIShader.h" />
     <ClInclude Include="engine\Core\Windows\WindowsTimer.h" />
-    <ClInclude Include="engine\Core\Layers\Thread.h" />
+    <ClInclude Include="engine\Core\Platform\Thread\Thread.h" />
     <ClInclude Include="engine\Core\Layers\ThreadPool.h" />
     <ClInclude Include="engine\Core\Windows\WindowsLog.h" />
     <ClInclude Include="engine\Core\Windows\WindowsFileManager.h" />
     <ClInclude Include="engine\Core\Platform\WindowManager\WindowMenu.h" />
     <ClInclude Include="engine\Core\Platform\WindowManager\WindowExtender.h" />
+    <ClInclude Include="engine\RHICore\RHI\RHIViewport.h" />
+    <ClInclude Include="engine\RHICore\RHI\RHISwapChain.h" />
+    <ClInclude Include="engine\Core\Windows\WindowsThread.h" />
+    <ClInclude Include="engine\Core\Platform\Thread\ThreadManager.h" />
+    <ClInclude Include="engine\Core\Windows\WindowsThreadManager.h" />
+    <ClInclude Include="engine\RHICore\Vulkan\VulkanRHISwapChain.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="engine\ThirdParty\assimp\color4.inl" />

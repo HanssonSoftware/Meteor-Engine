@@ -14,19 +14,17 @@ public:
 	
 	};
 
+	virtual ~IRHIOutputContext() = default;
+
 	virtual void Clear() = 0;
 
 	virtual void Draw() = 0;
 
 	virtual void CleanUp() const = 0;
 
-	virtual bool CreateCommandBuffers() = 0;
-
 	virtual void CompileShader(const String name) = 0;
 
 	IRHIRegistry* GetRegistry() const { return registry; };
-
-	virtual ~IRHIOutputContext() = default;
 
 protected:
 	IRHIRegistry* registry;

@@ -4,8 +4,15 @@
 #include <Logging/LogMacros.h>
 #include <cstdarg>
 
+#pragma warning(disable : 26495)
+
+static_assert(sizeof(char) == 1, "Advanced string handling required!");
+
 String::String() noexcept
+	: bIsUsingHeap(false)
 {
+	MakeEmpty();
+
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
@@ -13,265 +20,390 @@ String::String() noexcept
 
 String::String(const char* Input)
 {
-	if (Input == nullptr)
+	if (!Input || Input[0] == '\0')
+	{
+		MakeEmpty();
 		return;
+	}
 
 	const size_t inputSize = strlen(Input);
-	//if (inputSize <= MAX_STRING_SIZE)
-	//{
-	//	buffer.finite;
-	//}
-
-	buffer = new char[inputSize + 1]();
-#ifdef MR_DEBUG
-	bIsInited = true;
-#endif // MR_DEBUG
-	if (buffer)
+	if (inputSize <= SSO_MAX_CHARS)
 	{
-		strncpy(buffer, Input, inputSize);
+		memcpy(stackBuffer.ptr, Input, inputSize);
+		stackBuffer.ptr[inputSize] = '\0';
+
+		stackBuffer.length = (unsigned short)inputSize;
+	
+		bIsUsingHeap = false;
 	}
 	else
 	{
-		MR_LOG(LogTemp, Error, "Invalid Input!");
+		heapBuffer.length = inputSize;
+		heapBuffer.capacity = inputSize + 1;
+
+		heapBuffer.ptr = new char[heapBuffer.capacity]();
+		memcpy(heapBuffer.ptr, Input, inputSize);
+		
+		heapBuffer.ptr[inputSize] = '\0';
+		
+		bIsUsingHeap = true;
 	}
-}
 
-
-String::String(wchar_t* Input)
-{
-	if (Input == nullptr)
-		return;
-
-	const size_t requiredSize = wcslen(Input) + 1;
-	if (requiredSize == 0)
-		return;
-
-	buffer = new char[requiredSize]();
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
-
-	if (wcstombs(buffer, Input, requiredSize - 1) == requiredSize - 1)
-	{
-		//buffer[requiredSize] = '\0';
-	}
-	else
-	{
-		delete[] buffer;
-	}
 }
-
 
 String::String(const wchar_t* Input)
 {
-	if (Input == nullptr)
-		return;
-
-	const size_t requiredSize = wcslen(Input) + 1;
-	if (requiredSize == 0)
-		return;
-
-	buffer = new char[requiredSize]();
-#ifdef MR_DEBUG
-	bIsInited = true;
-#endif // MR_DEBUG
-
-	if (wcstombs(buffer, Input, requiredSize - 1) == requiredSize - 1)
+	if (!Input || Input[0] == L'\0')
 	{
-		//buffer[requiredSize] = '\0';
+		MakeEmpty();
+		return;
+	}
+
+	const size_t inputSize = wcslen(Input);
+
+	if (inputSize <= SSO_MAX_CHARS)
+	{
+		wcstombs(stackBuffer.ptr, Input, inputSize);
+
+		stackBuffer.ptr[inputSize] = '\0';
+
+		stackBuffer.length = (unsigned short)inputSize;
+	
+		bIsUsingHeap = false;
 	}
 	else
 	{
-		delete[] buffer;
+		heapBuffer.length = inputSize;
+		heapBuffer.capacity = inputSize + 1;
+
+		heapBuffer.ptr = new char[heapBuffer.capacity]();
+
+		wcstombs(heapBuffer.ptr, Input, inputSize);
+
+		heapBuffer.ptr[inputSize] = '\0';
+
+		bIsUsingHeap = true;
 	}
+
+#ifdef MR_DEBUG
+	bIsInited = true;
+#endif // MR_DEBUG
 }
 
 String::String(const int Input)
 {
-	const std::string fake = std::to_string(Input);
+	const int inputSize = snprintf(nullptr, 0, "%d", Input);
 
-	const char* convertedString = fake.c_str();
-	buffer = new char[strlen(convertedString) + 1]();
-#ifdef MR_DEBUG
-	bIsInited = true;
-#endif // MR_DEBUG
-	if (strcmp(strcpy(buffer, convertedString), convertedString) == 0)
+	if (inputSize <= SSO_MAX_CHARS)
 	{
-		buffer[strlen(convertedString) + 1] = '\0';
+		snprintf(stackBuffer.ptr, inputSize + 1, "%d", Input);
+
+		//stackBuffer.ptr[inputSize] = '\0'; // optional
+
+		stackBuffer.length = (unsigned short)inputSize;
+
+		bIsUsingHeap = false;
 	}
 	else
 	{
-		delete[] buffer;
+		heapBuffer.length = inputSize;
+		heapBuffer.capacity = inputSize + 1;
+
+		heapBuffer.ptr = new char[heapBuffer.capacity]();
+
+		snprintf(heapBuffer.ptr, inputSize + 1, "%d", Input);
+
+		heapBuffer.ptr[inputSize] = '\0';
+
+		bIsUsingHeap = true;
 	}
+
+#ifdef MR_DEBUG
+	bIsInited = true;
+#endif // MR_DEBUG
 }
 
 String::String(const uint32 Input)
 {
-	const std::string fake = std::to_string(Input);
+	const int inputSize = snprintf(nullptr, 0, "%u", Input);
 
-	const char* convertedString = fake.c_str();
-	const uint32 size = (uint32)fake.size();
-
-	buffer = new char[size + 1]();
-#ifdef MR_DEBUG
-	bIsInited = true;
-#endif // MR_DEBUG
-	if (strcmp(strncpy(buffer, convertedString, size), convertedString) == 0)
+	if (inputSize <= SSO_MAX_CHARS)
 	{
-		//buffer[strlen(convertedString) + 1] = '\0';
+		snprintf(stackBuffer.ptr, inputSize + 1, "%u", Input);
+
+		//stackBuffer.ptr[inputSize] = '\0'; // optional
+
+		stackBuffer.length = (unsigned short)inputSize;
+
+		bIsUsingHeap = false;
 	}
 	else
 	{
-		delete[] buffer;
+		heapBuffer.length = inputSize;
+		heapBuffer.capacity = inputSize + 1;
+
+		heapBuffer.ptr = new char[heapBuffer.capacity]();
+
+		snprintf(heapBuffer.ptr, inputSize + 1, "%u", Input);
+
+		heapBuffer.ptr[inputSize] = '\0';
+
+		bIsUsingHeap = true;
 	}
+
+#ifdef MR_DEBUG
+	bIsInited = true;
+#endif // MR_DEBUG
 }
 
 String::String(const float Input)
 {
-	const std::string fake = std::to_string(Input);
+	const int inputSize = snprintf(nullptr, 0, "%f", Input);
 
-	const char* convertedString = fake.c_str();
-	buffer = new char[strlen(convertedString) + 1]();
-#ifdef MR_DEBUG
-	bIsInited = true;
-#endif // MR_DEBUG
-	if (strcmp(strcpy(buffer, convertedString), convertedString) == 0)
+	if (inputSize <= SSO_MAX_CHARS)
 	{
-		buffer[strlen(convertedString) + 1] = '\0';
+		snprintf(stackBuffer.ptr, inputSize + 1, "%f", Input);
+
+		//stackBuffer.ptr[inputSize] = '\0'; // optional
+
+		stackBuffer.length = (unsigned short)inputSize;
+
+		bIsUsingHeap = false;
 	}
 	else
 	{
-		delete[] buffer;
+		heapBuffer.length = inputSize;
+		heapBuffer.capacity = inputSize + 1;
+
+		heapBuffer.ptr = new char[heapBuffer.capacity]();
+
+		snprintf(heapBuffer.ptr, inputSize + 1, "%f", Input);
+
+		heapBuffer.ptr[inputSize] = '\0';
+
+		bIsUsingHeap = true;
 	}
+
+#ifdef MR_DEBUG
+	bIsInited = true;
+#endif // MR_DEBUG
 }
 
 String::String(const unsigned long Input)
 {
-	const std::string fake = std::to_string(Input);
+	const int inputSize = snprintf(nullptr, 0, "%u", Input);
 
-	const char* convertedString = fake.c_str();
-	buffer = new char[strlen(convertedString) + 1]();
-#ifdef MR_DEBUG
-	bIsInited = true;
-#endif // MR_DEBUG
-	if (strcmp(strcpy(buffer, convertedString), convertedString) == 0)
+	if (inputSize <= SSO_MAX_CHARS)
 	{
-		buffer[strlen(convertedString) + 1] = '\0';
+		snprintf(stackBuffer.ptr, inputSize + 1, "%u", Input);
+
+		//stackBuffer.ptr[inputSize] = '\0'; // optional
+
+		stackBuffer.length = (unsigned short)inputSize;
+
+		bIsUsingHeap = false;
 	}
 	else
 	{
-		delete[] buffer;
+		heapBuffer.length = inputSize;
+		heapBuffer.capacity = inputSize + 1;
+
+		heapBuffer.ptr = new char[heapBuffer.capacity]();
+
+		snprintf(heapBuffer.ptr, inputSize + 1, "%u", Input);
+
+		heapBuffer.ptr[inputSize] = '\0';
+
+		bIsUsingHeap = true;
 	}
+
+#ifdef MR_DEBUG
+	bIsInited = true;
+#endif // MR_DEBUG
 }
 
 String::String(const std::string Input)
 {
-	const char* convertedString = Input.c_str();
-	buffer = new char[strlen(convertedString) + 1]();
-#ifdef MR_DEBUG
-	bIsInited = true;
-#endif // MR_DEBUG
-	if (strcmp(strncpy(buffer, convertedString, Input.size()), convertedString) == 0)
+	if (Input.empty())
 	{
-		//buffer[strlen(convertedString) + 1] = '\0';
+		MakeEmpty();
+		return;
+	}
+
+	const size_t inputSize = Input.size();
+	if (inputSize <= SSO_MAX_CHARS)
+	{
+		memcpy(stackBuffer.ptr, Input.c_str(), inputSize);
+		stackBuffer.ptr[inputSize] = '\0';
+
+		stackBuffer.length = (unsigned short)inputSize;
+
+		bIsUsingHeap = false;
 	}
 	else
 	{
-		delete[] buffer;
+		heapBuffer.length = inputSize;
+		heapBuffer.capacity = inputSize + 1;
+
+		heapBuffer.ptr = new char[heapBuffer.capacity]();
+		memcpy(heapBuffer.ptr, Input.c_str(), inputSize);
+
+		heapBuffer.ptr[inputSize] = '\0';
+
+		bIsUsingHeap = true;
 	}
+
+#ifdef MR_DEBUG
+	bIsInited = true;
+#endif // MR_DEBUG
 }
 
 String::String(const std::wstring Input)
 {
-	if (buffer == nullptr)
-		return;
-
-	const wchar_t* convertedString = Input.c_str();
-	const size_t requiredSize = wcslen(convertedString) + 1;
-	if (requiredSize == 0)
-		return;
-
-	buffer = new char[requiredSize]();
-#ifdef MR_DEBUG
-	bIsInited = true;
-#endif // MR_DEBUG
-
-	if (wcstombs(buffer, convertedString, requiredSize) == requiredSize - 1)
+	if (Input.empty() == 0)
 	{
-		//buffer[requiredSize] = '\0';
+		MakeEmpty();
+		return;
+	}
+
+	const size_t inputSize = Input.size();
+
+	if (inputSize <= SSO_MAX_CHARS)
+	{
+		wcstombs(stackBuffer.ptr, Input.c_str(), inputSize);
+
+		stackBuffer.ptr[inputSize] = '\0';
+
+		stackBuffer.length = (unsigned short)inputSize;
+
+		bIsUsingHeap = false;
 	}
 	else
 	{
-		delete[] buffer;
+		heapBuffer.length = inputSize;
+		heapBuffer.capacity = inputSize + 1;
+
+		heapBuffer.ptr = new char[heapBuffer.capacity]();
+
+		wcstombs(heapBuffer.ptr, Input.c_str(), inputSize);
+
+		heapBuffer.ptr[inputSize] = '\0';
+
+		bIsUsingHeap = true;
 	}
+
+#ifdef MR_DEBUG
+	bIsInited = true;
+#endif // MR_DEBUG
 }
 
 String::String(String&& other) noexcept
 {
-	if (other.buffer)
+	ResetBuffers();
+	
+	bIsUsingHeap = other.bIsUsingHeap;
+
+	if (other.bIsUsingHeap)
 	{
-		const size_t count = strlen(other.buffer);
+		heapBuffer.capacity = other.heapBuffer.capacity;
+		heapBuffer.length = other.heapBuffer.length;
 
-		buffer = new char[count + 1];
+		heapBuffer.ptr = new char[heapBuffer.capacity]();
 
-		strncpy(buffer, other.buffer, count);
-		buffer[count] = '\0';
+		memmove(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
+		heapBuffer.ptr[heapBuffer.length] = '\0';
+
+		other.ResetBuffers();
 	}
-}
+	else
+	{
+		stackBuffer.length = other.stackBuffer.length;
 
-String::String(const String& other)
-{
-	if (!other.buffer)
-		return;
+		memmove(stackBuffer.ptr, other.stackBuffer.ptr, stackBuffer.length);
+		stackBuffer.ptr[stackBuffer.length] = '\0';
 
-	const char* convertedString = other.buffer;
-	const int size = (int)strlen(convertedString) + 1;
-
-	buffer = new char[size]();
+		other.ResetBuffers();
+	}
 
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
-
-	strncpy(buffer, convertedString, size - 1);
 }
 
-String::~String()
+String::String(const String& other)
 {
-	if (buffer != nullptr)
+	if (other.bIsUsingHeap)
 	{
-		delete[] buffer;
+		bIsUsingHeap = true;
 
-		buffer = nullptr;
-#ifdef MR_DEBUG
-		bIsInited = false;
-#endif // MR_DEBUG
+		heapBuffer.capacity = other.heapBuffer.capacity;
+		heapBuffer.length = other.heapBuffer.length;
+
+		heapBuffer.ptr = new char[heapBuffer.capacity]();
+
+		memcpy(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
+		heapBuffer.ptr[heapBuffer.length] = '\0';
 	}
+	else
+	{
+		bIsUsingHeap = false;
+
+		stackBuffer.length = other.stackBuffer.length;
+
+		memcpy(stackBuffer.ptr, other.stackBuffer.ptr, stackBuffer.length);
+		stackBuffer.ptr[stackBuffer.length] = '\0';
+	}
+
+#ifdef MR_DEBUG
+	bIsInited = true;
+#endif // MR_DEBUG
+}
+
+String::~String() noexcept
+{
+	if (bIsUsingHeap && heapBuffer.ptr)
+	{
+		delete[] heapBuffer.ptr;
+		heapBuffer.ptr = nullptr;
+
+		heapBuffer.length = 0;
+		heapBuffer.capacity = 0;
+		
+		bIsUsingHeap = false;
+	}
+
+#ifdef MR_DEBUG
+	bIsInited = false;
+#endif // MR_DEBUG
 }
 
 String String::operator+(const String& Other)
 {
-	const char* otherBuffer = Other.buffer;
-	const char* thisBuffer = buffer;
+	//const char* otherBuffer = Other.buffer;
+	//const char* thisBuffer = buffer;
 
-	const size_t size = strlen(thisBuffer) + strlen(otherBuffer) + 1;
+	//const size_t size = strlen(thisBuffer) + strlen(otherBuffer) + 1;
 
-	char* super = new char[size]();
+	//char* super = new char[size]();
 
-	if (super == nullptr)
-	{
-		delete[] super;
-		MR_LOG(LogTemp, Error, "String concencation failed! Wide buffer is null!");
-		return String("");
-	}
+	//if (super == nullptr)
+	//{
+	//	delete[] super;
+	//	MR_LOG(LogTemp, Error, "String concencation failed! Wide buffer is null!");
+	//	return String("");
+	//}
 
-	strcpy(super, thisBuffer);
-	strcat(super, otherBuffer);
+	//strcpy(super, thisBuffer);
+	//strcat(super, otherBuffer);
 
-	String newStringBuffer(super);
+	//String newStringBuffer(super);
 
-	delete[] super;
-	return newStringBuffer;
+	//delete[] super;
+	//return newStringBuffer;
+	return String("");
 }
 
 
@@ -304,37 +436,48 @@ String operator+(const String& OtherA, const String& OtherB)
 
 bool String::operator==(const String& Other) const
 {
-	return strcmp(buffer, Other.buffer) == 0;
+	return strcmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) == 0;
 }
 
 bool String::operator!=(const String& Other) const
 {
-	return strcmp(buffer, Other.buffer) != 0;
+	return strcmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) != 0;
 }
 
-bool String::operator!=(String& Other) const
+String String::operator+=(const char* other)
 {
-	return strcmp(buffer, Other.buffer) != 0;
-}
+	//if (other)
+	//{
+	//	const size_t otherSize = strlen(other);
 
-const char* String::operator*()
-{
-	return buffer ? buffer : "";
-}
+	//	size_t thisSize = this->buffer ? strlen(this->buffer) : 0;
 
-const char* String::Chr()
-{
-	return buffer ? buffer : "";
-}
+	//	buffer = new char[otherSize + thisSize + 1]();
 
-char* String::Data()
-{
-	return buffer;
+	//	strcat(buffer, other);
+	//}
+
+	return *this;
 }
 
 const char* String::Chr() const
 {
-	return buffer ? buffer : "";
+	if (bIsUsingHeap)
+	{
+		return heapBuffer.ptr || heapBuffer.length != 0 ? heapBuffer.ptr : "";
+	}
+
+	return stackBuffer.ptr || stackBuffer.length != 0 ? stackBuffer.ptr : "";
+}
+
+char* String::Data()
+{
+	return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr;
+}
+
+bool String::operator!() const
+{
+	return bIsUsingHeap ? !heapBuffer.ptr : !stackBuffer.ptr;
 }
 
 String String::Delim(const String character, bool first)
@@ -342,46 +485,30 @@ String String::Delim(const String character, bool first)
 	if (character.IsEmpty())
 		return "";
 
-	char* A = buffer;
+	char* A = /*buffer*/nullptr;
 	char* B = strtok(A, character.Chr());
 
 	return first ? B : A;
 }
 
-bool String::IsEmpty() const
+bool String::IsEmpty() const noexcept
 {
-	return buffer == nullptr || strlen(buffer) == 0;
+	return bIsUsingHeap ? heapBuffer.length == 0 : stackBuffer.length == 0;
 }
 
-bool String::EndsWith(const String string) const
+int String::ToInt() const noexcept
 {
-	if (string.IsEmpty())
-		return false;
-
-	size_t suffixLength = strlen(string.Chr());
-	size_t thisLength = strlen(this->buffer);
-
-	if (suffixLength > thisLength)
-		return false;
-
-	return strcmp(this->Chr() + thisLength - suffixLength, string.Chr()) == 0;
+	return strtol(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, nullptr, 0);
 }
 
-int String::ToInt() const
+float String::ToFloat() const noexcept
 {
-	char* end;
-	return strtol(buffer, &end, 10);
+	return strtof(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, nullptr);
 }
 
-float String::ToFloat() const
+uint32 String::Length() const noexcept
 {
-	char* end;
-	return strtof(buffer, &end);
-}
-
-uint32 String::Length() const
-{
-	return buffer != nullptr ? (uint32)strlen(buffer) : /*(uint32)*/ 0;
+	return bIsUsingHeap ? (uint32)heapBuffer.length : (uint32)stackBuffer.length;
 }
 
 String String::Format(const String format, ...)
@@ -406,24 +533,80 @@ String String::Format(const String format, ...)
 	return stringized;
 }
 
-String& String::operator=(const String& other)
+bool String::Contains(const char* buffer, const char* target)
+{
+	if (!buffer || !target)
+		return false;
+
+	char* dupedBuffer = _strdup(buffer);
+
+	MR_ASSERT(strcmp(dupedBuffer, buffer) == 0, "Buffer duplication error!");
+
+	char* deconstedParam = const_cast<char*>(target);
+
+	char* found = strstr(dupedBuffer, deconstedParam);
+
+	const bool result = found ? true : false;
+
+	free(dupedBuffer);
+	return result;
+}
+
+constexpr void String::MakeEmpty()
+{
+	stackBuffer.ptr[0] = '\0';
+	stackBuffer.length = 0;
+}
+
+constexpr void String::ResetBuffers()
+{
+	if (bIsUsingHeap)
+	{
+		delete[] heapBuffer.ptr;
+		heapBuffer.ptr = nullptr;
+
+		heapBuffer.capacity = 0;
+		heapBuffer.length = 0;
+	}
+	else
+	{
+		stackBuffer.ptr[0] = '\0';
+		stackBuffer.length = 0;
+	}
+}
+
+String String::operator=(const String& other)
 {
 	if (this != &other)
 	{
-		if (!other.buffer)
+		ResetBuffers();
+
+		if (other.bIsUsingHeap)
 		{
+			bIsUsingHeap = true;
+
+			heapBuffer.capacity = other.heapBuffer.capacity;
+			heapBuffer.length = other.heapBuffer.length;
+
+			heapBuffer.ptr = new char[heapBuffer.capacity]();
+			strncpy(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
+			
+			heapBuffer.ptr[heapBuffer.length] = '\0';
+
 			return *this;
 		}
-
-		if (buffer)
+		else
 		{
-			delete[] buffer;
-			buffer = nullptr;
-		};
+			bIsUsingHeap = false;
 
-		const size_t otherBuffSize = strlen(other.buffer) + 1;
-		buffer = new char[otherBuffSize]();
-		strncpy(buffer, other.buffer, otherBuffSize - 1);
+			stackBuffer.length = other.stackBuffer.length;
+
+			strncpy(stackBuffer.ptr, other.stackBuffer.ptr, stackBuffer.length);
+
+			stackBuffer.ptr[stackBuffer.length] = '\0';
+
+			return *this;
+		}
 	}
 
 	return *this;

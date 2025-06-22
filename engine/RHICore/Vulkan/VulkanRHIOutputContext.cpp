@@ -6,10 +6,10 @@
 
 LOG_ADDCATEGORY(Vulkan);
 
+#define STR(x) #x
+
 void VulkanRHIOutputContext::Clear()
 {
-	return;
-
 	VulkanRHIRegistry* vk = (VulkanRHIRegistry*)registry;
 	if (vk == nullptr)
 	{
@@ -17,22 +17,10 @@ void VulkanRHIOutputContext::Clear()
 		return;
 	}
 
-	const uint32 swapChainImagesQuantity = (uint32)vk->swapChainImages.size();
-	for (uint32 i = 0; i < swapChainImagesQuantity; i++)
-	{
-		VkClearColorValue cls = {1.f, 1.f, 0.f, 0.f};
-		VkImageSubresourceRange rgs = {};
-		rgs.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-
-		vkCmdClearColorImage(cmdBuffer, vk->swapChainImages[i], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &cls, 1, &rgs);
-	}
-	
 }
 
 void VulkanRHIOutputContext::Draw()
 {
-	return;
-
 	VulkanRHIRegistry* vk = (VulkanRHIRegistry*)registry;
 	if (vk == nullptr)
 	{
@@ -40,11 +28,71 @@ void VulkanRHIOutputContext::Draw()
 		return;
 	}
 
+
+	vkWaitForFences(vk->selectedDevice, 1, &renderFence, VK_TRUE, UINT64_MAX);
+	vkResetFences(vk->selectedDevice, 1, &renderFence);
+
+	static uint32 img = 0;
+	vkAcquireNextImageKHR(vk->selectedDevice, vk->swapChain, UINT32_MAX, renderWaitSemaphore, 0, &img);
+
 	VkCommandBufferBeginInfo beginInfo = { VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO };
-	//vkCmdBindPipeline();
-	//vkCmdBindVertexBuffers();
-	//vkCmdBindIndexBuffer();
-	//vkCmdDrawIndexed();
+
+	VkCommandBufferBeginInfo cmdBufferBeginInfo = { VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO };
+	cmdBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+	vkResetCommandBuffer(cmdBuffer, 0);
+	vkBeginCommandBuffer(cmdBuffer, &cmdBufferBeginInfo);
+
+	//VkClearColorValue cv = { 0.4f, 0.f, 1.f, 0.f };
+
+	//VkImageSubresourceRange imgR = {};
+	//imgR.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	//imgR.baseArrayLayer = 0;
+	//imgR.baseMipLevel = 0;
+	//imgR.levelCount = 1;
+	//imgR.layerCount = 1;
+
+	//vkCmdClearColorImage(cmdBuffer, vk->swapChainImages[img], VK_IMAGE_LAYOUT_GENERAL, &cv, 1 , &imgR);
+
+	VkClearValue cls = { 0.4f, 0.f, 1.f, 0.f };
+
+	VkRenderPassBeginInfo rpInfo = { VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO };
+	rpInfo.clearValueCount = 1;
+	rpInfo.pClearValues = &cls;
+	rpInfo.framebuffer = vk->swapChainFramebuffers[img];
+	rpInfo.renderPass = vk->renderPass;
+	rpInfo.renderArea.offset = { 0, 0 };
+	rpInfo.renderArea.extent = vk->surfaceCapabilities.maxImageExtent;
+
+	vkCmdBeginRenderPass(cmdBuffer, &rpInfo, VK_SUBPASS_CONTENTS_INLINE);
+	// ...
+	vkCmdEndRenderPass(cmdBuffer);
+
+	vkEndCommandBuffer(cmdBuffer);
+
+	static constexpr VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+
+	VkSubmitInfo smInfo = { VK_STRUCTURE_TYPE_SUBMIT_INFO };
+	smInfo.commandBufferCount = 1;
+	smInfo.pCommandBuffers = &cmdBuffer;
+	smInfo.pSignalSemaphores = &renderSharpSemaphore;
+	smInfo.signalSemaphoreCount = 1;
+	smInfo.pWaitSemaphores = &renderWaitSemaphore;
+	smInfo.waitSemaphoreCount = 1;
+	smInfo.pWaitDstStageMask = waitStages;
+	
+	VkResult a = vkQueueSubmit(vk->graphicsQueue, 1, &smInfo, 0);
+
+	VkPresentInfoKHR presentInfo = { VK_STRUCTURE_TYPE_PRESENT_INFO_KHR };
+	presentInfo.pImageIndices = &img;
+	presentInfo.pSwapchains = &vk->swapChain;
+	presentInfo.swapchainCount = 1;
+	presentInfo.waitSemaphoreCount = 1;
+	presentInfo.pWaitSemaphores = &renderSharpSemaphore;
+
+	VkResult b = vkQueuePresentKHR(vk->graphicsQueue, &presentInfo);
+
+	vkQueueWaitIdle(vk->graphicsQueue);
 }
 
 bool VulkanRHIOutputContext::CreateCommandBuffers()
@@ -54,16 +102,37 @@ bool VulkanRHIOutputContext::CreateCommandBuffers()
 		return false;
 
 	VkCommandPoolCreateInfo cmdPoolInfo = { VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO };
-	cmdPoolInfo.queueFamilyIndex = vk->selectedQueueIndex;
+	cmdPoolInfo.queueFamilyIndex = vk->QueueIndex;
+	cmdPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 
-	vkCreateCommandPool(vk->selectedDevice, &cmdPoolInfo, nullptr, &cmdPool);
+	VkResult result = vkCreateCommandPool(vk->selectedDevice, &cmdPoolInfo, nullptr, &cmdPool);
+	if (result != VK_SUCCESS)
+	{
+		MR_LOG(LogVulkan, Error, "vkCreateCommandPool returned: %s", STR(result));
+		return false;
+	}
 
 	VkCommandBufferAllocateInfo cmdBufferInfo = { VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO };
 	cmdBufferInfo.commandBufferCount = 1;
 	cmdBufferInfo.commandPool = cmdPool;
 	cmdBufferInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 
-	VK_CHECK(vkAllocateCommandBuffers(vk->selectedDevice, &cmdBufferInfo, &cmdBuffer), vkAllocateCommandBuffers);
+	VkResult resultA = vkAllocateCommandBuffers(vk->selectedDevice, &cmdBufferInfo, &cmdBuffer);
+	if (resultA != VK_SUCCESS)
+	{
+		MR_LOG(LogVulkan, Error, "vkAllocateCommandBuffers returned: %s", STR(result));
+		return false;
+	}
+
+	VkSemaphoreCreateInfo smInfo = { VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO };
+
+	VkResult a = vkCreateSemaphore(vk->selectedDevice, &smInfo, nullptr, &renderWaitSemaphore);
+	VkResult b = vkCreateSemaphore(vk->selectedDevice, &smInfo, nullptr, &renderSharpSemaphore);
+
+	VkFenceCreateInfo fcInfo = { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
+
+	VkResult c = vkCreateFence(vk->selectedDevice, &fcInfo, nullptr, &renderFence);
+
 	return true;
 }
 
@@ -79,6 +148,11 @@ void VulkanRHIOutputContext::CleanUp() const
 		return;
 
 	vkDeviceWaitIdle(vk->selectedDevice);
+
+	vkDestroyFence(vk->selectedDevice, renderFence, nullptr);
+
+	vkDestroySemaphore(vk->selectedDevice, renderWaitSemaphore, nullptr);
+	vkDestroySemaphore(vk->selectedDevice, renderSharpSemaphore, nullptr);
 
 	vkFreeCommandBuffers(vk->selectedDevice, cmdPool, 1, &cmdBuffer);
 

@@ -14,12 +14,19 @@ struct WindowsFileManager : public IFileManager
 
 	static bool IsPathExists(const String name);
 
+	/** Returns true if the path is qualified, or false otherwise. */
+	static bool IsPathRelative(const String path);
+
+	static bool IsEndingWith(const String name, const String extension);
+
 	static String GetExecutableDirectory();
 
 	static String NormalizeDir(const String input);
 
 	static IFile* CreateFileOperation(const String path, int accessType, int sharingMode, FileOverrideRules createType, FileStatus& status);
 private:
+	WindowsFileManager() = default;
+
 	static constexpr const int evaluateAccessTypeForCreateFileOperation(int accessType);
 
 	static constexpr const int evaluateSharingModeForCreateFileOperation(int sharingMode);

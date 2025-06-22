@@ -59,6 +59,12 @@ void WindowsLog::Initialize()
 
 			SetConsoleCP(/*CP_UTF8*/ 65001);
 
+			CONSOLE_CURSOR_INFO cf;
+			GetConsoleCursorInfo(hConsole, &cf);
+			cf.bVisible = false;
+
+			SetConsoleCursorInfo(hConsole, &cf);
+
 			OSLayer* systemLayer = Layer::GetSystemLayer();
 
 			if (!SetStdHandle(STD_OUTPUT_HANDLE, hConsole))
@@ -66,7 +72,7 @@ void WindowsLog::Initialize()
 				App::RequestExit(-1);
 			}
 
-			wchar_t* buffer = systemLayer->ConvertToWide(String::Format("%s developer console b%d", Application::Get()->GetAppInfo().appName.Chr(), BUILD_NUMBER).Chr());
+			wchar_t* buffer = systemLayer->ConvertToWide(String::Format("%s developer console (b%d)", Application::Get()->GetAppInfo().appName.Chr(), BUILD_NUMBER).Chr());
 
 			if (!SetConsoleTitleW(buffer))
 			{
@@ -99,11 +105,20 @@ void WindowsLog::Shutdown()
 
 void WindowsLog::SendToOutputBuffer(const String Buffer)
 {
-	if (OSLayer* systemLayer = Layer::GetSystemLayer())
+	if constexpr (bIsRunningDebugMode)
 	{
+		OSLayer* systemLayer = Layer::GetSystemLayer();
+
 		wchar_t* message = systemLayer->ConvertToWide(Buffer.Chr());
 
-		switch (ILogger::Get()->GetActualEntry()->severity)
+		const LogDescriptor* actualDescriptor = ILogger::Get()->GetActualEntry();
+		if (!actualDescriptor) 
+		{
+			delete[] message;
+			return;
+		}
+
+		switch (actualDescriptor->severity)
 		{
 		case Log:
 			SetConsoleTextAttribute(hConsole, 0x7);
@@ -139,6 +154,26 @@ void WindowsLog::SendToOutputBuffer(const String Buffer)
 	ILogger::SendToOutputBuffer(Buffer);
 }
 
+void WindowsLog::HandleFatal()
+{
+	if (OSLayer* systemLayer = Layer::GetSystemLayer())
+	{
+		const LogDescriptor* actualDescriptor = ILogger::Get()->GetActualEntry();
+		if (!actualDescriptor)
+		{
+			FatalAppExitW(0, L"Unknown error!");
+			return;
+		}
+
+		const wchar_t* convertedFatalText = systemLayer->ConvertToWide(actualDescriptor->message.Chr());
+
+		FatalAppExitW(0, convertedFatalText);
+		delete[] convertedFatalText;
+	}
+
+	FatalAppExitW(0, L"Unknown error!");
+}
+
 bool WindowsLog::IsDebuggerAttached()
 {
 	return IsDebuggerPresent() ? true : false;
@@ -169,6 +204,18 @@ static INT_PTR WindowsLoggingDialogProcedure(HWND wnd, UINT msg, WPARAM ai1, LPA
 				if (!Logger::IsDebuggerAttached())
 					EnableWindow(GetDlgItem(wnd, IDBREAKONDEBUGGER), 0);
 
+				if (!pkg->assertMessage.IsEmpty())
+				{
+					wchar_t* message = systemLayer->ConvertToWide(pkg->assertMessage.Chr());
+					SetDlgItemTextW(wnd, IDC_ASSERTIONLINEMESSAGE, message);
+
+					delete[] message;
+				}
+				else
+				{
+					ShowWindow(GetDlgItem(wnd, IDC_ASSERTIONLINEMESSAGE), SW_HIDE);
+					ShowWindow(GetDlgItem(wnd, IDC_ASSERTIONMESSAGE), SW_HIDE);
+				}
 			}
 			
 		}
@@ -208,9 +255,7 @@ static INT_PTR WindowsLoggingDialogProcedure(HWND wnd, UINT msg, WPARAM ai1, LPA
 int WindowsLog::TransmitAssertion(LogAssertion& Info)
 {
 	if (Info.bIgnoreThis || Info.bIgnoreFor > 0)
-	{
 		return -1;
-	}
 
 	auto result = DialogBoxParamW(
 		GetModuleHandleW(0), 

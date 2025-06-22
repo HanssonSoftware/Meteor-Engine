@@ -22,6 +22,8 @@ public:
 
 	virtual String GetError() override;
 
+	virtual String GetError(const /* HRESULT */ unsigned long code);
+
 	virtual String GetMachineVersion() override;
 
 	virtual Vector3<float> InspectPixel(const Vector2<float> screenCoordinates) override;

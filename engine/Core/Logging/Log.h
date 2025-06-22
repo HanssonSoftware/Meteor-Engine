@@ -31,6 +31,8 @@ struct ILogger
 
 	static LogDescriptor* GetActualEntry() { return Get()->actualDescriptor; };
 
+	static void HandleFatal();
+
 	static void SetActualLog(LogDescriptor* newDescriptor);
 
 	static void TransmitMessage(LogDescriptor * Descriptor);

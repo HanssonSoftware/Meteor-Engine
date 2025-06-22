@@ -2,18 +2,8 @@
 
 #pragma once
 #include <RHI/RHIRegistry.h>
-//#include "VulkanRHIOutputContext.h"
+#include "VulkanQueue.h"
 #include <vulkan/vulkan.h>
-
-#define APPEND_PRIV(text) \
-	L#text
-
-#define LINE_PRIV __LINE__
-#define MERGEFUNC(x, y) x##y
-#define MERGEFUNC2(x, y) MERGEFUNC(x, y)
-
-#define VK_CHECK(result, func) \
-	VkResult MERGEFUNC2(func, LINE_PRIV) = result; bool MERGEFUNC2(boolean, LINE_PRIV) = MERGEFUNC2(func, LINE_PRIV) != VK_SUCCESS; if (MERGEFUNC2(boolean, LINE_PRIV)) { MR_LOG(LogVulkan, Error, "%s returned: %s", #func, evaluateResultToText(MERGEFUNC2(func, LINE_PRIV)).Chr()); } return !MERGEFUNC2(boolean, LINE_PRIV);
 
 
 class VulkanRHIRegistry : public IRHIRegistry
@@ -47,16 +37,9 @@ protected:
 
 	bool CreateImageViews();
 
-	struct 
-	{
-		VkQueue graphicsQueue;
-		int graphicsQueueFamily = -1;
-		int graphicsQueueFamilyIndex = -1;
-
-		VkQueue presentationQueue;
-		int presentationQueueFamily = -1;
-		int presentationQueueFamilyIndex = -1;
-	} Queues;
+	bool CreateFramebuffers();
+	
+	bool CreateRenderpass();
 
 	VkInstance instance;
 
@@ -64,24 +47,37 @@ protected:
 
 	VkPhysicalDevice selectedVirtualDevice;
 
-	int selectedQueueIndex = -1;
-	int selectedQueueFamilyCount = 0;
+	int QueueIndex = -1;
 	VkDevice selectedDevice;
 
-	VkSurfaceKHR surface;
+	VkSurfaceKHR surface; // RHISwapChain
 
-	VkSwapchainKHR swapChain;
+	VkSwapchainKHR swapChain; // RHISwapChain
 
-	std::vector<VkImage> swapChainImages;
+	VkQueue graphicsQueue;
 
-	std::vector<VkImageView> swapChainImageViews;
+	VkImage* swapChainImages;
+
+	VkImageView* swapChainImageViews;
+
+	VkFramebuffer* swapChainFramebuffers;
 
 	VkShaderModule shaderModuleFrag;
 
 	VkShaderModule shaderModuleVert;
 
-	VkPipelineLayout pipelineLayout;
+	VkPipeline pipeline;
 
 	VkSurfaceCapabilitiesKHR surfaceCapabilities;
+
+	VkRenderPass renderPass;
+
+	VkShaderModule CreateShader(const VkShaderModule fromModule) const {};
+
+	VkShaderModule OpenShader(const String path) const;
+	
+	uint32 swapChainImagesCount = 0;
+private:
+
 };
 

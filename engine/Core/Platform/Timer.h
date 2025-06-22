@@ -2,7 +2,7 @@
 
 #pragma once
 #include <Types/String.h>
-#include <Types/PlatformDefs.h>
+#include <Platform/PlatformDefs.h>
 
 //struct String;
 

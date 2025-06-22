@@ -16,6 +16,7 @@
 #include <shlwapi.h>
 #include <PathCch.h>
 #include <Shlobj.h>
+
 #pragma comment (lib, "Shlwapi.lib")
 #pragma comment (lib, "Pathcch.lib")
 #pragma comment (lib, "Shell32.lib")
@@ -86,14 +87,17 @@ bool WindowsFileManager::IsPathExists(const String name)
             return false;
         }
 
-        if (PathCchRemoveFileSpec(dirName, wcslen(dirName)) != S_OK)
-        {
+        //if (PathCchRemoveFileSpec(dirName, wcslen(dirName)) != S_OK)
+        //{
+        //
+        //}
 
-        }
-
-        if (::PathFileExists(dirName) == 0)
+        if (::PathFileExistsW(dirName) == 0)
         {
-            MR_LOG(LogFileManager, Error, "IsPathExists returned: %s", Layer::GetSystemLayer()->GetError().Chr());
+            if (GetLastError() != ERROR_FILE_NOT_FOUND)
+            {
+                MR_LOG(LogFileManager, Error, "IsPathExists returned: %s", Layer::GetSystemLayer()->GetError().Chr());
+            }
 
             delete[] dirName;
             return false;
@@ -105,6 +109,29 @@ bool WindowsFileManager::IsPathExists(const String name)
 
    
     return false;
+}
+
+/** Returns true if the path is qualified, or false otherwise. */
+bool WindowsFileManager::IsPathRelative(const String path)
+{
+    MR_ASSERT(Layer::GetSystemLayer() != nullptr, "System Layer does not initialized!");
+
+    if (OSLayer* systemLayer = Layer::GetSystemLayer())
+    {
+        wchar_t* buffer = systemLayer->ConvertToWide(path.Chr());
+
+        const BOOL result = PathIsRelativeW(buffer);
+        delete[] buffer;
+
+        return result ? true : false;
+    }
+
+    return false;
+}
+
+bool WindowsFileManager::IsEndingWith(const String name, const String extension)
+{
+    return IFileManager::IsEndingWith(name, extension);
 }
 
 String WindowsFileManager::NormalizeDir(const String input)
@@ -161,6 +188,7 @@ IFile* WindowsFileManager::CreateFileOperation(const String pathA, int accessTyp
 
     WindowsFile* newWindowsFile = new WindowsFile();
     newWindowsFile->fileHandle = file;
+    newWindowsFile->fileName = name;
 
     return newWindowsFile;
 }

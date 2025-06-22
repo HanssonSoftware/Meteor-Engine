@@ -129,7 +129,7 @@
       <PreprocessorDefinitions>MR_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)engine\Graphics;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\Core</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)engine\Graphics;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\Core</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -168,7 +168,7 @@
     </ResourceCompile>
     <ClCompile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)engine\Graphics;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\Core</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)engine\Graphics;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\Core</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(CoreLibraryDependencies);$(SolutionDir)product\crimson.lib</AdditionalDependencies>
@@ -177,25 +177,33 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core\Application.cpp" />
-    <ClCompile Include="Parsing\DirectoryExplorer.cpp" />
-    <ClCompile Include="Parsing\SolutionGenerator.cpp" />
-    <ClCompile Include="Parsing\Solution.cpp" />
+    <ClCompile Include="Parsing\Module.cpp" />
+    <ClCompile Include="Parsing\LocatingInterface.cpp" />
+    <ClCompile Include="Parsing\VisualStudio\VSSolution.cpp" />
+    <ClCompile Include="Parsing\ScriptParser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Application.h" />
-    <ClInclude Include="Parsing\DirectoryExplorer.h" />
+    <ClInclude Include="Parsing\Module.h" />
+    <ClInclude Include="Parsing\LocatingInterface.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Parsing\SolutionGenerator.h" />
-    <ClInclude Include="Parsing\Solution.h" />
+    <ClInclude Include="Parsing\VisualStudio\VSSolution.h" />
+    <ClInclude Include="Parsing\ScriptParser.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MeteorBuild.aps" />
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="..\..\resources\assertbox.rc" />
     <ResourceCompile Include="MeteorBuild.rc" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="MeteorBuild.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\meteor.vcxproj">
+      <Project>{709b7964-f338-40b8-b8e2-a2898b438a1c}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

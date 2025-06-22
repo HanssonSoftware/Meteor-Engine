@@ -1,1 +1,11 @@
-project = Core
+Solution "Meteor"
+{
+	Project "Core"
+	{
+		IncludePath:
+		{
+			"",
+			"",
+		}
+	}
+}

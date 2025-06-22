@@ -94,6 +94,37 @@ String WindowsLayer::GetError()
     return realBuffer;
 }
 
+String WindowsLayer::GetError(const /* HRESULT */ unsigned long code)
+{
+    DWORD Num = HRESULT_CODE(code);
+    LPVOID buffer;
+
+    const DWORD count = FormatMessageW(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+        0,
+        Num,
+        0,
+        (LPTSTR)&buffer,
+        0,
+        0
+    );
+
+    //ConvertToNarrow((LPTSTR)buffer);
+
+    const int requiredSizeInBytes = WideCharToMultiByte(/*CP_UTF8*/ 65001, 0, (LPTSTR)buffer, -1, 0, 0, 0, 0);
+    if (requiredSizeInBytes == 0) return "";
+
+    char* super = new char[requiredSizeInBytes];
+
+    WideCharToMultiByte(/*CP_UTF8*/ 65001, 0, (LPTSTR)buffer, -1, super, requiredSizeInBytes, 0, 0);
+    String realBuffer(super);
+
+
+    LocalFree(buffer);
+    if (super) delete[] super;
+    return realBuffer;
+}
+
 static String version;
 String WindowsLayer::GetMachineVersion()
 {

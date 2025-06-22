@@ -3,7 +3,7 @@
 #pragma once
 #include <Application.h>
 #include <Logging/LogMacros.h>
-#include <Generic/WindowManager.h>
+#include <Platform/WindowManager/WindowManager.h>
 #include <Commandlet.h>
 
 LOG_ADDCATEGORY(BuildSystemApplication);
@@ -11,7 +11,7 @@ LOG_ADDCATEGORY(BuildSystemApplication);
 struct BuildSystemApplication : public Application 
 {
 public:
-	BuildSystemApplication(const ApplicationInitializationInfo* Info);
+	BuildSystemApplication();
 
 	virtual void Init() override;
 
@@ -26,13 +26,13 @@ int launchStranger(int ArgumentCount, char* Arguments[])
 {
 	ApplicationInitializationInfo appInfo = {};
 	appInfo.appName = String("MeteorBuild");
+	appInfo.appCodeName = "Hansson";
 	appInfo.flags = APPFLAG_NO_WINDOW | APPFLAG_NO_FILE_LOGGING | APPFLAG_START_ONLY_FROM_COMMAND_LINE;
 
-	ICommandlet::Get().Parse(ArgumentCount, Arguments);
-	BuildSystemApplication* App = new BuildSystemApplication(&appInfo);
+	ICommandlet::Initalize();
 
-	App->Init();
+	BuildSystemApplication newBuilderApp = {};
+	App::InstantiateApplication(&newBuilderApp, &appInfo);
 
-	delete App;
-	return 0;
+	return App::GetRequestExitCode();
 }

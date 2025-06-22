@@ -11,6 +11,6 @@ class RHILoader
 public:
 	static IRHIRegistry* InitRHI(const SystemLayout layout);
 private:
-	static inline IRHIRegistry* InitWindows() noexcept;
+	static IRHIRegistry* InitWindows() noexcept;
 };
 

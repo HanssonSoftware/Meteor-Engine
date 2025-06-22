@@ -1,7 +1,6 @@
 /* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
-#include <Common/MemoryManager.h>
 
 /**
  * ScopedPtr owns a pointer, so you don’t have to think about deleting it.

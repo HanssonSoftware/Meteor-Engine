@@ -9,14 +9,24 @@ LogAssertion::LogAssertion(const char* inputFile, const int inputLine, const cha
     , assertLineInFile(inputLine)
     , assertStatement(statement)
 {
-    va_list a = 0;
-    va_start(a, inputMessage);
-    const int requiredAmount = vsnprintf(nullptr, 0, inputMessage, a);
+    if (inputMessage)
+    {
+        va_list a = 0;
+        va_start(a, inputMessage);
+        const int requiredAmount = vsnprintf(nullptr, 0, inputMessage, a);
 
-    char* super = new char[requiredAmount + 1];
-    vsnprintf(super, requiredAmount, inputMessage, a);
-    va_end(a);
+        if (requiredAmount == 0)
+        {
+            va_end(a);
+            assertMessage = "";
+            return;
+        }
 
-    assertMessage = super;
-    delete[] super;
+        char* super = new char[requiredAmount + 1];
+        vsnprintf(super, requiredAmount, inputMessage, a);
+        va_end(a);
+
+        assertMessage = super;
+        delete[] super;
+    }
 }

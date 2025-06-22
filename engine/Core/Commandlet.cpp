@@ -1,42 +1,87 @@
 ﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
+#define _CRT_SECURE_NO_WARNINGS
 #include "Commandlet.h"
+#include <Platform/PlatformLayout.h>
 
+#ifdef MR_PLATFORM_WINDOWS
+#include <Windows/Windows.h>
+#endif // MR_PLATFORM_WINDOWS
 
-static ICommandlet instance;
+#pragma warning(disable : 6031)
 
-ICommandlet& ICommandlet::Get()
+static const char* commandLine;
+
+void ICommandlet::Initalize()
 {
-
-	return instance;
+#ifdef MR_PLATFORM_WINDOWS
+	commandLine = GetCommandLineA();
+#endif // MR_PLATFORM_WINDOWS
 }
 
-void ICommandlet::InitCommandlet(char* Input[])
+String ICommandlet::Parse(const char* inParam)
 {
-}
+	MR_ASSERT(commandLine, "CLI buffer is empty, consider checking!");
 
-String ICommandlet::Search(String Name)
-{
-	Name = String::Format("-%s", Name.Chr());
-	const size_t s = currentQueue.size();
-
-	for (size_t i = 0; i < s; i++)
+	static String cachedValue;
+	if (!inParam)
 	{
-		String Temp = currentQueue[i];
-
-		char* g = const_cast<char*>(Temp.Chr());
-		g = strtok(0, " ");
-		if (strcmp(g, Name.Chr()) == 0)
-		{
-			return currentQueue[i];
-		}
+		return cachedValue;
 	}
 
+	char* cmd = _strdup(commandLine);
+
+	MR_ASSERT(strcmp(cmd, commandLine) == 0, "Buffer duplication error!");
+
+	char* deconstedParam = const_cast<char*>(inParam);
+
+	char* found = strstr(cmd, deconstedParam);
+	if (found)
+	{
+		char* foundCommand = strtok(found, " ");
+
+		char* foundParam = strtok(0, " ");
+		if (!foundParam || foundParam[0] == '-')
+		{
+			cachedValue = "1";
+			free(cmd);
+
+			return "1";
+		}
+
+		cachedValue = foundParam;
+		free(cmd);
+
+		return /* foundParam */ cachedValue;
+	}
+
+	free(cmd);
 	return "";
 }
 
-void ICommandlet::Parse(int Count, char* Array[])
+String ICommandlet::Parse(const char* buffer, const char* inParam)
 {
+	if (!buffer || !inParam)
+		return "";
 
+	char* cmd = _strdup(buffer);
+
+	MR_ASSERT(strcmp(cmd, buffer) == 0, "Buffer duplication error!");
+
+	char* deconstedParam = const_cast<char*>(inParam);
+
+	char* found = strstr(cmd, deconstedParam);
+	if (found)
+	{
+		strtok(found, " ");
+
+		char* foundParam = strtok(0, " ");
+
+		String c = foundParam;
+		free(cmd);
+		return c;
+	}
+
+	free(cmd);
+	return "";
 }
-

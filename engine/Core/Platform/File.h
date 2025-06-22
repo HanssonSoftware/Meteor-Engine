@@ -30,7 +30,7 @@ public:
 
 	virtual void SetName(String content) {};
 	 
-	uint32 GetSize() const { return size; }
+	unsigned long long GetSize() const { return size; }
 
 	bool IsValid() const
 	{
@@ -65,7 +65,7 @@ protected:
 
 	bool bWasInitSucceded = false;
 
-	uint32 size = 0;
+	unsigned long long size = 0;
 
 	char* buffer;
 

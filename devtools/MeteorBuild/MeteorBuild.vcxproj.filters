@@ -18,13 +18,16 @@
     <ClCompile Include="Core\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Parsing\DirectoryExplorer.cpp">
+    <ClCompile Include="Parsing\LocatingInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Parsing\SolutionGenerator.cpp">
+    <ClCompile Include="Parsing\Module.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Parsing\Solution.cpp">
+    <ClCompile Include="Parsing\VisualStudio\VSSolution.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Parsing\ScriptParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -32,16 +35,19 @@
     <ClInclude Include="Core\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Parsing\DirectoryExplorer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Parsing\SolutionGenerator.h">
+    <ClInclude Include="Parsing\LocatingInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Parsing\Solution.h">
+    <ClInclude Include="Parsing\Module.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Parsing\VisualStudio\VSSolution.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Parsing\ScriptParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -50,6 +56,9 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MeteorBuild.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="..\..\resources\assertbox.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

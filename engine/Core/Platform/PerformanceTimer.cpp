@@ -63,10 +63,7 @@ double PerformanceTimer::Evaluate(const TimeEvaluationTarget defaultTarget)
 {
 	double calculated = 0.0;
 	if (bFired == true)
-	{
-		MR_LOG(LogHighPerformanceTimer, Warn, "High Performance Timer does not stopped! Stopping...");
 		Stop();
-	}
 
 	calculated = (end - start) / (double)frequency;
 

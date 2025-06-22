@@ -30,13 +30,10 @@
     <ClCompile Include="engine\Core\Layers\LayerManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Common\Array.cpp">
+    <ClCompile Include="engine\Core\Types\Array.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Common\Delegate.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Core\Common\MemoryManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Config\Archive.cpp">
@@ -76,9 +73,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Common\Guid.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\RHICore\RHI\VertexBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Launch.cpp">
@@ -132,12 +126,6 @@
     <ClCompile Include="engine\RHICore\RHI\RHIOutputContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\RHICore\D3D11\D3DVertexBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\RHICore\Vulkan\VulkanRHIRegistry.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\RHICore\D3D11\D3D11RHIRegistry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -147,16 +135,13 @@
     <ClCompile Include="engine\Core\Windows\WindowsFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\RHICore\Vulkan\VulkanRHIOutputContext.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\RHICore\RHI\RHIShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Windows\WindowsTimer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Layers\Thread.cpp">
+    <ClCompile Include="engine\Core\Platform\Thread\Thread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Layers\ThreadPool.cpp">
@@ -180,6 +165,45 @@
     <ClCompile Include="engine\Core\Logging\LogAssertion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="engine\RHICore\D3D11\D3D11OutputContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\RHICore\Vulkan\VulkanQueue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\RHICore\Vulkan\VulkanRHIOutputContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\RHICore\Vulkan\VulkanRHIRegistry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\RHICore\RHI\RHIViewport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\RHICore\D3D11\D3D11RHIViewport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\RHICore\RHI\RHISwapChain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\RHICore\D3D11\D3D11RHISwapChain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\Windows\WindowsThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\Platform\Thread\ThreadManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\Windows\WindowsThreadManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\RHICore\Vulkan\VulkanRHISwapChain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\MemoryManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\Core\Application.h">
@@ -197,13 +221,10 @@
     <ClInclude Include="engine\Core\Layers\LayerManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Common\Array.h">
+    <ClInclude Include="engine\Core\Types\Array.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Common\Delegate.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Core\Common\MemoryManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Config\Archive.h">
@@ -233,7 +254,7 @@
     <ClInclude Include="engine\Core\Types\Cast.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Types\PlatformDefs.h">
+    <ClInclude Include="engine\Core\Platform\PlatformDefs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Types\String.h">
@@ -512,9 +533,6 @@
     <ClInclude Include="engine\Core\Common\Conversions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\RHICore\RHI\VertexBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\RHICore\Widgets\Common\FontAsset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -563,12 +581,6 @@
     <ClInclude Include="engine\RHICore\RHI\RHIOutputContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\RHICore\D3D11\D3DVertexBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\RHICore\Vulkan\VulkanRHIRegistry.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\RHICore\RHI\RHICommons.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -581,16 +593,13 @@
     <ClInclude Include="engine\Core\Windows\WindowsFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\RHICore\Vulkan\VulkanRHIOutputContext.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\RHICore\RHI\RHIShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Windows\WindowsTimer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Layers\Thread.h">
+    <ClInclude Include="engine\Core\Platform\Thread\Thread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Layers\ThreadPool.h">
@@ -633,6 +642,51 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resources\assertbox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\RHICore\D3D11\D3D11OutputContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\RHICore\Vulkan\VulkanQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\RHICore\Vulkan\VulkanRHIOutputContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\RHICore\Vulkan\VulkanRHIRegistry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\RHICore\RHI\RHIViewport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\RHICore\D3D11\D3D11RHIViewport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Common\Math.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\RHICore\RHI\RHISwapChain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\RHICore\D3D11\D3D11RHISwapChain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Windows\WindowsThread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Platform\Thread\ThreadDescriptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Platform\Thread\ThreadManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Windows\WindowsThreadManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\RHICore\Vulkan\VulkanRHISwapChain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\MemoryManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

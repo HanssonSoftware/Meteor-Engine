@@ -17,6 +17,8 @@ struct WindowsLog : public ILogger
 
 	static inline bool IsDebuggerAttached();
 
+	static void HandleFatal();
+
 	static int TransmitAssertion(LogAssertion& Info);
 
 	virtual void SendToOutputBuffer(const String Buffer) override;

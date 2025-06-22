@@ -4,7 +4,7 @@
 #include "VulkanRHIOutputContext.h"
 #include <Logging/LogMacros.h>
 #include <Platform/PlatformLayout.h>
-#include <vulkan/vulkan.h>
+#include "VulkanQueue.h"
 
 #ifdef MR_PLATFORM_WINDOWS
 #include <Windows/Windows.h>
@@ -89,7 +89,14 @@ bool VulkanRHIRegistry::Initialize()
 
 	bError = !CreateImageViews();
 
-	bError = !context->CreateCommandBuffers();
+	bError = !CreateRenderpass();
+
+	bError = !CreateFramebuffers();
+
+	VulkanRHIOutputContext* ctx = (VulkanRHIOutputContext*)context;
+	ctx->CreateCommandBuffers();
+
+	//initVK();
 
 	if (bError) CleanUp();
 	return true;
@@ -98,17 +105,30 @@ bool VulkanRHIRegistry::Initialize()
 void VulkanRHIRegistry::CleanUp() const
 {
 	context->CleanUp();
+	
+	for (uint32 i = 0; i < swapChainImagesCount; i++)
+	{
+		vkDestroyFramebuffer(selectedDevice, swapChainFramebuffers[i], nullptr);
+		swapChainFramebuffers[i] = nullptr;
+	}
 
-	vkDestroyPipelineLayout(selectedDevice, pipelineLayout, 0);
+	delete[] swapChainFramebuffers;
+
+	vkDestroyRenderPass(selectedDevice, renderPass, nullptr);
+
+	vkDestroyPipeline(selectedDevice, pipeline, 0);
 
 	vkDestroyShaderModule(selectedDevice, shaderModuleVert, 0);
 
 	vkDestroyShaderModule(selectedDevice, shaderModuleFrag, 0);
 
-	for (VkImageView imageView : swapChainImageViews) 
+	for (uint32 j = 0; j < swapChainImagesCount; j++)
 	{
-		vkDestroyImageView(selectedDevice, imageView, 0);
+		vkDestroyImageView(selectedDevice, swapChainImageViews[j], nullptr);
+		swapChainImageViews[j] = nullptr;
 	}
+
+	delete[] swapChainImageViews;
 
 	vkDestroySwapchainKHR(selectedDevice, swapChain, 0);
 
@@ -146,7 +166,7 @@ bool VulkanRHIRegistry::CreateSurfaceWin32()
 	}
 	else
 	{
-		MR_LOG(LogVulkan, Warn, "Unable to get Window Manager! Using fallback method!");
+		MR_LOG(LogVulkan, Warn, "Unable to get window manager! Using fallback method!");
 
 		win32SurfaceInfo.hinstance = GetModuleHandle(0);
 		win32SurfaceInfo.hwnd = GetFocus();
@@ -158,6 +178,8 @@ bool VulkanRHIRegistry::CreateSurfaceWin32()
 		MR_LOG(LogVulkan, Error, "vkCreateWin32SurfaceKHR returned: %s", STR(result));
 		return false;
 	}
+
+	return true;
 }
 
 bool VulkanRHIRegistry::CreateQueueSlots()
@@ -178,10 +200,7 @@ bool VulkanRHIRegistry::CreateQueueSlots()
 		uint32 physicalDeviceQueueFamiliesCount = 0;
 		vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &physicalDeviceQueueFamiliesCount, 0);
 		if (physicalDeviceQueueFamiliesCount == 0)
-		{
-			MR_LOG(LogVulkan, Warn, "No queue properties found on this device!");
 			continue;
-		}
 
 		std::vector<VkQueueFamilyProperties> physicalDeviceQueueFamilies(physicalDeviceQueueFamiliesCount);
 		vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &physicalDeviceQueueFamiliesCount, physicalDeviceQueueFamilies.data());
@@ -193,19 +212,18 @@ bool VulkanRHIRegistry::CreateQueueSlots()
 			if (queueFamilyProps.queueCount == 0)
 				continue;
 
+			int availableQueues = queueFamilyProps.queueCount;
+
 			if (queueFamilyProps.queueFlags & VK_QUEUE_GRAPHICS_BIT)
 			{
-				selectedVirtualDevice = physicalDevice;
-				Queues.graphicsQueueFamilyIndex = i;
-			}
-
-			VkBool32 bIsGood = 0;
-			vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, i, surface, &bIsGood);
-			if (bIsGood)
-			{
-				Queues.presentationQueueFamily = i;
-
-				return true;
+				VkBool32 bIsGood = 0;
+				vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, i, surface, &bIsGood);
+				if (bIsGood)
+				{
+					QueueIndex = i;
+					selectedVirtualDevice = physicalDevice;
+					return true;
+				}
 			}
 		}
 	}
@@ -217,52 +235,100 @@ bool VulkanRHIRegistry::CreateDevice()
 {
 	VkDeviceCreateInfo deviceInfo = { VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
 
-	static const std::vector<const char*> extensions
-	{
+	static constexpr const char* requiredDeviceExtensions[] = {
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
 
-	deviceInfo.enabledExtensionCount = (uint32)extensions.size();
-	deviceInfo.ppEnabledExtensionNames = extensions.data();
+	static constexpr const uint32 requiredDeviceExtensionsCount = sizeof(requiredDeviceExtensions) / sizeof(requiredDeviceExtensions[0]);
+
+	deviceInfo.enabledExtensionCount = requiredDeviceExtensionsCount;
+	deviceInfo.ppEnabledExtensionNames = requiredDeviceExtensions;
 
 	VkDeviceQueueCreateInfo queueOne = { VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO };
 	constexpr float priority = 1.f;
 		
 	queueOne.pQueuePriorities = &priority;
-	queueOne.queueCount = Queues.graphicsQueueFamily;
-	queueOne.queueFamilyIndex = Queues.graphicsQueueFamilyIndex;
+	queueOne.queueCount = 1;
+	queueOne.queueFamilyIndex = QueueIndex;
 		
 	deviceInfo.pQueueCreateInfos = &queueOne;
 	deviceInfo.queueCreateInfoCount = 1;
 
+	
 	const VkResult result = vkCreateDevice(selectedVirtualDevice, &deviceInfo, 0, &selectedDevice);
-	if (result != VK_SUCCESS)
+	if (result == VK_ERROR_EXTENSION_NOT_PRESENT)
+	{
+		uint32 extensionsCount = 0;
+		vkEnumerateDeviceExtensionProperties(selectedVirtualDevice, nullptr, &extensionsCount, nullptr);
+
+		std::vector<VkExtensionProperties> extensions(extensionsCount);
+
+		vkEnumerateDeviceExtensionProperties(selectedVirtualDevice, nullptr, &extensionsCount, extensions.data());
+		
+		const uint32 foundExtensions = (uint32)extensions.size();
+		
+		std::vector<const char*> unsupportedExtensions;
+		for (uint32 i = 0; i < requiredDeviceExtensionsCount; i++)
+		{
+			bool bHasFound = false;
+			const char* criticalExtensionIndex = requiredDeviceExtensions[i];
+
+			for (uint32 j = 0; j < extensionsCount; j++)
+			{
+				VkExtensionProperties& extProp = extensions[j];
+				if (strcmp(criticalExtensionIndex, extProp.extensionName) == 0)
+				{
+					bHasFound = true;
+					break;
+				}
+			}
+
+			if (!bHasFound) unsupportedExtensions.push_back(criticalExtensionIndex);
+		}
+
+		const uint32 extSize = (uint32)unsupportedExtensions.size();
+		String super;
+		for (uint32 i = 0; i < extSize; i++)
+		{
+			super += unsupportedExtensions[i];
+			if (extSize > 1)
+				super += ", ";
+		}
+
+		MR_LOG(LogVulkan, Fatal, "Vulkan extension(s) are not supported! %s", super.Chr());
+		// return false;
+	}
+	else if (result != VK_SUCCESS)
 	{
 		MR_LOG(LogVulkan, Error, "vkCreateDevice returned: %s", STR(result));
 		return false;
 	}
 
-	vkGetDeviceQueue(selectedDevice, Queues.graphicsQueueFamilyIndex, 0, &Queues.graphicsQueue);
-	vkGetDeviceQueue(selectedDevice, Queues.presentationQueueFamilyIndex, 1, &Queues.presentationQueue);
+	vkGetDeviceQueue(selectedDevice, QueueIndex, 0, &graphicsQueue);
+
+	return true;
 }
 
 bool VulkanRHIRegistry::CreateSwapchain()
 {
-	VkSwapchainCreateInfoKHR swapChainInfo = { VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR };
-	swapChainInfo.surface = surface;
-	swapChainInfo.minImageCount = 2;
-	swapChainInfo.imageFormat = VK_FORMAT_R8G8B8A8_UNORM;
-	swapChainInfo.imageColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
-
 	surfaceCapabilities = {};
 	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(selectedVirtualDevice, surface, &surfaceCapabilities);
 
+
+	VkSwapchainCreateInfoKHR swapChainInfo = { VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR };
+	swapChainInfo.surface = surface;
+	swapChainInfo.minImageCount = surfaceCapabilities.minImageCount + 1;
+	swapChainInfo.imageFormat = VK_FORMAT_R8G8B8A8_UNORM;
+	swapChainInfo.imageColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+
+
 	swapChainInfo.imageExtent = surfaceCapabilities.maxImageExtent;
 	swapChainInfo.imageArrayLayers = 1;
-	swapChainInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+	swapChainInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
 	swapChainInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	swapChainInfo.preTransform = surfaceCapabilities.currentTransform;
 	swapChainInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+	swapChainInfo.presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
 	swapChainInfo.clipped = 1;
 
 	const VkResult result = vkCreateSwapchainKHR(selectedDevice, &swapChainInfo, 0, &swapChain);
@@ -271,24 +337,21 @@ bool VulkanRHIRegistry::CreateSwapchain()
 		MR_LOG(LogVulkan, Error, "vkCreateSwapchainKHR returned: %s", STR(result));
 		return false;
 	}
+
+	
+	vkGetSwapchainImagesKHR(selectedDevice, swapChain, &swapChainImagesCount, nullptr);
+
+	swapChainImages = new VkImage[swapChainImagesCount]();
+	swapChainImageViews = new VkImageView[swapChainImagesCount]();
+
+	vkGetSwapchainImagesKHR(selectedDevice, swapChain, &swapChainImagesCount, swapChainImages);
+
+	return true;
 }
 
 bool VulkanRHIRegistry::CreateImageViews()
 {
-	uint32 imagesCount = 0;
-	vkGetSwapchainImagesKHR(selectedDevice, swapChain, &imagesCount, 0);
-	if (imagesCount == 0)
-	{
-		MR_LOG(LogVulkan, Error, "Failed to get swapchain images!");
-		return false;
-	}
-
-	swapChainImages.resize(imagesCount);
-	swapChainImageViews.resize(imagesCount);
-
-	vkGetSwapchainImagesKHR(selectedDevice, swapChain, &imagesCount, swapChainImages.data());
-
-	for (uint32 i = 0; i < imagesCount; i++)
+	for (uint32 i = 0; i < swapChainImagesCount; i++)
 	{
 		VkImageViewCreateInfo createInfo = { VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
 		createInfo.image = swapChainImages[i];
@@ -310,38 +373,110 @@ bool VulkanRHIRegistry::CreateImageViews()
 	return true;
 }
 
+bool VulkanRHIRegistry::CreateFramebuffers()
+{
+	swapChainFramebuffers = new VkFramebuffer[swapChainImagesCount]();
+
+	for (uint32 i = 0; i < swapChainImagesCount; i++)
+	{
+		VkFramebufferCreateInfo framebufferCreateInfo = { VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO };
+		framebufferCreateInfo.renderPass = renderPass;
+		framebufferCreateInfo.attachmentCount = 1;
+		framebufferCreateInfo.pAttachments = &swapChainImageViews[i];
+		framebufferCreateInfo.width = surfaceCapabilities.maxImageExtent.width;
+		framebufferCreateInfo.height = surfaceCapabilities.maxImageExtent.height;
+		framebufferCreateInfo.layers = 1;
+
+		const VkResult result = vkCreateFramebuffer(selectedDevice, &framebufferCreateInfo, nullptr, &swapChainFramebuffers[i]);
+		if (result != VK_SUCCESS)
+		{
+			MR_LOG(LogVulkan, Error, "vkCreateFramebuffer returned: %s", STR(result));
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool VulkanRHIRegistry::CreateRenderpass()
+{
+	VkAttachmentDescription attachmentInfo = {};
+	attachmentInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	attachmentInfo.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+	attachmentInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
+	attachmentInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+	attachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+	attachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	attachmentInfo.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	attachmentInfo.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+
+	VkAttachmentReference colorAttachmentRef = {};
+	colorAttachmentRef.attachment = 0;
+	colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+	VkSubpassDescription subpass = {};
+	subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+	subpass.colorAttachmentCount = 1;
+	subpass.pColorAttachments = &colorAttachmentRef;
+
+	VkSubpassDependency subpassD = {};
+	subpassD.srcSubpass = VK_SUBPASS_EXTERNAL;
+	subpassD.dstSubpass = 0;
+	subpassD.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	subpassD.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+	subpassD.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	subpassD.srcAccessMask = 0;
+
+	VkRenderPassCreateInfo renderPassInfo = { VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO };
+	renderPassInfo.pAttachments = &attachmentInfo;
+	renderPassInfo.attachmentCount = 1;
+	renderPassInfo.subpassCount = 1;
+	renderPassInfo.pSubpasses = &subpass;
+	renderPassInfo.dependencyCount = 1;
+	renderPassInfo.pDependencies = &subpassD;
+
+	const VkResult result = vkCreateRenderPass(selectedDevice, &renderPassInfo, nullptr, &renderPass);
+	if (result != VK_SUCCESS)
+	{
+		MR_LOG(LogVulkan, Error, "vkCreateRenderPass returned: %x", result);
+		return false;
+	}
+
+	return true;
+}
+
+VkShaderModule VulkanRHIRegistry::OpenShader(const String path) const
+{
+	FileStatus stat;
+	IFile* shader = FileManager::CreateFileOperation(path, OPENMODE_READ, SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS, stat);
+	if (shader)
+	{
+		shader->Read();
+
+		VkShaderModuleCreateInfo smoduleInfo = { VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO };
+		smoduleInfo.codeSize = shader->GetSize();
+		smoduleInfo.pCode = (uint32_t*)shader->GetBuffer();
+
+		VkShaderModule module = nullptr;
+		const VkResult result = vkCreateShaderModule(selectedDevice, &smoduleInfo, nullptr, &module);
+		if (result != VK_SUCCESS)
+		{
+			MR_LOG(LogVulkan, Error, "Failed to create shader module! %d", result);
+			return nullptr;
+		}
+
+		return module;
+	}
+
+	MR_LOG(LogVulkan, Error, "Failed to load shader file! %i", stat);
+	return nullptr;
+}
+
 bool VulkanRHIRegistry::initVK()
 {
 	{
-		FileStatus stat;
-
-		IFile* shaderVert = FileManager::CreateFileOperation("E:\\meteor\\editor\\vert.spv", OPENMODE_READ, SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS, stat);
-		IFile* shaderFrag = FileManager::CreateFileOperation("E:\\meteor\\editor\\frag.spv", OPENMODE_READ, SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS, stat);
-
-		shaderVert->Read();
-		shaderFrag->Read();
-
-		VkShaderModuleCreateInfo createInfo = { VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO };
-		createInfo.codeSize = shaderVert->GetSize();
-		createInfo.pCode = reinterpret_cast<const uint32_t*>(shaderVert->GetBuffer());
-
-		const VkResult result = vkCreateShaderModule(selectedDevice, &createInfo, 0, &shaderModuleVert);
-		if (result != VK_SUCCESS)
-		{
-			MR_LOG(LogVulkan, Error, "vkCreateShaderModule (1) returned: %s", STR(result));
-			return false;
-		}
-		
-		VkShaderModuleCreateInfo createInfoA = { VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO };
-		createInfoA.codeSize = shaderFrag->GetSize();
-		createInfoA.pCode = reinterpret_cast<const uint32_t*>(shaderFrag->GetBuffer());
-
-		const VkResult resultA = vkCreateShaderModule(selectedDevice, &createInfoA, 0, &shaderModuleFrag);
-		if (resultA != VK_SUCCESS)
-		{
-			MR_LOG(LogVulkan, Error, "vkCreateShaderModule (2) returned: %s", STR(resultA));
-			return false;
-		}
+		shaderModuleVert = OpenShader("E:\\meteor\\editor\\vert.spv");
+		shaderModuleFrag = OpenShader("E:\\meteor\\editor\\frag.spv");
 	}
 
 	{
@@ -427,33 +562,30 @@ bool VulkanRHIRegistry::initVK()
 		colorBlending.blendConstants[2] = 0.0f; // Optional
 		colorBlending.blendConstants[3] = 0.0f; // Optional
 
-		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		pipelineLayoutInfo.setLayoutCount = 0; // Optional
-		pipelineLayoutInfo.pSetLayouts = nullptr; // Optional
-		pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
-		pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
+		VkGraphicsPipelineCreateInfo gfxPp = { VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO };
 
-		std::vector<VkDynamicState> dynamicStates = {
+		static constexpr const VkDynamicState dynamicStates[] = {
 			VK_DYNAMIC_STATE_VIEWPORT,
 			VK_DYNAMIC_STATE_SCISSOR
 		};
 
 		VkPipelineDynamicStateCreateInfo dynamicState = { VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO };
-		dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
-		dynamicState.pDynamicStates = dynamicStates.data();
+		dynamicState.dynamicStateCount = sizeof(dynamicStates) / sizeof(dynamicStates[0]);
+		dynamicState.pDynamicStates = dynamicStates;
 
-		const VkResult result = vkCreatePipelineLayout(selectedDevice, &pipelineLayoutInfo, nullptr, &pipelineLayout);
+		const VkResult result = /*vkCreateGraphicsPipelines(selectedDevice, nullptr, 1, 0,0,0)*/VK_SUCCESS;
 		if (result != VK_SUCCESS)
 		{
 			MR_LOG(LogVulkan, Error, "vkCreatePipelineLayout returned: %s", STR(result));
 			return false;
 		}
 	}
+
+	return true; 
 }
 
 #ifdef MR_DEBUG
-static std::vector<const char*> layers
+static constexpr const char* layers[]
 {
 	"VK_LAYER_KHRONOS_validation"
 };
@@ -463,7 +595,7 @@ bool VulkanRHIRegistry::CreateInstance()
 {
 	VkInstanceCreateInfo instanceInfo = { VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO };
 
-	static const std::vector<const char*> extensions
+	static constexpr const char* extensions[]
 	{
 #ifdef MR_DEBUG
 		VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
@@ -479,12 +611,12 @@ bool VulkanRHIRegistry::CreateInstance()
 	VkApplicationInfo appInfo = { VK_STRUCTURE_TYPE_APPLICATION_INFO };
 	appInfo.apiVersion = VK_API_VERSION_1_3;
 
-	instanceInfo.enabledExtensionCount = (uint32)extensions.size();
-	instanceInfo.ppEnabledExtensionNames = extensions.data();
+	instanceInfo.enabledExtensionCount = (uint32)sizeof(extensions) / sizeof(extensions[0]);
+	instanceInfo.ppEnabledExtensionNames = extensions;
 
 #ifdef MR_DEBUG
-	instanceInfo.ppEnabledLayerNames = layers.data();
-	instanceInfo.enabledLayerCount = (uint32)layers.size();
+	instanceInfo.ppEnabledLayerNames = layers;
+	instanceInfo.enabledLayerCount = (uint32)sizeof(layers) / sizeof(layers[0]);
 #else
 	instanceInfo.ppEnabledLayerNames = nullptr;
 	instanceInfo.enabledLayerCount = 0;
@@ -498,10 +630,13 @@ bool VulkanRHIRegistry::CreateInstance()
 		MR_LOG(LogVulkan, Error, "vkCreateInstance returned: %s", STR(result));
 		return false;
 	};
+
+	return true;
 }
 
 bool VulkanRHIRegistry::GetInstanceLayerCompatibility()
 {
+#ifdef MR_DEBUG
 	if constexpr (bIsUsingValidation)
 	{
 		uint32 layerCount = 0;
@@ -522,18 +657,31 @@ bool VulkanRHIRegistry::GetInstanceLayerCompatibility()
 				}
 			}
 		}
+
+		return bFound ? true : false;
 	}
+
+#endif // MR_DEBUG
 
 	return false;
 }
 
 bool VulkanRHIRegistry::CreateDebugMessenger()
 {
-	VkDebugUtilsMessengerCreateInfoEXT dbmonInfo = { VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT };
-	dbmonInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-	dbmonInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-	dbmonInfo.pfnUserCallback = debugCallback;
+	constexpr VkDebugUtilsMessengerCreateInfoEXT dbmonInfo = { 
+		VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+		nullptr,
+		0,
+		VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | 
+		VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | 
+		VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
 
+		VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | 
+		VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | 
+		VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
+		debugCallback,
+		nullptr
+	};
 
 	PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsEXT =
 		(PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");

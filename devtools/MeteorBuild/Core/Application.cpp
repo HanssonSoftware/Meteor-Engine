@@ -2,18 +2,17 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 #include "Application.h"
-#include <string.h>
-#include "../Parsing/DirectoryExplorer.h"
-#include "../Parsing/SolutionGenerator.h"
-
+#include <Types/String.h>
+#include <Platform/PerformanceTimer.h>
+#include <Parsing/LocatingInterface.h>
 
 int main(int argc, char* argv[])
 {
 	return launchStranger(argc, argv);
 }
 
-BuildSystemApplication::BuildSystemApplication(const ApplicationInitializationInfo* Info)
-	: Application(*Info)
+BuildSystemApplication::BuildSystemApplication()
+	: Application()
 {
 
 }
@@ -22,26 +21,13 @@ void BuildSystemApplication::Init()
 {
 	Application::Init();
 
-	String sourceValue = ICommandlet::Get().Expected<String>("sourcedir");
-	if (!sourceValue.IsEmpty())
+	if (!ICommandlet::Parse("-sourcedir").IsEmpty())
 	{
-		DirectoryExplorer dxp;
-		dxp.StartExpedition(sourceValue);
-
-		String slnValue = ICommandlet::Get().Expected<String>("makesln");
-		if (!slnValue.IsEmpty())
-		{
-			SolutionGenerator sln(slnValue);
-
-			dxp.processModules();
-			sln.getHandle()->isPersistent() ? sln.readSolution() : sln.startSolutionFill();
-
-			int hd = 5;
-		}
+		bool b = LocatingInterface::FindAllReferences(ICommandlet::Parse("-sourcedir"));
 	}
 	else
 	{
-		MR_LOG(LogBuildSystemApplication, Fatal, """sourcedir"" Parameter is Missing! Without This We are Unable to Find Source Directory!");
+		MR_LOG(LogBuildSystemApplication, Fatal, """sourcedir"" Parameter is Missing! Unable to find source directory!");
 	}
 }
 

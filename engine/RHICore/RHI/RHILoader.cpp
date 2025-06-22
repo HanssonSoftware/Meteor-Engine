@@ -29,12 +29,16 @@ IRHIRegistry* RHILoader::InitRHI(const SystemLayout layout)
 	return reference;
 }
 
-inline IRHIRegistry* RHILoader::InitWindows() noexcept
+IRHIRegistry* RHILoader::InitWindows() noexcept
 {
-	if (ICommandlet::Get().Expected<bool>("d3d11"))
+	if (!ICommandlet::Parse("-vk").IsEmpty() ||
+		
+		!ICommandlet::Parse("-vulkan").IsEmpty()
+		
+		)
 	{
-		//return new D3D11RHIRegistry();
+		return new VulkanRHIRegistry();
 	}
 
-	return new VulkanRHIRegistry();
+	return new D3D11RHIRegistry();
 }

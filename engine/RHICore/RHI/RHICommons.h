@@ -3,6 +3,7 @@
 #pragma once
 #include <Types/String.h>
 #include <Types/Vector.h>
+#include <vector>
 
 enum SystemLayout
 {
@@ -15,11 +16,42 @@ enum SystemLayout
 
 struct MonitorInfo
 {
+	MonitorInfo(const String name, const Vector2<uint32> size, const int index)
+		: name(name)
+		, size(size)
+		, index(index)
+	{
+
+	}
+
 	String name;
 
 	Vector2<uint32> size = { 0, 0 };
 
 	int index = -1;
+
+	inline bool GetIsPrimary() const noexcept { return index == 0; }
+};
+
+struct GPUInfo
+{
+	GPUInfo(const String name, const int index, const int sizeLimit)
+		: name(name)
+		, index(index)
+		, videoMemorySizeInMB(sizeLimit)
+	{
+
+	}
+
+	GPUInfo() = delete;
+
+	String name;
+
+	int index = -1;
+
+	int videoMemorySizeInMB = 0;
+
+	std::vector<MonitorInfo> outputs;
 };
 
 enum RHIHealthStatus

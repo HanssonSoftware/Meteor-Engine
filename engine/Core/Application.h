@@ -71,6 +71,7 @@ struct Application
 
 private:
 	inline void CreateNativeWindow() const;
+
 protected:
 	int exitCode = 0;
 
@@ -86,15 +87,3 @@ protected:
 };
 
 using App = Application;
-
-//template<typename T>
-//void instantiateApp(const ApplicationInitializationInfo* appInfo)
-//{
-//	static_assert(std::is_base_of<Application, T>::value, TEXT("T must inherit from Application!"));
-//
-//	T* App = new T(appInfo);
-//	App->SetApplicationGetter(App);
-//	App->Init();
-//
-//	delete App;
-//}

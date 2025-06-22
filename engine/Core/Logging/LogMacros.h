@@ -31,7 +31,7 @@ LOG_ADDCATEGORY(Temp);
                 Logger::TransmitMessage(&Log##Line); \
                 if constexpr (Severity == Fatal) \
                 { \
-                    abort(); \
+                    Logger::HandleFatal(); \
                 } \
         } while (0); \
     }

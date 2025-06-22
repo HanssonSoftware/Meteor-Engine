@@ -1,7 +1,7 @@
 /* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
-#include "PlatformDefs.h"
+#include <Platform/PlatformDefs.h>
 
 
 template<typename T = uint32>

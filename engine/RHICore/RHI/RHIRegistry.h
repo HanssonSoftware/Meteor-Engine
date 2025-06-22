@@ -27,20 +27,15 @@ public:
 
 	virtual void CleanUp() const = 0;
 
-	virtual bool GetUserHasMultipleMonitors() const
-	{
-		return monitors.size() > 1;
-	}
-
 	virtual IRHIOutputContext* GetOutputContext() const
 	{
 		return context;
 	}
 
-  	virtual ~IRHIRegistry() = default;
+  	virtual ~IRHIRegistry() noexcept = default;
 
 protected:
-	std::vector<MonitorInfo> monitors;
+	std::vector<GPUInfo> graphicsAccelerators;
 
 	IRHIOutputContext* context;
 };

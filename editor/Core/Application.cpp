@@ -1,13 +1,13 @@
 ﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #include "Application.h"
-#include <Common/MemoryManager.h>
+#include <MemoryManager.h>
 #include <Types/String.h>
 #include <Common/Delegate.h>
 #include <Layers/LayerManager.h>
 #include <iostream>
 #include <Platform/File.h>
-#include <Common/Array.h>
+#include <Types/Array.h>
 #include <Commandlet.h>
 #include <Platform/FileManager.h>
 #include "EditorLayer.h"
@@ -40,7 +40,26 @@ void EditorApplication::Init()
 		Shutdown();
 	}
 
-	String fas("abcABC123éáűőúÉÁŰŐÚßçЖжПривет你好こんにちはمرحبا🙂💻!@#$%^&*()_+-=[]{};:'\",.<>/?\\|");
+	String fasdfg(123456789ul);
+
+	Array<int> fasz;
+	fasz.Resize(4);
+
+	fasz[0] = 412;
+	fasz[1] = 756;
+	fasz[2] = 76;
+	fasz[3] = 65;
+
+	for (uint32 i = 0; i < fasz.GetSize(); i++)
+	{
+		int& a = fasz[i];
+
+		Get();
+	}
+
+	fasz.Reset();
+
+	String fas("abcABC123éáűőúÉÁŰŐÚßçЖапсржПривет你好こんにちはمرحبا🙂💻!@#$%^&*()_+-=[]{};:'\",.<>/?\\|");
 	//MR_LOG(LogTemp, Log, "%s", fas.Chr());
 
  

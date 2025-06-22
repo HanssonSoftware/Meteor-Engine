@@ -4,7 +4,7 @@
 #include <Types/String.h>
 #include <sstream>
 #include <fstream>
-#include <Common/MemoryManager.h>
+#include <MemoryManager.h>
 
 bool ConfigCollection::openConfiguration(const String* names, uint32 count)
 {

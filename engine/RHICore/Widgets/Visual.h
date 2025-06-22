@@ -2,7 +2,7 @@
 
 #pragma once
 #include <Object/Object.h>
-#include <Types/PlatformDefs.h>
+#include <Platform/PlatformDefs.h>
 #include <Types/Vector.h>
 
 typedef enum EVisibleState

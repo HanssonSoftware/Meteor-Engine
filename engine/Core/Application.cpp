@@ -4,10 +4,9 @@
 #include <Platform/WindowManager/WindowManager.h>
 #include <RHI/RHIOutputContext.h>
 #include <RHI/RHIRegistry.h>
-#include <thread>
 #include <Platform/FileManager.h>
 
-#include <Common/MemoryManager.h>
+#include <MemoryManager.h>
 #include <Widgets/Viewport.h>
 #include <Layers/OSLayer.h>
 #include <Layers/LayerManager.h>
@@ -49,9 +48,9 @@ void Application::RequestExit(int Code)
 
 const int Application::GetRequestExitCode()
 {
-    MR_ASSERT(App::Get() != nullptr, "Application class is invalid!");
+    MR_ASSERT(appFramework != nullptr, "Application class is invalid!");
 
-    return App::Get()->exitCode;
+    return appFramework->exitCode;
 }
 
 void Application::Init()
@@ -60,10 +59,14 @@ void Application::Init()
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF);
 #endif // MR_DEBUG
 
-    windowManager->Init();
     layerManager->Init();
-
+    MemoryManager::Initialize();
     Logger::Initialize();
+
+    if (Application::Get()->appInfo.flags &~ APPFLAG_NO_WINDOW)
+        windowManager->Init();
+
+
     MR_LOG(LogApplication, Log, "Initializing application.");
 
     if (appInfo.appName.IsEmpty())
@@ -74,7 +77,7 @@ void Application::Init()
     CreateNativeWindow();
     
     if (Application::Get()->appInfo.flags & APPFLAG_DISPLAY_QUICK_INFO_ABOUT_MEMORY_USAGE)
-        MemoryManager::Get().bQuickMemoryLogging = true;
+        int h = 5; // DELETE
 
     if (GetRenderContext())
     {
@@ -97,7 +100,7 @@ bool Application::InstantiateApplication(Application* newInstance, const Applica
     appFramework = newInstance;
     appFramework->appInfo = *appCreateInfo;
 
-    newInstance->Init();
+    appFramework->Init();
 
     return true;
 }
@@ -159,19 +162,27 @@ void Application::Shutdown()
 {
     if (GetAppState() == APPLICATIONSTATE_RESTARTING)
     {
-        MR_LOG(LogApplication, Log, "Restarting Application!");
+        MR_LOG(LogApplication, Log, "Restarting application!");
     
+        windowManager->Shutdown();
+
+        layerManager->Shutdown();
+
+        Logger::Shutdown();
+
         appFramework->Init();
     }
     else
     {
-        MR_LOG(LogApplication, Log, "Shutting down Application!");
+        MR_LOG(LogApplication, Log, "Shutting down application!");
 
         windowManager->Shutdown();
 
         layerManager->Shutdown();
         
         Logger::Shutdown();
+
+        MemoryManager::Shutdown();
 
         exit(exitCode);
     }

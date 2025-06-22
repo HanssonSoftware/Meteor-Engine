@@ -2,13 +2,15 @@
 
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
-#include "PlatformDefs.h"
+#include <Platform/PlatformDefs.h>
 #include <string>
 
 /** Human readable piece of text. */
 struct String
 {
 	String() noexcept;
+
+	~String() noexcept;
 
 	String(const char* Input);
 
@@ -26,15 +28,11 @@ struct String
 
 	String(const std::wstring Input);
 
-	~String();
-
-	String(wchar_t* buffer);
-
 	String(const String& other);
 
 	String(String&& other) noexcept;
 
-	String& operator=(const String& other);
+	String operator=(const String& other);
 
 	String operator+(const String& Other);
 
@@ -42,63 +40,66 @@ struct String
 		
 	bool operator!=(const String& Other) const;
 
-	bool operator!=(String& Other) const;
-
-	char* operator=(const String& other) const
-	{
-		return other.buffer;
-	}
+	bool operator!() const;
 	
-	/** Chr() is the alternative. */
+	String operator+=(const char* other);
+	
 	const char* operator*();
 
-	operator const char*()
-	{
-		return buffer;
-	}
+	operator const char* () { return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr; };
 
-	operator char*()
-	{
-		return buffer;
-	}
+	operator char* ();
 
-	/** (*this) is the alternative. */
-	const char* Chr();	
+	const char* Chr() const;	
 
 	char* Data();
 
-	const char* Chr() const;
-
 	String Delim(const String character, bool first);
 
-	bool IsEmpty() const;
+	bool IsEmpty() const noexcept;
 
-	bool EndsWith(const String string) const;
+	int ToInt() const noexcept;
 
-	int ToInt() const;
+	float ToFloat() const noexcept;
 
-	float ToFloat() const;
-
-	uint32 Length() const;
+	uint32 Length() const noexcept;
 
 	static String Format(const String format, ...);
+
+	static bool Contains(const char* buffer, const char* target);
 private:
 #ifdef MR_DEBUG
 	bool bIsInited = false;
 #endif // MR_DEBUG
 
-	char* buffer = nullptr;
-	//static constexpr const int MAX_STRING_SIZE = 16;
+	constexpr void MakeEmpty();
 
-	//static constexpr bool USE_HEAP = false;
-	//
-	//union stb
-	//{
-	//	char* finite[MAX_STRING_SIZE + 1];
+	constexpr void ResetBuffers();
 
-	//	char* infinite = nullptr;
+	bool bIsUsingHeap = false;
 
-	//} buffer;
+	union
+	{
+		struct
+		{
+			char* ptr = nullptr;
+
+			size_t length = 0;
+
+			size_t capacity = 0;
+
+		} heapBuffer;
+
+		struct
+		{ 
+			char ptr[sizeof(heapBuffer) - sizeof(unsigned short)] = {'\0'};
+
+			unsigned short length = 0;
+
+		} stackBuffer;
+	};
+
+	static constexpr size_t SSO_MAX_CHARS = sizeof(heapBuffer) - sizeof(unsigned short) - 1;
 };
 
 String operator+(const String& OtherA, const String& OtherB);
