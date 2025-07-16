@@ -4,21 +4,21 @@
 #include <Types/String.h>
 #include <Layers/Layer.h>
 #include <Types/Vector.h>
-#include "OSLayerHelper.h"
+#include "SystemLayerHelper.h"
 
 class IThreadPool;
 
 
-class OSLayer : public Layer
+class SystemLayer : public Layer
 {
 	friend class LayerManager;
 
 public:
-	OSLayer(const String Name) noexcept;
+	SystemLayer(const String Name) noexcept;
 
-	OSLayer() = delete;
+	SystemLayer() = delete;
 
-	virtual ~OSLayer() = default;
+	virtual ~SystemLayer() = default;
 
 	/** This is not automatic! Please call if you want post-Attached phase. */
 	virtual void Init() override;

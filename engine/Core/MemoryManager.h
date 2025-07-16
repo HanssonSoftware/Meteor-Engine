@@ -12,7 +12,7 @@ public:
 
 	static void* Allocate();
 
-	static void DeAllocate();
+	static void Deallocate();
 
 	static constexpr uint32 GetSize(void* data);
 private:

@@ -3,10 +3,13 @@
 #include "MemoryManager.h"
 #include <Platform/PlatformLayout.h>
 #include <Logging/LogMacros.h>
+#include <Layers/SystemLayer.h>
 
 #include <Windows/Windows.h>
 
-static constexpr const float engineRecommendedPercent = 0.2f;
+LOG_ADDCATEGORY(Arena);
+
+static constexpr const float engineRecommendedPercent = 0.15f;
 
 static MemoryManager object;
 
@@ -16,17 +19,17 @@ void MemoryManager::Initialize()
 	MEMORYSTATUSEX longlong = {};
 	longlong.dwLength = sizeof(MEMORYSTATUSEX);
 
-	if (GlobalMemoryStatusEx(&longlong) == 0)
+	if (!GlobalMemoryStatusEx(&longlong))
 	{
-		DWORD a = GetLastError();
-		int j = 5;
+		MR_LOG(LogArena, Fatal, "GlobalMemoryStatusEx failed with: %s", *Layer::GetSystemLayer()->GetError());
+		return;
 	}
 
 	object.availableMemoryOnTheRig = longlong.ullTotalPhys;
 
 	uint64 requiredByPercent = longlong.ullTotalPhys * engineRecommendedPercent;
 
-	object.pool = VirtualAlloc(0, requiredByPercent, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+	object.pool = VirtualAlloc(nullptr, requiredByPercent, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 	
 	MR_ASSERT(object.pool != nullptr, "Failed to reserve, the engine recommended memory! Application exiting...");
 #endif // MR_PLATFORM_WINDOWS
@@ -34,11 +37,10 @@ void MemoryManager::Initialize()
 
 void MemoryManager::Shutdown()
 {
-	if (VirtualFree(object.pool, 0, MEM_RELEASE) == 0)
+	if (!VirtualFree(object.pool, 0, MEM_RELEASE))
 	{
-		DWORD a = GetLastError();
-
-		int j = 5;
+		MR_LOG(LogArena, Fatal, "VirtualFree failed with: %s", *Layer::GetSystemLayer()->GetError());
+		return;
 	}
 }
 
@@ -49,7 +51,7 @@ void* MemoryManager::Allocate()
 	return place;
 }
 
-void MemoryManager::DeAllocate()
+void MemoryManager::Deallocate()
 {
 }
 

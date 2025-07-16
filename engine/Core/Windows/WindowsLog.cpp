@@ -4,10 +4,11 @@
 #include <Windows/Windows.h>
 #include <Logging/LogMacros.h>
 #include <Application.h>
-#include <Layers/OSLayer.h>
+#include <Layers/SystemLayer.h>
 #include <Version.h>
 #include "WindowsFile.h"
 
+#include <DbgHelp.h>
 #include <assertbox.h>
 #pragma warning(disable : 6001) // Using uninitialized memory 'X'
 
@@ -28,6 +29,7 @@ WindowsLog::~WindowsLog() noexcept
 
 void WindowsLog::Initialize()
 {
+#ifdef MR_DEBUG
 	if constexpr (bIsRunningDebugMode)
 	{
 		FreeConsole();
@@ -65,7 +67,7 @@ void WindowsLog::Initialize()
 
 			SetConsoleCursorInfo(hConsole, &cf);
 
-			OSLayer* systemLayer = Layer::GetSystemLayer();
+			SystemLayer* systemLayer = Layer::GetSystemLayer();
 
 			if (!SetStdHandle(STD_OUTPUT_HANDLE, hConsole))
 			{
@@ -83,12 +85,14 @@ void WindowsLog::Initialize()
 			delete[] buffer; // Using uninitialized memory 'X'
 		}
 	}
+#endif // MR_DEBUG
 
 	ILogger::Initialize();
 }
 
 void WindowsLog::Shutdown()
 {
+#ifdef MR_DEBUG
 	if constexpr (bIsRunningDebugMode)
 	{
 		CloseHandle(hConsole);
@@ -98,6 +102,7 @@ void WindowsLog::Shutdown()
 			App::RequestExit(-1);
 		}
 	}
+#endif // MR_DEBUG
 
 	ILogger::Shutdown();
 }
@@ -105,9 +110,10 @@ void WindowsLog::Shutdown()
 
 void WindowsLog::SendToOutputBuffer(const String Buffer)
 {
+#ifdef MR_DEBUG
 	if constexpr (bIsRunningDebugMode)
 	{
-		OSLayer* systemLayer = Layer::GetSystemLayer();
+		SystemLayer* systemLayer = Layer::GetSystemLayer();
 
 		wchar_t* message = systemLayer->ConvertToWide(Buffer.Chr());
 
@@ -140,7 +146,7 @@ void WindowsLog::SendToOutputBuffer(const String Buffer)
 		DWORD written = 0;
 		if (!WriteConsoleW(hConsole, message, (DWORD)wcslen(message), &written, 0))
 		{
-			systemLayer->GetError();
+			return ILogger::SendToOutputBuffer(Buffer);
 		}
 
 		if (IsDebuggerAttached())
@@ -150,13 +156,14 @@ void WindowsLog::SendToOutputBuffer(const String Buffer)
 
 		delete[] message;
 	}
+#endif // MR_DEBUG
 
 	ILogger::SendToOutputBuffer(Buffer);
 }
 
 void WindowsLog::HandleFatal()
 {
-	if (OSLayer* systemLayer = Layer::GetSystemLayer())
+	if (SystemLayer* systemLayer = Layer::GetSystemLayer())
 	{
 		const LogDescriptor* actualDescriptor = ILogger::Get()->GetActualEntry();
 		if (!actualDescriptor)
@@ -187,7 +194,7 @@ static INT_PTR WindowsLoggingDialogProcedure(HWND wnd, UINT msg, WPARAM ai1, LPA
 	case WM_INITDIALOG:
 		if (const LogAssertion* pkg = reinterpret_cast<const LogAssertion*>(ai2))
 		{
-			OSLayer* systemLayer = Layer::GetSystemLayer();
+			SystemLayer* systemLayer = Layer::GetSystemLayer();
 			if (systemLayer)
 			{
 				wchar_t* fileName = systemLayer->ConvertToWide(pkg->assertLocationInFile);
@@ -279,7 +286,7 @@ int WindowsLog::TransmitAssertion(LogAssertion& Info)
 		break;
 	}
 
-	if (OSLayer* systemLayer = Layer::GetSystemLayer())
+	if (SystemLayer* systemLayer = Layer::GetSystemLayer())
 	{
 		const String j = systemLayer->GetError();
 	}

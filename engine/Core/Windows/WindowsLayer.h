@@ -1,9 +1,9 @@
 ﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
-#include <Layers/OSLayer.h>
+#include <Layers/SystemLayer.h>
 
-class WindowsLayer : public OSLayer
+class WindowsLayer : public SystemLayer
 {
 public:
 	WindowsLayer(const String Name) noexcept;

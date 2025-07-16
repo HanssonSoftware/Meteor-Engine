@@ -6,7 +6,7 @@
 #include "WindowsWindow.h"
 #include <RHI/RHILoader.h>
 #include <RHI/RHIRegistry.h>
-#include <Layers/OSLayer.h>
+#include <Layers/SystemLayer.h>
 #include <dwmapi.h>
 
 #pragma comment (lib, "UxTheme.lib")

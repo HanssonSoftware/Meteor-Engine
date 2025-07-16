@@ -3,7 +3,7 @@
 #include "LocatingInterface.h"
 #include <Windows/Windows.h>
 #include <Platform/FileManager.h>
-#include <Layers/OSLayer.h>
+#include <Layers/SystemLayer.h>
 #include <PathCch.h>
 
 #pragma comment(lib, "Pathcch.lib")
@@ -24,7 +24,7 @@ bool LocatingInterface::FindAllReferences(const String sourceDirectory)
         if (FileManager::IsPathRelative(sourceDirectory))
         {
             fullPath = FileManager::GetExecutableDirectory();
-            if (OSLayer* systemLayer = Layer::GetSystemLayer())
+            if (SystemLayer* systemLayer = Layer::GetSystemLayer())
             {
                 wchar_t* wideExecutableDirectory = systemLayer->ConvertToWide(fullPath.Chr());
                 
@@ -58,7 +58,7 @@ bool LocatingInterface::FindAllReferences(const String sourceDirectory)
         MR_LOG(LogLocatingInterface, Fatal, "Directory does not exist! (%s)", sourceDirectory.Chr());
     }
 
-    if (OSLayer* systemLayer = Layer::GetSystemLayer())
+    if (SystemLayer* systemLayer = Layer::GetSystemLayer())
     {
         wchar_t* path = systemLayer->ConvertToWide(fullPath.Chr());
 

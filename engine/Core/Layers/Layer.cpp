@@ -4,7 +4,7 @@
 #include <Core/Application.h>
 #include <Layers/LayerManager.h>
 
-OSLayer* Layer::GetSystemLayer()
+SystemLayer* Layer::GetSystemLayer()
 {
 	if (const Application* App = Application::Get())
 	{

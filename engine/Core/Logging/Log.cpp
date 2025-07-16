@@ -6,7 +6,7 @@
 #include <Core/Application.h>
 #include <Platform/Timer.h>
 #include <Platform/File.h>
-#include <Layers/OSLayer.h>
+#include <Layers/SystemLayer.h>
 #include <Platform/FileManager.h>
 #include "LogAssertion.h"
 
@@ -111,7 +111,7 @@ void ILogger::TransmitAssertion(const LogAssertion* Info)
 {
 	if (!Info) return;
 
-    if (OSLayer* systemLayer = Layer::GetSystemLayer())
+    if (SystemLayer* systemLayer = Layer::GetSystemLayer())
     {
         MessageBoxDescriptor mbxInfo = {};
         mbxInfo.Description = String::Format(

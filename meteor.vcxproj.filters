@@ -108,7 +108,7 @@
     <ClCompile Include="engine\Core\Windows\WindowsWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Layers\OSLayer.cpp">
+    <ClCompile Include="engine\Core\Layers\SystemLayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Windows\WindowsLayer.cpp">
@@ -557,7 +557,7 @@
     <ClInclude Include="engine\Core\Serialisation\AssetManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Layers\OSLayer.h">
+    <ClInclude Include="engine\Core\Layers\SystemLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Windows\WindowsWindowManager.h">
@@ -626,7 +626,7 @@
     <ClInclude Include="engine\Core\Platform\PlatformLayout.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Layers\OSLayerHelper.h">
+    <ClInclude Include="engine\Core\Layers\SystemLayerHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Logging\LogHelpers.h">

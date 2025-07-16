@@ -5,7 +5,7 @@
 #include <Common/Delegate.h>
 #include <Logging/LogMacros.h>
 
-class OSLayer;
+class SystemLayer;
 
 LOG_ADDCATEGORY(Layers);
 
@@ -13,7 +13,7 @@ class Layer
 {
 	friend class LayerManager;
 public:
-	static OSLayer* GetSystemLayer();
+	static SystemLayer* GetSystemLayer();
 
 	Layer(const String Name) noexcept;
 

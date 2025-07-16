@@ -6,7 +6,7 @@
 
 class Layer;
 struct String;
-class OSLayer;
+class SystemLayer;
 
 class LayerManager : public Object
 {
@@ -24,15 +24,15 @@ public:
 
 	void UpdateLayer();
 
-	void PushOSLayer();
+	void PushSystemLayer();
 
 	virtual void Init() override;
 
 	virtual void Shutdown() override;
 
-	OSLayer* GetSystemLayer() const { return systemLayer ? systemLayer : nullptr; }
+	SystemLayer* GetSystemLayer() const { return systemLayer ? systemLayer : nullptr; }
 private:
-	OSLayer* systemLayer;
+	SystemLayer* systemLayer;
 
 	std::vector<Layer*> layers;
 };

@@ -12,7 +12,7 @@
 #include <Platform/FileManager.h>
 #include "EditorLayer.h"
 #include <Serialisation/FontImporter.h>
-#include <Layers/OSLayer.h>
+#include <Layers/SystemLayer.h>
 #include <Platform/PerformanceTimer.h>
 
 EditorApplication::EditorApplication() 

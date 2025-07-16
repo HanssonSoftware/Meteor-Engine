@@ -44,7 +44,7 @@ struct String
 	
 	String operator+=(const char* other);
 	
-	const char* operator*();
+	const char* operator*() { return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr; };
 
 	operator const char* () { return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr; };
 

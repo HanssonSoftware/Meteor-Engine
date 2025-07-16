@@ -4,7 +4,7 @@
 #include <Logging/LogMacros.h>
 #include <Windows/WindowsWindowManager.h>
 #include <RHI/RHIRegistry.h>
-#include <Layers/OSLayer.h>
+#include <Layers/SystemLayer.h>
 
 //#include <../Resources/resource.h>
 #include <dwmapi.h>

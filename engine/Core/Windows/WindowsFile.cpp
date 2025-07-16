@@ -6,7 +6,7 @@
 #include <PathCch.h>
 #include <Shlwapi.h>
 #include <Application.h>
-#include <Layers/OSLayer.h>
+#include <Layers/SystemLayer.h>
 
 #pragma comment(lib, "Pathcch.lib")
 #pragma comment(lib, "Shlwapi.lib")
@@ -72,7 +72,7 @@ void WindowsFile::Write(const String buffer) const
 	DWORD written = 0;
 	if (!WriteFile(fileHandle, buffer.Chr(), (DWORD)buffer.Length(), &written, nullptr))
 	{
-		if (OSLayer* Layer = Layer::GetSystemLayer())
+		if (SystemLayer* Layer = Layer::GetSystemLayer())
 		{
 			const String a = Layer->GetError();
 			MR_LOG(LogFileSystem, Error, "WriteFile returned: %s", a.Chr());
@@ -90,7 +90,7 @@ void WindowsFile::Read()
 	LARGE_INTEGER lg;
 	if (GetFileSizeEx(fileHandle, &lg) == 0)
 	{
-		if (OSLayer* Layer = Layer::GetSystemLayer())
+		if (SystemLayer* Layer = Layer::GetSystemLayer())
 		{
 			const String a = Layer->GetError();
 			MR_LOG(LogFileSystem, Error, "GetFileSizeEx returned: %s", a.Chr());		
@@ -113,7 +113,7 @@ void WindowsFile::Read()
 	{
 		if (!ReadFile(fileHandle, buffer, (DWORD)lg.QuadPart, &write, 0))
 		{
-			if (OSLayer* Layer = Layer::GetSystemLayer())
+			if (SystemLayer* Layer = Layer::GetSystemLayer())
 			{
 				const String a = Layer->GetError();
 				MR_LOG(LogFileSystem, Error, "ReadFile returned: %s", a.Chr());
@@ -135,7 +135,7 @@ void WindowsFile::Read()
 		//	const int writtenAmount = /*MultiByteToWideChar(CP_UTF8, 0, narrowBuffer, write, buffer, requiredAmount)*/4;
 		//	if (writtenAmount == 0 || writtenAmount != requiredAmount)
 		//	{
-		//		if (OSLayer* Layer = Layer::GetSystemLayer())
+		//		if (SystemLayer* Layer = Layer::GetSystemLayer())
 		//		{
 		//			const String a = Layer->GetError();
 		//			MR_LOG(LogFileSystem, Error, TEXT("MultiByteToWideChar returned: %s"), a.Chr());				

@@ -6,6 +6,10 @@
 #define	WIN32_LEAN_AND_MEAN
 #define	NOMINMAX
 #define	NOHELP
+#define	NOSERVICE
+#define	NOPROFILER
+#define	NOMCX
+#define	NODRAWTEXT
 #include <Windows.h>
 
 #endif // defined(_WIN32) || defined(_WIN64)

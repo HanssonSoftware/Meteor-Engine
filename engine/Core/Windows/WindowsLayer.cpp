@@ -13,7 +13,7 @@ static MSG messageForProcedure;
 static HWND focusedWindow;
 
 WindowsLayer::WindowsLayer(const String Name) noexcept
-    : OSLayer(Name)
+    : SystemLayer(Name)
 {
 
 }

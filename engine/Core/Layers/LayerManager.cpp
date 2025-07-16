@@ -2,7 +2,7 @@
 
 #include "LayerManager.h"
 #include "Layer.h"
-#include "OSLayer.h"
+#include "SystemLayer.h"
 #include <Windows/WindowsLayer.h>
 
 LayerManager::LayerManager()
@@ -12,7 +12,7 @@ LayerManager::LayerManager()
 
 void LayerManager::Init()
 {
-	PushOSLayer();
+	PushSystemLayer();
 }
 
 void LayerManager::Shutdown()
@@ -71,7 +71,7 @@ void LayerManager::UpdateLayer()
 }
 
 static bool bWasAdded = false;
-void LayerManager::PushOSLayer()
+void LayerManager::PushSystemLayer()
 {
 	if (bWasAdded) return;
 

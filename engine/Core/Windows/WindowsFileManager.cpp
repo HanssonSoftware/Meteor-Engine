@@ -7,7 +7,7 @@
 #include <Logging/LogMacros.h>
 #include <Layers/Layer.h>
 #include <Application.h>
-#include <Layers/OSLayer.h>
+#include <Layers/SystemLayer.h>
 #include <Windows/WindowsFile.h>
 
 #include <Windows/Windows.h>
@@ -75,7 +75,7 @@ bool WindowsFileManager::IsPathExists(const String name)
         return false;
     }
 
-    if (OSLayer* systemLayer = Layer::GetSystemLayer())
+    if (SystemLayer* systemLayer = Layer::GetSystemLayer())
     {
         wchar_t* dirName = systemLayer->ConvertToWide(name.Chr());
 
@@ -116,7 +116,7 @@ bool WindowsFileManager::IsPathRelative(const String path)
 {
     MR_ASSERT(Layer::GetSystemLayer() != nullptr, "System Layer does not initialized!");
 
-    if (OSLayer* systemLayer = Layer::GetSystemLayer())
+    if (SystemLayer* systemLayer = Layer::GetSystemLayer())
     {
         wchar_t* buffer = systemLayer->ConvertToWide(path.Chr());
 
@@ -162,7 +162,7 @@ IFile* WindowsFileManager::CreateFileOperation(const String pathA, int accessTyp
 
     String path = NormalizeDir(pathA);
 
-    OSLayer* systemLayer = Layer::GetSystemLayer();
+    SystemLayer* systemLayer = Layer::GetSystemLayer();
     wchar_t* name = systemLayer->ConvertToWide(path.Chr());
 
     if (!IsPathExists(path))
