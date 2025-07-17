@@ -248,9 +248,9 @@
     <ClCompile Include="engine\Core\Platform\Timer.cpp" />
     <ClCompile Include="engine\Core\Types\String.cpp" />
     <ClCompile Include="engine\Core\Types\Vector.cpp" />
-    <ClCompile Include="engine\Renderer\VulkanQueue.cpp" />
-    <ClCompile Include="engine\Renderer\VulkanRHIOutputContext.cpp" />
-    <ClCompile Include="engine\Renderer\VulkanRHIRegistry.cpp" />
+    <ClCompile Include="engine\Renderer\Queue.cpp" />
+    <ClCompile Include="engine\Renderer\OutputContext.cpp" />
+    <ClCompile Include="engine\Renderer\Registry.cpp" />
     <ClCompile Include="engine\Renderer\Widgets\Common\FontAsset.cpp" />
     <ClCompile Include="engine\Renderer\Widgets\Components\TextBlock.cpp" />
     <ClCompile Include="engine\Renderer\Widgets\Viewport.cpp" />
@@ -279,7 +279,7 @@
     <ClCompile Include="engine\Core\Windows\WindowsThread.cpp" />
     <ClCompile Include="engine\Core\Platform\Thread\ThreadManager.cpp" />
     <ClCompile Include="engine\Core\Windows\WindowsThreadManager.cpp" />
-    <ClCompile Include="engine\Renderer\VulkanRHISwapChain.cpp" />
+    <ClCompile Include="engine\Renderer\SwapChain.cpp" />
     <ClCompile Include="engine\Core\MemoryManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -315,9 +315,9 @@
     <ClInclude Include="engine\Core\Types\String.h" />
     <ClInclude Include="engine\Core\Types\Vector.h" />
     <ClInclude Include="engine\Renderer\Vulkan.h" />
-    <ClInclude Include="engine\Renderer\VulkanQueue.h" />
-    <ClInclude Include="engine\Renderer\VulkanRHIOutputContext.h" />
-    <ClInclude Include="engine\Renderer\VulkanRHIRegistry.h" />
+    <ClInclude Include="engine\Renderer\Queue.h" />
+    <ClInclude Include="engine\Renderer\OutputContext.h" />
+    <ClInclude Include="engine\Renderer\Registry.h" />
     <ClInclude Include="engine\Renderer\Widgets\Common\FontAsset.h" />
     <ClInclude Include="engine\Renderer\Widgets\Components\TextBlock.h" />
     <ClInclude Include="engine\Renderer\Widgets\Viewport.h" />
@@ -432,7 +432,7 @@
     <ClInclude Include="engine\Core\Windows\WindowsThread.h" />
     <ClInclude Include="engine\Core\Platform\Thread\ThreadManager.h" />
     <ClInclude Include="engine\Core\Windows\WindowsThreadManager.h" />
-    <ClInclude Include="engine\Renderer\VulkanRHISwapChain.h" />
+    <ClInclude Include="engine\Renderer\SwapChain.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="engine\ThirdParty\assimp\color4.inl" />

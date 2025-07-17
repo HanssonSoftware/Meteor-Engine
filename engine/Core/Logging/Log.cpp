@@ -38,7 +38,7 @@ void ILogger::Shutdown()
 
 void ILogger::Initialize()
 {
-    if (const Application* app = Application::Get())
+    if (const Application* app = GetApplication())
     {
 		app->GetAppInfo().flags & APPFLAG_ENABLE_VERBOSE_LOGGING ? instance->bIsUsingVerbose = true : instance->bIsUsingVerbose = false;
 		app->GetAppInfo().flags & APPFLAG_NO_FILE_LOGGING ? instance->bIsUsingFile = false : instance->bIsUsingFile = true;
@@ -50,7 +50,7 @@ void ILogger::Initialize()
 
     if (instance->bIsUsingFile)
     {
-        if (const Application* app = Application::Get())
+        if (const Application* app = GetApplication())
         {
             FileStatus stat;
             instance->buffer = FileManager::CreateFileOperation(

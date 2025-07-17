@@ -14,10 +14,7 @@ struct String;
 struct LogAssertion;
 class IFile;
 
-struct LogEntry
-{
-
-};
+struct LogEntry {};
 
 struct ILogger
 {

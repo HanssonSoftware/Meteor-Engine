@@ -147,13 +147,13 @@
     <ClCompile Include="engine\Core\Logging\LogAssertion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Renderer\VulkanQueue.cpp">
+    <ClCompile Include="engine\Renderer\Queue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Renderer\VulkanRHIOutputContext.cpp">
+    <ClCompile Include="engine\Renderer\OutputContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Renderer\VulkanRHIRegistry.cpp">
+    <ClCompile Include="engine\Renderer\Registry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Windows\WindowsThread.cpp">
@@ -165,7 +165,7 @@
     <ClCompile Include="engine\Core\Windows\WindowsThreadManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Renderer\VulkanRHISwapChain.cpp">
+    <ClCompile Include="engine\Renderer\SwapChain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\MemoryManager.cpp">
@@ -590,13 +590,13 @@
     <ClInclude Include="resources\assertbox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Renderer\VulkanQueue.h">
+    <ClInclude Include="engine\Renderer\Queue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Renderer\VulkanRHIOutputContext.h">
+    <ClInclude Include="engine\Renderer\OutputContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Renderer\VulkanRHIRegistry.h">
+    <ClInclude Include="engine\Renderer\Registry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Common\Math.h">
@@ -614,7 +614,7 @@
     <ClInclude Include="engine\Core\Windows\WindowsThreadManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Renderer\VulkanRHISwapChain.h">
+    <ClInclude Include="engine\Renderer\SwapChain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\MemoryManager.h">

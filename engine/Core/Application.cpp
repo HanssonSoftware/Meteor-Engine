@@ -2,12 +2,9 @@
 
 #include "Application.h"
 #include <Platform/WindowManager/WindowManager.h>
-#include <RHI/RHIOutputContext.h>
-#include <RHI/RHIRegistry.h>
 #include <Platform/FileManager.h>
 
 #include <MemoryManager.h>
-#include <Widgets/Viewport.h>
 #include <Layers/SystemLayer.h>
 #include <Layers/LayerManager.h>
 //#include <GraphicsEngine/SceneGraph.h>
@@ -170,4 +167,9 @@ void Application::CreateNativeWindow() const
         return;
 
     GetWindowManager()->CreateNativeWindow(&appFramework->appInfo.windowCreateInfo);
+}
+
+inline Application* GetApplication()
+{
+    return appFramework;
 }

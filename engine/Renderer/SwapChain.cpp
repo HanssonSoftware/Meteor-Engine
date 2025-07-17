@@ -1,15 +1,10 @@
 /* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
-#include "VulkanRHISwapChain.h"
+#include "SwapChain.h"
 #include <Platform/PlatformLayout.h>
 
-#ifdef MR_PLATFORM_WINDOWS
-#include <Windows/Windows.h>
-#include <vulkan/vulkan_win32.h>
-#endif // _WIN64
 
-
-void VulkanRHISwapChain::Init()
+void VulkanSwapChain::Init()
 {
 	//VkResult result = vkCreateWin32SurfaceKHR();
 
@@ -18,17 +13,17 @@ void VulkanRHISwapChain::Init()
 	//VkResult resultA = vkCreateSwapchainKHR();
 }
 
-void VulkanRHISwapChain::Shutdown()
+void VulkanSwapChain::Shutdown()
 {
 
 }
 
-void VulkanRHISwapChain::Present()
+void VulkanSwapChain::Present()
 {
 
 }
 
-Vector2<float> VulkanRHISwapChain::GetSize() const noexcept
+Vector2<float> VulkanSwapChain::GetSize() const noexcept
 {
 	if (object)
 	{

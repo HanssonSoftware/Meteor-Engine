@@ -1,6 +1,6 @@
 ﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
-#include "VulkanRHIOutputContext.h"
+#include "OutputContext.h"
 #include <Types/String.h>
 #include <Logging/LogMacros.h>
 
@@ -8,9 +8,9 @@ LOG_ADDCATEGORY(Vulkan);
 
 #define STR(x) #x
 
-void VulkanRHIOutputContext::Clear()
+void VulkanOutputContext::Clear()
 {
-	VulkanRHIRegistry* vk = (VulkanRHIRegistry*)registry;
+	VulkanRegistry* vk = (VulkanRegistry*)registry;
 	if (vk == nullptr)
 	{
 		MR_LOG(LogVulkan, Error, "Invalid RHIRegistry, clear command halted!");
@@ -19,9 +19,9 @@ void VulkanRHIOutputContext::Clear()
 
 }
 
-void VulkanRHIOutputContext::Draw()
+void VulkanOutputContext::Draw()
 {
-	VulkanRHIRegistry* vk = (VulkanRHIRegistry*)registry;
+	VulkanRegistry* vk = (VulkanRegistry*)registry;
 	if (vk == nullptr)
 	{
 		MR_LOG(LogVulkan, Error, "Invalid RHIRegistry, draw command halted!");
@@ -95,9 +95,9 @@ void VulkanRHIOutputContext::Draw()
 	vkQueueWaitIdle(vk->graphicsQueue);
 }
 
-bool VulkanRHIOutputContext::CreateCommandBuffers()
+bool VulkanOutputContext::CreateCommandBuffers()
 {
-	VulkanRHIRegistry* vk = (VulkanRHIRegistry*)registry;
+	VulkanRegistry* vk = (VulkanRegistry*)registry;
 	if (vk == nullptr)
 		return false;
 
@@ -136,14 +136,14 @@ bool VulkanRHIOutputContext::CreateCommandBuffers()
 	return true;
 }
 
-void VulkanRHIOutputContext::CompileShader(const String name)
+void VulkanOutputContext::CompileShader(const String name)
 {
 
 }
 
-void VulkanRHIOutputContext::CleanUp() const
+void VulkanOutputContext::CleanUp() const
 {
-	VulkanRHIRegistry* vk = (VulkanRHIRegistry*)registry;
+	VulkanRegistry* vk = (VulkanRegistry*)registry;
 	if (vk == nullptr)
 		return;
 
@@ -160,7 +160,7 @@ void VulkanRHIOutputContext::CleanUp() const
 }
 
 
-const String VulkanRHIOutputContext::evaluateResultToText(VkResult Result) noexcept
+const String VulkanOutputContext::evaluateResultToText(VkResult Result) noexcept
 {
 	switch (Result)
 	{

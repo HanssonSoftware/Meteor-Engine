@@ -1,22 +1,17 @@
 ﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
-#include <RHI/RHIRegistry.h>
-#include "VulkanQueue.h"
-#include <vulkan/vulkan.h>
+#include "Queue.h"
 
-
-class VulkanRHIRegistry : public IRHIRegistry
+class VulkanRegistry
 {
-	friend class VulkanRHIOutputContext;
+	friend class VulkanOutputContext;
 public:
-	virtual int GetMonitorIndex() const override;
+	virtual String GetName() const;
 
-	virtual String GetName() const override;
+	virtual bool Initialize();
 
-	virtual bool Initialize() override;
-
-	virtual void CleanUp() const override;
+	virtual void CleanUp() const;
 
 protected:
 	bool initVK();

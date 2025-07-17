@@ -1,15 +1,9 @@
 ﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
-#include "VulkanRHIRegistry.h"
-#include "VulkanRHIOutputContext.h"
+#include "Registry.h"
+#include "OutputContext.h"
 #include <Logging/LogMacros.h>
 #include <Platform/PlatformLayout.h>
-#include "VulkanQueue.h"
-
-#ifdef MR_PLATFORM_WINDOWS
-#include <Windows/Windows.h>
-#include <vulkan/vulkan_win32.h>
-#endif // _WIN64
 
 #include <Core/Application.h>
 #include <Platform/PerformanceTimer.h>
@@ -27,11 +21,6 @@ static constexpr const bool bIsUsingValidation = true;
 #else
 static constexpr const bool bIsUsingValidation = false;
 #endif
-
-int VulkanRHIRegistry::GetMonitorIndex() const
-{
-	return -1;
-}
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 	VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -59,7 +48,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 }
 
 static String privRHIName;
-String VulkanRHIRegistry::GetName() const
+String VulkanRegistry::GetName() const
 {
 	static constexpr const wchar_t* vkRHIDisplayName = L"Vulkan";
 
@@ -68,11 +57,9 @@ String VulkanRHIRegistry::GetName() const
 	return privRHIName;
 }
 
-bool VulkanRHIRegistry::Initialize()
+bool VulkanRegistry::Initialize()
 {
-	MR_LOG(LogVulkan, Log, "Initializing %s.", GetName().Chr());
-
-	context = new VulkanRHIOutputContext(this);
+	context = new VulkanOutputContext();
 
 	bool bError = false;
 	bError = !CreateInstance();
@@ -93,7 +80,7 @@ bool VulkanRHIRegistry::Initialize()
 
 	bError = !CreateFramebuffers();
 
-	VulkanRHIOutputContext* ctx = (VulkanRHIOutputContext*)context;
+	VulkanOutputContext* ctx = (VulkanOutputContext*)context;
 	ctx->CreateCommandBuffers();
 
 	//initVK();
@@ -102,7 +89,7 @@ bool VulkanRHIRegistry::Initialize()
 	return true;
 }
 
-void VulkanRHIRegistry::CleanUp() const
+void VulkanRegistry::CleanUp() const
 {
 	context->CleanUp();
 	
@@ -156,7 +143,7 @@ void VulkanRHIRegistry::CleanUp() const
 	vkDestroyInstance(instance, 0);
 }
 
-bool VulkanRHIRegistry::CreateSurfaceWin32()
+bool VulkanRegistry::CreateSurfaceWin32()
 {
 	VkWin32SurfaceCreateInfoKHR win32SurfaceInfo = { VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR };
 	if (WindowsWindowManager* windowManager = (WindowsWindowManager*)Application::Get()->GetWindowManager())
@@ -182,7 +169,7 @@ bool VulkanRHIRegistry::CreateSurfaceWin32()
 	return true;
 }
 
-bool VulkanRHIRegistry::CreateQueueSlots()
+bool VulkanRegistry::CreateQueueSlots()
 {
 	uint32 physicalDeviceCount = 0;
 	vkEnumeratePhysicalDevices(instance, &physicalDeviceCount, 0);
@@ -231,7 +218,7 @@ bool VulkanRHIRegistry::CreateQueueSlots()
 	return false;
 }
 
-bool VulkanRHIRegistry::CreateDevice()
+bool VulkanRegistry::CreateDevice()
 {
 	VkDeviceCreateInfo deviceInfo = { VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO };
 
@@ -309,7 +296,7 @@ bool VulkanRHIRegistry::CreateDevice()
 	return true;
 }
 
-bool VulkanRHIRegistry::CreateSwapchain()
+bool VulkanRegistry::CreateSwapchain()
 {
 	surfaceCapabilities = {};
 	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(selectedVirtualDevice, surface, &surfaceCapabilities);
@@ -349,7 +336,7 @@ bool VulkanRHIRegistry::CreateSwapchain()
 	return true;
 }
 
-bool VulkanRHIRegistry::CreateImageViews()
+bool VulkanRegistry::CreateImageViews()
 {
 	for (uint32 i = 0; i < swapChainImagesCount; i++)
 	{
@@ -373,7 +360,7 @@ bool VulkanRHIRegistry::CreateImageViews()
 	return true;
 }
 
-bool VulkanRHIRegistry::CreateFramebuffers()
+bool VulkanRegistry::CreateFramebuffers()
 {
 	swapChainFramebuffers = new VkFramebuffer[swapChainImagesCount]();
 
@@ -398,7 +385,7 @@ bool VulkanRHIRegistry::CreateFramebuffers()
 	return true;
 }
 
-bool VulkanRHIRegistry::CreateRenderpass()
+bool VulkanRegistry::CreateRenderpass()
 {
 	VkAttachmentDescription attachmentInfo = {};
 	attachmentInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
@@ -445,7 +432,7 @@ bool VulkanRHIRegistry::CreateRenderpass()
 	return true;
 }
 
-VkShaderModule VulkanRHIRegistry::OpenShader(const String path) const
+VkShaderModule VulkanRegistry::OpenShader(const String path) const
 {
 	FileStatus stat;
 	IFile* shader = FileManager::CreateFileOperation(path, OPENMODE_READ, SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS, stat);
@@ -472,7 +459,7 @@ VkShaderModule VulkanRHIRegistry::OpenShader(const String path) const
 	return nullptr;
 }
 
-bool VulkanRHIRegistry::initVK()
+bool VulkanRegistry::initVK()
 {
 	{
 		shaderModuleVert = OpenShader("E:\\meteor\\editor\\vert.spv");
@@ -591,7 +578,7 @@ static constexpr const char* layers[]
 };
 #endif // MR_DEBUG
 
-bool VulkanRHIRegistry::CreateInstance()
+bool VulkanRegistry::CreateInstance()
 {
 	VkInstanceCreateInfo instanceInfo = { VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO };
 
@@ -634,7 +621,7 @@ bool VulkanRHIRegistry::CreateInstance()
 	return true;
 }
 
-bool VulkanRHIRegistry::GetInstanceLayerCompatibility()
+bool VulkanRegistry::GetInstanceLayerCompatibility()
 {
 #ifdef MR_DEBUG
 	if constexpr (bIsUsingValidation)
@@ -666,7 +653,7 @@ bool VulkanRHIRegistry::GetInstanceLayerCompatibility()
 	return false;
 }
 
-bool VulkanRHIRegistry::CreateDebugMessenger()
+bool VulkanRegistry::CreateDebugMessenger()
 {
 	constexpr VkDebugUtilsMessengerCreateInfoEXT dbmonInfo = { 
 		VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,

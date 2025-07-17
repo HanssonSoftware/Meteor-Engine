@@ -1,31 +1,26 @@
 ﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
-#include "VulkanRHIRegistry.h"
-#include <RHI/RHIOutputContext.h>
+#include "Registry.h"
 
 struct String;
 #pragma warning(disable : 26495) // Variable 'X::Y' is uninitialized. Always initialize a member variable (type.6).
 
-class VulkanRHIOutputContext : public IRHIOutputContext
+class VulkanOutputContext
 {
-	friend class VulkanRHIRegistry;
+	friend class VulkanRegistry;
 public:
-	VulkanRHIOutputContext(VulkanRHIRegistry* registry)
-		: IRHIOutputContext(registry)
-	{
+	VulkanOutputContext() = default;
 
-	}
+	virtual void Clear();
 
-	virtual void Clear() override;
-
-	virtual void Draw() override;
+	virtual void Draw();
 
 	virtual void CleanUp() const;
 
 	bool CreateCommandBuffers();
 	
-	virtual void CompileShader(const String name) override;
+	virtual void CompileShader(const String name);
 private:
 	VkCommandBuffer cmdBuffer;
 
