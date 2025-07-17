@@ -462,12 +462,8 @@ String String::operator+=(const char* other)
 
 const char* String::Chr() const
 {
-	if (bIsUsingHeap)
-	{
-		return heapBuffer.ptr || heapBuffer.length != 0 ? heapBuffer.ptr : "";
-	}
-
-	return stackBuffer.ptr || stackBuffer.length != 0 ? stackBuffer.ptr : "";
+	return bIsUsingHeap ? (heapBuffer.ptr || heapBuffer.length != 0 ? heapBuffer.ptr : "") : 
+		stackBuffer.ptr || stackBuffer.length != 0 ? stackBuffer.ptr : "";
 }
 
 char* String::Data()

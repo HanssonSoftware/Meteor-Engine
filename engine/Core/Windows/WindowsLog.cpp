@@ -40,19 +40,19 @@ void WindowsLog::Initialize()
 			{
 				if (!AttachConsole(ATTACH_PARENT_PROCESS))
 				{
-					App::RequestExit(-1);
+					Application::RequestExit(-1);
 				}
 			}
 			else
 			{
-				App::RequestExit(-1);
+				Application::RequestExit(-1);
 			}
 		}
 		else
 		{
 			if (!SetStdHandle(STD_INPUT_HANDLE, INVALID_HANDLE_VALUE))
 			{
-				App::RequestExit(-1);
+				Application::RequestExit(-1);
 			}
 
 			hConsole = CreateFileW(L"CONOUT$", GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
@@ -71,7 +71,7 @@ void WindowsLog::Initialize()
 
 			if (!SetStdHandle(STD_OUTPUT_HANDLE, hConsole))
 			{
-				App::RequestExit(-1);
+				Application::RequestExit(-1);
 			}
 
 			wchar_t* buffer = systemLayer->ConvertToWide(String::Format("%s developer console (b%d)", Application::Get()->GetAppInfo().appName.Chr(), BUILD_NUMBER).Chr());
@@ -79,7 +79,7 @@ void WindowsLog::Initialize()
 			if (!SetConsoleTitleW(buffer))
 			{
 				delete[] buffer;
-				App::RequestExit(-1);
+				Application::RequestExit(-1);
 			}
 
 			delete[] buffer; // Using uninitialized memory 'X'
@@ -99,7 +99,7 @@ void WindowsLog::Shutdown()
 
 		if (!FreeConsole())
 		{
-			App::RequestExit(-1);
+			Application::RequestExit(-1);
 		}
 	}
 #endif // MR_DEBUG

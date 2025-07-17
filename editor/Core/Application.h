@@ -33,12 +33,13 @@ int launchStranger(int ArgumentCount, char* Arguments[])
 	appInfo.appName = "Meteor Editor";
 	appInfo.appCodeName = "Astronaut";
 	appInfo.windowCreateInfo = wInfo;
+	appInfo.requiredMinimumMemoryInPercent = 0.15f;
 	appInfo.flags = APPFLAG_ENABLE_VERBOSE_LOGGING;
 
 	ICommandlet::Initalize();
 
 	EditorApplication newEditorApp = {};
-	App::InstantiateApplication(&newEditorApp, &appInfo);
+	Application::InstantiateApplication(&newEditorApp, &appInfo);
 
-	return App::GetRequestExitCode();
+	return Application::GetRequestExitCode();
 }

@@ -60,7 +60,7 @@ void Application::Init()
 #endif // MR_DEBUG
 
     layerManager->Init();
-    MemoryManager::Initialize();
+    MemoryManager::Initialize(appFramework->appInfo.requiredMinimumMemoryInPercent);
     Logger::Initialize();
 
     if (Application::Get()->appInfo.flags &~ APPFLAG_NO_WINDOW)
@@ -79,13 +79,6 @@ void Application::Init()
     if (Application::Get()->appInfo.flags & APPFLAG_DISPLAY_QUICK_INFO_ABOUT_MEMORY_USAGE)
         int h = 5; // DELETE
 
-    if (GetRenderContext())
-    {
-        //SceneGraph::Get().addToRoot(&nc);
-        //GetRenderContext()->graphToRender = &SceneGraph::Get();
-        //GetRenderContext()->setImGUIUsed(true);
-    }
-
     SetAppState(APPLICATIONSTATE_RUNNING);
 }
 
@@ -93,7 +86,7 @@ bool Application::InstantiateApplication(Application* newInstance, const Applica
 {
     if (!newInstance || !appCreateInfo)
     {
-        App::RequestExit(-1);
+        Application::RequestExit(-1);
         return false;
     }
 
@@ -107,54 +100,14 @@ bool Application::InstantiateApplication(Application* newInstance, const Applica
 
 void Application::Run()
 {
-    IRHIRegistry* graphicsDevice = (IRHIRegistry*)GetWindowManager()->GetRenderContext();
-  /*  if (GetWindowManager()->GetRenderContext() != nullptr)
-        graphicsDevice->renderThread = std::thread([&graphicsDevice]() 
-            { 
-                while (Application::Get()->GetAppState() == ApplicationState::Running)
-                {
-                    if (graphicsDevice->getDeviceReadyState() == GRAPHICS_ENGINE_STATE_RUNNING)
-                    {
-                        graphicsDevice->Render();
-                    }
-                    else
-                    {
-                        std::this_thread::sleep_for(std::chrono::milliseconds(5));
-                    }
-                }
-            }
-        );*/
-
-
     SetAppState(APPLICATIONSTATE_RUNNING);
 
     while (GetAppState() == APPLICATIONSTATE_RUNNING)
     {
-        PerformanceTimer tm;
-        tm.Start();
-
-        //MR_ASSERT();
-
-	    if (graphicsDevice) graphicsDevice->GetOutputContext()->Clear();
-		if (graphicsDevice) graphicsDevice->GetOutputContext()->Draw();
-
-        tm.Stop();
-
-        double t = tm.Evaluate();
-        if (layerManager) layerManager->UpdateLayer();
-
-        //SceneGraph::Get().Update(0.01f);
+        layerManager->UpdateLayer();
         appFramework->Run();
     }
 
-    //if (windowManager->GetRenderContext() != nullptr)
-    //{
-    //    if (graphicsDevice->renderThread.joinable())
-    //        graphicsDevice->renderThread.join();
-    //}
-
-
-    //windowManager->DestroyWindow("Super");
     appFramework->Shutdown();
 }
 
@@ -183,8 +136,6 @@ void Application::Shutdown()
         Logger::Shutdown();
 
         MemoryManager::Shutdown();
-
-        exit(exitCode);
     }
 }
 

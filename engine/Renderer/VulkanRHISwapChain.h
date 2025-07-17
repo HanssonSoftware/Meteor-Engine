@@ -1,7 +1,6 @@
 /* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
-#include <RHI/RHISwapChain.h>
 
 #include <vulkan/vulkan.h>
 

@@ -6,7 +6,7 @@
 class MemoryManager
 {
 public:
-	static void Initialize();
+	static void Initialize(const float RequiredMinimum);
 
 	static void Shutdown();
 
@@ -16,6 +16,7 @@ public:
 
 	static constexpr uint32 GetSize(void* data);
 private:
+
 	uint64 availableMemoryOnTheRig = 0;
 
 	uint64 recommendedByPool = 0;

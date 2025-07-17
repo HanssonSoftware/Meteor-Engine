@@ -85,5 +85,3 @@ protected:
 
 	String applicationName = L"Saxon Proprietary Game Engine";
 };
-
-using App = Application;

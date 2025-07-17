@@ -27,6 +27,7 @@ struct ApplicationInitializationInfo
 
 	int flags = 0;
 
+	float requiredMinimumMemoryInPercent = 0.f;
 };
 
 enum ApplicationState

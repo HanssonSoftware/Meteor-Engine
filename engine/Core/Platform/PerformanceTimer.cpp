@@ -1,11 +1,9 @@
 /* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #include "PerformanceTimer.h"
-#ifdef _WIN64
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
+#include <Windows/Windows.h>
+
 LARGE_INTEGER lg;
-#endif // _WIN64
 #include <Logging/LogMacros.h>
 
 LOG_ADDCATEGORY(HighPerformanceTimer);

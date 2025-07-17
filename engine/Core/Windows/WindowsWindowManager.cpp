@@ -169,7 +169,7 @@ LRESULT CALLBACK MeteorSpecifiedWindowProcedure(HWND wnd, UINT uint, WPARAM p1, 
         break;
 
     case WM_CLOSE:
-        App::RequestExit(0);
+        Application::RequestExit(0);
         break;
     case WM_SIZING:
         break;

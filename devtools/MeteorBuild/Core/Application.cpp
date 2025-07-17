@@ -27,7 +27,7 @@ void BuildSystemApplication::Init()
 	}
 	else
 	{
-		MR_LOG(LogBuildSystemApplication, Fatal, """sourcedir"" Parameter is Missing! Unable to find source directory!");
+		MR_LOG(LogBuildSystemApplication, Fatal, """-sourcedir"" Parameter is Missing! Unable to find source directory!");
 	}
 }
 

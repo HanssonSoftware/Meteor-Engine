@@ -9,12 +9,14 @@
 
 LOG_ADDCATEGORY(Arena);
 
-static constexpr const float engineRecommendedPercent = 0.15f;
+static float engineRecommendedPercent = 0.15f;
 
 static MemoryManager object;
 
-void MemoryManager::Initialize()
+void MemoryManager::Initialize(const float RequiredMinimum)
 {
+	engineRecommendedPercent = RequiredMinimum > 0.f ? RequiredMinimum : 0.1f;
+
 #ifdef MR_PLATFORM_WINDOWS
 	MEMORYSTATUSEX longlong = {};
 	longlong.dwLength = sizeof(MEMORYSTATUSEX);
@@ -28,6 +30,11 @@ void MemoryManager::Initialize()
 	object.availableMemoryOnTheRig = longlong.ullTotalPhys;
 
 	uint64 requiredByPercent = longlong.ullTotalPhys * engineRecommendedPercent;
+	if (requiredByPercent < 1'000'000'000)
+	{
+		MR_LOG(LogArena, Fatal, "Your PC's memory is too low! Consider buying some RAM stick! (Below 1GB)");
+		return;
+	}
 
 	object.pool = VirtualAlloc(nullptr, requiredByPercent, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 	
