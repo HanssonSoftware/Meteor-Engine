@@ -2,8 +2,8 @@
 
 #include "WindowManager.h"
 #include <Platform/WindowManager/Window.h>
+#include <Renderer/Registry.h>
 //#include <Core/Application.h>
-#include <RHI/RHIRegistry.h>
 
 
 
@@ -24,13 +24,7 @@ void IWindowManager::Init()
 
 void IWindowManager::Shutdown()
 {
-	if (renderContext)
-	{
-		renderContext->CleanUp();
-
-		delete renderContext;
-		renderContext = nullptr;
-	}
+	VulkanRegistry::Shutdown();
 }
 
 IWindow* IWindowManager::SearchFor(const String ID)

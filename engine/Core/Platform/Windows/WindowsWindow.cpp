@@ -3,7 +3,6 @@
 #include "WindowsWindow.h"
 #include <Logging/LogMacros.h>
 #include <Windows/WindowsWindowManager.h>
-#include <RHI/RHIRegistry.h>
 #include <Layers/SystemLayer.h>
 
 //#include <../Resources/resource.h>
@@ -59,16 +58,7 @@ bool WindowsWindow::CreateNativeWindow(const WindowCreateInfo* windowData)
 
 	RECT windowRect = { 0, 0, (LONG)windowData->size.x, (LONG)windowData->size.y };
 	AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, 0);
-
-	
-#ifdef MR_DEBUG
-	if (const IRHIRegistry* currentDevice = owner->GetRenderContext())
-	{
-		aWindowData.windowName = String::Format(L"%s - %s", windowData->windowName.Chr(), currentDevice->GetName().Chr());
-	}
-#else
 	aWindowData.windowName = windowData->windowName;
-#endif // MR_DEBUG
 
 	const wchar_t* buffer = Layer::GetSystemLayer()->ConvertToWide(aWindowData.windowName.Chr());
 	
@@ -123,17 +113,6 @@ void WindowsWindow::ShowWindow()
 		return;
 	}
 
-#ifdef MR_DEBUG
-	if (const IRHIRegistry* currentDevice = owner->GetRenderContext())
-	{
-		const String titleName = String::Format(L"%s - %s", windowData.windowName.Chr(), currentDevice->GetName().Chr());
-		const wchar_t* buffer = Layer::GetSystemLayer()->ConvertToWide(titleName.Chr());
-
-		::SetWindowTextW((HWND)handle, buffer);
-		delete[] buffer;
-	}
-#endif // MR_DEBUG
-
 	::ShowWindow((HWND)handle, /*SW_SHOWDEFAULT*/ 10);
 }
 
@@ -147,10 +126,6 @@ void WindowsWindow::SetTitle(const String newName)
 
 	windowData.windowName = newName;
 
-#ifdef MR_DEBUG
-	if (const IRHIRegistry* currentDevice = owner->GetRenderContext())
-		windowData.windowName = String::Format(L"%s - %s", windowData.windowName.Chr(), currentDevice->GetName().Chr());
-#endif
 	const wchar_t* buffer = Layer::GetSystemLayer()->ConvertToWide(windowData.windowName.Chr());
 	
 	if (::SetWindowTextW((HWND)handle, buffer) == 0)

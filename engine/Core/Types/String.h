@@ -42,17 +42,13 @@ struct String
 
 	bool operator!() const;
 	
-	String operator+=(const char* other);
+	String operator+=(const String& other);
 	
 	const char* operator*() { return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr; };
 
-	operator const char* () { return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr; };
-
-	operator char* ();
+	operator const char* () const { return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr; };
 
 	const char* Chr() const;	
-
-	char* Data();
 
 	String Delim(const String character, bool first);
 
@@ -67,6 +63,10 @@ struct String
 	static String Format(const String format, ...);
 
 	static bool Contains(const char* buffer, const char* target);
+	
+	static bool IsWhitespace(const char* buffer);
+
+	static bool IsSpace(const char* buffer);
 private:
 #ifdef MR_DEBUG
 	bool bIsInited = false;

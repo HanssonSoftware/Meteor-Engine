@@ -3,6 +3,11 @@
 #pragma once
 #if defined(_WIN32) || defined(_WIN64)
 
+#ifdef _WINDOWS_
+#error Windows.h should not be included!
+#endif // _WINDOWS_
+
+
 #define	WIN32_LEAN_AND_MEAN
 #define	NOMINMAX
 #define	NOHELP

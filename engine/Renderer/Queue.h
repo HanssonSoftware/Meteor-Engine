@@ -1,7 +1,7 @@
 /* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
-#include <vulkan/vulkan.h>
+#include "Vulkan.h"
 
 struct VulkanQueue
 {

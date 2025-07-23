@@ -27,7 +27,7 @@ int launchStranger(int ArgumentCount, char* Arguments[])
 	WindowCreateInfo wInfo = {};
 	wInfo.size = Vector2<>(1280, 720);
 	wInfo.windowID = String("Super");
-	wInfo.windowName = String("Meteor Editor");
+	wInfo.windowName = "Meteor Editor";
 
 	ApplicationInitializationInfo appInfo = {};
 	appInfo.appName = "Meteor Editor";

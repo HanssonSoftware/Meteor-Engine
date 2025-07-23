@@ -139,10 +139,10 @@ String WindowsFileManager::NormalizeDir(const String input)
     if (input.IsEmpty()) 
         return "";
 
-    String old = input;
+    char* buffer = new char[input.Length()];
+    memcpy(buffer, input.Chr(), input.Length());
 
-    char* buffer = old.Data();
-    int size = (int)strlen(buffer);
+    int size = (int)input.Length();
 
     for (int i = 0; i < size; i++)
     {
@@ -153,7 +153,10 @@ String WindowsFileManager::NormalizeDir(const String input)
         }
     }
 
-    return old;
+    String bf(buffer);
+
+    delete[] buffer;
+    return bf;
 }
 
 IFile* WindowsFileManager::CreateFileOperation(const String pathA, int accessType, int sharingMode, FileOverrideRules createType, FileStatus& status)

@@ -18,10 +18,10 @@
     <ClCompile Include="engine\Core\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Commandlet.cpp">
+    <ClCompile Include="engine\Core\Platform\Commandlet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\InputManager.cpp">
+    <ClCompile Include="engine\Core\Platform\InputManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Layers\Layer.cpp">
@@ -34,15 +34,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Common\Delegate.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Core\Config\Archive.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Core\Config\Config.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Core\Config\ConfigCollection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Platform\File.cpp">
@@ -67,9 +58,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Common\Pointers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Core\AssetLoader\Mesh\StaticMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Common\Guid.cpp">
@@ -102,25 +90,25 @@
     <ClCompile Include="engine\Core\Serialisation\AssetManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Windows\WindowsWindowManager.cpp">
+    <ClCompile Include="engine\Core\Platform\Windows\WindowsWindowManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Windows\WindowsWindow.cpp">
+    <ClCompile Include="engine\Core\Platform\Windows\WindowsWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Layers\SystemLayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Windows\WindowsLayer.cpp">
+    <ClCompile Include="engine\Core\Platform\Windows\WindowsLayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Platform\PerformanceTimer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Windows\WindowsFile.cpp">
+    <ClCompile Include="engine\Core\Platform\Windows\WindowsFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Windows\WindowsTimer.cpp">
+    <ClCompile Include="engine\Core\Platform\Windows\WindowsTimer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Platform\Thread\Thread.cpp">
@@ -129,13 +117,13 @@
     <ClCompile Include="engine\Core\Layers\ThreadPool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Windows\WindowsLog.cpp">
+    <ClCompile Include="engine\Core\Platform\Windows\WindowsLog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Platform\FileManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Windows\WindowsFileManager.cpp">
+    <ClCompile Include="engine\Core\Platform\Windows\WindowsFileManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Platform\WindowManager\WindowMenu.cpp">
@@ -156,13 +144,13 @@
     <ClCompile Include="engine\Renderer\Registry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Windows\WindowsThread.cpp">
+    <ClCompile Include="engine\Core\Platform\Windows\WindowsThread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Platform\Thread\ThreadManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Windows\WindowsThreadManager.cpp">
+    <ClCompile Include="engine\Core\Platform\Windows\WindowsThreadManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Renderer\SwapChain.cpp">
@@ -171,15 +159,24 @@
     <ClCompile Include="engine\Core\MemoryManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="engine\Renderer\Device.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Renderer\PipelineManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Renderer\Pipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\Core\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Commandlet.h">
+    <ClInclude Include="engine\Core\Platform\Commandlet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\InputManager.h">
+    <ClInclude Include="engine\Core\Platform\InputManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Layers\Layer.h">
@@ -192,15 +189,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Common\Delegate.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Core\Config\Archive.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Core\Config\Config.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Core\Config\ConfigCollection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Platform\File.h">
@@ -491,9 +479,6 @@
     <ClInclude Include="resources\resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\AssetLoader\Mesh\StaticMesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\Core\Common\Guid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -527,22 +512,22 @@
     <ClInclude Include="engine\Core\Layers\SystemLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Windows\WindowsWindowManager.h">
+    <ClInclude Include="engine\Core\Platform\Windows\WindowsWindowManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Windows\WindowsWindow.h">
+    <ClInclude Include="engine\Core\Platform\Windows\WindowsWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Windows\WindowsLayer.h">
+    <ClInclude Include="engine\Core\Platform\Windows\WindowsLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Platform\PerformanceTimer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Windows\WindowsFile.h">
+    <ClInclude Include="engine\Core\Platform\Windows\WindowsFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Windows\WindowsTimer.h">
+    <ClInclude Include="engine\Core\Platform\Windows\WindowsTimer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Platform\Thread\Thread.h">
@@ -551,10 +536,10 @@
     <ClInclude Include="engine\Core\Layers\ThreadPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Windows\Windows.h">
+    <ClInclude Include="engine\Core\Platform\Windows\Windows.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Windows\WindowsLog.h">
+    <ClInclude Include="engine\Core\Platform\Windows\WindowsLog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Platform\FileHelpers.h">
@@ -566,7 +551,7 @@
     <ClInclude Include="engine\Core\Platform\FileManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Windows\WindowsFileManager.h">
+    <ClInclude Include="engine\Core\Platform\Windows\WindowsFileManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Platform\PlatformLayout.h">
@@ -602,7 +587,7 @@
     <ClInclude Include="engine\Core\Common\Math.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Windows\WindowsThread.h">
+    <ClInclude Include="engine\Core\Platform\Windows\WindowsThread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Platform\Thread\ThreadDescriptor.h">
@@ -611,7 +596,7 @@
     <ClInclude Include="engine\Core\Platform\Thread\ThreadManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Windows\WindowsThreadManager.h">
+    <ClInclude Include="engine\Core\Platform\Windows\WindowsThreadManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Renderer\SwapChain.h">
@@ -621,6 +606,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Renderer\Vulkan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Renderer\Device.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Renderer\PipelineManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Renderer\Pipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

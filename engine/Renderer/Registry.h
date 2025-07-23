@@ -2,77 +2,76 @@
 
 #pragma once
 #include "Queue.h"
+#include <Platform/PlatformDefs.h>
+
+struct String;
+class VulkanSwapChain;
+class VulkanOutputContext;
+class VulkanDevice;
 
 class VulkanRegistry
 {
 	friend class VulkanOutputContext;
+	friend class VulkanSwapChain;
 public:
-	virtual String GetName() const;
+	VulkanRegistry() = default;
+	
+	virtual ~VulkanRegistry() noexcept = default;
 
-	virtual bool Initialize();
+	static String GetName();
 
-	virtual void CleanUp() const;
+	static bool Initialize();
+
+	static void Shutdown();
+
+	void Render();
+
+	static VulkanRegistry* GetRegistry();
+
+	VkInstance GetInstance() const { return instance; }
 
 protected:
-	bool initVK();
 
 	bool CreateInstance();
 
-	bool GetInstanceLayerCompatibility();
+	void CreateDebugMessenger();
 
-	bool CreateDebugMessenger();
+	void DestroyDebugMessenger() const;
 
-	bool CreateSurfaceWin32();
-
-	bool CreateQueueSlots();
+	bool FindQueues();
 
 	bool CreateDevice();
 
-	bool CreateSwapchain();
-
-	bool CreateImageViews();
-
-	bool CreateFramebuffers();
-	
 	bool CreateRenderpass();
+
+	//bool CreateSwapchain();
+
+	//bool CreateImageViews();
+
+	//bool CreateFramebuffers();
+	//
+
 
 	VkInstance instance;
 
-	VkDebugUtilsMessengerEXT dbMon;
-
-	VkPhysicalDevice selectedVirtualDevice;
-
-	int QueueIndex = -1;
-	VkDevice selectedDevice;
-
-	VkSurfaceKHR surface; // RHISwapChain
-
-	VkSwapchainKHR swapChain; // RHISwapChain
-
-	VkQueue graphicsQueue;
-
-	VkImage* swapChainImages;
-
-	VkImageView* swapChainImageViews;
-
-	VkFramebuffer* swapChainFramebuffers;
-
-	VkShaderModule shaderModuleFrag;
-
-	VkShaderModule shaderModuleVert;
-
-	VkPipeline pipeline;
-
-	VkSurfaceCapabilitiesKHR surfaceCapabilities;
-
-	VkRenderPass renderPass;
+	VkDebugUtilsMessengerEXT debugger;
 
 	VkShaderModule CreateShader(const VkShaderModule fromModule) const {};
 
-	VkShaderModule OpenShader(const String path) const;
+	//VkShaderModule OpenShader(const String path) const;
 	
-	uint32 swapChainImagesCount = 0;
-private:
 
+protected:
+	static inline VulkanRegistry* registry;
+
+	VulkanOutputContext* outputContext;
+
+	VulkanSwapChain* swapChain;
+
+	VulkanDevice* device;
+
+	VkRenderPass renderPass;
 };
 
+
+constexpr const char* VkResultToText(const VkResult& result);

@@ -1,0 +1,13 @@
+Project "Renderer" : "Meteor"
+{
+	IncludePath:
+	{
+		"",
+		"",
+	},
+
+	Modules:
+	{
+		"CoreKit"
+	}
+}

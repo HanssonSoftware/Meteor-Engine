@@ -23,7 +23,7 @@ void BuildSystemApplication::Init()
 
 	if (!ICommandlet::Parse("-sourcedir").IsEmpty())
 	{
-		bool b = LocatingInterface::FindAllReferences(ICommandlet::Parse("-sourcedir"));
+		bool b = Locator::FindAllReferences(ICommandlet::Parse("-sourcedir"));
 	}
 	else
 	{
@@ -38,5 +38,6 @@ void BuildSystemApplication::Run()
 
 void BuildSystemApplication::Shutdown()
 {
+	Application::Shutdown();
 }
 

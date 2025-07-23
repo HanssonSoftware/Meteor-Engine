@@ -6,10 +6,14 @@
 
 struct String;
 
-struct LocatingInterface
+struct Locator
 {
-	static bool FindAllReferences(const String sourceDirectory);
+	static bool FindAllReferences(const String& sourceDirectory);
+
+	static void ListDirectory(const String& directory, std::vector<String>& returned);
 
 	inline static std::vector<IModule*> modules;
+
+	inline static std::vector<String> foundPaths;
 };
 

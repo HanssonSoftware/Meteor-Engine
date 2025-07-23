@@ -1,9 +1,9 @@
 /* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 #pragma once
 #include <cstdint>
+#include "PlatformLayout.h"
 
-
-#ifdef _WIN64
+#ifdef MR_PLATFORM_WINDOWS
 /** uint32 variable size is: 16bit */
 typedef unsigned int uint32;
 typedef unsigned long long uint64;

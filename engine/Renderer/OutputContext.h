@@ -21,7 +21,11 @@ public:
 	bool CreateCommandBuffers();
 	
 	virtual void CompileShader(const String name);
-private:
+
+protected:
+	VulkanRegistry* registry;
+	VulkanDevice* owningDevice;
+
 	VkCommandBuffer cmdBuffer;
 
 	VkCommandPool cmdPool;
@@ -31,7 +35,5 @@ private:
 	VkFence renderFence;
 
 	VkSemaphore renderSharpSemaphore;
-
-	const String evaluateResultToText(VkResult Result) noexcept;
 };
 

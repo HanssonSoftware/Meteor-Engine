@@ -4,10 +4,9 @@
 #include <../Resources/resource.h>
 #include <Core/Application.h>
 #include "WindowsWindow.h"
-#include <RHI/RHILoader.h>
-#include <RHI/RHIRegistry.h>
 #include <Layers/SystemLayer.h>
 #include <dwmapi.h>
+#include <Renderer/Registry.h>
 
 #pragma comment (lib, "UxTheme.lib")
 
@@ -60,10 +59,9 @@ IWindow* WindowsWindowManager::CreateNativeWindow(const WindowCreateInfo* Create
 
 		if (GetFirstWindow() == newWindow)
 		{
-            renderContext = RHILoader::InitRHI(SYSTEM_LAYOUT_WINDOWS);
-            if (!renderContext->Initialize())
+            if (!VulkanRegistry::Initialize())
             {
-                MR_LOG(LogWindowManager, Fatal, "Failed to create rendering interface! %s", renderContext->GetName().Chr());
+                MR_LOG(LogWindowManager, Fatal, "Failed to create rendering interface! %s", *VulkanRegistry::GetName());
                 return nullptr; // just in case
             }
 
@@ -158,14 +156,7 @@ LRESULT CALLBACK MeteorSpecifiedWindowProcedure(HWND wnd, UINT uint, WPARAM p1, 
         break;
 
     case WM_DESTROY:
-        if (WindowsWindowManager* wm = (WindowsWindowManager*)Application::Get()->GetWindowManager())
-        {
-            if (WindowsWindow* wind = wm->SearchForHWND(wnd))
-            {
-                //wind->DestroyWindow();
-            }
-        }
-
+        
         break;
 
     case WM_CLOSE:

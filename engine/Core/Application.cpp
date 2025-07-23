@@ -14,6 +14,7 @@
 #include <crtdbg.h>
 #endif // MR_DEBUG
 #include <Platform/PerformanceTimer.h>
+#include <Renderer/Registry.h>
 
 static Application* appFramework = nullptr;
 
@@ -40,7 +41,7 @@ void Application::RequestExit(int Code)
     MR_ASSERT(appFramework != nullptr, "Application class is invalid!");
     
     appFramework->exitCode = Code;
-    appFramework->Shutdown();
+    appFramework->SetAppState(APPLICATIONSTATE_SHUTDOWN);
 }
 
 const int Application::GetRequestExitCode()
@@ -97,12 +98,14 @@ bool Application::InstantiateApplication(Application* newInstance, const Applica
 
 void Application::Run()
 {
+    VulkanRegistry* reg = VulkanRegistry::GetRegistry();
     SetAppState(APPLICATIONSTATE_RUNNING);
 
     while (GetAppState() == APPLICATIONSTATE_RUNNING)
     {
         layerManager->UpdateLayer();
         appFramework->Run();
+        reg->Render();
     }
 
     appFramework->Shutdown();
@@ -169,7 +172,7 @@ void Application::CreateNativeWindow() const
     GetWindowManager()->CreateNativeWindow(&appFramework->appInfo.windowCreateInfo);
 }
 
-inline Application* GetApplication()
+Application* GetApplication()
 {
     return appFramework;
 }

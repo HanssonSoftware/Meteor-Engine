@@ -66,7 +66,7 @@ void LayerManager::UpdateLayer()
 
 	for (Layer*& indexed : layers)
 	{
-		indexed->Update();
+		if (indexed != nullptr) indexed->Update();
 	}
 }
 

@@ -3,6 +3,7 @@
 #pragma once
 #include <Types/String.h>
 #include <Platform/File.h>
+#include <vector>
 
 class IModule
 {
@@ -14,7 +15,9 @@ public:
 
 	static IModule* CreateModule(const String fullPathToModule);
 
-	void OpenPath(const String fullPathToModule);
+	static void Search(const String& dir, std::vector<String>& array);
+
+	void OpenPath(const String& fullPathToModule);
 
 	IFile* GetModuleBuffer() const { return moduleDescriptor; }
 private:

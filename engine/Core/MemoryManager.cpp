@@ -29,7 +29,7 @@ void MemoryManager::Initialize(const float RequiredMinimum)
 
 	object.availableMemoryOnTheRig = longlong.ullTotalPhys;
 
-	uint64 requiredByPercent = longlong.ullTotalPhys * engineRecommendedPercent;
+	uint64 requiredByPercent = (uint64)(longlong.ullTotalPhys * engineRecommendedPercent);
 	if (requiredByPercent < 1'000'000'000)
 	{
 		MR_LOG(LogArena, Fatal, "Your PC's memory is too low! Consider buying some RAM stick! (Below 1GB)");

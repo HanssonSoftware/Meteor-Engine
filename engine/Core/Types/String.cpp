@@ -263,12 +263,6 @@ String::String(const std::string Input)
 
 String::String(const std::wstring Input)
 {
-	if (Input.empty() == 0)
-	{
-		MakeEmpty();
-		return;
-	}
-
 	const size_t inputSize = Input.size();
 
 	if (inputSize <= SSO_MAX_CHARS)
@@ -444,18 +438,24 @@ bool String::operator!=(const String& Other) const
 	return strcmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) != 0;
 }
 
-String String::operator+=(const char* other)
+String String::operator+=(const String& other)
 {
-	//if (other)
-	//{
-	//	const size_t otherSize = strlen(other);
+	if (!other.IsEmpty())
+	{
+		if (bIsUsingHeap)
+		{
+			const size_t length = Length() + (other.bIsUsingHeap ? other.heapBuffer.length : other.stackBuffer.length);
 
-	//	size_t thisSize = this->buffer ? strlen(this->buffer) : 0;
+			strcat(heapBuffer.ptr, other.bIsUsingHeap ? other.heapBuffer.ptr : other.stackBuffer.ptr);
 
-	//	buffer = new char[otherSize + thisSize + 1]();
-
-	//	strcat(buffer, other);
-	//}
+			heapBuffer.length = length;
+			heapBuffer.capacity = length + 1;
+		}
+		else
+		{
+			MR_ASSERT(false, "This part is not implemented, yet!");
+		}
+	}
 
 	return *this;
 }
@@ -464,11 +464,6 @@ const char* String::Chr() const
 {
 	return bIsUsingHeap ? (heapBuffer.ptr || heapBuffer.length != 0 ? heapBuffer.ptr : "") : 
 		stackBuffer.ptr || stackBuffer.length != 0 ? stackBuffer.ptr : "";
-}
-
-char* String::Data()
-{
-	return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr;
 }
 
 bool String::operator!() const
@@ -513,15 +508,16 @@ String String::Format(const String format, ...)
 
 	va_list a;
 	va_start(a, format);
-	const uint32 sizeForVA = vsnprintf(0, 0, formattingBuffer, a);
-	va_end(a);
+
+	va_list a_cpy;
+	va_copy(a_cpy, a);
+	const uint32 sizeForVA = vsnprintf(nullptr, 0, formattingBuffer, a_cpy);
+	va_end(a_cpy);
 
 	char* newFormattedBuffer = new char[sizeForVA + 1]();
 
-	va_list b;
-	va_start(b, format);
-	vsnprintf(newFormattedBuffer, sizeForVA + 1 ,formattingBuffer, b);
-	va_end(b);
+	vsnprintf(newFormattedBuffer, sizeForVA + 1 ,formattingBuffer, a);
+	va_end(a);
 
 	String stringized(newFormattedBuffer);
 
@@ -606,4 +602,23 @@ String String::operator=(const String& other)
 	}
 
 	return *this;
+}
+
+bool String::IsWhitespace(const char* buffer)
+{
+	if (buffer[0] == '\n' || 
+		buffer[0] == '\t' ||
+		buffer[0] == '\f' ||
+		buffer[0] == '\r' ||
+		buffer[0] == '\v' )
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool String::IsSpace(const char* buffer)
+{
+	return buffer[0] == ' ' ? true : false;
 }
