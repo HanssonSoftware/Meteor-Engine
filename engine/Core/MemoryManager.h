@@ -3,14 +3,13 @@
 #pragma once
 #include <Platform/PlatformDefs.h>
 
-class MemoryManager
+struct MemoryManager
 {
-public:
 	static void Initialize(const float RequiredMinimum);
 
 	static void Shutdown();
 
-	static void* Allocate();
+	static void* Allocate(const size_t& size);
 
 	static void Deallocate();
 
@@ -21,6 +20,13 @@ private:
 
 	uint64 recommendedByPool = 0;
 
-	void* pool;
+	struct 
+	{
+		void* begin;
+
+		void* end;
+
+		size_t offset;
+	};
 };
 

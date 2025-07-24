@@ -5,6 +5,8 @@
 #include <Platform/FileHelpers.h>
 #undef CreateDirectory
 
+#include <vector>
+
 struct String;
 class File;
 
@@ -16,6 +18,8 @@ struct IFileManager
 
 	static bool DeleteDirectory(const String name, bool bToFullPath);
 
+	static void ListDirectory(const String directoryToCheck, std::vector<String>& output);
+	
 	static bool IsPathExists(const String name);
 
 	static bool IsPathRelative(const String path);

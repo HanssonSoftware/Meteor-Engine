@@ -5,6 +5,9 @@
 #include <Types/String.h>
 #include <Platform/PerformanceTimer.h>
 #include <Parsing/LocatingInterface.h>
+#include <shellapi.h>
+
+#pragma comment(lib, "Shell32.lib")
 
 int main(int argc, char* argv[])
 {

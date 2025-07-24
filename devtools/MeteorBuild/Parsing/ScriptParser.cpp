@@ -4,7 +4,7 @@
 #include "Module.h"
 #include <Commandlet.h>
 
-void ScriptParser::BeginParse(const IModule& module)
+void ScriptParser::BeginParse(const Module& module)
 {
 	if (IFile* file = module.GetModuleBuffer())
 	{

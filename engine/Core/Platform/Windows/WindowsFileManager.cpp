@@ -59,10 +59,17 @@ bool WindowsFileManager::DeleteDirectory(const String name, bool bToFullPath)
     if (!RemoveDirectoryW(dirName))
     {
         MR_LOG(LogFileManager, Error, "Error: %s", Layer::GetSystemLayer()->GetError());
+        delete[] dirName;
         return false;
     }
 
+    delete[] dirName;
     return true;
+}
+
+void WindowsFileManager::ListDirectory(const String directoryToCheck, std::vector<String>& output)
+{
+
 }
 
 bool WindowsFileManager::IsPathExists(const String name)

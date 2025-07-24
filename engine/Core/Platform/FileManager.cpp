@@ -18,6 +18,10 @@ bool IFileManager::DeleteDirectory(const String name, bool bToFullPath)
 	return false;
 }
 
+void IFileManager::ListDirectory(const String directoryToCheck, std::vector<String>& output)
+{
+}
+
 bool IFileManager::IsPathExists(const String name)
 {
 	return false;

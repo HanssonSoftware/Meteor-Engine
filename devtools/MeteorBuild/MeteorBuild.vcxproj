@@ -176,6 +176,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Caching\Intermediate.cpp" />
     <ClCompile Include="Core\Application.cpp" />
     <ClCompile Include="Parsing\Module.cpp" />
     <ClCompile Include="Parsing\LocatingInterface.cpp" />
@@ -183,6 +184,7 @@
     <ClCompile Include="Parsing\ScriptParser.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Caching\Intermediate.h" />
     <ClInclude Include="Core\Application.h" />
     <ClInclude Include="Parsing\Module.h" />
     <ClInclude Include="Parsing\LocatingInterface.h" />

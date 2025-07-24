@@ -1,11 +1,11 @@
 /* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #pragma once
-class IModule;
+class Module;
 
 struct ScriptParser
 {
-	static void BeginParse(const IModule& module);
+	static void BeginParse(const Module& module);
 
 	static const char* ParseIndex(const char* pos);
 

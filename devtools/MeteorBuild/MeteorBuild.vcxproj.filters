@@ -30,6 +30,9 @@
     <ClCompile Include="Parsing\ScriptParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Caching\Intermediate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Application.h">
@@ -48,6 +51,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Parsing\ScriptParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Caching\Intermediate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

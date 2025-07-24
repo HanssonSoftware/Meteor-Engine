@@ -13,7 +13,7 @@ class ScopedPtr
 public:
 	ScopedPtr();
 
-	explicit ScopedPtr(T* newPtr) 
+	ScopedPtr(T* newPtr) 
 		: ptr(newPtr) 
 	{
 	
@@ -45,12 +45,12 @@ public:
 	{
 		if (this != &other)
 		{
-			if (ptr)
-				mrfree(ptr);
+			if (ptr) {}
 
 			ptr = other.ptr;
 			other.ptr = nullptr;
 		}
+
 		return *this;
 	}
 private:
@@ -68,7 +68,6 @@ inline ScopedPtr<T>::~ScopedPtr()
 {
 	if (ptr != nullptr)
 	{
-		mrfree(ptr);
 		ptr = nullptr;
 	}
 }

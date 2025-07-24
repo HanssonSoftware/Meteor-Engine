@@ -11,11 +11,11 @@
 
 #pragma comment(lib, "Pathcch.lib")
 
-IModule* IModule::CreateModule(const String fullPathToModule)
+Module* Module::CreateModule(const String fullPathToModule)
 {
 	MR_ASSERT(!fullPathToModule.IsEmpty(), "Module path is empty!");
 
-	IModule* super = new IModule();
+	Module* super = new Module();
 
 	wchar_t* path = Layer::GetSystemLayer()->ConvertToWide(fullPathToModule);
 	PathCchRemoveFileSpec(path, wcslen(path));
@@ -24,40 +24,22 @@ IModule* IModule::CreateModule(const String fullPathToModule)
 	Locator::ListDirectory(path, pa);
 	delete[] path;
 	
+	int s = pa.size();
+	for (int i = 0; i < s; i++)
+	{
+		if (FileManager::IsEndingWith(pa[i], "mrbuild"))
+		{
+			pa.erase(pa.begin() + i);
+			break;
+		}
+	}
+
 	//ScriptParser::BeginParse();
 
 	return super;
 }
 
-void IModule::Search(const String& dir, std::vector<String>& array)
-{
-	WIN32_FIND_DATAW find;
-
-	wchar_t* path = Layer::GetSystemLayer()->ConvertToWide(dir.Chr());
-	HANDLE file = FindFirstFileW(wcscat(path, L"\\*"), &find);
-
-	do
-	{
-		if (find.cFileName[0] == L'.')
-			continue;
-
-		switch (find.dwFileAttributes)
-		{
-		case FILE_ATTRIBUTE_DIRECTORY:
-			Search(path, array);
-			break;
-
-		case FILE_ATTRIBUTE_ARCHIVE:
-			
-			break;
-		}
-
-	} while (FindNextFileW(file, &find) != 0);
-
-	delete[] path;
-}
-
-void IModule::OpenPath(const String& fullPathToModule)
+void Module::OpenPath(const String& fullPathToModule)
 {
 	FileStatus stat;
 	moduleDescriptor = FileManager::CreateFileOperation(fullPathToModule, OPENMODE_READ, SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS, stat);

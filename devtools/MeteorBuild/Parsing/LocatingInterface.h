@@ -12,7 +12,9 @@ struct Locator
 
 	static void ListDirectory(const String& directory, std::vector<String>& returned);
 
-	inline static std::vector<IModule*> modules;
+	static void SearchExtensionSpecified(const String& directory, const String& extension,std::vector<String>& returned);
+
+	inline static std::vector<Module*> modules;
 
 	inline static std::vector<String> foundPaths;
 };

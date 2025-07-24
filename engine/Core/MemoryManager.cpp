@@ -29,31 +29,34 @@ void MemoryManager::Initialize(const float RequiredMinimum)
 
 	object.availableMemoryOnTheRig = longlong.ullTotalPhys;
 
-	uint64 requiredByPercent = (uint64)(longlong.ullTotalPhys * engineRecommendedPercent);
+	size_t requiredByPercent = (size_t)(longlong.ullTotalPhys * engineRecommendedPercent);
 	if (requiredByPercent < 1'000'000'000)
 	{
 		MR_LOG(LogArena, Fatal, "Your PC's memory is too low! Consider buying some RAM stick! (Below 1GB)");
 		return;
 	}
 
-	object.pool = VirtualAlloc(nullptr, requiredByPercent, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+	object.begin = VirtualAlloc(nullptr, requiredByPercent, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 	
-	MR_ASSERT(object.pool != nullptr, "Failed to reserve, the engine recommended memory! Application exiting...");
+	MR_ASSERT(object.begin != nullptr, "Failed to reserve, the engine recommended memory! Application exiting...");
 #endif // MR_PLATFORM_WINDOWS
+
+	object.end = (char*)object.begin + requiredByPercent;
 }
 
 void MemoryManager::Shutdown()
 {
-	if (!VirtualFree(object.pool, 0, MEM_RELEASE))
+	if (!VirtualFree(object.begin, 0, MEM_RELEASE))
 	{
 		MR_LOG(LogArena, Fatal, "VirtualFree failed with: %s", *Layer::GetSystemLayer()->GetError());
-		return;
 	}
 }
 
-void* MemoryManager::Allocate()
+void* MemoryManager::Allocate(const size_t& size)
 {
-	void* const place = nullptr;
+	void* place = (char*)object.begin + object.offset;
+
+
 
 	return place;
 }

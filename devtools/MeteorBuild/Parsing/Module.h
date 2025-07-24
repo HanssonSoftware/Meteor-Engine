@@ -5,21 +5,20 @@
 #include <Platform/File.h>
 #include <vector>
 
-class IModule
+class Module
 {
 public:
-	IModule() = default;
-	IModule(const IModule&) = delete;
+	Module() = default;
+	Module(const Module&) = delete;
 
-	virtual ~IModule() noexcept = default;
+	virtual ~Module() noexcept = default;
 
-	static IModule* CreateModule(const String fullPathToModule);
-
-	static void Search(const String& dir, std::vector<String>& array);
+	static Module* CreateModule(const String fullPathToModule);
 
 	void OpenPath(const String& fullPathToModule);
 
 	IFile* GetModuleBuffer() const { return moduleDescriptor; }
+
 private:
 	String name;
 
