@@ -126,21 +126,21 @@ void WindowsLog::SendToOutputBuffer(const String Buffer)
 
 		switch (actualDescriptor->severity)
 		{
-		case Log:
-			SetConsoleTextAttribute(hConsole, 0x7);
-			break;
-		case Verbose:
-			SetConsoleTextAttribute(hConsole, 0x9);
-			break;
-		case Error:
-			SetConsoleTextAttribute(hConsole, 0xC);
-			break;
-		case Warn:
-			SetConsoleTextAttribute(hConsole, 0x6);
-			break;
-		case Fatal:
-			SetConsoleTextAttribute(hConsole, 0x4);
-			break;
+			case Log:
+				SetConsoleTextAttribute(hConsole, 0x7);
+				break;
+			case Verbose:
+				SetConsoleTextAttribute(hConsole, 0x9);
+				break;
+			case Error:
+				SetConsoleTextAttribute(hConsole, 0xC);
+				break;
+			case Warn:
+				SetConsoleTextAttribute(hConsole, 0x6);
+				break;
+			case Fatal:
+				SetConsoleTextAttribute(hConsole, 0x4);
+				break;
 		}
 
 		DWORD written = 0;
@@ -279,7 +279,7 @@ int WindowsLog::TransmitAssertion(LogAssertion& Info)
 		break;
 	case 2:		
 		Info.bIgnoreThis = true;
-		MR_LOG(LogAssertionSystem, Warn, "Assert is supressed! [%s:%d]", Info.assertLocationInFile, Info.assertLineInFile);
+		MR_LOG(LogAssertionSystem, Warn, "Assert is supressed! %s:%d", Info.assertLocationInFile, Info.assertLineInFile);
 		break;
 
 	default:

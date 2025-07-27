@@ -8,31 +8,31 @@
 
 static_assert(!std::is_same_v<FileManager, IFileManager>, "File Manager is using BASE type!");
 
-bool IFileManager::CreateDirectory(const String name, bool bForceCreate)
+bool IFileManager::CreateDirectory(const String& name, bool bForceCreate)
 {
 	return false;
 }
 
-bool IFileManager::DeleteDirectory(const String name, bool bToFullPath)
+bool IFileManager::DeleteDirectory(const String& name, bool bToFullPath)
 {
 	return false;
 }
 
-void IFileManager::ListDirectory(const String directoryToCheck, std::vector<String>& output)
+void IFileManager::ListDirectory(String directoryToCheck, std::vector<String>& output)
 {
 }
 
-bool IFileManager::IsPathExists(const String name)
-{
-	return false;
-}
-
-bool IFileManager::IsPathRelative(const String path)
+bool IFileManager::IsPathExists(const String& name)
 {
 	return false;
 }
 
-bool IFileManager::IsEndingWith(const String name, const String extension)
+bool IFileManager::IsPathRelative(const String& path)
+{
+	return false;
+}
+
+bool IFileManager::IsEndingWith(const String& name, const String& extension)
 {
 	if (name.IsEmpty() || extension.IsEmpty())
 		return false;
@@ -57,12 +57,12 @@ String IFileManager::GetExecutableDirectory()
 	return String();
 }
 
-String IFileManager::NormalizeDir(const String input)
+void IFileManager::NormalizeDirectory(String& input)
 {
-	return String();
+	
 }
 
-IFile* IFileManager::CreateFileOperation(const String path, int accessType, int sharingMode, int createType, FileStatus& status)
+IFile* IFileManager::CreateFileOperation(const String& path, int accessType, int sharingMode, int createType, FileStatus& status)
 {
 	return nullptr;
 }

@@ -32,7 +32,8 @@ WindowsThread* WindowsThreadManager::CreateThread(const ThreadInitializationDesc
 	//HANDLE newHandle = ::CreateThread(
 	//	nullptr,
 	//	0,
-	//	inputFunction
+	//	inputFunction,
+	//	
 	//	);
 
 	return nullptr;

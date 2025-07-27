@@ -7,10 +7,8 @@
 
 class Module
 {
+	friend struct ScriptParser;
 public:
-	Module() = default;
-	Module(const Module&) = delete;
-
 	virtual ~Module() noexcept = default;
 
 	static Module* CreateModule(const String fullPathToModule);
@@ -19,10 +17,27 @@ public:
 
 	IFile* GetModuleBuffer() const { return moduleDescriptor; }
 
-private:
-	String name;
+protected:
+	Module() = default;
 
-	String path;
+	Module(const Module&) = delete;
+
+	struct
+	{
+		String moduleName;
+
+		String solution;
+
+		std::vector<String> includePaths;
+
+		std::vector<String> dependencyModules;
+
+		std::vector<String> linkedLibraries;
+	};
+
+	String fullPath;
+
+	std::vector<String> includedSources;
 
 	IFile* moduleDescriptor = nullptr;
 };

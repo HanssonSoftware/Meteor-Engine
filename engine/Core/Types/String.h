@@ -50,6 +50,8 @@ struct String
 
 	const char* Chr() const;	
 
+	char* Allocate();	
+
 	String Delim(const String character, bool first);
 
 	bool IsEmpty() const noexcept;

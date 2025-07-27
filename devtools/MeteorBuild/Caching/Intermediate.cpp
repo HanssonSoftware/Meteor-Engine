@@ -1,11 +1,19 @@
 /* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
 
 #include "Intermediate.h"
-#include <Commandlet.h>
 
-String Intermediate::GetIntermediateDirectory()
+#include <FileManager.h>
+
+bool Intermediate::SearchIntermediateFiles(String intermediateDirectory)
 {
-	const String directory = ICommandlet::Parse("-int");
+	if (!intermediateDirectory.IsEmpty())
+	{
+		std::vector<String> dirs;
+		FileManager::ListDirectory(intermediateDirectory, dirs);
 
-	return directory.IsEmpty() ? String("") : directory;
+
+		return dirs.size() > 0 ? true : false;
+	}
+
+	return false;
 }

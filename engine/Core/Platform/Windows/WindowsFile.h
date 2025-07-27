@@ -10,17 +10,17 @@ class WindowsFile : public IFile
 public:
 	WindowsFile() = default;
 
-	virtual ~WindowsFile();
+	virtual ~WindowsFile() noexcept;
 
 	virtual void* GetFileHandle();
 
-	virtual bool ValidDirectory(const String& directory, bool bCreateIfNotExist = false) override;
-
-	virtual void Write(const String buffer) const override;
+	virtual void Write(const String& buffer) const override;
 
 	virtual void Read() override;
 
 	virtual void Close() override;
+
+	virtual void Delete() override;
 private:
 	void* /*HANDLE*/ fileHandle;
 };

@@ -240,7 +240,6 @@
     <ClCompile Include="engine\Core\Layers\LayerManager.cpp" />
     <ClCompile Include="engine\Core\Types\Array.cpp" />
     <ClCompile Include="engine\Core\Common\Delegate.cpp" />
-    <ClCompile Include="engine\Core\Platform\File.cpp" />
     <ClCompile Include="engine\Launch.cpp" />
     <ClCompile Include="engine\Core\Logging\Log.cpp" />
     <ClCompile Include="engine\Core\Platform\Timer.cpp" />

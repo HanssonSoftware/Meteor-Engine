@@ -6,6 +6,8 @@
 #include <Platform/PerformanceTimer.h>
 #include <Parsing/LocatingInterface.h>
 #include <shellapi.h>
+#include <MemoryManager.h>
+#include <Caching/Intermediate.h>
 
 #pragma comment(lib, "Shell32.lib")
 
@@ -17,12 +19,17 @@ int main(int argc, char* argv[])
 BuildSystemApplication::BuildSystemApplication()
 	: Application()
 {
-
+	MemoryManager::SetMinimumSize(1'000'000);
 }
 
 void BuildSystemApplication::Init()
 {
 	Application::Init();
+
+	if (Intermediate::SearchIntermediateFiles(ICommandlet::Parse("-int")))
+	{
+
+	}
 
 	if (!ICommandlet::Parse("-sourcedir").IsEmpty())
 	{

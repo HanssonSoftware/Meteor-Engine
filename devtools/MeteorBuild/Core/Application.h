@@ -18,8 +18,6 @@ public:
 	virtual void Run() override;
 
 	virtual void Shutdown() override;
-
-	String workDirectory;
 };
 
 int launchStranger(int ArgumentCount, char* Arguments[])
@@ -27,7 +25,7 @@ int launchStranger(int ArgumentCount, char* Arguments[])
 	ApplicationInitializationInfo appInfo = {};
 	appInfo.appName = String("MeteorBuild");
 	appInfo.appCodeName = "Hansson";
-	appInfo.requiredMinimumMemoryInPercent = 0.05f;
+	appInfo.requiredMinimumMemoryInPercent = 0.03f;
 	appInfo.flags = APPFLAG_NO_WINDOW | APPFLAG_NO_FILE_LOGGING | APPFLAG_START_ONLY_FROM_COMMAND_LINE;
 
 	ICommandlet::Initalize();

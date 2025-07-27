@@ -14,19 +14,33 @@ struct MemoryManager
 	static void Deallocate();
 
 	static constexpr uint32 GetSize(void* data);
+
+	static constexpr void SetMinimumSize(const size_t& requiredMinimumInBytes) noexcept
+	{
+		if (!object)
+			object = new MemoryManager();
+
+		object->requiredMinimumInBytes = requiredMinimumInBytes;
+	};
+
 private:
+	MemoryManager() = default;
 
-	uint64 availableMemoryOnTheRig = 0;
+	virtual ~MemoryManager() noexcept = default;
 
-	uint64 recommendedByPool = 0;
+	static inline MemoryManager* object;
+
+	size_t requiredMinimumInBytes = 1'000'000'000;
+
+	size_t totalMemoryOnPC = 0;
 
 	struct 
 	{
-		void* begin;
+		void* begin = nullptr;
 
-		void* end;
+		void* end = nullptr;
 
-		size_t offset;
+		size_t offset = 0;
 	};
 };
 

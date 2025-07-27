@@ -17,38 +17,33 @@ Module* Module::CreateModule(const String fullPathToModule)
 
 	Module* super = new Module();
 
+	super->fullPath = fullPathToModule;
+
 	wchar_t* path = Layer::GetSystemLayer()->ConvertToWide(fullPathToModule);
 	PathCchRemoveFileSpec(path, wcslen(path));
 	
-	std::vector<String> pa;
-	Locator::ListDirectory(path, pa);
+	Locator::ListDirectory(path, super->includedSources);
 	delete[] path;
 	
-	int s = pa.size();
+	int s = (int)super->includedSources.size();
 	for (int i = 0; i < s; i++)
 	{
-		if (FileManager::IsEndingWith(pa[i], "mrbuild"))
+		if (FileManager::IsEndingWith(super->includedSources[i], "mrbuild"))
 		{
-			pa.erase(pa.begin() + i);
+			super->includedSources.erase(super->includedSources.begin() + i);
 			break;
 		}
 	}
 
-	//ScriptParser::BeginParse();
-
+	if (ScriptParser::OpenScript(super))
+	{
+		ScriptParser::BeginParse();
+	}
+	
 	return super;
 }
 
 void Module::OpenPath(const String& fullPathToModule)
 {
-	FileStatus stat;
-	moduleDescriptor = FileManager::CreateFileOperation(fullPathToModule, OPENMODE_READ, SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS, stat);
-	if (!moduleDescriptor)
-		return;
 
-	moduleDescriptor->Read();
-	if (String::Contains(moduleDescriptor->GetBuffer(), "Project"))
-	{
-		int j = 4;
-	}
 }

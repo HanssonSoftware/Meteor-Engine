@@ -67,7 +67,9 @@ bool Locator::FindAllReferences(const String& sourceDirectory)
     
     for (String& path : a)
     {
-        Module::CreateModule(path);
+        Module* t = Module::CreateModule(path);
+
+        int h = 5;
     }
 
     return true;

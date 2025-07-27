@@ -4,28 +4,30 @@
 #include <Platform/FileManager.h>
 #undef CreateDirectory
 
+#include <Types/String.h>
+
 class IFile;
 
 struct WindowsFileManager : public IFileManager
 {
-	static bool CreateDirectory(const String name, bool bToFullPath);
+	static bool CreateDirectory(const String& name, bool bToFullPath);
 
-	static bool DeleteDirectory(const String name, bool bToFullPath);
+	static bool DeleteDirectory(const String& name, bool bToFullPath);
 
-	static void ListDirectory(const String dir, std::vector<String>& output);
+	static void ListDirectory(String dir, std::vector<String>& output);
 
-	static bool IsPathExists(const String name);
+	static bool IsPathExists(const String& name);
 
 	/** Returns true if the path is qualified, or false otherwise. */
-	static bool IsPathRelative(const String path);
+	static bool IsPathRelative(const String& path);
 
-	static bool IsEndingWith(const String name, const String extension);
+	static bool IsEndingWith(const String& name, const String& extension);
 
 	static String GetExecutableDirectory();
 
-	static String NormalizeDir(const String input);
+	static void NormalizeDirectory(String& input);
 
-	static IFile* CreateFileOperation(const String path, int accessType, int sharingMode, FileOverrideRules createType, FileStatus& status);
+	static IFile* CreateFileOperation(const String& path, int accessType, int sharingMode, FileOverrideRules createType, FileStatus& status);
 private:
 	WindowsFileManager() = default;
 

@@ -2,11 +2,12 @@
 
 #include "ScriptParser.h"
 #include "Module.h"
+#include <FileManager.h>
 #include <Commandlet.h>
 
-void ScriptParser::BeginParse(const Module& module)
+void ScriptParser::BeginParse()
 {
-	if (IFile* file = module.GetModuleBuffer())
+	if (IFile* file = currentlyReadModule->GetModuleBuffer())
 	{
 		if (const char* buffer = file->GetBuffer())
 		{
@@ -15,22 +16,29 @@ void ScriptParser::BeginParse(const Module& module)
 	}
 }
 
-const char* ScriptParser::ParseIndex(const char* pos)
+bool ScriptParser::OpenScript(Module* module)
 {
-	if (!pos || !(pos + 1))
-		return nullptr;
+	if (!module) return false;
 
-	return pos + 1;
+	FileStatus stat;
+	IFile*& fileDescriptor = module->moduleDescriptor;
+
+	fileDescriptor = FileManager::CreateFileOperation(module->fullPath, OPENMODE_READ, SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS, stat);
+	if (!fileDescriptor)
+		return false;
+
+	fileDescriptor->Read();
+	return true;
 }
 
-const char* ScriptParser::ParseBlock(const char* pos)
+void ScriptParser::AdvanceACharacter()
 {
-	while (*pos)
+	if (position != '\0')
 	{
-
-
-		pos++;
+		position++;
 	}
+}
 
-	return nullptr;
+void ScriptParser::SkipWhitspace()
+{
 }

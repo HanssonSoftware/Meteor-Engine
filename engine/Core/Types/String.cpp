@@ -365,7 +365,7 @@ String::~String() noexcept
 
 		heapBuffer.length = 0;
 		heapBuffer.capacity = 0;
-		
+
 		bIsUsingHeap = false;
 	}
 
@@ -399,7 +399,6 @@ String String::operator+(const String& Other)
 	//return newStringBuffer;
 	return String("");
 }
-
 
 String operator+(const String& OtherA, const String& OtherB)
 {
@@ -464,6 +463,11 @@ const char* String::Chr() const
 {
 	return bIsUsingHeap ? (heapBuffer.ptr || heapBuffer.length != 0 ? heapBuffer.ptr : "") : 
 		stackBuffer.ptr || stackBuffer.length != 0 ? stackBuffer.ptr : "";
+}
+
+char* String::Allocate()
+{
+	return new char[bIsUsingHeap ? heapBuffer.capacity : stackBuffer.length + 1]();
 }
 
 bool String::operator!() const

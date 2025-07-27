@@ -36,9 +36,6 @@
     <ClCompile Include="engine\Core\Common\Delegate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Platform\File.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\Core\Logging\Log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

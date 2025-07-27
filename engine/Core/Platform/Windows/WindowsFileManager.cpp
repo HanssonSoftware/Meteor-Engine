@@ -22,7 +22,7 @@
 #pragma comment (lib, "Shell32.lib")
 
 
-bool WindowsFileManager::CreateDirectory(const String name, bool bToFullPath)
+bool WindowsFileManager::CreateDirectory(const String& name, bool bToFullPath)
 {
     MR_ASSERT(Layer::GetSystemLayer() != nullptr, "System Layer does not initialized!");
 
@@ -32,7 +32,10 @@ bool WindowsFileManager::CreateDirectory(const String name, bool bToFullPath)
         return false;
     }
 
-    wchar_t* dirName = Layer::GetSystemLayer()->ConvertToWide(NormalizeDir(name).Chr());
+    String tm = name;
+    NormalizeDirectory(tm);
+
+    wchar_t* dirName = Layer::GetSystemLayer()->ConvertToWide(tm.Chr());
     if (!dirName)
     {
         MR_LOG(LogFileManager, Error, "Invalid wide buffer!");
@@ -45,7 +48,7 @@ bool WindowsFileManager::CreateDirectory(const String name, bool bToFullPath)
     return false;
 }
 
-bool WindowsFileManager::DeleteDirectory(const String name, bool bToFullPath)
+bool WindowsFileManager::DeleteDirectory(const String& name, bool bToFullPath)
 {
     MR_ASSERT(Layer::GetSystemLayer() != nullptr, "System Layer does not initialized!");
 
@@ -67,12 +70,63 @@ bool WindowsFileManager::DeleteDirectory(const String name, bool bToFullPath)
     return true;
 }
 
-void WindowsFileManager::ListDirectory(const String directoryToCheck, std::vector<String>& output)
+void WindowsFileManager::ListDirectory(String dir, std::vector<String>& output)
 {
+    if (FileManager::IsPathRelative(dir))
+    {
+        wchar_t path[MAX_PATH];
+        GetModuleFileNameW(nullptr, path, MAX_PATH); 
+        size_t written = wcslen(path);
 
+        PathCchRemoveFileSpec(path, written);
+
+        wchar_t* bf = Layer::GetSystemLayer()->ConvertToWide(dir);
+        PathCchAppend(path, written + dir.Length(), bf);
+
+        delete[] bf;
+
+        dir = path;
+    }
+
+
+    WIN32_FIND_DATAW find;
+
+    wchar_t* path = Layer::GetSystemLayer()->ConvertToWide(String::Format("%s\\*", dir.Chr()));
+    HANDLE file = FindFirstFileW(path, &find);
+
+    if (file != INVALID_HANDLE_VALUE)
+    {
+        do
+        {
+            if (find.cFileName[0] == L'.')
+                continue;
+
+            switch (find.dwFileAttributes)
+            {
+                case FILE_ATTRIBUTE_DIRECTORY:
+                {
+                    ListDirectory(String::Format("%s\\%ls", dir.Chr(), find.cFileName), output);
+                    break;
+                }
+
+                case FILE_ATTRIBUTE_ARCHIVE:
+                {
+                    output.push_back(String::Format("%s\\%ls", dir.Chr(), find.cFileName));
+                    break;
+                }
+            }
+
+        } while (FindNextFileW(file, &find) != 0);
+    }
+    else
+    {
+        MR_LOG(LogFileManager, Error, "Directory handle invalid!");
+    }
+
+    delete[] path;
 }
 
-bool WindowsFileManager::IsPathExists(const String name)
+bool WindowsFileManager::IsPathExists(const String& name)
 {
     MR_ASSERT(Layer::GetSystemLayer() != nullptr, "System Layer does not initialized!");
 
@@ -94,11 +148,6 @@ bool WindowsFileManager::IsPathExists(const String name)
             return false;
         }
 
-        //if (PathCchRemoveFileSpec(dirName, wcslen(dirName)) != S_OK)
-        //{
-        //
-        //}
-
         if (::PathFileExistsW(dirName) == 0)
         {
             if (GetLastError() != ERROR_FILE_NOT_FOUND)
@@ -119,7 +168,7 @@ bool WindowsFileManager::IsPathExists(const String name)
 }
 
 /** Returns true if the path is qualified, or false otherwise. */
-bool WindowsFileManager::IsPathRelative(const String path)
+bool WindowsFileManager::IsPathRelative(const String& path)
 {
     MR_ASSERT(Layer::GetSystemLayer() != nullptr, "System Layer does not initialized!");
 
@@ -136,41 +185,40 @@ bool WindowsFileManager::IsPathRelative(const String path)
     return false;
 }
 
-bool WindowsFileManager::IsEndingWith(const String name, const String extension)
+bool WindowsFileManager::IsEndingWith(const String& name, const String& extension)
 {
     return IFileManager::IsEndingWith(name, extension);
 }
 
-String WindowsFileManager::NormalizeDir(const String input)
+void WindowsFileManager::NormalizeDirectory(String& input)
 {
-    if (input.IsEmpty()) 
-        return "";
-
-    char* buffer = new char[input.Length()];
+    char* buffer = input.Allocate();
     memcpy(buffer, input.Chr(), input.Length());
 
-    int size = (int)input.Length();
+    uint32 size = (int)input.Length();
 
     for (int i = 0; i < size; i++)
     {
         if (buffer[i] == '/' || buffer[i] == '//')
         {
             buffer[i] = '\\';
-            i++;
         }
     }
 
-    String bf(buffer);
+    size = (uint32)strlen(buffer);
+    buffer[size] = '\0';
+
+    input = String(buffer);
 
     delete[] buffer;
-    return bf;
 }
 
-IFile* WindowsFileManager::CreateFileOperation(const String pathA, int accessType, int sharingMode, FileOverrideRules createType, FileStatus& status)
+IFile* WindowsFileManager::CreateFileOperation(const String& pathA, int accessType, int sharingMode, FileOverrideRules createType, FileStatus& status)
 {
     MR_ASSERT(Layer::GetSystemLayer(), "System Layer does not initialized!");
 
-    String path = NormalizeDir(pathA);
+    String path = pathA;
+    NormalizeDirectory(path);
 
     SystemLayer* systemLayer = Layer::GetSystemLayer();
     wchar_t* name = systemLayer->ConvertToWide(path.Chr());

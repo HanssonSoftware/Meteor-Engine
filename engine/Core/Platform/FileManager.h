@@ -14,23 +14,23 @@ LOG_ADDCATEGORY(FileManager);
 
 struct IFileManager
 {
-	static bool CreateDirectory(const String name, bool bForceCreate);
+	static bool CreateDirectory(const String& name, bool bForceCreate);
 
-	static bool DeleteDirectory(const String name, bool bToFullPath);
+	static bool DeleteDirectory(const String& name, bool bToFullPath);
 
-	static void ListDirectory(const String directoryToCheck, std::vector<String>& output);
+	static void ListDirectory(String directoryToCheck, std::vector<String>& output);
 	
-	static bool IsPathExists(const String name);
+	static bool IsPathExists(const String& name);
 
-	static bool IsPathRelative(const String path);
+	static bool IsPathRelative(const String& path);
 
-	static bool IsEndingWith(const String name, const String extension);
+	static bool IsEndingWith(const String& name, const String& extension);
 
 	static String GetExecutableDirectory();
 
-	static String NormalizeDir(const String input);
+	static void NormalizeDirectory(String& input);
 
-	static IFile* CreateFileOperation(const String path, int accessType, int sharingMode, int createType, FileStatus& status);
+	static IFile* CreateFileOperation(const String& path, int accessType, int sharingMode, int createType, FileStatus& status);
 
 private:
 	IFileManager() = default;

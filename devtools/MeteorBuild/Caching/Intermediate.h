@@ -5,6 +5,6 @@
 
 struct Intermediate
 {
-	static String GetIntermediateDirectory();
+	static bool SearchIntermediateFiles(String intermediateDirectory);
 };
 

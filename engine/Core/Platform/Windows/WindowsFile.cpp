@@ -2,9 +2,11 @@
 
 #include "WindowsFile.h"
 #include <Windows/Windows.h>
+
 #include <handleapi.h>
 #include <PathCch.h>
 #include <Shlwapi.h>
+
 #include <Application.h>
 #include <Layers/SystemLayer.h>
 
@@ -26,23 +28,6 @@ void* WindowsFile::GetFileHandle()
     return fileHandle;
 }
 
-
-bool WindowsFile::ValidDirectory(const String& directory, bool bCreateIfNotExist)
-{
-	if (directory.IsEmpty())
-	{
-		MR_LOG(LogFileSystem, Error, "Directory cannot be empty!");
-		return false;
-	}
-
-	while (true)
-	{
-
-	}
-
-	return false;
-}
-
 void WindowsFile::Close()
 {
 	if (fileHandle)
@@ -61,7 +46,15 @@ void WindowsFile::Close()
 	delete this;
 }
 
-void WindowsFile::Write(const String buffer) const
+void WindowsFile::Delete()
+{
+	if (!::DeleteFileW(nullptr))
+	{
+		MR_LOG(LogFileSystem, Error, "Unable to delete file! %s", *Layer::GetSystemLayer()->GetError());
+	}
+}
+
+void WindowsFile::Write(const String& buffer) const
 {
 	if (fileHandle == INVALID_HANDLE_VALUE)
 	{
@@ -72,14 +65,8 @@ void WindowsFile::Write(const String buffer) const
 	DWORD written = 0;
 	if (!WriteFile(fileHandle, buffer.Chr(), (DWORD)buffer.Length(), &written, nullptr))
 	{
-		if (SystemLayer* Layer = Layer::GetSystemLayer())
-		{
-			const String a = Layer->GetError();
-			MR_LOG(LogFileSystem, Error, "WriteFile returned: %s", a.Chr());
-			return;
-		}
-
-		MR_LOG(LogFileSystem, Error, "WriteFile error!");
+		MR_LOG(LogFileSystem, Error, "WriteFile error! %s", *Layer::GetSystemLayer()->GetError());
+		return;
 	}
 
 	FlushFileBuffers(fileHandle);
@@ -87,64 +74,33 @@ void WindowsFile::Write(const String buffer) const
 
 void WindowsFile::Read()
 {
-	LARGE_INTEGER lg;
-	if (GetFileSizeEx(fileHandle, &lg) == 0)
+	if (fileHandle == INVALID_HANDLE_VALUE) 
 	{
-		if (SystemLayer* Layer = Layer::GetSystemLayer())
-		{
-			const String a = Layer->GetError();
-			MR_LOG(LogFileSystem, Error, "GetFileSizeEx returned: %s", a.Chr());		
-			return;
-		}
-
-		MR_LOG(LogFileSystem, Error, "GetFileSizeEx error!");
+		MR_LOG(LogFileSystem, Error, "File handle is invalid!");
 		return;
 	}
 
-	DWORD write = 0;
 
-	if (lg.QuadPart > 0)
-		buffer = new char[lg.QuadPart + 1];
-	else
-		buffer = new char[1];
+	LARGE_INTEGER lg;
+	if (!GetFileSizeEx(fileHandle, &lg))
+	{
+		MR_LOG(LogFileSystem, Error, "GetFileSizeEx returned: %s", *Layer::GetSystemLayer()->GetError());
+		return;		
+	}
 
+	buffer = new char[lg.QuadPart > 0 ? lg.QuadPart + 1 : 1];
 
 	if (buffer)
 	{
+		DWORD write = 0;
+
 		if (!ReadFile(fileHandle, buffer, (DWORD)lg.QuadPart, &write, 0))
 		{
-			if (SystemLayer* Layer = Layer::GetSystemLayer())
-			{
-				const String a = Layer->GetError();
-				MR_LOG(LogFileSystem, Error, "ReadFile returned: %s", a.Chr());
-				return;
-			}
-
-			MR_LOG(LogFileSystem, Error, "ReadFile error!");
+			MR_LOG(LogFileSystem, Error, "ReadFile returned: %s", *Layer::GetSystemLayer()->GetError());
 			return;
 		}
 
 		size = (uint32)lg.QuadPart;
 		buffer[write] = '\0';
-
-		//const int requiredAmount = MultiByteToWideChar(CP_UTF8, 0, narrowBuffer, write, 0, 0);
-		//buffer = new char[requiredAmount + 1];
-
-		//if (requiredAmount > 0)
-		//{
-		//	const int writtenAmount = /*MultiByteToWideChar(CP_UTF8, 0, narrowBuffer, write, buffer, requiredAmount)*/4;
-		//	if (writtenAmount == 0 || writtenAmount != requiredAmount)
-		//	{
-		//		if (SystemLayer* Layer = Layer::GetSystemLayer())
-		//		{
-		//			const String a = Layer->GetError();
-		//			MR_LOG(LogFileSystem, Error, TEXT("MultiByteToWideChar returned: %s"), a.Chr());				
-		//			return;
-		//		}
-		//	}
-		//}
-
-		//buffer[write] = L'\0';
-		//delete[] narrowBuffer;
 	}
 }

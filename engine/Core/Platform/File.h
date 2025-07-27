@@ -14,21 +14,19 @@ class IFile
 public:
 	IFile() = default;
 
-	virtual ~IFile();
+	virtual ~IFile() noexcept = default;
 
 	virtual void* GetFileHandle() = 0;
 
-	virtual void Write(const String buffer) const = 0;
+	virtual void Write(const String& buffer) const = 0;
 
 	virtual void Read() = 0;
 
 	virtual void Close() = 0;
 
-	virtual bool ValidDirectory(const String& directory, bool bCreateIfNotExist = false) = 0;
-
 	String GetName() const { return fileName; };
 
-	virtual void SetName(String content) {};
+	virtual void SetName(const String& content) { fileName = content; };
 	 
 	unsigned long long GetSize() const { return size; }
 
@@ -43,19 +41,9 @@ public:
 		return !bWasCreatedByProgramatically;
 	}
 
-	void Delete();
+	virtual void Delete() = 0;
 
 	const char* GetBuffer() const noexcept
-	{
-		return buffer;
-	}
-
-	operator char* ()
-	{
-		return buffer;
-	}
-
-	operator const char* ()
 	{
 		return buffer;
 	}

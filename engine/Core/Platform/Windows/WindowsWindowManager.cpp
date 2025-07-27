@@ -23,14 +23,14 @@ void WindowsWindowManager::Shutdown()
     {
         if (!bIsUsingFallbackClassName)
         {
-            if (const Application* app = Application::Get())
+            if (const Application* app = GetApplication())
             {
-                UnregisterClass(Layer::GetSystemLayer()->ConvertToWide(app->GetAppInfo().appName.Chr()), instance);
+                UnregisterClassW(Layer::GetSystemLayer()->ConvertToWide(app->GetAppInfo().appName.Chr()), instance);
             }
         }
         else
         {
-            UnregisterClass(ApplicationClassName, instance);
+            UnregisterClassW(ApplicationClassName, instance);
         }
     }
 }

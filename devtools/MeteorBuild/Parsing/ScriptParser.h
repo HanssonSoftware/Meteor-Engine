@@ -3,12 +3,31 @@
 #pragma once
 class Module;
 
+enum class TokenType
+{
+	Identifier,         // Project, IncludePath, Modules
+	StringLiteral,      // "Renderer", "Meteor", "CoreKit"
+	Colon,              // :
+	Comma,              // ,
+	OpenBrace,          // {
+	CloseBrace,         // }
+	EndOfFile,			// \0
+	Unknown
+};
+
 struct ScriptParser
 {
-	static void BeginParse(const Module& module);
+	static void BeginParse();
 
-	static const char* ParseIndex(const char* pos);
+	static bool OpenScript(Module* module);
 
-	static const char* ParseBlock(const char* pos);
+protected:
+	static inline char* position = nullptr;
+
+	static inline Module* currentlyReadModule = nullptr;
+
+	static void AdvanceACharacter();
+
+	static void SkipWhitspace();
 };
 
