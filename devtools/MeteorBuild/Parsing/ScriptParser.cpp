@@ -1,4 +1,4 @@
-/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
+/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #include "ScriptParser.h"
 #include "Module.h"
@@ -11,7 +11,7 @@ void ScriptParser::BeginParse()
 	{
 		if (const char* buffer = file->GetBuffer())
 		{
-			ParseBlock(buffer);
+			
 		}
 	}
 }
@@ -41,4 +41,14 @@ void ScriptParser::AdvanceACharacter()
 
 void ScriptParser::SkipWhitspace()
 {
+	if (position == " " || 
+		position == "\f" || 
+		position == "\n" || 
+		position == "\r" || 
+		position == "\t" || 
+		position == "\v"
+		)
+	{
+		position++;
+	}
 }

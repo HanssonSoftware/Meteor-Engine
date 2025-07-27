@@ -1,4 +1,4 @@
-﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
+﻿/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #include "WindowsWindowManager.h"
 #include <../Resources/resource.h>

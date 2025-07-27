@@ -1,4 +1,4 @@
-﻿/* Copyright 2020 - 2025, Saxon Software. All rights reserved. */
+﻿/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
 #include <Logging/LogMacros.h>
