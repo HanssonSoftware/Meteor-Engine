@@ -59,13 +59,10 @@ bool Locator::FindAllReferences(const String& sourceDirectory)
         MR_LOG(LogLocator, Fatal, "Directory does not exist! (%s)", sourceDirectory.Chr());
     }
 
-
-    ListDirectory(fullPath, foundPaths);
-
-    std::vector<String> a;
-    SearchExtensionSpecified(fullPath, "mrbuild", a);
+    std::vector<String> foundScripts;
+    SearchExtensionSpecified(fullPath, "mrbuild", foundScripts);
     
-    for (String& path : a)
+    for (String& path : foundScripts)
     {
         Module* t = Module::CreateModule(path);
 

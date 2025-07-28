@@ -356,6 +356,30 @@ String::String(const String& other)
 #endif // MR_DEBUG
 }
 
+String::String(const char* string, uint32 length)
+{
+	MakeEmpty();
+
+	bIsUsingHeap = length <= SSO_MAX_CHARS ? false : true;
+	
+	if (bIsUsingHeap)
+	{
+		heapBuffer.capacity = (size_t)(length + 1);
+		heapBuffer.length = (size_t)length;
+		heapBuffer.ptr = new char[heapBuffer.capacity]();
+
+		memcpy(heapBuffer.ptr, string, length);
+		heapBuffer.ptr[heapBuffer.length] = '\0';
+	}
+	else
+	{
+		stackBuffer.length = (size_t)length;
+
+		memcpy(stackBuffer.ptr, string, length);
+		stackBuffer.ptr[stackBuffer.length] = '\0';
+	}
+}
+
 String::~String() noexcept
 {
 	if (bIsUsingHeap && heapBuffer.ptr)

@@ -30,6 +30,8 @@ struct String
 
 	String(const String& other);
 
+	String(const char* string, uint32 length);
+
 	String(String&& other) noexcept;
 
 	String operator=(const String& other);

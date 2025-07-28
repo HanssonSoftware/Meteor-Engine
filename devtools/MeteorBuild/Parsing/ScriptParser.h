@@ -22,12 +22,20 @@ struct ScriptParser
 	static bool OpenScript(Module* module);
 
 protected:
-	static inline char* position = nullptr;
+	static inline char* buffer = nullptr;
 
 	static inline Module* currentlyReadModule = nullptr;
+
+	static void Expected(const char* ptr);
+
+	static void GetValue();
 
 	static void AdvanceACharacter();
 
 	static void SkipWhitspace();
+	
+	static bool IsWhitspace();
+
+	static bool IsAlpha(const char input);
 };
 
