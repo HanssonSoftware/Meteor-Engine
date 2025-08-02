@@ -7,7 +7,7 @@
 
 #include <vector>
 
-struct String;
+class String;
 class File;
 
 LOG_ADDCATEGORY(FileManager);

@@ -10,7 +10,7 @@ static constexpr const bool bIsRunningDebugMode = true;
 static constexpr const bool bIsRunningDebugMode = false;
 #endif // MR_DEBUG
 
-struct String;
+class String;
 struct LogAssertion;
 class IFile;
 

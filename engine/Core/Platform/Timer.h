@@ -4,7 +4,7 @@
 #include <Types/String.h>
 #include <Platform/PlatformDefs.h>
 
-//struct String;
+//class String;
 
 class Timer 
 {

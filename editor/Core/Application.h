@@ -5,7 +5,7 @@
 #include <Types/Vector.h>
 #include <Platform/WindowManager/WindowManager.h>
 #include <Commandlet.h>
-//#include <Common/Pointers.h>
+//#include <Types/Pointers.h>
 
 LOG_ADDCATEGORY(EditorApplication);
 

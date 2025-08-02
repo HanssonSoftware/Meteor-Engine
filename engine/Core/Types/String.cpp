@@ -373,7 +373,7 @@ String::String(const char* string, uint32 length)
 	}
 	else
 	{
-		stackBuffer.length = (size_t)length;
+		stackBuffer.length = (unsigned short)length;
 
 		memcpy(stackBuffer.ptr, string, length);
 		stackBuffer.ptr[stackBuffer.length] = '\0';
@@ -649,4 +649,9 @@ bool String::IsWhitespace(const char* buffer)
 bool String::IsSpace(const char* buffer)
 {
 	return buffer[0] == ' ' ? true : false;
+}
+
+bool String::IsAlpha(const char* buffer)
+{
+	return (buffer[0] >= 'a' && buffer[0] <= 'z' || buffer[0] >= 'A' && buffer[0] <= 'Z');
 }

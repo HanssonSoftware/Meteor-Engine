@@ -4,7 +4,7 @@
 #include <Parsing/Module.h>
 #include <vector>
 
-struct String;
+class String;
 
 struct Locator
 {

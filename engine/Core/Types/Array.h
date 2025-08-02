@@ -2,82 +2,130 @@
 
 #pragma once
 #include <Platform/PlatformDefs.h>
+#include <Logging/LogMacros.h>
 #include <cstring>
+
+LOG_ADDCATEGORY(Array);
 
 template <class T>
 class Array
 {
 public:
-	Array();
+	Array()
+	{
+		capacity = RECOMMENDED_CAPACITY_PADDING;
+		size = 1;
 
-	~Array();
+		container = new T[capacity]();
+	}
 
-	void Resize(const uint32 Num);
+	~Array()
+	{
+		if (container && size > 0)
+		{
+			delete[] container;
+			container = nullptr;
 
-	void Reset();
+			capacity = 0, size = 0;
+		}
+	}
+
+	Array(const uint32& count)
+	{
+		capacity = count + RECOMMENDED_CAPACITY_PADDING;
+		size = count;
+
+		container = new T[capacity]();
+	}
+
+	void Add(const T* elem, const uint32& at)
+	{
+		size = size < at ? at : size;
+
+		if (!IsOutOfBounds(at))
+		{
+			container[at] = *elem;
+		}
+	}
+
+	void Add(const T* elem)
+	{
+		container[size] = *elem;
+		size++;
+
+		if (size >= capacity)
+			Resize(capacity + RECOMMENDED_CAPACITY_PADDING);
+
+	}
+
+	void Remove(const uint32& at)
+	{
+		if (!IsOutOfBounds(at))
+		{
+			container[at] = {};
+		}
+	}
+
+	void Pop(const uint32& at)
+	{
+		if (!IsOutOfBounds(at))
+		{
+			container[at] = {};
+		}
+		
+		if (at > size)
+		{
+			memmove(container, container + at, at);
+		}
+	}
+
+	void Resize(const uint32 Num)
+	{		
+		if (Num == size) return;
+
+		size = Num;
+		capacity = Num + RECOMMENDED_CAPACITY_PADDING;
+
+		T* newContainer = new T[capacity]();
+
+		memcpy(newContainer, container, size);
+		delete[] container;
+
+		container = newContainer;
+	};
+
+	void Reset()
+	{
+		for (uint32 i = 0; i < capacity; i++)
+		{
+			container[i] = {};
+		}
+	}
 
 	uint32 GetSize() const
 	{
 		return size;
 	}
 
-	T& operator[](int index)
+	T& operator[](const uint32& index)
 	{
-		if (index > (int)size || index < 0) return container[0];
+		if (IsOutOfBounds(index))
+		{
+			MR_LOG(LogArray, Error, "Trying to reach out of bounds value: %d\tOf: %u", index, size);
+			return container[0];
+		}
 
 		return container[index];
 	}
 
+	bool IsOutOfBounds(const uint32& index) { return index > capacity || index < 0 ? true : false; };
 private:
-	uint32 capacity;
 
-	uint32 size;
+	static constexpr const uint32 RECOMMENDED_CAPACITY_PADDING = 4;
 
-	T* container;
+	uint32 capacity = 0;
+
+	uint32 size = 0;
+
+	T* container = nullptr;
 };
-
-
-template<class T>
-inline Array<T>::Array()
-{
-	capacity = 2;
-	size = capacity - 1;
-
-	container = new T[capacity]();
-}
-
-template<class T>
-inline Array<T>::~Array()
-{
-	if (container && size > 0)
-	{
-		delete[] container;
-
-		capacity, size = 0;
-	}
-}
-
-template<class T>
-void Array<T>::Reset()
-{
-	for (uint32 i = 0; i < capacity; i++)
-	{
-		container[i] = {};
-	}
-}
-
-template<class T>
-void Array<T>::Resize(const uint32 Num)
-{
-	if (Num == size)
-		return;
-
-	size = Num;
-
-	T* newContainer = new T[size]();
-
-	memmove(newContainer, container, size);
-	delete[] container;
-
-	container = newContainer;
-}

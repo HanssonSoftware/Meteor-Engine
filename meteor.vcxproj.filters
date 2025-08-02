@@ -30,9 +30,6 @@
     <ClCompile Include="engine\Core\Layers\LayerManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Types\Array.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\Core\Common\Delegate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -54,9 +51,6 @@
     <ClCompile Include="engine\Core\Platform\WindowManager\WindowManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Common\Pointers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\Core\Common\Guid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -76,15 +70,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Object\Object.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Core\Serialisation\FontImporter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Core\Serialisation\Importer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Core\Serialisation\AssetManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Platform\Windows\WindowsWindowManager.cpp">
@@ -163,6 +148,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Renderer\Pipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\Module\ModuleManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -470,7 +458,7 @@
     <ClInclude Include="engine\ThirdParty\assimp\ZipArchiveIOSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Common\Pointers.h">
+    <ClInclude Include="engine\Core\Types\Pointers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resources\resource.h">
@@ -495,15 +483,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Object\Object.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Core\Serialisation\FontImporter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Core\Serialisation\Importer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Core\Serialisation\AssetManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Layers\SystemLayer.h">
@@ -612,6 +591,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Renderer\Pipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Module\ModuleManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

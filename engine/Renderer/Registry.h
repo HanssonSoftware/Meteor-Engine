@@ -4,7 +4,7 @@
 #include "Queue.h"
 #include <Platform/PlatformDefs.h>
 
-struct String;
+class String;
 class VulkanSwapChain;
 class VulkanOutputContext;
 class VulkanDevice;

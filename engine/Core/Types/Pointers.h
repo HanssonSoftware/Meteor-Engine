@@ -3,23 +3,37 @@
 #pragma once
 
 /**
- * ScopedPtr owns a pointer, so you don’t have to think about deleting it.
+ * ScopedPtr owns a pointer, so you don't have to think about deleting it.
  * When this thing goes out of scope, the pointer is gone too.
- * No magic, no bullshit.
- */
+*/
 template<typename T>
 class ScopedPtr
 {
 public:
-	ScopedPtr();
-
-	ScopedPtr(T* newPtr) 
-		: ptr(newPtr) 
+	ScopedPtr()
 	{
+		ptr = nullptr;
+	};
+
+	ScopedPtr(T* newPtr)
+		: ptr(newPtr)
+	{
+
+	};
 	
+	~ScopedPtr() noexcept
+	{
+		if (ptr != nullptr)
+		{
+			delete ptr;
+			ptr = nullptr;
+		}
+	};
+
+	T& operator*()
+	{
+		return *this->ptr;
 	}
-	
-	~ScopedPtr();
 
 	T* Get() const
 	{
@@ -56,18 +70,3 @@ public:
 private:
 	T* ptr = nullptr;
 };
-
-template<typename T>
-inline ScopedPtr<T>::ScopedPtr()
-{
-	ptr = nullptr;
-}
-
-template<typename T>
-inline ScopedPtr<T>::~ScopedPtr()
-{
-	if (ptr != nullptr)
-	{
-		ptr = nullptr;
-	}
-}

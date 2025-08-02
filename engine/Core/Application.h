@@ -15,7 +15,7 @@
 
 #endif // _WIN64
 
-struct String;
+class String;
 class IWindow;
 class Camera;
 class LayerManager;

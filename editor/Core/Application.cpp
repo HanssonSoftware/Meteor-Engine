@@ -11,9 +11,9 @@
 #include <Commandlet.h>
 #include <Platform/FileManager.h>
 #include "EditorLayer.h"
-#include <Serialisation/FontImporter.h>
 #include <Layers/SystemLayer.h>
 #include <Platform/PerformanceTimer.h>
+#include <Types/Pointers.h>
 
 EditorApplication::EditorApplication() 
 	: Application()
@@ -24,6 +24,17 @@ EditorApplication::EditorApplication()
 void EditorApplication::Init()
 {
 	Application::Init();
+
+	int j = 76;
+
+	Array<int> is(4);
+	is.Add(&j, 5);
+
+	is.Add(&j);
+	is.Remove(5);
+
+
+	//MemoryManager::Deallocate(asd);
 
 	EditorLayer Super("geci");
 	Application::Get()->GetLayerManager()->PushLayer(&Super);

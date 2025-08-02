@@ -4,6 +4,13 @@
 
 class VulkanPipelineManager
 {
+public:
+	static VulkanPipelineManager& Get();
 
+
+protected:
+
+
+	static VulkanPipelineManager* object;
 };
 

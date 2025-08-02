@@ -3,7 +3,7 @@
 #pragma once
 #include "Registry.h"
 
-struct String;
+class String;
 #pragma warning(disable : 26495) // Variable 'X::Y' is uninitialized. Always initialize a member variable (type.6).
 
 class VulkanOutputContext

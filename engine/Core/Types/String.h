@@ -6,8 +6,9 @@
 #include <string>
 
 /** Human readable piece of text. */
-struct String
+class String
 {
+public:
 	String() noexcept;
 
 	~String() noexcept;
@@ -71,11 +72,10 @@ struct String
 	static bool IsWhitespace(const char* buffer);
 
 	static bool IsSpace(const char* buffer);
-private:
-#ifdef MR_DEBUG
-	bool bIsInited = false;
-#endif // MR_DEBUG
 
+	static bool IsAlpha(const char* buffer);
+
+private:
 	constexpr void MakeEmpty();
 
 	constexpr void ResetBuffers();
@@ -104,6 +104,10 @@ private:
 	};
 
 	static constexpr size_t SSO_MAX_CHARS = sizeof(heapBuffer) - sizeof(unsigned short) - 1;
+
+#ifdef MR_DEBUG
+	bool bIsInited = false;
+#endif // MR_DEBUG
 };
 
 String operator+(const String& OtherA, const String& OtherB);

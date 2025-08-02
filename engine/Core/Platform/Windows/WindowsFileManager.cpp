@@ -197,7 +197,7 @@ void WindowsFileManager::NormalizeDirectory(String& input)
 
     uint32 size = (int)input.Length();
 
-    for (int i = 0; i < size; i++)
+    for (uint32 i = 0; i < size; i++)
     {
         if (buffer[i] == '/' || buffer[i] == '//')
         {

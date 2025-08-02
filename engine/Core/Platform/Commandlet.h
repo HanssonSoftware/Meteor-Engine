@@ -4,7 +4,7 @@
 #include <Logging/LogMacros.h>
 //#include <Types/String.h>
 
-struct String;
+class String;
 
 LOG_ADDCATEGORY(Commandlet);
 

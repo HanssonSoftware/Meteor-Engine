@@ -5,7 +5,7 @@
 
 #include <Types/String.h>
 #include <Logging/LogMacros.h>
-#include <Common/Pointers.h>
+#include <Types/Pointers.h>
 
 LOG_ADDCATEGORY(FileSystem);
 

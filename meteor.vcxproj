@@ -231,14 +231,12 @@
   <ItemGroup>
     <ClCompile Include="engine\Renderer\Device.cpp" />
     <ClCompile Include="engine\Core\Layers\SystemLayer.cpp" />
-    <ClCompile Include="engine\Core\Serialisation\AssetManager.cpp" />
     <ClCompile Include="engine\Core\Object\Object.cpp" />
     <ClCompile Include="engine\Core\Application.cpp" />
     <ClCompile Include="engine\Core\Platform\Commandlet.cpp" />
     <ClCompile Include="engine\Core\Platform\InputManager.cpp" />
     <ClCompile Include="engine\Core\Layers\Layer.cpp" />
     <ClCompile Include="engine\Core\Layers\LayerManager.cpp" />
-    <ClCompile Include="engine\Core\Types\Array.cpp" />
     <ClCompile Include="engine\Core\Common\Delegate.cpp" />
     <ClCompile Include="engine\Launch.cpp" />
     <ClCompile Include="engine\Core\Logging\Log.cpp" />
@@ -254,10 +252,7 @@
     <ClCompile Include="engine\Renderer\Widgets\Visual.cpp" />
     <ClCompile Include="engine\Core\Platform\WindowManager\Window.cpp" />
     <ClCompile Include="engine\Core\Platform\WindowManager\WindowManager.cpp" />
-    <ClCompile Include="engine\Core\Common\Pointers.cpp" />
     <ClCompile Include="engine\Core\Common\Guid.cpp" />
-    <ClCompile Include="engine\Core\Serialisation\FontImporter.cpp" />
-    <ClCompile Include="engine\Core\Serialisation\Importer.cpp" />
     <ClCompile Include="engine\Core\Platform\Windows\WindowsWindowManager.cpp" />
     <ClCompile Include="engine\Core\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="engine\Core\Platform\Windows\WindowsLayer.cpp" />
@@ -279,6 +274,7 @@
     <ClCompile Include="engine\Core\MemoryManager.cpp" />
     <ClCompile Include="engine\Renderer\PipelineManager.cpp" />
     <ClCompile Include="engine\Renderer\Pipeline.cpp" />
+    <ClCompile Include="engine\Core\Module\ModuleManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\Renderer\Device.h" />
@@ -291,7 +287,6 @@
     <ClInclude Include="engine\Core\Platform\PlatformLayout.h" />
     <ClInclude Include="engine\Core\Platform\Windows\Windows.h" />
     <ClInclude Include="engine\Core\Layers\SystemLayer.h" />
-    <ClInclude Include="engine\Core\Serialisation\AssetManager.h" />
     <ClInclude Include="engine\Core\Common\Conversions.h" />
     <ClInclude Include="engine\Core\Object\Object.h" />
     <ClInclude Include="engine\Core\Application.h" />
@@ -403,16 +398,15 @@
     <ClInclude Include="engine\ThirdParty\assimp\XMLTools.h" />
     <ClInclude Include="engine\ThirdParty\assimp\ZipArchiveIOSystem.h" />
     <ClInclude Include="engine\Version.h" />
-    <ClInclude Include="engine\Core\Common\Pointers.h" />
+    <ClInclude Include="engine\Core\Types\Pointers.h" />
     <ClInclude Include="engine\Core\Common\Guid.h" />
-    <ClInclude Include="engine\Core\Serialisation\FontImporter.h" />
-    <ClInclude Include="engine\Core\Serialisation\Importer.h" />
     <ClInclude Include="engine\Core\Platform\PerformanceTimer.h" />
     <ClInclude Include="engine\Core\Platform\FileManager.h" />
     <ClInclude Include="engine\Core\Logging\LogAssertion.h" />
     <ClInclude Include="engine\Core\MemoryManager.h" />
     <ClInclude Include="engine\Renderer\PipelineManager.h" />
     <ClInclude Include="engine\Renderer\Pipeline.h" />
+    <ClInclude Include="engine\Core\Module\ModuleManager.h" />
     <ClInclude Include="resources\assertbox.h" />
     <ClInclude Include="resources\resource.h" />
     <ClInclude Include="engine\Core\Platform\Windows\WindowsWindowManager.h" />

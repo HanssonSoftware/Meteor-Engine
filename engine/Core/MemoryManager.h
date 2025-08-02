@@ -2,6 +2,8 @@
 
 #pragma once
 #include <Platform/PlatformDefs.h>
+#include <basetsd.h>
+#include <vector>
 
 struct MemoryManager
 {
@@ -11,7 +13,7 @@ struct MemoryManager
 
 	static void* Allocate(const size_t& size);
 
-	static void Deallocate();
+	static void Deallocate(void* data);
 
 	static constexpr uint32 GetSize(void* data);
 
@@ -23,24 +25,32 @@ struct MemoryManager
 		object->requiredMinimumInBytes = requiredMinimumInBytes;
 	};
 
-private:
+protected:
 	MemoryManager() = default;
 
 	virtual ~MemoryManager() noexcept = default;
 
-	static inline MemoryManager* object;
+	struct MemoryData
+	{
+		size_t offset = 0;
 
-	size_t requiredMinimumInBytes = 1'000'000'000;
+		size_t size = 0;
+
+		bool used = false;
+	};
+
+	static MemoryData FindAvailable(const size_t& size);
+
+	size_t requiredMinimumInBytes = 1'000'000'000; // 1GB ~= 1000 MB
 
 	size_t totalMemoryOnPC = 0;
 
-	struct 
-	{
-		void* begin = nullptr;
+	char* begin = nullptr;
 
-		void* end = nullptr;
+	char* end = nullptr;
 
-		size_t offset = 0;
-	};
+	static inline std::vector<MemoryData> heap;
+
+	static inline MemoryManager* object;
 };
 

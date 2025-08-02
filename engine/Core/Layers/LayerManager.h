@@ -5,7 +5,7 @@
 #include <Object/Object.h>
 
 class Layer;
-struct String;
+class String;
 class SystemLayer;
 
 class LayerManager : public Object

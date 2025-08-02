@@ -4,7 +4,7 @@
 
 #define _WIN64_WINNT 0x0600
 #include "Windows.h"
-#include <Common/Pointers.h>
+#include <Types/Pointers.h>
 #include <Core/Application.h>
 
 LOG_ADDCATEGORY(WindowsLayer);

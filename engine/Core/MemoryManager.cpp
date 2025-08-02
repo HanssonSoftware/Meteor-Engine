@@ -36,7 +36,7 @@ void MemoryManager::Initialize(const float RequiredMinimum)
 		return;
 	}
 
-	object->begin = VirtualAlloc(nullptr, requiredByPercent, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+	object->begin = (char*)VirtualAlloc(nullptr, requiredByPercent, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 	
 	MR_ASSERT(object->begin != nullptr, "Failed to reserve, the engine recommended memory! Application exiting...");
 #endif // MR_PLATFORM_WINDOWS
@@ -51,23 +51,67 @@ void MemoryManager::Shutdown()
 		MR_LOG(LogArena, Fatal, "VirtualFree failed with: %s", *Layer::GetSystemLayer()->GetError());
 	}
 
+	object->begin = nullptr;
+	object->end = nullptr;
+
 	delete object;
 }
 
 void* MemoryManager::Allocate(const size_t& size)
 {
-	void* place = (char*)object->begin + object->offset;
+	MemoryData data = FindAvailable(size);
 
+	if (data.size == 0)
+	{
+		MR_LOG(LogArena, Fatal, "Out of memory. Could not allocate %llu bytes.", size);
+		return nullptr;
+	}
 
-
-	return place;
+	void* ptr = object->begin + data.offset;
+	heap.push_back({ data.offset, size, true });
+	return ptr;
 }
 
-void MemoryManager::Deallocate()
+void MemoryManager::Deallocate(void* data)
 {
+	if (!data)
+		return;
+
+	size_t offset = (char*)data - object->begin;
+
+	for (MemoryData& entry : heap)
+	{
+		if (entry.offset == offset && entry.used)
+		{
+			entry.used = false;
+			return;
+		}
+	}
+
+	MR_LOG(LogArena, Warn, "Tried to deallocate unknown or already freed memory at offset %llu", offset);
 }
 
 constexpr uint32 MemoryManager::GetSize(void* data)
 {
 	return sizeof(data);
 }
+
+MemoryManager::MemoryData MemoryManager::FindAvailable(const size_t& size)
+{
+	size_t currentOffset = 0;
+
+	for (const MemoryData& entry : heap)
+	{
+		if (!entry.used && entry.size >= size)
+		{
+			return { entry.offset, size, true };
+		}
+		currentOffset = std::max(currentOffset, entry.offset + entry.size);
+	}
+
+	if ((object->begin + currentOffset + size) > object->end)
+		return { 0, 0, false };
+
+	return { currentOffset, size, true };
+}
+
