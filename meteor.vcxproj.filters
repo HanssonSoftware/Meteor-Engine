@@ -596,6 +596,9 @@
     <ClInclude Include="engine\Core\Module\ModuleManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="engine\Core\Types\Iterator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\d1.bin">
@@ -625,6 +628,7 @@
     <None Include="engine\ThirdParty\assimp\vector3.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="engine\Renderer\Renderer.mrbuild" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\sampleapp.rc">

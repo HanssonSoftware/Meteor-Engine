@@ -3,12 +3,13 @@
 #pragma once
 #include <Platform/PlatformDefs.h>
 #include <Logging/LogMacros.h>
+#include "Iterator.h"
 #include <cstring>
 
 LOG_ADDCATEGORY(Array);
 
 template <class T>
-class Array
+class Array : public Iterator<T>
 {
 public:
 	Array()
@@ -37,6 +38,10 @@ public:
 
 		container = new T[capacity]();
 	}
+
+	Array(const Array& other) = delete;
+
+	Array& operator=(const Array& other) = delete;
 
 	void Add(const T* elem, const uint32& at)
 	{
@@ -73,9 +78,9 @@ public:
 			container[at] = {};
 		}
 		
-		if (at > size)
+		if (at < size)
 		{
-			memmove(container, container + at, at);
+			memmove(&container[at], &container[at + 1u], (size - at) * sizeof(container[0]));
 		}
 	}
 
@@ -118,7 +123,11 @@ public:
 		return container[index];
 	}
 
-	bool IsOutOfBounds(const uint32& index) { return index > capacity || index < 0 ? true : false; };
+	bool IsOutOfBounds(const uint32& index) { return index >= capacity; };
+
+	Iterator<T> begin() { return Iterator(&container[0]); }
+
+	Iterator<T> end() { return Iterator(&container[size]); }
 private:
 
 	static constexpr const uint32 RECOMMENDED_CAPACITY_PADDING = 4;

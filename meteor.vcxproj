@@ -407,6 +407,7 @@
     <ClInclude Include="engine\Renderer\PipelineManager.h" />
     <ClInclude Include="engine\Renderer\Pipeline.h" />
     <ClInclude Include="engine\Core\Module\ModuleManager.h" />
+    <ClInclude Include="engine\Core\Types\Iterator.h" />
     <ClInclude Include="resources\assertbox.h" />
     <ClInclude Include="resources\resource.h" />
     <ClInclude Include="engine\Core\Platform\Windows\WindowsWindowManager.h" />
@@ -426,6 +427,7 @@
     <ClInclude Include="engine\Renderer\SwapChain.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="engine\Renderer\Renderer.mrbuild" />
     <None Include="engine\ThirdParty\assimp\color4.inl" />
     <None Include="engine\ThirdParty\assimp\material.inl" />
     <None Include="engine\ThirdParty\assimp\matrix3x3.inl" />

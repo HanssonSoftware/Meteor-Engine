@@ -28,11 +28,20 @@ void EditorApplication::Init()
 	int j = 76;
 
 	Array<int> is(4);
-	is.Add(&j, 5);
+	for (uint32 i = 0; i < is.GetSize(); i++)
+	{
+		int& a = is[i];
+
+		a = i + 1000;
+	}
 
 	is.Add(&j);
-	is.Remove(5);
+	is.Pop(3);
 
+	for (int i : is)
+	{
+		int jsa = 523;
+	}
 
 	//MemoryManager::Deallocate(asd);
 

@@ -113,9 +113,9 @@ bool VulkanRegistry::CreateInstance()
 {
 	uint32 version = 0;
 	vkEnumerateInstanceVersion(&version);
-	if (version < VK_API_VERSION_1_3)
+	if (version < VK_API_VERSION_1_1)
 	{
-		MR_LOG(LogVulkan, Fatal, "Vulkan is not compatible with your system! Consider upgrading.");
+		MR_LOG(LogVulkan, Fatal, "Vulkan is not compatible with your system, or outdated! Update your driver, or change GPU.");
 	}
 
 	constexpr VkApplicationInfo appInfo = {
@@ -125,7 +125,7 @@ bool VulkanRegistry::CreateInstance()
 		0,										// applicationVersion
 		"",										// pEngineName
 		0,										// engineVersion
-		VK_API_VERSION_1_3						// apiVersion
+		VK_API_VERSION_1_1						// apiVersion
 	};
 
 	VkInstanceCreateInfo instanceInfo = { 
