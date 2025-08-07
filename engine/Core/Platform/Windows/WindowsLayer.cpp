@@ -35,14 +35,6 @@ void WindowsLayer::Init()
             return;
         }
     }
-
-
-    IWindow* Ref = Application::Get()->GetWindowManager()->SearchFor("Super");
-
-    //std::atomic<float> dt = 0.f;
-
-    if (Ref)
-        focusedWindow = (HWND)Ref->GetWindowHandle();
 }
 
 void WindowsLayer::Attached()
@@ -73,19 +65,19 @@ String WindowsLayer::GetError()
         0,
         Num,
         0,
-        (LPTSTR)&buffer,
+        (LPWSTR)&buffer,
         0,
         0
     );
 
     //ConvertToNarrow((LPTSTR)buffer);
 
-    const int requiredSizeInBytes = WideCharToMultiByte(/*CP_UTF8*/ 65001, 0, (LPTSTR)buffer, -1, 0, 0, 0, 0);
+    const int requiredSizeInBytes = WideCharToMultiByte(/*CP_UTF8*/ 65001, 0, (LPWSTR)buffer, -1, 0, 0, 0, 0);
     if (requiredSizeInBytes == 0) return "";
 
     char* super = new char[requiredSizeInBytes];
 
-    WideCharToMultiByte(/*CP_UTF8*/ 65001, 0, (LPTSTR)buffer, -1, super, requiredSizeInBytes, 0, 0);
+    WideCharToMultiByte(/*CP_UTF8*/ 65001, 0, (LPWSTR)buffer, -1, super, requiredSizeInBytes, 0, 0);
     String realBuffer(super);
     
 
@@ -104,19 +96,19 @@ String WindowsLayer::GetError(const /* HRESULT */ unsigned long code)
         0,
         Num,
         0,
-        (LPTSTR)&buffer,
+        (LPWSTR)&buffer,
         0,
         0
     );
 
     //ConvertToNarrow((LPTSTR)buffer);
 
-    const int requiredSizeInBytes = WideCharToMultiByte(/*CP_UTF8*/ 65001, 0, (LPTSTR)buffer, -1, 0, 0, 0, 0);
+    const int requiredSizeInBytes = WideCharToMultiByte(/*CP_UTF8*/ 65001, 0, (LPWSTR)buffer, -1, 0, 0, 0, 0);
     if (requiredSizeInBytes == 0) return "";
 
     char* super = new char[requiredSizeInBytes];
 
-    WideCharToMultiByte(/*CP_UTF8*/ 65001, 0, (LPTSTR)buffer, -1, super, requiredSizeInBytes, 0, 0);
+    WideCharToMultiByte(/*CP_UTF8*/ 65001, 0, (LPWSTR)buffer, -1, super, requiredSizeInBytes, 0, 0);
     String realBuffer(super);
 
 
@@ -138,7 +130,7 @@ String WindowsLayer::GetMachineVersion()
         RegCloseKey(versionKey);
 
         MR_LOG(LogWindowsLayer, Error, "RegOpenKeyExW returned: %s", GetError().Chr());
-        return "0";
+        return "";
     }
     
     DWORD size = 0;
@@ -149,7 +141,7 @@ String WindowsLayer::GetMachineVersion()
     {
         err = RegGetValueW(versionKey, 0, L"CurrentVersion", RRF_RT_REG_SZ, 0, 0, &size);
 
-        buffer = new wchar_t[size];
+        buffer = new wchar_t[size + 1]();
         err = RegGetValueW(versionKey, 0, L"CurrentVersion", RRF_RT_REG_SZ, 0, buffer, &size);
         if (err != ERROR_SUCCESS)
         {
@@ -161,7 +153,7 @@ String WindowsLayer::GetMachineVersion()
     }
     else
     {
-        buffer = new wchar_t[size];
+        buffer = new wchar_t[size + 1]();
         err = RegGetValueW(versionKey, 0, L"LCUVer", RRF_RT_REG_SZ, 0, buffer, &size);
         if (err != ERROR_SUCCESS)
         {
@@ -207,14 +199,14 @@ bool WindowsLayer::IsRunningAnAnotherInstance()
 {
     if (const Application* app = Application::Get())
     {
-        const wchar_t* MrWide = ConvertToWide(app->GetAppInfo().appCodeName);
-        HANDLE appMtx = CreateMutex(0, 1, MrWide);
+        //const wchar_t* MrWide = ConvertToWide(app->GetAppInfo().appCodeName);
+        //HANDLE appMtx = CreateMutexW(0, 1, MrWide);
 
-        delete[] MrWide;
+        //delete[] MrWide;
         
         if (GetLastError() == ERROR_ALREADY_EXISTS)
         {
-            if (appMtx) CloseHandle(appMtx);
+            //if (appMtx) CloseHandle(appMtx);
             return true;
         }
         
@@ -236,7 +228,7 @@ MessageBoxDecision WindowsLayer::AddMessageBox(const MessageBoxDescriptor* Info)
 
     const uint32 flags = evaluateMessageBoxFlags(Info->Type);
 
-    const int returnCode = MessageBox(windowRef, bufferDesc, bufferTitle, flags);
+    const int returnCode = MessageBoxW(windowRef, bufferDesc, bufferTitle, flags);
     delete[] bufferDesc, bufferTitle;
     if (returnCode == 0)
     {
@@ -256,7 +248,7 @@ wchar_t* WindowsLayer::ConvertToWide(const char* Buffer)
         return nullptr;
     }
 
-    const int requiredSize = MultiByteToWideChar(65001 /*CP_UTF8*/, 0, Buffer, -1, 0, 0);
+    const int requiredSize = MultiByteToWideChar(CP_UTF8, 0, Buffer, -1, 0, 0);
     if (requiredSize == 0)
     {
         MR_LOG(LogWindowsLayer, Error, "MultiByteToWideChar said: %s", GetError().Chr());
@@ -264,7 +256,7 @@ wchar_t* WindowsLayer::ConvertToWide(const char* Buffer)
     }
 
     wchar_t* super = new wchar_t[requiredSize + 1];
-    if (MultiByteToWideChar(65001 /*CP_UTF8*/, 0, Buffer, -1, super, requiredSize) == requiredSize)
+    if (MultiByteToWideChar(CP_UTF8, 0, Buffer, -1, super, requiredSize) == requiredSize)
     {
         return super;
     }
@@ -288,7 +280,7 @@ char* WindowsLayer::ConvertToNarrow(const wchar_t* Buffer)
     }
 
     char* super = new char[requiredSize + 1];
-    if (WideCharToMultiByte(65001 /*CP_UTF8*/, 0, Buffer, -1, super, requiredSize, 0, 0) == requiredSize)
+    if (WideCharToMultiByte(CP_UTF8, 0, Buffer, -1, super, requiredSize, 0, 0) == requiredSize)
     {
         return super;
     }

@@ -3,7 +3,6 @@
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
 #include <Platform/PlatformDefs.h>
-#include <string>
 
 /** Human readable piece of text. */
 class String
@@ -24,10 +23,6 @@ public:
 	String(const unsigned long Input);
 
 	String(const uint32 Input);
-
-	String(const std::string Input);
-
-	String(const std::wstring Input);
 
 	String(const String& other);
 
@@ -53,6 +48,7 @@ public:
 
 	const char* Chr() const;	
 
+	/** Creates an allocated string, straight from this container. Do not forget to delete! */
 	char* Allocate();	
 
 	String Delim(const String character, bool first);
@@ -64,7 +60,8 @@ public:
 	float ToFloat() const noexcept;
 
 	uint32 Length() const noexcept;
-
+	
+	/** */
 	static String Format(const String format, ...);
 
 	static bool Contains(const char* buffer, const char* target);
@@ -73,6 +70,7 @@ public:
 
 	static bool IsSpace(const char* buffer);
 
+	/** Checks whenever the passed parameter is a letter. Upper/Lower case.*/
 	static bool IsAlpha(const char* buffer);
 
 private:

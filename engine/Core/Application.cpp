@@ -14,21 +14,20 @@
 #include <crtdbg.h>
 #endif // MR_DEBUG
 #include <Platform/PerformanceTimer.h>
-#include <Renderer/Registry.h>
-
-static Application* appFramework = nullptr;
+#include <Module/ModuleManager.h>
 
 Application::Application()
 {
+    appFramework = this;
+
 #ifdef _WIN64
     WindowsWindowManager* wm = new WindowsWindowManager();
 #else
 
 #endif // _WIN64
-    LayerManager* lm = new LayerManager();
 
     SetWindowManager(wm);
-    SetLayerManager(lm);
+    SetLayerManager(new LayerManager());
 }
 
 Application* Application::Get()
@@ -38,17 +37,8 @@ Application* Application::Get()
 
 void Application::RequestExit(int Code)
 {
-    MR_ASSERT(appFramework != nullptr, "Application class is invalid!");
-    
     appFramework->exitCode = Code;
-    appFramework->SetAppState(APPLICATIONSTATE_SHUTDOWN);
-}
-
-const int Application::GetRequestExitCode()
-{
-    MR_ASSERT(appFramework != nullptr, "Application class is invalid!");
-
-    return appFramework->exitCode;
+    appFramework->SetAppState(ECurrentApplicationState::SHUTDOWN);
 }
 
 void Application::Init()
@@ -57,55 +47,25 @@ void Application::Init()
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF);
 #endif // MR_DEBUG
 
+    MemoryManager::Initialize(appFramework->Memory.memoryReservePercent);
     layerManager->Init();
-    MemoryManager::Initialize(appFramework->appInfo.requiredMinimumMemoryInPercent);
+
+    windowManager->Init();
     Logger::Initialize();
-
-    if (Application::Get()->appInfo.flags &~ APPFLAG_NO_WINDOW)
-        windowManager->Init();
-
 
     MR_LOG(LogApplication, Log, "Initializing application.");
 
-    if (appInfo.appName.IsEmpty())
-    {
-        MR_LOG(LogApplication, Fatal, "AppInfo is invalid!");
-    }
+    ModuleManager::Get().LoadModule("Renderer");
 
-    CreateNativeWindow();
-    
-    if (Application::Get()->appInfo.flags & APPFLAG_DISPLAY_QUICK_INFO_ABOUT_MEMORY_USAGE)
-        int h = 5; // DELETE
-
-    SetAppState(APPLICATIONSTATE_RUNNING);
-}
-
-bool Application::InstantiateApplication(Application* newInstance, const ApplicationInitializationInfo* appCreateInfo)
-{
-    if (!newInstance || !appCreateInfo)
-    {
-        Application::RequestExit(-1);
-        return false;
-    }
-
-    appFramework = newInstance;
-    appFramework->appInfo = *appCreateInfo;
-
-    appFramework->Init();
-
-    return true;
+    SetAppState(ECurrentApplicationState::RUNNING);
 }
 
 void Application::Run()
 {
-    VulkanRegistry* reg = VulkanRegistry::GetRegistry();
-    SetAppState(APPLICATIONSTATE_RUNNING);
-
-    while (GetAppState() == APPLICATIONSTATE_RUNNING)
+    while (GetAppState() == ECurrentApplicationState::RUNNING)
     {
         layerManager->UpdateLayer();
         appFramework->Run();
-        reg->Render();
     }
 
     appFramework->Shutdown();
@@ -113,7 +73,7 @@ void Application::Run()
 
 void Application::Shutdown()
 {
-    if (GetAppState() == APPLICATIONSTATE_RESTARTING)
+    //if (GetAppState() == APPLICATIONSTATE_RESTARTING)
     {
         MR_LOG(LogApplication, Log, "Restarting application!");
     
@@ -125,7 +85,7 @@ void Application::Shutdown()
 
         appFramework->Init();
     }
-    else
+    //else
     {
         MR_LOG(LogApplication, Log, "Shutting down application!");
 
@@ -155,24 +115,15 @@ Application::~Application()
 
 String Application::GetApplicationName()
 {
-    if (appFramework->appInfo.appName.IsEmpty())
-    {
-        return appFramework->GetWindowManager()->GetFirstWindow()->windowData.windowName;
-    }
+    //if (appFramework->appInfo.appName.IsEmpty())
+    //{
+    //    return appFramework->GetWindowManager()->GetFirstWindow()->windowData.windowName;
+    //}
 
-    return appFramework->appInfo.appName;
-}
-
-
-void Application::CreateNativeWindow() const
-{
-    if (appFramework->appInfo.flags & APPFLAG_NO_WINDOW)
-        return;
-
-    GetWindowManager()->CreateNativeWindow(&appFramework->appInfo.windowCreateInfo);
+    return "appFramework->appInfo.appName";
 }
 
 Application* GetApplication()
 {
-    return appFramework;
+    return Application::Get();
 }

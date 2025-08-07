@@ -7,7 +7,7 @@
 
 struct MemoryManager
 {
-	static void Initialize(const float RequiredMinimum);
+	static void Initialize(const double& RequiredMinimum);
 
 	static void Shutdown();
 

@@ -1,8 +1,13 @@
-Project "CoreKit" : "Meteor"
+Project "Core" : "Meteor"
 {
 	IncludePath:
 	{
 		"",
 		"",
+	}
+
+	Flags:
+	{
+		ROOT
 	}
 }

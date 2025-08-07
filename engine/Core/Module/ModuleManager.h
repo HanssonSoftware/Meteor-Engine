@@ -1,7 +1,7 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <vector>
+#include <Types/Array.h>
 #include <Types/String.h>
 
 class ModuleManager
@@ -13,8 +13,10 @@ public:
 
 
 protected:
-	std::vector<String> modules;
+	virtual ~ModuleManager() noexcept;
 
-	static ModuleManager object;
+	Array<String> modules;
+
+	// static ModuleManager object; // This must be an extensible class!
 };
 

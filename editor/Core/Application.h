@@ -21,25 +21,4 @@ public:
 	virtual void Shutdown() override;
 }; 
 
-
-int launchStranger(int ArgumentCount, char* Arguments[])
-{
-	WindowCreateInfo wInfo = {};
-	wInfo.size = Vector2<>(1280, 720);
-	wInfo.windowID = String("Super");
-	wInfo.windowName = "Meteor Editor";
-
-	ApplicationInitializationInfo appInfo = {};
-	appInfo.appName = "Meteor Editor";
-	appInfo.appCodeName = "Astronaut";
-	appInfo.windowCreateInfo = wInfo;
-	appInfo.requiredMinimumMemoryInPercent = 0.15f;
-	appInfo.flags = APPFLAG_ENABLE_VERBOSE_LOGGING;
-
-	ICommandlet::Initalize();
-
-	EditorApplication newEditorApp = {};
-	Application::InstantiateApplication(&newEditorApp, &appInfo);
-
-	return Application::GetRequestExitCode();
-}
+IMPLEMENT_APPLICATION(EditorApplication);

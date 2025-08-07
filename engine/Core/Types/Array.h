@@ -2,13 +2,10 @@
 
 #pragma once
 #include <Platform/PlatformDefs.h>
-#include <Logging/LogMacros.h>
 #include "Iterator.h"
 #include <cstring>
 
-LOG_ADDCATEGORY(Array);
-
-template <class T>
+template <typename T>
 class Array : public Iterator<T>
 {
 public:
@@ -39,29 +36,40 @@ public:
 		container = new T[capacity]();
 	}
 
-	Array(const Array& other) = delete;
+	Array(const Array& other)
+	{
+		int j = 5;
+	};
 
-	Array& operator=(const Array& other) = delete;
+	Array(T* buffer)
+	{
+		int j = 5;
+	};
 
-	void Add(const T* elem, const uint32& at)
+	Array& operator=(const Array& other)
+	{
+		return *this;
+	};
+
+	void Add(const T elem, const uint32& at)
 	{
 		size = size < at ? at : size;
 
 		if (!IsOutOfBounds(at))
 		{
-			container[at] = *elem;
+			container[at] = elem;
 		}
-	}
+	};
 
-	void Add(const T* elem)
+	void Add(const T elem)
 	{
-		container[size] = *elem;
+		container[size] = elem;
 		size++;
 
 		if (size >= capacity)
 			Resize(capacity + RECOMMENDED_CAPACITY_PADDING);
 
-	}
+	};
 
 	void Remove(const uint32& at)
 	{
@@ -69,7 +77,7 @@ public:
 		{
 			container[at] = {};
 		}
-	}
+	};
 
 	void Pop(const uint32& at)
 	{
@@ -105,31 +113,30 @@ public:
 		{
 			container[i] = {};
 		}
-	}
+	};
 
 	uint32 GetSize() const
 	{
 		return size;
-	}
+	};
 
 	T& operator[](const uint32& index)
 	{
 		if (IsOutOfBounds(index))
 		{
-			MR_LOG(LogArray, Error, "Trying to reach out of bounds value: %d\tOf: %u", index, size);
 			return container[0];
 		}
 
 		return container[index];
-	}
+	};
 
 	bool IsOutOfBounds(const uint32& index) { return index >= capacity; };
 
 	Iterator<T> begin() { return Iterator(&container[0]); }
 
 	Iterator<T> end() { return Iterator(&container[size]); }
-private:
 
+private:
 	static constexpr const uint32 RECOMMENDED_CAPACITY_PADDING = 4;
 
 	uint32 capacity = 0;

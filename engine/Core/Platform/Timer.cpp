@@ -1,33 +1,13 @@
 ﻿/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #include "Timer.h"
-//#include <sstream>
-#include <iomanip>
 #include <Types/String.h>
-//#include <Windows.h>
-//#include <Log/Exception.h>
-//#include <Platform/Log.h>
+#include <type_traits>
 
-Timer::Timer()
+static_assert(!std::is_same_v<Timer, ITimer>, "Timer is base type!");
+
+Time ITimer::Now() noexcept
 {
-
-
-}
-
-String Timer::Now(const String Format)
-{
-    if (Format.IsEmpty())
-        return "";
-
-    time_t rawtime;
-    char buffer[256];
-
-    time(&rawtime);
-
-    tm* a = localtime(&rawtime);
-
-    strftime(buffer, 256, Format.Chr(), a);
-
-    return buffer;
+	return {};
 }
 

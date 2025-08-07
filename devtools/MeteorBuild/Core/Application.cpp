@@ -11,10 +11,6 @@
 
 #pragma comment(lib, "Shell32.lib")
 
-int main(int argc, char* argv[])
-{
-	return launchStranger(argc, argv);
-}
 
 BuildSystemApplication::BuildSystemApplication()
 	: Application()
@@ -25,15 +21,11 @@ BuildSystemApplication::BuildSystemApplication()
 void BuildSystemApplication::Init()
 {
 	Application::Init();
+	String val;
 
-	if (Intermediate::SearchIntermediateFiles(ICommandlet::Parse("-int")))
+	if (!Commandlet::Parse("-sourcedir", val))
 	{
-
-	}
-
-	if (!ICommandlet::Parse("-sourcedir").IsEmpty())
-	{
-		bool b = Locator::FindAllReferences(ICommandlet::Parse("-sourcedir"));
+		bool b = Locator::FindAllReferences(val);
 	}
 	else
 	{

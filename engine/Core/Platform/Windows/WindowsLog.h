@@ -21,7 +21,7 @@ struct WindowsLog : public ILogger
 
 	static int TransmitAssertion(LogAssertion& Info);
 
-	virtual void SendToOutputBuffer(const String Buffer) override;
+	virtual void SendToOutputBuffer(const String& Buffer) override;
 
 protected:
 	IFile* consoleBuffer = nullptr;

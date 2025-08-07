@@ -18,7 +18,7 @@
     <ClCompile Include="engine\Core\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Platform\Commandlet.cpp">
+    <ClCompile Include="engine\Core\Commandlet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Platform\InputManager.cpp">
@@ -55,18 +55,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Launch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Renderer\Widgets\Common\FontAsset.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Renderer\Widgets\Components\TextBlock.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Renderer\Widgets\Viewport.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Renderer\Widgets\Visual.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Object\Object.cpp">
@@ -117,15 +105,6 @@
     <ClCompile Include="engine\Core\Logging\LogAssertion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Renderer\Queue.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Renderer\OutputContext.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Renderer\Registry.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\Core\Platform\Windows\WindowsThread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -135,22 +114,22 @@
     <ClCompile Include="engine\Core\Platform\Windows\WindowsThreadManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Renderer\SwapChain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\Core\MemoryManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Renderer\Device.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Renderer\PipelineManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Renderer\Pipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\Core\Module\ModuleManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\Platform\Paths.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\Platform\Windows\WindowsPaths.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Renderer\Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\Module\Module.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -158,7 +137,7 @@
     <ClInclude Include="engine\Core\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Platform\Commandlet.h">
+    <ClInclude Include="engine\Core\Commandlet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Platform\InputManager.h">
@@ -470,18 +449,6 @@
     <ClInclude Include="engine\Core\Common\Conversions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Renderer\Widgets\Common\FontAsset.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Renderer\Widgets\Components\TextBlock.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Renderer\Widgets\Viewport.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Renderer\Widgets\Visual.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\Core\Object\Object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -521,9 +488,6 @@
     <ClInclude Include="engine\Core\Platform\FileHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\ApplicationHelpers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\Core\Platform\FileManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -551,15 +515,6 @@
     <ClInclude Include="resources\assertbox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Renderer\Queue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Renderer\OutputContext.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Renderer\Registry.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\Core\Common\Math.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -575,28 +530,25 @@
     <ClInclude Include="engine\Core\Platform\Windows\WindowsThreadManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Renderer\SwapChain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\Core\MemoryManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Renderer\Vulkan.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Renderer\Device.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Renderer\PipelineManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Renderer\Pipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Module\ModuleManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Types\Iterator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Platform\Paths.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Platform\Windows\WindowsPaths.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Renderer\Renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Module\Module.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -628,7 +580,7 @@
     <None Include="engine\ThirdParty\assimp\vector3.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="engine\Renderer\Renderer.mrbuild" />
+    <None Include="engine\Core\CoreKit.mrbuild" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\sampleapp.rc">

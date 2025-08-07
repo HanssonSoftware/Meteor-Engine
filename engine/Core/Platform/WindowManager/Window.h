@@ -3,8 +3,6 @@
 #pragma once
 #include <Types/String.h>
 #include <Types/Vector.h>
-#include "WindowExtender.h"
-#include <vector>
 
 struct WindowCreateInfo
 {
@@ -27,7 +25,7 @@ public:
 
 	IWindow(IWindowManager* newOwner);
 
-	virtual ~IWindow() = default;
+	virtual ~IWindow() noexcept = default;
 
 	Vector2<uint32> GetSize() const
 	{
@@ -40,7 +38,7 @@ public:
 
 	virtual void ShowWindow() = 0;
 
-	virtual void SetTitle(const String newName) = 0;
+	virtual void SetTitle(const String& newName) = 0;
 
 	virtual void HideWindow() = 0;
 
@@ -49,11 +47,15 @@ public:
 	virtual void* GetWindowHandle() = 0;
 
 	WindowCreateInfo windowData;
+
 protected:
 	IWindowManager* owner;
-
-	std::vector<IWindowExtender*> extensions;
-
-	void* handle = nullptr;
 };
+
+#include <PlatformLayout.h>
+
+#ifdef MR_PLATFORM_WINDOWS
+#include <Windows/WindowsWindow.h>
+#endif // MR_PLATFORM_WINDOWS
+
 

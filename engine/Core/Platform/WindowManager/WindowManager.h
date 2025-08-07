@@ -4,14 +4,16 @@
 #include "Window.h"
 #include <Object/Object.h>
 #include <Logging/LogMacros.h>
-#include <vector>
+#include <Types/Array.h>
 
 LOG_ADDCATEGORY(WindowManager);
 
-class IRHIRegistry;
 class InputManager;
 
-static constexpr const wchar_t* ApplicationClassName = L"MeteorApplication";
+inline static constexpr const wchar_t* GetDefaultApplicationName() noexcept
+{
+	return L"MeteorApplication";
+}
 
 class IWindowManager
 {
@@ -40,17 +42,20 @@ public:
 
 	/** Gets the current or last focused window, can be non-engine specific. */
 	virtual IWindow* GetFocusedWindow() = 0;
-	
-	IRHIRegistry* GetRenderContext() const { return renderContext; };
 
 	InputManager* GetInputManager() const { return inputManager; };
 protected:
 	IWindow* privSearchFor(const String Name);
 
-	IRHIRegistry* renderContext;
-
 	InputManager* inputManager;
 
-	std::vector<IWindow*> activeWindows; 
+	Array<IWindow*> activeWindows;
 };
+
+
+#include <PlatformLayout.h>
+
+#ifdef MR_PLATFORM_WINDOWS
+#include <Windows/WindowsWindowManager.h>
+#endif // MR_PLATFORM_WINDOWS
 

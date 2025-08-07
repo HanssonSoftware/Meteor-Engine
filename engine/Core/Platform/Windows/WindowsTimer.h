@@ -2,11 +2,14 @@
 
 #pragma once
 #include <Platform/Timer.h>
+#include <Windows/Windows.h>
 
-class WinTimer : public Timer
+class WindowsTimer : public ITimer
 {
 public:
-	WinTimer();
+	WindowsTimer();
+
+	virtual ~WindowsTimer() = default;
 
 	virtual void Start() override;
 
@@ -14,7 +17,9 @@ public:
 	
 	virtual void Reset() override;
 
+	static Time Now() noexcept;
 private:
-	void* /*HANDLE*/ timer;
+	HANDLE timer;
 };
 
+using Timer = WindowsTimer;

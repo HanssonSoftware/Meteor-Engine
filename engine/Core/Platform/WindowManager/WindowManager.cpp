@@ -1,10 +1,8 @@
 ﻿/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #include "WindowManager.h"
-#include <Platform/WindowManager/Window.h>
-#include <Renderer/Registry.h>
+#include <WindowManager/Window.h>
 //#include <Core/Application.h>
-
 
 
 static int lastSearchIndex = -1;
@@ -12,9 +10,7 @@ static String lastSearch = "";
 
 IWindowManager::IWindowManager()
 {
-	renderContext = nullptr;
 	inputManager = nullptr;
-
 }
 
 void IWindowManager::Init()
@@ -24,17 +20,16 @@ void IWindowManager::Init()
 
 void IWindowManager::Shutdown()
 {
-	VulkanRegistry::Shutdown();
 }
 
 IWindow* IWindowManager::SearchFor(const String ID)
 {
-	if (lastSearchIndex != -1 && lastSearchIndex < activeWindows.size() && lastSearch == ID)
+	if (lastSearchIndex != -1 && lastSearchIndex < activeWindows.GetSize() && lastSearch == ID)
 	{
 		return activeWindows[lastSearchIndex];
 	}
 
-	const size_t activeCount = activeWindows.size();
+	const size_t activeCount = activeWindows.GetSize();
 	for (int i = 0; i < activeCount; i++)
 	{
 		IWindow* Temp = activeWindows[i];
@@ -52,7 +47,7 @@ IWindow* IWindowManager::SearchFor(const String ID)
 
 IWindow* IWindowManager::GetFirstWindow()
 {
-	if (activeWindows.size() > 0)
+	if (activeWindows.GetSize() > 0)
 		return activeWindows[0];
 
 	return nullptr;
@@ -60,13 +55,13 @@ IWindow* IWindowManager::GetFirstWindow()
 
 void IWindowManager::ShowWindow(const String ID)
 {
-	if (lastSearchIndex != -1 && lastSearchIndex < activeWindows.size() && lastSearch == ID)
+	if (lastSearchIndex != -1 && lastSearchIndex < activeWindows.GetSize() && lastSearch == ID)
 	{
 		activeWindows[lastSearchIndex]->ShowWindow();
 		return;
 	}
 
-	const size_t activeCount = activeWindows.size();
+	const size_t activeCount = activeWindows.GetSize();
 
 	for (int i = 0; i < activeCount; i++)
 	{
@@ -83,13 +78,13 @@ void IWindowManager::ShowWindow(const String ID)
 
 void IWindowManager::HideWindow(const String ID)
 {
-	if (lastSearchIndex != -1 && lastSearchIndex < activeWindows.size() && lastSearch == ID)
+	if (lastSearchIndex != -1 && lastSearchIndex < activeWindows.GetSize() && lastSearch == ID)
 	{
 		activeWindows[lastSearchIndex]->HideWindow();
 		return;
 	}
 
-	const size_t activeCount = activeWindows.size();
+	const size_t activeCount = activeWindows.GetSize();
 
 	for (int i = 0; i < activeCount; i++)
 	{
@@ -106,13 +101,13 @@ void IWindowManager::HideWindow(const String ID)
 
 bool IWindowManager::DrawAttention(const String ID)
 {
-	if (lastSearchIndex != -1 && lastSearchIndex < activeWindows.size() && lastSearch == ID)
+	if (lastSearchIndex != -1 && lastSearchIndex < activeWindows.GetSize() && lastSearch == ID)
 	{
 		activeWindows[lastSearchIndex]->DrawAttention();
 		return true;
 	}
 
-	const size_t activeCount = activeWindows.size();
+	const size_t activeCount = activeWindows.GetSize();
 
 	for (int i = 0; i < activeCount; i++)
 	{
@@ -131,13 +126,13 @@ bool IWindowManager::DrawAttention(const String ID)
 
 bool IWindowManager::DestroyWindow(const String ID)
 {
-	if (lastSearchIndex != -1 && lastSearchIndex < activeWindows.size() && lastSearch == ID)
+	if (lastSearchIndex != -1 && lastSearchIndex < activeWindows.GetSize() && lastSearch == ID)
 	{
 		activeWindows[lastSearchIndex]->DestroyWindow();
 		return true;
 	}
 
-	const size_t activeCount = activeWindows.size();
+	const size_t activeCount = activeWindows.GetSize();
 
 	for (int i = 0; i < activeCount; i++)
 	{
@@ -156,12 +151,12 @@ bool IWindowManager::DestroyWindow(const String ID)
 
 IWindow* IWindowManager::privSearchFor(const String Name)
 {
-	if (lastSearchIndex != -1 && lastSearchIndex < activeWindows.size() && lastSearch == Name)
+	if (lastSearchIndex != -1 && lastSearchIndex < activeWindows.GetSize() && lastSearch == Name)
 	{
 		return activeWindows[lastSearchIndex];
 	}
 
-	const size_t activeCount = activeWindows.size();
+	const size_t activeCount = activeWindows.GetSize();
 	for (int i = 0; i < activeCount; i++)
 	{
 		IWindow* Temp = activeWindows[i];

@@ -8,7 +8,6 @@
 #include <vector>
 
 class String;
-class File;
 
 LOG_ADDCATEGORY(FileManager);
 

@@ -69,11 +69,11 @@ bool WindowsWindow::CreateNativeWindow(const WindowCreateInfo* windowData)
 		if (const WindowsWindowManager* wm = (WindowsWindowManager*)owner)
 		{
 			bIsFallback = wm->GetIsUsingFallbackClass();
-			className = bIsFallback ? ApplicationClassName : Layer::GetSystemLayer()->ConvertToWide(app->GetAppInfo().appName.Chr());
+			className = bIsFallback ? GetDefaultApplicationName() : Layer::GetSystemLayer()->ConvertToWide(app->appName.Chr());
 		}
 	}
 
-	handle = ::CreateWindowEx(
+	handle = ::CreateWindowExW(
 		/*WS_EX_ACCEPTFILES*/ 0,
 		className,
 		buffer,
@@ -116,7 +116,7 @@ void WindowsWindow::ShowWindow()
 	::ShowWindow((HWND)handle, /*SW_SHOWDEFAULT*/ 10);
 }
 
-void WindowsWindow::SetTitle(const String newName)
+void WindowsWindow::SetTitle(const String& newName)
 {
 	if (handle == nullptr)
 	{

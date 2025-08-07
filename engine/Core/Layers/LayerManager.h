@@ -1,7 +1,7 @@
 ﻿/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <vector>
+#include <Types/Array.h>
 #include <Object/Object.h>
 
 class Layer;
@@ -31,9 +31,10 @@ public:
 	virtual void Shutdown() override;
 
 	SystemLayer* GetSystemLayer() const { return systemLayer ? systemLayer : nullptr; }
-private:
+
+protected:
 	SystemLayer* systemLayer;
 
-	std::vector<Layer*> layers;
+	Array<Layer*> layers;
 };
 

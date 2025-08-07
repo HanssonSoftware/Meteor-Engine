@@ -1,12 +1,10 @@
 ﻿/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
-#include "ApplicationHelpers.h"
-
 #include <Types/Vector.h>
 #include <Types/String.h>
 #include <Logging/LogMacros.h>
-#include <Platform/WindowManager/WindowManager.h>
+#include <WindowManager/WindowManager.h>
 //#include <Windows/Windows.h>
 
 #ifdef _WIN64
@@ -27,6 +25,26 @@ LOG_ADDCATEGORY(Application);
 
 struct Application
 {
+	enum class ECurrentApplicationState { NONE, STARTUP, RUNNING, SHUTDOWN, DEAD };
+
+	struct
+	{
+		/** Application name, this would be appearing on the created window. */
+		String appName;
+
+		/** Useful for directories. */
+		String appCodeName;
+
+		union
+		{
+			double memoryReservePercent;
+
+			double memoryReserveInBytes;
+
+		} Memory;
+
+	};
+
 	Application();
 
 	Application(const Application& Nah) = delete;
@@ -39,8 +57,6 @@ struct Application
 
 	virtual void Shutdown();
 
-	static bool InstantiateApplication(Application* newInstance, const ApplicationInitializationInfo* appCreateInfo);
-
 	static String GetApplicationDirectory();
 
 	static String GetApplicationName();
@@ -49,13 +65,7 @@ struct Application
 
 	static void RequestExit(int Code);
 
-	static const int GetRequestExitCode();
-
-	ApplicationInitializationInfo GetAppInfo() const { return appInfo; };
-
-	ApplicationState GetAppState() const { return State; };
-
-	void SetAppState(const ApplicationState newState) { State = newState; };
+	int GetRequestExitCode() const { return appFramework->exitCode; };
 
 	IWindowManager* GetWindowManager() const { return windowManager; };
 
@@ -65,26 +75,33 @@ struct Application
 
 	void SetLayerManager(LayerManager* NewValue) { layerManager = NewValue; };
 
-	IRHIRegistry* GetRenderContext() const { return windowManager->GetRenderContext(); };
-
 	IWindow* GetFirstWindow() const { return windowManager ? windowManager->GetFirstWindow() : nullptr; };
 
-private:
-	inline void CreateNativeWindow() const;
+	ECurrentApplicationState GetAppState() const { return state; };
+
+	void SetAppState(const ECurrentApplicationState& newState) { state = newState; };
 
 protected:
+
 	int exitCode = 0;
 
 	IWindowManager* windowManager;
 
 	LayerManager* layerManager;
 
-	ApplicationState State = APPLICATIONSTATE_INITIALIZATION;
+	ECurrentApplicationState state = ECurrentApplicationState::NONE;
 
-	ApplicationInitializationInfo appInfo;
-
-	String applicationName = L"Saxon Proprietary Game Engine";
+	static inline Application* appFramework = nullptr;
 };
 
-
 Application* GetApplication();
+
+#define IMPLEMENT_APPLICATION(ApplicationClass) \
+	extern "C" int LaunchApplication(int ArgumentCount, char* Arguments[]) \
+	{	\
+		static ApplicationClass instance; \
+        instance.Init(); \
+        instance.Run(); \
+        instance.Shutdown(); \
+        return 0; \
+	}

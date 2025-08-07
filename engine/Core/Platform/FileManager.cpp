@@ -54,7 +54,7 @@ bool IFileManager::IsEndingWith(const String& name, const String& extension)
 
 String IFileManager::GetExecutableDirectory()
 {
-	return String();
+	return "";
 }
 
 void IFileManager::NormalizeDirectory(String& input)

@@ -1,17 +1,27 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <Types/String.h>
 #include <Platform/PlatformDefs.h>
 
-//class String;
+class String;
 
-class Timer 
+struct Time
+{
+    uint32 year = 0;
+    uint32 month = 0;
+    uint32 day = 0;
+    uint32 hour = 0;
+    uint32 minute = 0;
+    uint32 second = 0;
+    uint32 millisecond = 0;
+};
+
+class ITimer 
 {
 public:
-    Timer();
+    ITimer() = default;
 
-    virtual ~Timer() = default;
+    virtual ~ITimer() = default;
 
     virtual void Start() = 0;
 
@@ -21,7 +31,7 @@ public:
 
     bool IsRunning() const { return bRunning; };
 
-    static String Now(const String Format = "%Y-%m-%d %H:%M:%S");
+    static Time Now() noexcept;
 
 protected:
     uint64 begin = 0;
@@ -30,3 +40,9 @@ protected:
 
     bool bRunning = false;
 };
+
+#include "PlatformLayout.h"
+
+#ifdef MR_PLATFORM_WINDOWS
+#include <Windows/WindowsTimer.h>
+#endif // MR_PLATFORM_WINDOWS

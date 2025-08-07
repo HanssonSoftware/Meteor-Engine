@@ -31,12 +31,12 @@ void LayerManager::PushLayer(Layer* Instance)
 		return;
 
 	Instance->privAttached();
-	layers.push_back(Instance);
+	layers.Add(Instance);
 }
 
 void LayerManager::RemoveLayer(const Layer* Instance)
 {
-	const size_t size = layers.size();
+	const size_t size = layers.GetSize();
 	for (size_t i = 0; i < size; i++)
 	{
 		if (layers[i] == Instance)
@@ -49,7 +49,7 @@ void LayerManager::RemoveLayer(const Layer* Instance)
 
 void LayerManager::RemoveLayer(const String Name)
 {
-	const size_t size = layers.size();
+	const size_t size = layers.GetSize();
 	for (size_t i = 0; i < size; i++)
 	{
 		if (layers[i]->GetName() == Name)

@@ -1,0 +1,20 @@
+﻿/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
+
+#pragma once
+#include <Logging/LogMacros.h>
+#include <Types/Array.h>
+#include <Types/String.h>
+
+class String;
+
+LOG_ADDCATEGORY(Commandlet);
+
+struct Commandlet
+{
+	static void Initialize();
+
+	static bool Parse(const String& inParam, String& returnVal);
+
+protected:
+	static inline Array<String> parsedWords;
+};

@@ -43,14 +43,14 @@
     <OutDir>$(SolutionDir)Product\</OutDir>
     <TargetName>Meteor$(ProjectName)</TargetName>
     <IntDir>$(SolutionDir)Intermediate\$(ProjectName)\</IntDir>
-    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(VULKAN_SDK)\Libs\;%(AdditionalLibraryDirectories);$(SolutionDir)engine\ThirdParty\assimp</LibraryPath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);%(AdditionalLibraryDirectories);$(SolutionDir)product</LibraryPath>
     <IncludePath>$(SolutionDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
     <OutDir>$(SolutionDir)Product\</OutDir>
     <IntDir>$(SolutionDir)Intermediate\$(ProjectName)\</IntDir>
     <TargetName>Meteor$(ProjectName)</TargetName>
-    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(VULKAN_SDK)\Libs\;%(AdditionalLibraryDirectories);$(SolutionDir)engine\ThirdParty\assimp</LibraryPath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);%(AdditionalLibraryDirectories);$(SolutionDir)product</LibraryPath>
     <IncludePath>$(SolutionDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -65,7 +65,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(SolutionDir)product\crimson.lib;$(CoreLibraryDependencies);D3D11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MeteorEngine-Core.lib;$(CoreLibraryDependencies);D3D11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ShaderType>
@@ -82,7 +82,7 @@
       <PreprocessorDefinitions>;UNICODE</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(SolutionDir)product\crimson.lib;$(CoreLibraryDependencies);D3D11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MeteorEngine-Core.lib;$(CoreLibraryDependencies);D3D11.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
     <FxCompile>

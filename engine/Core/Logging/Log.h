@@ -38,7 +38,7 @@ struct ILogger
 
 	static inline bool IsDebuggerAttached();
 
-	virtual void SendToOutputBuffer(const String Buffer);
+	virtual void SendToOutputBuffer(const String& Buffer);
 protected:
 	ILogger();
 

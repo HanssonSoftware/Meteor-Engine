@@ -3,7 +3,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 #include "WindowsFileManager.h"
-#include <Types/String.h>
 #include <Logging/LogMacros.h>
 #include <Layers/Layer.h>
 #include <Application.h>
@@ -240,7 +239,7 @@ IFile* WindowsFileManager::CreateFileOperation(const String& pathA, int accessTy
 
     if (file == INVALID_HANDLE_VALUE)
     {
-        MR_LOG(LogFileManager, Error, "%s", systemLayer->GetError());
+        MR_LOG(LogFileManager, Error, "%s", *systemLayer->GetError());
         return nullptr;
     }
 
@@ -301,12 +300,10 @@ bool WindowsFileManager::startRecursiveCreate(wchar_t* dir)
     const size_t dirSize = wcslen(dir);
 
     if (PathCchRemoveExtension(dir, dirSize) == S_OK)
-    {
         /*PathCchRemoveExtension*/ PathCchRemoveFileSpec(dir, dirSize);
-    }
 
     DWORD requiredAmount = GetCurrentDirectoryW(0, 0);
-    wchar_t* super = new wchar_t[requiredAmount + 1];
+    wchar_t* super = new wchar_t[requiredAmount + 1]();
     GetCurrentDirectoryW(requiredAmount, super);
 
     wchar_t* superSuper;

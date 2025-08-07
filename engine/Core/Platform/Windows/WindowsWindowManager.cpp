@@ -6,7 +6,6 @@
 #include "WindowsWindow.h"
 #include <Layers/SystemLayer.h>
 #include <dwmapi.h>
-#include <Renderer/Registry.h>
 
 #pragma comment (lib, "UxTheme.lib")
 
@@ -25,12 +24,12 @@ void WindowsWindowManager::Shutdown()
         {
             if (const Application* app = GetApplication())
             {
-                UnregisterClassW(Layer::GetSystemLayer()->ConvertToWide(app->GetAppInfo().appName.Chr()), instance);
+                UnregisterClassW(Layer::GetSystemLayer()->ConvertToWide(app->appName.Chr()), instance);
             }
         }
         else
         {
-            UnregisterClassW(ApplicationClassName, instance);
+            UnregisterClassW(GetDefaultApplicationName(), instance);
         }
     }
 }
@@ -55,16 +54,10 @@ IWindow* WindowsWindowManager::CreateNativeWindow(const WindowCreateInfo* Create
 	WindowsWindow* newWindow = new WindowsWindow(this);
 	if (newWindow->CreateNativeWindow(CreateInfo))
 	{
-		activeWindows.push_back(newWindow);
+		activeWindows.Add(newWindow);
 
 		if (GetFirstWindow() == newWindow)
 		{
-            if (!VulkanRegistry::Initialize())
-            {
-                MR_LOG(LogWindowManager, Fatal, "Failed to create rendering interface! %s", *VulkanRegistry::GetName());
-                return nullptr; // just in case
-            }
-
             newWindow->ShowWindow();
 		}
 
@@ -105,7 +98,7 @@ inline bool WindowsWindowManager::RegisterWindowClass()
 	instance = GetModuleHandle(NULL);
 	HICON ico = (HICON)LoadImage(instance, MAKEINTRESOURCE(IDI_DEFAULTAPPICON), IMAGE_ICON, 64, 64, LR_DEFAULTCOLOR);
 
-	WNDCLASSEX windowClass = {};
+	WNDCLASSEXW windowClass = {};
 	windowClass.cbSize = sizeof(WNDCLASSEX);
 	windowClass.hInstance = instance;
 	windowClass.hIcon = ico;
@@ -114,16 +107,16 @@ inline bool WindowsWindowManager::RegisterWindowClass()
 
     if (const Application* app = Application::Get())
     {
-        windowClass.lpszClassName = Layer::GetSystemLayer()->ConvertToWide(app->GetAppInfo().appName.Chr());
+        windowClass.lpszClassName = Layer::GetSystemLayer()->ConvertToWide(app->appName.Chr());
     }
     else
     {
         MR_LOG(LogWindowManager, Error, "Failed to get application codename, using fallback name! Multiple instance detection may not work!");
         bIsUsingFallbackClassName = true;
-        windowClass.lpszClassName = ApplicationClassName;
+        windowClass.lpszClassName = GetDefaultApplicationName();
     }
 
-	if (!RegisterClassEx(&windowClass))
+	if (!RegisterClassExW(&windowClass))
 	{
 		MR_LOG(LogWindowManager, Fatal, "Failed to register WinAPI class!");
 		return false;

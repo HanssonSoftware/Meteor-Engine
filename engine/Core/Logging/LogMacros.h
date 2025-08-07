@@ -14,7 +14,7 @@
     struct Log##CategoryName : public LogEntry \
 	{ \
         static constexpr const char* GetName() { return MERGE2(Log##CategoryName); }; \
-    };
+    }
 
 LOG_ADDCATEGORY(Temp);
 

@@ -3,12 +3,13 @@
 #include "WindowsTimer.h"
 #include "Windows/Windows.h"
 #include <Logging/LogMacros.h>
+#include <Layers/SystemLayer.h>
 
 LOG_ADDCATEGORY(Timer);
 
-WinTimer::WinTimer()
+WindowsTimer::WindowsTimer()
 {
-	timer = CreateWaitableTimer(0, /*TRUE*/ 1, 0);
+	timer = CreateWaitableTimerW(0, /*TRUE*/ 1, 0);
 	if (timer == 0)
 	{
 		MR_LOG(LogTimer, Error, "CreateWaitableTimer failed!");
@@ -16,14 +17,14 @@ WinTimer::WinTimer()
 	}
 }
 
-void WinTimer::Start()
+void WindowsTimer::Start()
 {
 	bRunning = true;
 
 	//SetWaitableTimer(timer, 0, 0, 0, 0, 0);
 }
 
-void WinTimer::Stop()
+void WindowsTimer::Stop()
 {
 	bRunning = false;
 
@@ -34,6 +35,24 @@ void WinTimer::Stop()
 	}
 }
 
-void WinTimer::Reset()
+void WindowsTimer::Reset()
 {
 }
+
+Time WindowsTimer::Now() noexcept
+{
+	SYSTEMTIME tm = {};
+	GetLocalTime(&tm);
+
+	Time newTime = {};
+	newTime.year = tm.wYear;
+	newTime.month = tm.wMonth;
+	newTime.day = tm.wDay;
+	newTime.hour = tm.wHour;
+	newTime.minute = tm.wMinute;
+	newTime.second = tm.wSecond;
+	newTime.millisecond = tm.wMilliseconds;
+
+	return newTime;
+}
+

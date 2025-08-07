@@ -7,6 +7,8 @@
 #pragma once
 #if defined(_WIN32) || defined(_WIN64)
 
+#pragma comment(linker, "/SUBSYSTEM:WINDOWS")
+
 #define	WIN32_LEAN_AND_MEAN
 #define	NOMINMAX
 #define	NOHELP

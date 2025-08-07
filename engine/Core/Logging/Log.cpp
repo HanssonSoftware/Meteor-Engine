@@ -31,40 +31,37 @@ void ILogger::Shutdown()
 {
     if (instance->bIsUsingFile && instance->buffer)
     {
-        instance->buffer->Write(String::Format("Logging closed at %s.\n", Timer::Now().Chr()));
+        const Time current = Timer::Now();
+
+        instance->buffer->Write(String::Format("Logging closed at %d-%d-%d %d:%d.\n", current.year, current.month, current.day, current.hour, current.minute));
         instance->buffer->Close();
     }
 }
 
 void ILogger::Initialize()
 {
-    if (const Application* app = GetApplication())
+    String val;
+    instance->bIsUsingVerbose = Commandlet::Parse("-verbose", val);
+
+    instance->bIsUsingFile = !Commandlet::Parse("-nofilelogging", val);
+
+    if (instance->bIsUsingFile && false)
     {
-		app->GetAppInfo().flags & APPFLAG_ENABLE_VERBOSE_LOGGING ? instance->bIsUsingVerbose = true : instance->bIsUsingVerbose = false;
-		app->GetAppInfo().flags & APPFLAG_NO_FILE_LOGGING ? instance->bIsUsingFile = false : instance->bIsUsingFile = true;
-	}
+        //if (const Application* app = GetApplication())
+        //{
+        //    FileStatus stat;
+        //    instance->buffer = FileManager::CreateFileOperation(
+        //        String::Format(
+        //            "E:\\Logging\\%s-%s.txt", 
+        //            app->GetAppInfo().appName.Chr(), 
+        //            ITimer::Now("%H.%M.%S").Chr()),
 
-    if (!instance->bIsUsingVerbose) instance->bIsUsingVerbose = ICommandlet::Parse("-verbose").IsEmpty();
+        //        OPENMODE_WRITE | OPENMODE_READ, SHAREMODE_READ | SHAREMODE_WRITE, OVERRIDERULE_CREATE_NEW_DONT_MIND, 
+        //        stat
+        //    );
 
-    if (instance->bIsUsingFile) instance->bIsUsingFile = !ICommandlet::Parse("-nofilelogging").IsEmpty();
-
-    if (instance->bIsUsingFile)
-    {
-        if (const Application* app = GetApplication())
-        {
-            FileStatus stat;
-            instance->buffer = FileManager::CreateFileOperation(
-                String::Format(
-                    "E:\\Logging\\%s-%s.txt", 
-                    app->GetAppInfo().appName.Chr(), 
-                    Timer::Now("%H.%M.%S").Chr()),
-
-                OPENMODE_WRITE | OPENMODE_READ, SHAREMODE_READ | SHAREMODE_WRITE, OVERRIDERULE_CREATE_NEW_DONT_MIND, 
-                stat
-            );
-
-            instance->buffer->Write(String::Format("Logging started at %s.\n", Timer::Now("%Y/%m/%d-%H:%M:%S").Chr()));
-        }
+        //    if (instance->buffer) instance->buffer->Write(String::Format("Logging started at %s.\n", ITimer::Now("%Y/%m/%d-%H:%M:%S").Chr()));
+        //}
     }
 }
 
@@ -88,19 +85,25 @@ void ILogger::TransmitMessage(LogDescriptor* Descriptor)
     SetActualLog(Descriptor);
 
     String fullMessage;
+    Time current = Timer::Now();
+
     if (Descriptor->severity == Fatal)
     {
         fullMessage = String::Format(
-            "=============[ Fatal error ]=============\nWhere:\t\t%s\nWhen:\t\t%s\nMessage:\t%s\n\nFile:\t%s\n",
+            "=============[ Fatal error ]=============\nWhere:\t\t%s\nWhen:\t\t%d-%d-%d %d:%d\nMessage:\t%s\n\nFile:\t%s\n",
             Descriptor->function,
-            Timer::Now("%Y-%m-%d %H:%M:%S").Chr(),
+            current.year, current.month, current.day, current.hour, current.minute,
             Descriptor->message.Chr(),
             Descriptor->file
         );
     }
     else
     {
-        fullMessage = String::Format("[%s] %s: %s\n", Timer::Now().Chr(), Descriptor->team, Descriptor->message.Chr());
+        fullMessage = String::Format("[%d-%d-%d %d:%d] %s: %s\n", 
+            current.year, current.month, current.day, current.hour, current.minute,
+            Descriptor->team, 
+            *Descriptor->message
+        );
     }
     
 
@@ -131,7 +134,7 @@ bool ILogger::IsDebuggerAttached()
     return false;
 }
 
-void ILogger::SendToOutputBuffer(const String Buffer)
+void ILogger::SendToOutputBuffer(const String& Buffer)
 {
     if (!Buffer.IsEmpty() && instance->buffer)
     {

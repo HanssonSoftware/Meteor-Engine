@@ -57,9 +57,9 @@ void WindowsLog::Initialize()
 
 			hConsole = CreateFileW(L"CONOUT$", GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
 
-			SetConsoleOutputCP(/*CP_UTF8*/ 65001);
+			SetConsoleOutputCP(CP_UTF8);
 
-			SetConsoleCP(/*CP_UTF8*/ 65001);
+			SetConsoleCP(CP_UTF8);
 
 			CONSOLE_CURSOR_INFO cf;
 			GetConsoleCursorInfo(hConsole, &cf);
@@ -67,22 +67,22 @@ void WindowsLog::Initialize()
 
 			SetConsoleCursorInfo(hConsole, &cf);
 
-			SystemLayer* systemLayer = Layer::GetSystemLayer();
-
-			if (!SetStdHandle(STD_OUTPUT_HANDLE, hConsole))
+			
+			if (SystemLayer* systemLayer = Layer::GetSystemLayer())
 			{
-				Application::RequestExit(-1);
+				if (!SetStdHandle(STD_OUTPUT_HANDLE, hConsole))
+					Application::RequestExit(-1);
+
+				wchar_t* buffer = systemLayer->ConvertToWide(String::Format("%s developer console (b%d)", Application::Get()->appName.Chr(), BUILD_NUMBER).Chr());
+
+				if (!SetConsoleTitleW(buffer))
+				{
+					delete[] buffer;
+					Application::RequestExit(-1);
+				}
+
+				delete[] buffer; // Using uninitialized memory 'X'
 			}
-
-			wchar_t* buffer = systemLayer->ConvertToWide(String::Format("%s developer console (b%d)", Application::Get()->GetAppInfo().appName.Chr(), BUILD_NUMBER).Chr());
-
-			if (!SetConsoleTitleW(buffer))
-			{
-				delete[] buffer;
-				Application::RequestExit(-1);
-			}
-
-			delete[] buffer; // Using uninitialized memory 'X'
 		}
 	}
 #endif // MR_DEBUG
@@ -108,24 +108,24 @@ void WindowsLog::Shutdown()
 }
 
 
-void WindowsLog::SendToOutputBuffer(const String Buffer)
+void WindowsLog::SendToOutputBuffer(const String& Buffer)
 {
 #ifdef MR_DEBUG
 	if constexpr (bIsRunningDebugMode)
 	{
-		SystemLayer* systemLayer = Layer::GetSystemLayer();
-
-		wchar_t* message = systemLayer->ConvertToWide(Buffer.Chr());
-
-		const LogDescriptor* actualDescriptor = ILogger::Get()->GetActualEntry();
-		if (!actualDescriptor) 
+		if (SystemLayer* systemLayer = Layer::GetSystemLayer())
 		{
-			delete[] message;
-			return;
-		}
+			wchar_t* message = systemLayer->ConvertToWide(Buffer.Chr());
 
-		switch (actualDescriptor->severity)
-		{
+			const LogDescriptor* actualDescriptor = ILogger::Get()->GetActualEntry();
+			if (!actualDescriptor)
+			{
+				delete[] message;
+				return;
+			}
+
+			switch (actualDescriptor->severity)
+			{
 			case Log:
 				SetConsoleTextAttribute(hConsole, 0x7);
 				break;
@@ -141,20 +141,17 @@ void WindowsLog::SendToOutputBuffer(const String Buffer)
 			case Fatal:
 				SetConsoleTextAttribute(hConsole, 0x4);
 				break;
-		}
+			}
 
-		DWORD written = 0;
-		if (!WriteConsoleW(hConsole, message, (DWORD)wcslen(message), &written, 0))
-		{
-			return ILogger::SendToOutputBuffer(Buffer);
-		}
+			DWORD written = 0;
+			if (!WriteConsoleW(hConsole, message, (DWORD)wcslen(message), &written, 0))
+				return ILogger::SendToOutputBuffer(Buffer);
 
-		if (IsDebuggerAttached())
-		{
-			OutputDebugStringW(message);
-		}
+			if (IsDebuggerAttached())
+				OutputDebugStringW(message);
 
-		delete[] message;
+			delete[] message;
+		}
 	}
 #endif // MR_DEBUG
 

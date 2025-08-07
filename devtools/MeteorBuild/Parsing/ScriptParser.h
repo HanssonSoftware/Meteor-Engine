@@ -22,9 +22,6 @@ struct ScriptParser
 	static bool OpenScript(Module* module);
 
 protected:
-	static inline char* buffer = nullptr;
-
-	static inline Module* currentlyReadModule = nullptr;
 
 	static void Expected(const char* ptr);
 
@@ -37,5 +34,9 @@ protected:
 	static bool IsWhitspace();
 
 	static bool IsAlpha(const char input);
+
+	static inline char* buffer = nullptr;
+
+	static inline Module* currentlyReadModule = nullptr;
 };
 

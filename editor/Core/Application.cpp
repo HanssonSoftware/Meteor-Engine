@@ -14,16 +14,24 @@
 #include <Layers/SystemLayer.h>
 #include <Platform/PerformanceTimer.h>
 #include <Types/Pointers.h>
+#include <Platform/Paths.h>
+
 
 EditorApplication::EditorApplication() 
 	: Application()
 {
-	
+	appName = "Meteor Editor";
+	appCodeName = "Astronaut";
+
+	Memory.memoryReservePercent = 0.15;
 }
 
 void EditorApplication::Init()
 {
 	Application::Init();
+	
+	Paths::GetSystemDirectory();
+	Paths::GetDocumentsDirectory();
 
 	int j = 76;
 
@@ -35,7 +43,7 @@ void EditorApplication::Init()
 		a = i + 1000;
 	}
 
-	is.Add(&j);
+	is.Add(j);
 	is.Pop(3);
 
 	for (int i : is)

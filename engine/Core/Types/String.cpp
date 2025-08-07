@@ -2,7 +2,9 @@
 
 #include "String.h"
 #include <Logging/LogMacros.h>
-#include <cstdarg>
+#include <stdio.h>
+#include <cstdlib>
+#include <Layers/SystemLayer.h>
 
 #pragma warning(disable : 26495)
 
@@ -225,75 +227,6 @@ String::String(const unsigned long Input)
 #endif // MR_DEBUG
 }
 
-String::String(const std::string Input)
-{
-	if (Input.empty())
-	{
-		MakeEmpty();
-		return;
-	}
-
-	const size_t inputSize = Input.size();
-	if (inputSize <= SSO_MAX_CHARS)
-	{
-		memcpy(stackBuffer.ptr, Input.c_str(), inputSize);
-		stackBuffer.ptr[inputSize] = '\0';
-
-		stackBuffer.length = (unsigned short)inputSize;
-
-		bIsUsingHeap = false;
-	}
-	else
-	{
-		heapBuffer.length = inputSize;
-		heapBuffer.capacity = inputSize + 1;
-
-		heapBuffer.ptr = new char[heapBuffer.capacity]();
-		memcpy(heapBuffer.ptr, Input.c_str(), inputSize);
-
-		heapBuffer.ptr[inputSize] = '\0';
-
-		bIsUsingHeap = true;
-	}
-
-#ifdef MR_DEBUG
-	bIsInited = true;
-#endif // MR_DEBUG
-}
-
-String::String(const std::wstring Input)
-{
-	const size_t inputSize = Input.size();
-
-	if (inputSize <= SSO_MAX_CHARS)
-	{
-		wcstombs(stackBuffer.ptr, Input.c_str(), inputSize);
-
-		stackBuffer.ptr[inputSize] = '\0';
-
-		stackBuffer.length = (unsigned short)inputSize;
-
-		bIsUsingHeap = false;
-	}
-	else
-	{
-		heapBuffer.length = inputSize;
-		heapBuffer.capacity = inputSize + 1;
-
-		heapBuffer.ptr = new char[heapBuffer.capacity]();
-
-		wcstombs(heapBuffer.ptr, Input.c_str(), inputSize);
-
-		heapBuffer.ptr[inputSize] = '\0';
-
-		bIsUsingHeap = true;
-	}
-
-#ifdef MR_DEBUG
-	bIsInited = true;
-#endif // MR_DEBUG
-}
-
 String::String(String&& other) noexcept
 {
 	ResetBuffers();
@@ -476,7 +409,7 @@ String String::operator+=(const String& other)
 		}
 		else
 		{
-			MR_ASSERT(false, "This part is not implemented, yet!");
+			MR_ASSERT(false, "This part is not implemented!");
 		}
 	}
 
@@ -491,7 +424,10 @@ const char* String::Chr() const
 
 char* String::Allocate()
 {
-	return new char[bIsUsingHeap ? heapBuffer.capacity : stackBuffer.length + 1]();
+	char* buffer = new char[bIsUsingHeap ? heapBuffer.capacity : stackBuffer.length + 1]();
+	memcpy(buffer, Chr(), bIsUsingHeap ? heapBuffer.length : stackBuffer.length);
+	
+	return buffer;
 }
 
 bool String::operator!() const
