@@ -3,7 +3,9 @@
 #pragma once
 class String;
 
-struct IPaths
+#include <Core.h>
+
+struct MR_CORE_API IPaths
 {
 	static String GetSystemDirectory();
 
@@ -16,6 +18,8 @@ struct IPaths
 	static String GetEngineSavedDirectory();
 
 	static String GetSavedGameDirectory();
+
+	static String GetExecutableDirctory();
 };
 
 

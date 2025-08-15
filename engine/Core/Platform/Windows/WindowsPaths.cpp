@@ -13,9 +13,7 @@ String WindowsPaths::GetSystemDirectory()
 {
 	UINT num = GetWindowsDirectoryW(nullptr, 0);
 	if (num == 0)
-	{
 		return "";
-	}
 
 	wchar_t* buffer = new wchar_t[num + 1]();
 	if (GetWindowsDirectoryW(buffer, num) > 0)
@@ -69,4 +67,12 @@ String WindowsPaths::GetEngineSavedDirectory()
 String WindowsPaths::GetSavedGameDirectory()
 {
 	return "";
+}
+
+String WindowsPaths::GetExecutableDirctory()
+{
+	wchar_t path[MAX_PATH] = { L'\0' };
+	GetModuleFileNameW(GetModuleHandle(nullptr), path, MAX_PATH);
+
+	return path;
 }

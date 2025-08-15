@@ -7,9 +7,11 @@
 
 class SystemLayer;
 
+#include <Core.h>
+
 LOG_ADDCATEGORY(Layers);
 
-class Layer
+class MR_CORE_API Layer
 {
 	friend class LayerManager;
 public:

@@ -57,15 +57,16 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG;UNICODE;MR_DEBUG</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG;UNICODE;MR_DEBUG;MR_EDITORAPP_ENABLE</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)engine\Core\Platform;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty\ImGUI\;$(VULKAN_SDK)\Include\;$(SolutionDir)Source\;$(SolutionDir)Source\ThirdParty\FreeType\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);$(SolutionDir)Source\ThirdParty\ImGUI\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessToFile>false</PreprocessToFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>MeteorEngine-Core.lib;$(CoreLibraryDependencies);D3D11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);D3D11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ShaderType>
@@ -79,11 +80,14 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)engine\Core\Platform;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <PreprocessorDefinitions>;UNICODE</PreprocessorDefinitions>
+      <PreprocessorDefinitions>;UNICODE;MR_EDITORAPP_ENABLE</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>MeteorEngine-Core.lib;$(CoreLibraryDependencies);D3D11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);D3D11.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <ProgramDatabaseFile />
     </Link>
     <FxCompile>
       <ShaderType>
@@ -99,6 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core/Application.h" />
+    <ClInclude Include="Core\EditorCore.h" />
     <ClInclude Include="Core\EditorLayer.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>

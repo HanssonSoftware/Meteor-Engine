@@ -25,8 +25,6 @@ struct IFileManager
 
 	static bool IsEndingWith(const String& name, const String& extension);
 
-	static String GetExecutableDirectory();
-
 	static void NormalizeDirectory(String& input);
 
 	static IFile* CreateFileOperation(const String& path, int accessType, int sharingMode, int createType, FileStatus& status);

@@ -32,6 +32,9 @@
     <ClInclude Include="Core\EditorLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Core\EditorCore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Editor.rc">

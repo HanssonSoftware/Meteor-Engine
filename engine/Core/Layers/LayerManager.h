@@ -8,7 +8,9 @@ class Layer;
 class String;
 class SystemLayer;
 
-class LayerManager : public Object
+#include <Core.h>
+
+class MR_CORE_API LayerManager : public Object
 {
 	friend class Layer;
 public:

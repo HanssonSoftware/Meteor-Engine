@@ -10,8 +10,10 @@
 #ifdef _WIN64
 #include <Windows/WindowsWindowManager.h>
 #else
-
 #endif // _WIN64
+
+
+#include <Core.h>
 
 class String;
 class IWindow;
@@ -23,7 +25,7 @@ class InputManager;
 
 LOG_ADDCATEGORY(Application);
 
-struct Application
+struct MR_CORE_API Application
 {
 	enum class ECurrentApplicationState { NONE, STARTUP, RUNNING, SHUTDOWN, DEAD };
 
@@ -97,7 +99,7 @@ protected:
 Application* GetApplication();
 
 #define IMPLEMENT_APPLICATION(ApplicationClass) \
-	extern "C" int LaunchApplication(int ArgumentCount, char* Arguments[]) \
+	extern "C" /*__declspec(dllexport)*/ int LaunchApplication(int ArgumentCount, char* Arguments[]) \
 	{	\
 		static ApplicationClass instance; \
         instance.Init(); \

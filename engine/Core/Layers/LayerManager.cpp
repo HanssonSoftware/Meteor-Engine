@@ -19,8 +19,11 @@ void LayerManager::Shutdown()
 {
 	for (Layer*& indexed : layers)
 	{
-		indexed->privRemoved();
-		indexed = nullptr;
+		if (indexed)
+		{
+			indexed->privRemoved();
+			indexed = nullptr;
+		}
 	}
 }
 
@@ -37,7 +40,7 @@ void LayerManager::PushLayer(Layer* Instance)
 void LayerManager::RemoveLayer(const Layer* Instance)
 {
 	const size_t size = layers.GetSize();
-	for (size_t i = 0; i < size; i++)
+	for (int i = 0; i < size; i++)
 	{
 		if (layers[i] == Instance)
 		{

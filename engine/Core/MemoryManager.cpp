@@ -9,13 +9,13 @@
 
 LOG_ADDCATEGORY(Arena);
 
-static float engineRecommendedPercent = 0.15f;
+static double engineRecommendedPercent = 0.15;
 
 
 void MemoryManager::Initialize(const double& RequiredMinimum)
 {
 	if (!object) object = new MemoryManager();
-	engineRecommendedPercent = RequiredMinimum > 0.f ? RequiredMinimum : 0.1f;
+	engineRecommendedPercent = RequiredMinimum > 0.0 ? RequiredMinimum : 0.1;
 
 #ifdef MR_PLATFORM_WINDOWS
 	MEMORYSTATUSEX longlong = {};

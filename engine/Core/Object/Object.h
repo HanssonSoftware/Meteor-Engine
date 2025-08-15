@@ -2,8 +2,9 @@
 
 #pragma once
 //#include <DirectXMath.h>
+#include <Core.h>
 
-class Object
+class MR_CORE_API Object
 {
 	friend class SceneGraph;
 public:

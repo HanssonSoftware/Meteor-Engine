@@ -5,8 +5,10 @@
 #include "Iterator.h"
 #include <cstring>
 
+#include <Core.h>
+
 template <typename T>
-class Array : public Iterator<T>
+class MR_CORE_API Array : public Iterator<T>
 {
 public:
 	Array()

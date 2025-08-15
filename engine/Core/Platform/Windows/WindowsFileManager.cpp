@@ -316,19 +316,3 @@ bool WindowsFileManager::startRecursiveCreate(wchar_t* dir)
     
     return true;
 }
-
-
-String WindowsFileManager::GetExecutableDirectory()
-{
-    static String location;
-
-    if (location.IsEmpty())
-    {
-        wchar_t buf[MAX_PATH];
-        DWORD count = GetModuleFileNameW(0, buf, MAX_PATH);
-
-        location = buf;
-    }
-
-    return location;
-}

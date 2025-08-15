@@ -44,7 +44,7 @@ void ScriptParser::Expected(const char* ptr)
 	const char* begin = buffer;
 	while (IsAlpha(*buffer)) buffer++;
 
-	String temp(begin, buffer - begin);
+	String temp(begin, (uint32)(buffer - begin));
 	if (strcmp(temp.Chr(), ptr) > 0)
 	{
 		MR_LOG(LogScript, Fatal, "Failed to parse! Word: %s At: Char[%l]", ptr, buffer - begin);

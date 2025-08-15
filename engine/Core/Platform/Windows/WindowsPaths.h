@@ -4,7 +4,7 @@
 #include <Platform/Paths.h>
 #undef GetSystemDirectory
 
-struct WindowsPaths : public IPaths
+struct MR_CORE_API WindowsPaths : public IPaths
 {
 	static String GetSystemDirectory();
 
@@ -17,6 +17,8 @@ struct WindowsPaths : public IPaths
 	static String GetEngineSavedDirectory();
 
 	static String GetSavedGameDirectory();
+
+	static String GetExecutableDirctory();
 
 private:
 	enum class EFolderGet { System, Documents, User, Engine, EngineSave, SavedGame };

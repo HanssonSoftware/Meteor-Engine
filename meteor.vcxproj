@@ -33,7 +33,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -42,7 +42,7 @@
     <EnableUnitySupport>false</EnableUnitySupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -88,7 +88,7 @@
     <TargetName>MeteorEngine-Core</TargetName>
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
-    <TargetExt>.lib</TargetExt>
+    <TargetExt>.dll</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
     <OutDir>$(SolutionDir)Product\</OutDir>
@@ -96,7 +96,7 @@
     <TargetName>MeteorEngine-Core</TargetName>
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
-    <TargetExt>.lib</TargetExt>
+    <TargetExt>.dll</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -166,7 +166,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG;MR_CORE_ENABLED</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)engine\Core\Platform;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -202,7 +202,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_CORE_ENABLED</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)engine\Core\Platform;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -243,7 +243,10 @@
     <ClCompile Include="engine\Core\Layers\Layer.cpp" />
     <ClCompile Include="engine\Core\Layers\LayerManager.cpp" />
     <ClCompile Include="engine\Core\Common\Delegate.cpp" />
-    <ClCompile Include="engine\Launch.cpp" />
+    <ClCompile Include="engine\Launch.cpp">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">false</DeploymentContent>
+    </ClCompile>
     <ClCompile Include="engine\Core\Logging\Log.cpp" />
     <ClCompile Include="engine\Core\Platform\Timer.cpp" />
     <ClCompile Include="engine\Core\Types\String.cpp" />
@@ -276,6 +279,7 @@
     <ClCompile Include="engine\Renderer\Renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="engine\Core\Core.h" />
     <ClInclude Include="engine\Core\Platform\Thread\ThreadDescriptor.h" />
     <ClInclude Include="engine\Core\Common\Math.h" />
     <ClInclude Include="engine\Core\Layers\SystemLayerHelper.h" />

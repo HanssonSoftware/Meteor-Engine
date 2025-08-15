@@ -551,6 +551,9 @@
     <ClInclude Include="engine\Core\Module\Module.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="engine\Core\Core.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\d1.bin">

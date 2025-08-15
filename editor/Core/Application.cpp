@@ -16,7 +16,6 @@
 #include <Types/Pointers.h>
 #include <Platform/Paths.h>
 
-
 EditorApplication::EditorApplication() 
 	: Application()
 {

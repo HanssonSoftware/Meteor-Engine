@@ -32,3 +32,8 @@ String IPaths::GetSavedGameDirectory()
 {
 	return "";
 }
+
+String IPaths::GetExecutableDirctory()
+{
+	return "";
+}

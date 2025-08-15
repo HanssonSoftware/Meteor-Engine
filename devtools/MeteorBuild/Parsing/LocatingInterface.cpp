@@ -2,6 +2,7 @@
 
 #include "LocatingInterface.h"
 #include <Types/String.h>
+#include <Paths.h>
 #include <Windows/Windows.h>
 #include <Platform/FileManager.h>
 #include <Layers/SystemLayer.h>
@@ -24,7 +25,7 @@ bool Locator::FindAllReferences(const String& sourceDirectory)
 
         if (FileManager::IsPathRelative(sourceDirectory))
         {
-            fullPath = FileManager::GetExecutableDirectory();
+            fullPath = Paths::GetExecutableDirctory();
             if (SystemLayer* systemLayer = Layer::GetSystemLayer())
             {
                 wchar_t* wideExecutableDirectory = systemLayer->ConvertToWide(fullPath.Chr());
