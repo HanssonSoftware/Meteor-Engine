@@ -3,9 +3,7 @@
 #pragma once
 #include <Layers/Layer.h>
 
-#include "EditorCore.h"
-
-class MR_EDITORAPPLICATION_API EditorLayer : public Layer
+class EditorLayer : public Layer
 {
 public:
 	EditorLayer(const String newName) noexcept;

@@ -18,10 +18,6 @@ bool IFileManager::DeleteDirectory(const String& name, bool bToFullPath)
 	return false;
 }
 
-void IFileManager::ListDirectory(String directoryToCheck, std::vector<String>& output)
-{
-}
-
 bool IFileManager::IsPathExists(const String& name)
 {
 	return false;
@@ -34,22 +30,7 @@ bool IFileManager::IsPathRelative(const String& path)
 
 bool IFileManager::IsEndingWith(const String& name, const String& extension)
 {
-	if (name.IsEmpty() || extension.IsEmpty())
-		return false;
-
-	char* buffer = _strdup(name.Chr());
-	MR_ASSERT(strcmp(buffer, name.Chr()) == 0, "Buffer duplication error!");
-
-	strtok(buffer, ".");
-	char* returned = strtok(0, ".");
-	if (strcmp(extension.Chr(), returned) != 0)
-	{
-		free(buffer);
-		return false;
-	}
-
-	free(buffer);
-	return true;
+	return false;
 }
 
 void IFileManager::NormalizeDirectory(String& input)

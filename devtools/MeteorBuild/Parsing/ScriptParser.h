@@ -1,9 +1,30 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
-class Module;
+#include <Types/String.h>
+#include <Types/Array.h>
 
-enum class TokenType
+class IFile;
+class Module;
+struct ScriptWordBase 
+{
+	constexpr ScriptWordBase() {};
+
+	static constexpr const char* GetWord() { return ""; };
+	Array<String> container;
+
+	virtual ~ScriptWordBase() = default;
+};
+
+#define ADD_SCRIPT_WORD(NewWord)							\
+	struct ScriptWord_##NewWord : public ScriptWordBase		\
+	{														\
+		constexpr ScriptWord_##NewWord() : ScriptWordBase() {}; \
+		static constexpr const char* GetWord() { return #NewWord; };\
+	}
+
+
+enum class TokenIdentifier
 {
 	Identifier,         // Project, IncludePath, Modules
 	StringLiteral,      // "Renderer", "Meteor", "CoreKit"
@@ -15,28 +36,63 @@ enum class TokenType
 	Unknown
 };
 
-struct ScriptParser
+class ScriptParser
 {
-	static void BeginParse();
+public:
+	enum class ParsingType { MainDescriptor, Module };
 
-	static bool OpenScript(Module* module);
+	void ParseScript(const ParsingType& type);
+
+	void SetBuffer(const char* newBuffer) { buffer = newBuffer; };
+
+	bool OpenScript(const String& modulePath);
+
+	static bool FindMainScript(String& path);
 
 protected:
+	void InputToContainer(ScriptWordBase& word);
 
-	static void Expected(const char* ptr);
+	bool Expected(const char*& in, const char* ptr);
 
-	static void GetValue();
+	bool ExpectedIdentifier(const char*& in, const TokenIdentifier& identifier);
 
-	static void AdvanceACharacter();
+	TokenIdentifier GetIdentifier(const char*& in);
 
-	static void SkipWhitspace();
+	String TokenIndetifierToString(const TokenIdentifier& identifier) const;
+
+	String GetValue(const char*& in);
+
+	String GetWord(const char*& in);
+
+	void AdvanceACharacter(const char*& in) { if (*in) { in++; } };
+
+	void SkipWhitspace(const char*& in) 
+	{
+		while (*in == ' ' || *in == '\n' || *in == '\r' || *in == '\t' || *in == '\v')
+			in++;
+	}
 	
-	static bool IsWhitspace();
+	bool IsWhitspace(const char*& in) { return (*in == ' ' || *in == '\n' || *in == '\r' || *in == '\t' || *in == '\v') ? true : false; }
 
-	static bool IsAlpha(const char input);
+	bool IsAlpha(const char& input) { return (input >= 'a' && input <= 'z' || input >= 'A' && input <= 'Z'); };
 
-	static inline char* buffer = nullptr;
+	const char* buffer = nullptr;
 
-	static inline Module* currentlyReadModule = nullptr;
+	IFile* currentlyReadModule = nullptr;
+
+	struct
+	{
+		String projectName;
+
+		String projectNameDependsFromSolution;
+
+		enum class EProjectType { Project, Solution };
+
+		Array<String> libraries;
+
+		Array<String> includePaths;
+
+		Array<String> executable;
+	};
 };
 

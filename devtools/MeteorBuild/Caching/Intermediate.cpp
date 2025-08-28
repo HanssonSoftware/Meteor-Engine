@@ -4,15 +4,13 @@
 
 #include <FileManager.h>
 
-bool Intermediate::SearchIntermediateFiles(String intermediateDirectory)
+bool Intermediate::SearchIntermediateFiles(const String& intermediateDirectory)
 {
 	if (!intermediateDirectory.IsEmpty())
 	{
-		std::vector<String> dirs;
-		FileManager::ListDirectory(intermediateDirectory, dirs);
 
 
-		return dirs.size() > 0 ? true : false;
+		return true;
 	}
 
 	return false;

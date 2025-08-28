@@ -4,10 +4,8 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <Platform/PlatformDefs.h>
 
-#include <Core.h>
-
 /** Human readable piece of text. */
-class MR_CORE_API String
+class String
 {
 public:
 	String() noexcept;

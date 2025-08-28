@@ -13,8 +13,6 @@
 #endif // _WIN64
 
 
-#include <Core.h>
-
 class String;
 class IWindow;
 class Camera;
@@ -25,17 +23,26 @@ class InputManager;
 
 LOG_ADDCATEGORY(Application);
 
-struct MR_CORE_API Application
+struct Application
 {
-	enum class ECurrentApplicationState { NONE, STARTUP, RUNNING, SHUTDOWN, DEAD };
+	enum class ECurrentApplicationState { NONE, STARTUP, RUNNING, RESTARTING, SHUTDOWN, DEAD };
 
 	struct
 	{
 		/** Application name, this would be appearing on the created window. */
 		String appName;
+		String appNameNoSpaces;
 
 		/** Useful for directories. */
 		String appCodeName;
+
+		struct
+		{
+			String name;
+
+			int x = 0, y = 0;
+
+		} WindowData;
 
 		union
 		{
@@ -99,11 +106,12 @@ protected:
 Application* GetApplication();
 
 #define IMPLEMENT_APPLICATION(ApplicationClass) \
-	extern "C" /*__declspec(dllexport)*/ int LaunchApplication(int ArgumentCount, char* Arguments[]) \
+	/*extern "C" __declspec(dllexport)*/ int LaunchApplication(int ArgumentCount, char* Arguments[]) \
 	{	\
+		Commandlet::Initialize(); \
 		static ApplicationClass instance; \
         instance.Init(); \
         instance.Run(); \
         instance.Shutdown(); \
-        return 0; \
+        return instance.GetRequestExitCode(); \
 	}

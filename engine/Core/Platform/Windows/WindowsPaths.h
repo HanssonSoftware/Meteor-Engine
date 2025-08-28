@@ -4,7 +4,7 @@
 #include <Platform/Paths.h>
 #undef GetSystemDirectory
 
-struct MR_CORE_API WindowsPaths : public IPaths
+struct WindowsPaths : public IPaths
 {
 	static String GetSystemDirectory();
 

@@ -551,9 +551,6 @@
     <ClInclude Include="engine\Core\Module\Module.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Core.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\d1.bin">
@@ -584,6 +581,7 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="engine\Core\CoreKit.mrbuild" />
+    <None Include="engine\Engine.mrbuild" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\sampleapp.rc">

@@ -26,7 +26,7 @@ struct LogDescriptor
 		va_start(d, file);
 		const int reqAmount = vsnprintf(0, 0, Message, d);
 
-		char* big = new char[reqAmount + 1];
+		char* big = new char[reqAmount + 1]();
 		vsnprintf(big, reqAmount + 1, Message, d);
 		va_end(d);
 

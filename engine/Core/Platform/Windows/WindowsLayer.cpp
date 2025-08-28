@@ -75,11 +75,12 @@ String WindowsLayer::GetError()
     const int requiredSizeInBytes = WideCharToMultiByte(/*CP_UTF8*/ 65001, 0, (LPWSTR)buffer, -1, 0, 0, 0, 0);
     if (requiredSizeInBytes == 0) return "";
 
-    char* super = new char[requiredSizeInBytes];
+    char* super = new char[requiredSizeInBytes]();
 
     WideCharToMultiByte(/*CP_UTF8*/ 65001, 0, (LPWSTR)buffer, -1, super, requiredSizeInBytes, 0, 0);
+    super[requiredSizeInBytes - 3] = '\0';
+
     String realBuffer(super);
-    
 
     LocalFree(buffer);
     if (super) delete[] super;

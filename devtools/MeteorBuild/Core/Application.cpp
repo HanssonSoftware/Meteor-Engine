@@ -8,6 +8,8 @@
 #include <shellapi.h>
 #include <MemoryManager.h>
 #include <Caching/Intermediate.h>
+#include <FileManager.h>
+#include <Parsing/ScriptParser.h>
 
 #pragma comment(lib, "Shell32.lib")
 
@@ -15,7 +17,11 @@
 BuildSystemApplication::BuildSystemApplication()
 	: Application()
 {
-	MemoryManager::SetMinimumSize(1'000'000);
+	appName = "Meteor Build";
+	appNameNoSpaces = "MeteorBuild";
+	appCodeName = "Apollo";
+
+	MemoryManager::SetMinimumSize(100'000);
 }
 
 void BuildSystemApplication::Init()
@@ -23,13 +29,35 @@ void BuildSystemApplication::Init()
 	Application::Init();
 	String val;
 
-	if (!Commandlet::Parse("-sourcedir", val))
+	if (Commandlet::Parse("-sourcedir", val))
 	{
-		bool b = Locator::FindAllReferences(val);
+		if (ScriptParser::FindMainScript(val))
+		{
+			ScriptParser solution;
+
+			solution.OpenScript(val);
+			solution.ParseScript(ScriptParser::ParsingType::MainDescriptor);
+		}
+
+		if (Commandlet::Parse("-intDir", val) || Commandlet::Parse("-int", val))
+		{
+			Intermediate::SearchIntermediateFiles(val);
+		}
+
+
+		if (Commandlet::Parse("-sourcedir", val))
+		{
+			Array<String> pathToDiscoveredItems;
+			Locator::LocateSources(val, pathToDiscoveredItems);
+		}
+		else
+		{
+
+		}
 	}
 	else
 	{
-		MR_LOG(LogBuildSystemApplication, Fatal, """-sourcedir"" Parameter is Missing! Unable to find source directory!");
+		MR_LOG(LogBuildSystemApplication, Fatal, "No source directory passed!");
 	}
 }
 

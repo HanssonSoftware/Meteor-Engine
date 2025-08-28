@@ -14,8 +14,6 @@ struct WindowsFileManager : public IFileManager
 
 	static bool DeleteDirectory(const String& name, bool bToFullPath);
 
-	static void ListDirectory(String dir, std::vector<String>& output);
-
 	static bool IsPathExists(const String& name);
 
 	/** Returns true if the path is qualified, or false otherwise. */

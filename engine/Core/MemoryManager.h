@@ -5,6 +5,7 @@
 #include <basetsd.h>
 #include <vector>
 
+
 struct MemoryManager
 {
 	static void Initialize(const double& RequiredMinimum);

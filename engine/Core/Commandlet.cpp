@@ -33,11 +33,15 @@ void Commandlet::Initialize()
 
 bool Commandlet::Parse(const String& inParam, String& returnVal)
 {
-	for (String& param : parsedWords)
+	static uint32 count = parsedWords.GetSize();
+
+	for (uint32 i = 0; i < count; i++)
 	{
-		if (param == inParam)
+		String& item = parsedWords[i];
+
+		if (item == inParam)
 		{
-			returnVal = param;
+			returnVal = parsedWords.IsOutOfBounds(i + 1) ? parsedWords[i] : parsedWords[i + 1];
 			return true;
 		}
 	}

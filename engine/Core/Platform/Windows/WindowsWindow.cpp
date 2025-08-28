@@ -69,7 +69,7 @@ bool WindowsWindow::CreateNativeWindow(const WindowCreateInfo* windowData)
 		if (const WindowsWindowManager* wm = (WindowsWindowManager*)owner)
 		{
 			bIsFallback = wm->GetIsUsingFallbackClass();
-			className = bIsFallback ? GetDefaultApplicationName() : Layer::GetSystemLayer()->ConvertToWide(app->appName.Chr());
+			className = bIsFallback ? GetDefaultApplicationName() : Layer::GetSystemLayer()->ConvertToWide(app->appNameNoSpaces.Chr());
 		}
 	}
 
@@ -90,6 +90,7 @@ bool WindowsWindow::CreateNativeWindow(const WindowCreateInfo* windowData)
 
 	if (!bIsFallback) delete[] className;
 
+	SetWindowTextW(handle, buffer);
 	delete[] buffer;
 	if (handle == INVALID_HANDLE_VALUE)
 	{
@@ -100,6 +101,7 @@ bool WindowsWindow::CreateNativeWindow(const WindowCreateInfo* windowData)
 
 	static const constexpr BOOL bCanIUseDarkWindowTitlebar = 1;
 	DwmSetWindowAttribute((HWND)handle, DWMWA_USE_IMMERSIVE_DARK_MODE, &bCanIUseDarkWindowTitlebar, sizeof(bCanIUseDarkWindowTitlebar));
+
 
 	//SetWindowTheme((HWND)handle, L"Explorer", L"");
 	return true;

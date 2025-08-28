@@ -88,5 +88,9 @@ void LayerManager::PushSystemLayer()
 
 LayerManager::~LayerManager()
 {
+	systemLayer->Removed();
+	delete systemLayer;
 
+	bWasAdded = false;
+	systemLayer = nullptr;
 }

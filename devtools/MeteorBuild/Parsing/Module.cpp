@@ -25,20 +25,20 @@ Module* Module::CreateModule(const String fullPathToModule)
 	Locator::ListDirectory(path, super->includedSources);
 	delete[] path;
 	
-	int s = (int)super->includedSources.size();
+	int s = (int)super->includedSources.GetSize();
 	for (int i = 0; i < s; i++)
 	{
 		if (FileManager::IsEndingWith(super->includedSources[i], "mrbuild"))
 		{
-			super->includedSources.erase(super->includedSources.begin() + i);
+			super->includedSources.Remove(i);
 			break;
 		}
 	}
 
-	if (ScriptParser::OpenScript(super))
-	{
-		ScriptParser::BeginParse();
-	}
+	//if (ScriptParser::OpenScript(super))
+	//{
+	//	ScriptParser::ParseScript();
+	//}
 	
 	return super;
 }

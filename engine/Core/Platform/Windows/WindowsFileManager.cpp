@@ -7,6 +7,7 @@
 #include <Layers/Layer.h>
 #include <Application.h>
 #include <Layers/SystemLayer.h>
+#include <Windows/WindowsPaths.h>
 #include <Windows/WindowsFile.h>
 
 #include <Windows/Windows.h>
@@ -31,20 +32,54 @@ bool WindowsFileManager::CreateDirectory(const String& name, bool bToFullPath)
         return false;
     }
 
-    String tm = name;
-    NormalizeDirectory(tm);
-
-    wchar_t* dirName = Layer::GetSystemLayer()->ConvertToWide(tm.Chr());
+    wchar_t* dirName = Layer::GetSystemLayer()->ConvertToWide(name.Chr());
     if (!dirName)
     {
         MR_LOG(LogFileManager, Error, "Invalid wide buffer!");
         return false;
     }
 
-    startRecursiveCreate(dirName);
+    if (IsPathRelative(name))
+    {
+        wchar_t* dirAbsoluteConvert = Layer::GetSystemLayer()->ConvertToWide(Paths::GetExecutableDirctory().Chr());
+        PathCchRemoveFileSpec(dirAbsoluteConvert, wcslen(dirAbsoluteConvert));
 
-    delete[] dirName;
-    return false;
+        wchar_t* combined = nullptr;
+        if (FAILED(PathAllocCombine(dirAbsoluteConvert, dirName, PATHCCH_ALLOW_LONG_PATHS, &combined)))
+        {
+            MR_LOG(LogFileManager, Error, "Failed to convert to full path: %s", *Layer::GetSystemLayer()->GetError());
+            return false;
+        }
+
+        delete[] dirAbsoluteConvert, dirName;
+        dirName = combined;
+    }
+
+    for (wchar_t* p = dirName; *p; ++p)
+    {
+        if (*p == L'/')
+            *p = L'\\';
+    }
+
+    const int result = SHCreateDirectoryExW(nullptr, dirName, nullptr);
+    if (result != ERROR_SUCCESS && result != ERROR_ALREADY_EXISTS)
+    {
+        if (PathIsRelativeW(dirName))
+            delete[] dirName;
+        else
+            LocalFree(dirName);
+
+        MR_LOG(LogFileManager, Error, "SHCreateDirectory returned: %s", *Layer::GetSystemLayer()->GetError());
+        
+        return false;
+    }
+
+    if (!PathIsRelativeW(dirName))
+        LocalFree(dirName);
+    else
+        delete[] dirName;
+
+    return true;
 }
 
 bool WindowsFileManager::DeleteDirectory(const String& name, bool bToFullPath)
@@ -60,70 +95,15 @@ bool WindowsFileManager::DeleteDirectory(const String& name, bool bToFullPath)
 
     if (!RemoveDirectoryW(dirName))
     {
-        MR_LOG(LogFileManager, Error, "Error: %s", Layer::GetSystemLayer()->GetError());
         delete[] dirName;
+        MR_LOG(LogFileManager, Error, "RemoveDirectoryW returned: %s", *Layer::GetSystemLayer()->GetError());
+        
         return false;
     }
 
     delete[] dirName;
     return true;
-}
-
-void WindowsFileManager::ListDirectory(String dir, std::vector<String>& output)
-{
-    if (FileManager::IsPathRelative(dir))
-    {
-        wchar_t path[MAX_PATH];
-        GetModuleFileNameW(nullptr, path, MAX_PATH); 
-        size_t written = wcslen(path);
-
-        PathCchRemoveFileSpec(path, written);
-
-        wchar_t* bf = Layer::GetSystemLayer()->ConvertToWide(dir);
-        PathCchAppend(path, written + dir.Length(), bf);
-
-        delete[] bf;
-
-        dir = path;
-    }
-
-
-    WIN32_FIND_DATAW find;
-
-    wchar_t* path = Layer::GetSystemLayer()->ConvertToWide(String::Format("%s\\*", dir.Chr()));
-    HANDLE file = FindFirstFileW(path, &find);
-
-    if (file != INVALID_HANDLE_VALUE)
-    {
-        do
-        {
-            if (find.cFileName[0] == L'.')
-                continue;
-
-            switch (find.dwFileAttributes)
-            {
-                case FILE_ATTRIBUTE_DIRECTORY:
-                {
-                    ListDirectory(String::Format("%s\\%ls", dir.Chr(), find.cFileName), output);
-                    break;
-                }
-
-                case FILE_ATTRIBUTE_ARCHIVE:
-                {
-                    output.push_back(String::Format("%s\\%ls", dir.Chr(), find.cFileName));
-                    break;
-                }
-            }
-
-        } while (FindNextFileW(file, &find) != 0);
-    }
-    else
-    {
-        MR_LOG(LogFileManager, Error, "Directory handle invalid!");
-    }
-
-    delete[] path;
-}
+} 
 
 bool WindowsFileManager::IsPathExists(const String& name)
 {
@@ -186,14 +166,34 @@ bool WindowsFileManager::IsPathRelative(const String& path)
 
 bool WindowsFileManager::IsEndingWith(const String& name, const String& extension)
 {
-    return IFileManager::IsEndingWith(name, extension);
+    if (name.IsEmpty() && extension.IsEmpty())
+        return false;
+
+    if (SystemLayer* systemLayer = Layer::GetSystemLayer())
+    {
+        wchar_t* buffer = systemLayer->ConvertToWide(name.Chr());
+
+        LPWSTR result = PathFindExtensionW(buffer);
+        if (wcslen(result) == 0)
+            return false;
+
+        memmove(result, result + 1, (wcslen(result) + 1) * sizeof(wchar_t));
+
+        bool bIsGood = false;
+        wchar_t* extensionConverted = systemLayer->ConvertToWide(extension.Chr());
+
+        bIsGood = wcscmp(result, extensionConverted) == 0 ? true : false;
+        delete[] buffer, extensionConverted;
+
+        return bIsGood ? true : false;
+    }
+
+    return false;
 }
 
 void WindowsFileManager::NormalizeDirectory(String& input)
 {
     char* buffer = input.Allocate();
-    memcpy(buffer, input.Chr(), input.Length());
-
     uint32 size = (int)input.Length();
 
     for (uint32 i = 0; i < size; i++)
@@ -223,9 +223,7 @@ IFile* WindowsFileManager::CreateFileOperation(const String& pathA, int accessTy
     wchar_t* name = systemLayer->ConvertToWide(path.Chr());
 
     if (!IsPathExists(path))
-    {
         FileManager::CreateDirectory(path, true);
-    }
 
     HANDLE file = CreateFileW(
         name,

@@ -18,7 +18,8 @@
 
 #pragma warning (disable : 28251)
 
-typedef int (*LaunchApplication)(int ArgumentCount, char* Arguments[]);
+//typedef int (*LaunchApplication)(int ArgumentCount, char* Arguments[]);
+extern int LaunchApplication(int ArgumentCount, char* Arguments[]);
 
 int main(int ArgumentCount, char* Arguments[])
 {
@@ -39,6 +40,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
 
     AddDllDirectory(wcscat(path, L"\\bin\0"));
 
+    LaunchApplication(0, &lpCmdLine);
+#if 0
     HMODULE entryPoint = LoadLibraryExW(L"MeteorEngine-Core.dll", nullptr, LOAD_LIBRARY_SEARCH_APPLICATION_DIR | LOAD_LIBRARY_SEARCH_USER_DIRS);
     if (!entryPoint) 
         return -1;
@@ -57,6 +60,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
         return Result;
     }
 
+    MessageBoxW(nullptr, L"Unable to reach engine code!", L"Engine Error!", MB_OK);
+#endif // 0
     return -1;
 }
 

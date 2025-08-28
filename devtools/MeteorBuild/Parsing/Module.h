@@ -3,11 +3,11 @@
 #pragma once
 #include <Types/String.h>
 #include <Platform/File.h>
-#include <vector>
+#include <Types/Array.h>
 
 class Module
 {
-	friend struct ScriptParser;
+	friend class ScriptParser;
 public:
 	virtual ~Module() noexcept = default;
 
@@ -28,16 +28,16 @@ protected:
 
 		String solution;
 
-		std::vector<String> includePaths;
+		Array<String> includePaths;
 
-		std::vector<String> dependencyModules;
+		Array<String> dependencyModules;
 
-		std::vector<String> linkedLibraries;
+		Array<String> linkedLibraries;
 	};
 
 	String fullPath;
 
-	std::vector<String> includedSources;
+	Array<String> includedSources;
 
 	IFile* moduleDescriptor = nullptr;
 };

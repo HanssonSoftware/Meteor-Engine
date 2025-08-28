@@ -1,10 +1,10 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <Core.h>
+
 
 template<typename T>
-class MR_CORE_API Iterator
+class Iterator
 {
 public:
 

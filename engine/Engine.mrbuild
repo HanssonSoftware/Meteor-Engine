@@ -1,0 +1,7 @@
+Solution "Meteor"
+{
+	Executable:
+	{
+		"Launch.cpp"
+	}
+}

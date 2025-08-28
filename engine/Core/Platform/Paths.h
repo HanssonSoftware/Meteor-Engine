@@ -3,9 +3,9 @@
 #pragma once
 class String;
 
-#include <Core.h>
 
-struct MR_CORE_API IPaths
+
+struct IPaths
 {
 	static String GetSystemDirectory();
 

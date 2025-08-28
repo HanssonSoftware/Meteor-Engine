@@ -4,15 +4,34 @@
 #include <Types/String.h>
 #include <type_traits>
 
+#include <Windows/Windows.h>
+
+enum class ELoadState
+{
+	NONE,
+	LOADING,
+	ENABLED,
+	DISABLED,
+	UNLOADED
+};
+
 class Module
 {
+	friend class ModuleManager;
 public:
 	virtual void StartupModule() = 0;
 
 	virtual void ShutdownModule() = 0;
 
 	String GetName() const { return name; }
+
 protected:
+#ifdef MR_PLATFORM_WINDOWS
+	HMODULE library;
+#endif // MR_PLATFORM
+
+	ELoadState moduleState;
+
 	String name;
 };
 

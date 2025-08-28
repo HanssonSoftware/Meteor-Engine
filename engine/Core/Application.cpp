@@ -55,7 +55,13 @@ void Application::Init()
 
     MR_LOG(LogApplication, Log, "Initializing application.");
 
-    ModuleManager::Get().LoadModule("Renderer");
+    WindowCreateInfo ci = {};
+    ci.windowName = appName;
+    ci.windowID = appNameNoSpaces;
+    ci.size.x = WindowData.x;
+    ci.size.y = WindowData.y;
+
+    windowManager->CreateNativeWindow(&ci);
 
     SetAppState(ECurrentApplicationState::RUNNING);
 }
@@ -67,13 +73,11 @@ void Application::Run()
         layerManager->UpdateLayer();
         appFramework->Run();
     }
-
-    appFramework->Shutdown();
 }
 
 void Application::Shutdown()
 {
-    //if (GetAppState() == APPLICATIONSTATE_RESTARTING)
+    if (GetAppState() == ECurrentApplicationState::RESTARTING)
     {
         MR_LOG(LogApplication, Log, "Restarting application!");
     
@@ -85,7 +89,7 @@ void Application::Shutdown()
 
         appFramework->Init();
     }
-    //else
+    else
     {
         MR_LOG(LogApplication, Log, "Shutting down application!");
 

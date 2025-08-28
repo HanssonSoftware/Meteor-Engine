@@ -6,12 +6,14 @@
 #include "WindowsWindow.h"
 #include <Layers/SystemLayer.h>
 #include <dwmapi.h>
+#include <Module/ModuleManager.h>
 
 #pragma comment (lib, "UxTheme.lib")
 
 void WindowsWindowManager::Init()
 {
     IWindowManager::Init();
+
 }
 
 void WindowsWindowManager::Shutdown()
@@ -24,7 +26,7 @@ void WindowsWindowManager::Shutdown()
         {
             if (const Application* app = GetApplication())
             {
-                UnregisterClassW(Layer::GetSystemLayer()->ConvertToWide(app->appName.Chr()), instance);
+                UnregisterClassW(Layer::GetSystemLayer()->ConvertToWide(app->appNameNoSpaces.Chr()), instance);
             }
         }
         else
@@ -36,9 +38,8 @@ void WindowsWindowManager::Shutdown()
 
 IWindow* WindowsWindowManager::CreateNativeWindow(const WindowCreateInfo* CreateInfo)
 {
-	if (CreateInfo->windowID.IsEmpty())
+	if (CreateInfo->windowID.IsEmpty() || CreateInfo->size.x == 0 || CreateInfo->size.y == 0)
 	{
-		MR_LOG(LogWindowManager, Error, "CreateInfo->windowID is Empty!");
 		return nullptr;
 	}
 
@@ -55,6 +56,8 @@ IWindow* WindowsWindowManager::CreateNativeWindow(const WindowCreateInfo* Create
 	if (newWindow->CreateNativeWindow(CreateInfo))
 	{
 		activeWindows.Add(newWindow);
+
+        ModuleManager::Get().LoadModule("Renderer");
 
 		if (GetFirstWindow() == newWindow)
 		{
@@ -107,7 +110,7 @@ inline bool WindowsWindowManager::RegisterWindowClass()
 
     if (const Application* app = Application::Get())
     {
-        windowClass.lpszClassName = Layer::GetSystemLayer()->ConvertToWide(app->appName.Chr());
+        windowClass.lpszClassName = Layer::GetSystemLayer()->ConvertToWide(app->appNameNoSpaces.Chr());
     }
     else
     {

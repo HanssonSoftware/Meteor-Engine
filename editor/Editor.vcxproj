@@ -66,7 +66,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(CoreLibraryDependencies);D3D11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MeteorEngine-Core.lib;$(CoreLibraryDependencies);D3D11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ShaderType>
@@ -84,7 +84,7 @@
       <PreprocessToFile>false</PreprocessToFile>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(CoreLibraryDependencies);D3D11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MeteorEngine-Core.lib;$(CoreLibraryDependencies);D3D11.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <ProgramDatabaseFile />
@@ -103,7 +103,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core/Application.h" />
-    <ClInclude Include="Core\EditorCore.h" />
     <ClInclude Include="Core\EditorLayer.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>

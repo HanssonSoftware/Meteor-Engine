@@ -15,7 +15,7 @@ static double engineRecommendedPercent = 0.15;
 void MemoryManager::Initialize(const double& RequiredMinimum)
 {
 	if (!object) object = new MemoryManager();
-	engineRecommendedPercent = RequiredMinimum > 0.0 ? RequiredMinimum : 0.1;
+	engineRecommendedPercent = (RequiredMinimum > 0.0 && RequiredMinimum <= 1.0) ? RequiredMinimum : 0.1;
 
 #ifdef MR_PLATFORM_WINDOWS
 	MEMORYSTATUSEX longlong = {};
@@ -24,7 +24,6 @@ void MemoryManager::Initialize(const double& RequiredMinimum)
 	if (!GlobalMemoryStatusEx(&longlong))
 	{
 		MR_LOG(LogArena, Fatal, "GlobalMemoryStatusEx failed with: %s", *Layer::GetSystemLayer()->GetError());
-		return;
 	}
 
 	object->totalMemoryOnPC = longlong.ullTotalPhys;
@@ -33,7 +32,6 @@ void MemoryManager::Initialize(const double& RequiredMinimum)
 	if (requiredByPercent < (size_t)object->requiredMinimumInBytes)
 	{
 		MR_LOG(LogArena, Fatal, "Your PC's memory is too low!");
-		return;
 	}
 
 	object->begin = (char*)VirtualAlloc(nullptr, requiredByPercent, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
@@ -93,7 +91,16 @@ void MemoryManager::Deallocate(void* data)
 
 constexpr uint32 MemoryManager::GetSize(void* data)
 {
-	return sizeof(data);
+	if (!data) return 0;
+	size_t offset = (char*)data - object->begin;
+
+	for (const MemoryData& entry : heap)
+	{
+		if (entry.offset == offset && entry.used)
+			return (uint32)entry.size;
+	}
+
+	return 0;
 }
 
 MemoryManager::MemoryData MemoryManager::FindAvailable(const size_t& size)

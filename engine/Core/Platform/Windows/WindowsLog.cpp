@@ -56,32 +56,34 @@ void WindowsLog::Initialize()
 			}
 
 			hConsole = CreateFileW(L"CONOUT$", GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
+			if (hConsole != INVALID_HANDLE_VALUE)
+			{
+				SetConsoleOutputCP(CP_UTF8);
 
-			SetConsoleOutputCP(CP_UTF8);
+				SetConsoleCP(CP_UTF8);
 
-			SetConsoleCP(CP_UTF8);
+				CONSOLE_CURSOR_INFO cf;
+				GetConsoleCursorInfo(hConsole, &cf);
+				cf.bVisible = false;
 
-			CONSOLE_CURSOR_INFO cf;
-			GetConsoleCursorInfo(hConsole, &cf);
-			cf.bVisible = false;
-
-			SetConsoleCursorInfo(hConsole, &cf);
+				SetConsoleCursorInfo(hConsole, &cf);
 
 			
-			if (SystemLayer* systemLayer = Layer::GetSystemLayer())
-			{
-				if (!SetStdHandle(STD_OUTPUT_HANDLE, hConsole))
-					Application::RequestExit(-1);
-
-				wchar_t* buffer = systemLayer->ConvertToWide(String::Format("%s developer console (b%d)", Application::Get()->appName.Chr(), BUILD_NUMBER).Chr());
-
-				if (!SetConsoleTitleW(buffer))
+				if (SystemLayer* systemLayer = Layer::GetSystemLayer())
 				{
-					delete[] buffer;
-					Application::RequestExit(-1);
-				}
+					if (!SetStdHandle(STD_OUTPUT_HANDLE, hConsole))
+						Application::RequestExit(-1);
 
-				delete[] buffer; // Using uninitialized memory 'X'
+					wchar_t* buffer = systemLayer->ConvertToWide(String::Format("%s developer console (b%d)", Application::Get()->appName.Chr(), BUILD_NUMBER).Chr());
+
+					if (!SetConsoleTitleW(buffer))
+					{
+						delete[] buffer;
+						Application::RequestExit(-1);
+					}
+
+					delete[] buffer; // Using uninitialized memory 'X'
+				}
 			}
 		}
 	}
@@ -165,17 +167,23 @@ void WindowsLog::HandleFatal()
 		const LogDescriptor* actualDescriptor = ILogger::Get()->GetActualEntry();
 		if (!actualDescriptor)
 		{
-			FatalAppExitW(0, L"Unknown error!");
+			MessageBoxW(nullptr, L"Unknown error!", L"Engine Error!", MB_OK);
+
+			TerminateProcess(GetCurrentProcess(), -1);
 			return;
 		}
 
 		const wchar_t* convertedFatalText = systemLayer->ConvertToWide(actualDescriptor->message.Chr());
 
-		FatalAppExitW(0, convertedFatalText);
+		MessageBoxW(nullptr, convertedFatalText, L"Engine Error!", MB_OK);
 		delete[] convertedFatalText;
 	}
+	else
+	{
+		MessageBoxW(nullptr, L"Unknown error!", L"Engine Error!", MB_OK);
+	}
 
-	FatalAppExitW(0, L"Unknown error!");
+	TerminateProcess(GetCurrentProcess(), -1);
 }
 
 bool WindowsLog::IsDebuggerAttached()

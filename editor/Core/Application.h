@@ -7,11 +7,9 @@
 #include <Commandlet.h>
 //#include <Types/Pointers.h>
 
-#include "EditorCore.h"
-
 LOG_ADDCATEGORY(EditorApplication);
 
-class MR_EDITORAPPLICATION_API EditorApplication : public Application
+class EditorApplication : public Application
 {
 public:
 	EditorApplication();

@@ -5,6 +5,6 @@
 
 struct Intermediate
 {
-	static bool SearchIntermediateFiles(String intermediateDirectory);
+	static bool SearchIntermediateFiles(const String& intermediateDirectory);
 };
 

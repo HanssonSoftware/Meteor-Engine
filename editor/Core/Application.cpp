@@ -20,7 +20,11 @@ EditorApplication::EditorApplication()
 	: Application()
 {
 	appName = "Meteor Editor";
+	appNameNoSpaces = "MeteorEditor";
 	appCodeName = "Astronaut";
+
+	WindowData.x = 1280;
+	WindowData.y = 720;
 
 	Memory.memoryReservePercent = 0.15;
 }

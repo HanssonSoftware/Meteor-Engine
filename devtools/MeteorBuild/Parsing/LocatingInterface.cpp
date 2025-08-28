@@ -12,56 +12,19 @@
 
 LOG_ADDCATEGORY(Locator);
 
-static bool bIsFirstCall = true;
-
 bool Locator::FindAllReferences(const String& sourceDirectory)
 {
     MR_ASSERT(!(!sourceDirectory), "Directory is empty! Consider checking via Debugger!");
     
-    String fullPath = sourceDirectory;
-    if (bIsFirstCall)
-    {
-        bIsFirstCall = false;
 
-        if (FileManager::IsPathRelative(sourceDirectory))
-        {
-            fullPath = Paths::GetExecutableDirctory();
-            if (SystemLayer* systemLayer = Layer::GetSystemLayer())
-            {
-                wchar_t* wideExecutableDirectory = systemLayer->ConvertToWide(fullPath.Chr());
-                
-                PathCchRemoveFileSpec(wideExecutableDirectory, wcslen(wideExecutableDirectory));
-                fullPath = String::Format("%ls\\%s", wideExecutableDirectory, sourceDirectory.Chr());
-                wchar_t* wideExecutableDirectoryNoFile = systemLayer->ConvertToWide(fullPath.Chr());
 
-                wchar_t* canonicalizedPath = nullptr;
-                if (PathAllocCanonicalize(wideExecutableDirectoryNoFile, PATHCCH_ALLOW_LONG_PATHS, &canonicalizedPath) != S_OK)
-                {
-                    MR_LOG(LogLocator, Fatal, "PathAllocCanonicalize returned: %s", systemLayer->GetError().Chr());
-                }
-                
-                fullPath = canonicalizedPath;
-
-                LocalFree(canonicalizedPath);
-                delete[] wideExecutableDirectory;
-            }
-        }
-        else
-        {
-            if (!FileManager::IsPathExists(sourceDirectory))
-            {
-                MR_LOG(LogLocator, Fatal, "Directory does not exist! (%s)", sourceDirectory.Chr());
-            }
-        }
-    }
-
-    if (!FileManager::IsPathExists(fullPath))
+    //if (!FileManager::IsPathExists(fullPath))
     {
         MR_LOG(LogLocator, Fatal, "Directory does not exist! (%s)", sourceDirectory.Chr());
     }
 
-    std::vector<String> foundScripts;
-    SearchExtensionSpecified(fullPath, "mrbuild", foundScripts);
+    Array<String> foundScripts;
+    //SearchExtensionSpecified(fullPath, "mrbuild", foundScripts);
     
     for (String& path : foundScripts)
     {
@@ -73,7 +36,57 @@ bool Locator::FindAllReferences(const String& sourceDirectory)
     return true;
 }
 
-void Locator::ListDirectory(const String& directory, std::vector<String>& returned)
+static bool bIsFirstCall = true;
+
+void Locator::LocateSources(const String& fullDirectoryToAll, Array<String>& returned)
+{
+    String fullPath = fullDirectoryToAll;
+    if (bIsFirstCall)
+    {
+        bIsFirstCall = false;
+
+        if (FileManager::IsPathRelative(fullDirectoryToAll))
+        {
+            fullPath = Paths::GetExecutableDirctory();
+            if (SystemLayer* systemLayer = Layer::GetSystemLayer())
+            {
+                wchar_t* wideExecutableDirectory = systemLayer->ConvertToWide(fullPath.Chr());
+
+                PathCchRemoveFileSpec(wideExecutableDirectory, wcslen(wideExecutableDirectory));
+                fullPath = String::Format("%ls\\%s", wideExecutableDirectory, fullDirectoryToAll.Chr());
+                wchar_t* wideExecutableDirectoryNoFile = systemLayer->ConvertToWide(fullPath.Chr());
+
+                wchar_t* canonicalizedPath = nullptr;
+                if (PathAllocCanonicalize(wideExecutableDirectoryNoFile, PATHCCH_ALLOW_LONG_PATHS, &canonicalizedPath) != S_OK)
+                {
+                    MR_LOG(LogLocator, Fatal, "PathAllocCanonicalize returned: %s", systemLayer->GetError().Chr());
+                }
+
+                fullPath = canonicalizedPath;
+
+                LocalFree(canonicalizedPath);
+                delete[] wideExecutableDirectory;
+            }
+        }
+        else
+        {
+            if (!FileManager::IsPathExists(fullDirectoryToAll))
+            {
+                MR_LOG(LogLocator, Fatal, "Directory does not exist! (%s)", fullDirectoryToAll.Chr());
+            }
+        }
+    }
+
+    ListDirectory(fullPath, returned);
+
+    //for (String& temp : returned)
+    //{
+    //    OutputDebugStringA(temp.Chr());
+    //    OutputDebugStringA("\n");
+    //}
+}
+
+void Locator::ListDirectory(const String& directory, Array<String>& returned)
 {
     WIN32_FIND_DATAW find;
 
@@ -97,7 +110,7 @@ void Locator::ListDirectory(const String& directory, std::vector<String>& return
 
                 case FILE_ATTRIBUTE_ARCHIVE:
                 {
-                    returned.push_back(String::Format("%s\\%ls", directory.Chr(), find.cFileName));
+                    returned.Add(String::Format("%s\\%ls", directory.Chr(), find.cFileName));
                     break;
                 }
             }
@@ -112,7 +125,7 @@ void Locator::ListDirectory(const String& directory, std::vector<String>& return
     delete[] path;
 }
 
-void Locator::SearchExtensionSpecified(const String& directory, const String& extension, std::vector<String>& returned)
+void Locator::SearchExtensionSpecified(const String& directory, const String& extension, Array<String>& returned)
 {
     WIN32_FIND_DATAW find;
 
@@ -139,7 +152,7 @@ void Locator::SearchExtensionSpecified(const String& directory, const String& ex
                     if (!FileManager::IsEndingWith(find.cFileName, extension))
                         break;
 
-                    returned.push_back(String::Format("%s\\%ls", directory.Chr(), find.cFileName));
+                    returned.Add(String::Format("%s\\%ls", directory.Chr(), find.cFileName));
                     break;
                 }
             }
