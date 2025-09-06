@@ -17,12 +17,13 @@
 
 LOG_ADDCATEGORY(Script);
 
-ADD_SCRIPT_WORD(Executable, ExecutableWord);
-
 static void ExecutableWord(const String& arg)
 {
-	MR_LOG(LogScript, Fatal, "ge %s", *arg);
+	MR_LOG(LogScript, Log, "%s", arg.Chr());
 }
+
+ADD_SCRIPT_WORD(Executable, ExecutableWord);
+
 
 void ScriptParser::ParseScript(const ParsingType& type)
 {
@@ -67,7 +68,7 @@ void ScriptParser::ParseScript(const ParsingType& type)
 						if (!quotedValue)
 							break;
 
-						word->Execute(quotedValue);
+						word->Invoke(quotedValue);
 
 						continue;
 					}
