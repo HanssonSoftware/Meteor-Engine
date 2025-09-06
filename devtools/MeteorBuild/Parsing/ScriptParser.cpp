@@ -17,7 +17,7 @@
 
 LOG_ADDCATEGORY(Script);
 
-ADD_SCRIPT_WORD(Executable);
+ADD_SCRIPT_WORD(Executable, { executable.Add(args.Chr()); });
 
 void ScriptParser::ParseScript(const ParsingType& type)
 {
@@ -40,46 +40,37 @@ void ScriptParser::ParseScript(const ParsingType& type)
 			if (projectName.IsEmpty())
 				return;
 
-			if (!ExpectedIdentifier(t, TokenIdentifier::OpenBrace))
+			if (!ExpectedIdentifier(t, TokenIdentifier::OpenBrace, true))
 				return;
-
-			SkipWhitspace(t);
-			AdvanceACharacter(t);
-			SkipWhitspace(t);
 			
-			while (!ExpectedIdentifier(t, TokenIdentifier::EndOfFile))
+			while (!ExpectedIdentifier(t, TokenIdentifier::EndOfFile, true))
 			{
-				const String fasz = GetWord(t);
-				if (!fasz.IsEmpty() && ExpectedIdentifier(t, TokenIdentifier::Colon))
+				const String parsedWord = GetWord(t);
+
+				if (!parsedWord.IsEmpty() && ExpectedIdentifier(t, TokenIdentifier::Colon, true))
 				{
-					AdvanceACharacter(t);
-					SkipWhitspace(t);
-
-					if (!ExpectedIdentifier(t, TokenIdentifier::OpenBrace))
+					ScriptWordBase* word = ScriptWordBase::Find(parsedWord);
+					if (!word)
 					{
-						MR_LOG(LogScript, Fatal, "Identifier at %c is not %s", *t, *TokenIndetifierToString(TokenIdentifier::OpenBrace));
+						MR_LOG(LogScript, Fatal, "Unknown or invalid word! %s", *parsedWord);
 					}
 
-					AdvanceACharacter(t);
-
-					bool bShouldClose = false;
-					while (!ExpectedIdentifier(t, TokenIdentifier::Comma))
+					const bool bCanStart = ExpectedIdentifier(t, TokenIdentifier::OpenBrace, true);
+					while (!ExpectedIdentifier(t, TokenIdentifier::CloseBrace, true) && bCanStart)
 					{
-						SkipWhitspace(t);
+						const String quotedValue = GetValue(t);
+						if (!quotedValue)
+							break;
 
-						executable.Add(GetValue(t));
-						
-						ScriptWord_Executable  fasz;
-						InputToContainer(fasz);
-						if (!ExpectedIdentifier(t, TokenIdentifier::Comma)) 
-						{ 
-							AdvanceACharacter(t);
-							break; 
-						};
+						word->Execute(quotedValue);
+
+						continue;
 					}
+
 				}
 
-				if (ExpectedIdentifier(t, TokenIdentifier::CloseBrace)) AdvanceACharacter(t);
+				if (ExpectedIdentifier(t, TokenIdentifier::CloseBrace, false))
+					AdvanceACharacter(t);
 			}
 
 			int j = 523;
@@ -182,8 +173,6 @@ bool ScriptParser::FindMainScript(String& path)
 
 void ScriptParser::InputToContainer(ScriptWordBase& word)
 {
-	String a = word.GetWord();
-	word.container;
 
 	int j = 4;
 }
@@ -200,11 +189,16 @@ bool ScriptParser::Expected(const char*& in, const char* ptr)
 	return true;
 }
 
-bool ScriptParser::ExpectedIdentifier(const char*& in, const TokenIdentifier& identifier)
+bool ScriptParser::ExpectedIdentifier(const char*& in, const TokenIdentifier& identifier, bool bStep = false)
 {
 	if (IsWhitspace(in)) SkipWhitspace(in);
 
-	return (GetIdentifier(in) == identifier) ? true : false;
+	const bool bResult = GetIdentifier(in) == identifier;
+
+	if (bResult && bStep)
+		in++;
+
+	return bResult;
 }
 
 TokenIdentifier ScriptParser::GetIdentifier(const char*& in)

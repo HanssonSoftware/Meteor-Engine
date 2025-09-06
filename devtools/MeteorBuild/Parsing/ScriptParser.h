@@ -8,20 +8,45 @@ class IFile;
 class Module;
 struct ScriptWordBase 
 {
-	constexpr ScriptWordBase() {};
+	ScriptWordBase() { Register(this); };
 
-	static constexpr const char* GetWord() { return ""; };
-	Array<String> container;
+	virtual const char* GetWord() const = 0;
 
 	virtual ~ScriptWordBase() = default;
+
+	virtual void Execute(const String& args) = 0;
+
+	static Array<ScriptWordBase*>& GetRegistry() 
+	{
+		static Array<ScriptWordBase*> instance;
+		return instance;
+	}
+
+	static ScriptWordBase* Find(const String& word)
+	{
+		Array<ScriptWordBase*>& reg = GetRegistry();
+		for (uint32 i = 0; i < reg.GetSize(); i++)
+		{
+			if (strcmp(word.Chr(), reg[i]->GetWord()) == 0)
+				return reg[i];
+		}
+
+		return nullptr;
+	}
+private:
+	static void Register(ScriptWordBase* word) { GetRegistry().Add(word); }
 };
 
-#define ADD_SCRIPT_WORD(NewWord)							\
-	struct ScriptWord_##NewWord : public ScriptWordBase		\
-	{														\
-		constexpr ScriptWord_##NewWord() : ScriptWordBase() {}; \
-		static constexpr const char* GetWord() { return #NewWord; };\
-	}
+#define ADD_SCRIPT_WORD(Name, Body)                             \
+    struct ScriptWord_##Name : public ScriptWordBase            \
+    {                                                           \
+        const char* GetWord() const override { return #Name; }  \
+        virtual void Execute(const String& args) override       \
+        {                                                       \
+            Body                                                \
+        }                                                       \
+    };                                                          \
+    static ScriptWord_##Name Global_WordInstance_##Name
 
 
 enum class TokenIdentifier
@@ -54,7 +79,7 @@ protected:
 
 	bool Expected(const char*& in, const char* ptr);
 
-	bool ExpectedIdentifier(const char*& in, const TokenIdentifier& identifier);
+	bool ExpectedIdentifier(const char*& in, const TokenIdentifier& identifier, bool bStep);
 
 	TokenIdentifier GetIdentifier(const char*& in);
 

@@ -2,6 +2,7 @@ Solution "Meteor"
 {
 	Executable:
 	{
-		"Launch.cpp"
+		"Launch.cpp",
+		"Geci.cpp"
 	}
 }

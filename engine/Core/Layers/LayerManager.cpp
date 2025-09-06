@@ -76,7 +76,8 @@ void LayerManager::UpdateLayer()
 static bool bWasAdded = false;
 void LayerManager::PushSystemLayer()
 {
-	if (bWasAdded) return;
+	if (bWasAdded) 
+		return;
 
 #ifdef _WIN64
 	systemLayer = new WindowsLayer("Windows System Layer");

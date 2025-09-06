@@ -5,13 +5,13 @@
 #include <Types/String.h>
 #include <Platform/PerformanceTimer.h>
 #include <Parsing/LocatingInterface.h>
-#include <shellapi.h>
+//#include <shellapi.h>
 #include <MemoryManager.h>
 #include <Caching/Intermediate.h>
 #include <FileManager.h>
 #include <Parsing/ScriptParser.h>
 
-#pragma comment(lib, "Shell32.lib")
+//#pragma comment(lib, "Shell32.lib")
 
 
 BuildSystemApplication::BuildSystemApplication()
