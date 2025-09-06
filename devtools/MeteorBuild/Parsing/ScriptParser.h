@@ -14,8 +14,6 @@ struct ScriptWordBase
 
 	virtual ~ScriptWordBase() = default;
 
-	virtual void Execute(const String& args) = 0;
-
 	static Array<ScriptWordBase*>& GetRegistry() 
 	{
 		static Array<ScriptWordBase*> instance;
@@ -41,10 +39,7 @@ private:
     struct ScriptWord_##Name : public ScriptWordBase            \
     {                                                           \
         const char* GetWord() const override { return #Name; }  \
-        virtual void Execute(const String& args) override       \
-        {                                                       \
-            Body                                                \
-        }                                                       \
+        typedef void (*Body)(const String& arg);\
     };                                                          \
     static ScriptWord_##Name Global_WordInstance_##Name
 

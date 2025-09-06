@@ -17,7 +17,12 @@
 
 LOG_ADDCATEGORY(Script);
 
-ADD_SCRIPT_WORD(Executable, { executable.Add(args.Chr()); });
+ADD_SCRIPT_WORD(Executable, ExecutableWord);
+
+static void ExecutableWord(const String& arg)
+{
+	MR_LOG(LogScript, Fatal, "ge %s", *arg);
+}
 
 void ScriptParser::ParseScript(const ParsingType& type)
 {
