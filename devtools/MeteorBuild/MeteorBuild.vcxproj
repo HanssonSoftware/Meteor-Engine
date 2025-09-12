@@ -182,15 +182,19 @@
     <ClCompile Include="Parsing\LocatingInterface.cpp" />
     <ClCompile Include="Parsing\VisualStudio\VSSolution.cpp" />
     <ClCompile Include="Parsing\ScriptParser.cpp" />
+    <ClCompile Include="Parsing\Solution.cpp" />
+    <ClCompile Include="Parsing\Project.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Caching\Intermediate.h" />
     <ClInclude Include="Core\Application.h" />
     <ClInclude Include="Parsing\Module.h" />
     <ClInclude Include="Parsing\LocatingInterface.h" />
+    <ClInclude Include="Parsing\Project.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Parsing\VisualStudio\VSSolution.h" />
     <ClInclude Include="Parsing\ScriptParser.h" />
+    <ClInclude Include="Parsing\Solution.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MeteorBuild.aps" />

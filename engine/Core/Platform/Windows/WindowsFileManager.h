@@ -23,15 +23,15 @@ struct WindowsFileManager : public IFileManager
 
 	static void NormalizeDirectory(String& input);
 
-	static IFile* CreateFileOperation(const String& path, int accessType, int sharingMode, FileOverrideRules createType, FileStatus& status);
+	static IFile* CreateFileOperation(const String& path, int32_t accessType, int32_t sharingMode, FileOverrideRules createType, FileStatus& status);
 private:
 	WindowsFileManager() = default;
 
-	static constexpr const int evaluateAccessTypeForCreateFileOperation(int accessType);
+	static constexpr const int32_t evaluateAccessTypeForCreateFileOperation(int32_t accessType);
 
-	static constexpr const int evaluateSharingModeForCreateFileOperation(int sharingMode);
+	static constexpr const int32_t evaluateSharingModeForCreateFileOperation(int32_t sharingMode);
 
-	static constexpr const int evaluateCreateTypeForCreateFileOperation(FileOverrideRules createType);
+	static constexpr const int32_t evaluateCreateTypeForCreateFileOperation(FileOverrideRules createType);
 
 	static bool startRecursiveCreate(wchar_t* dir);
 };

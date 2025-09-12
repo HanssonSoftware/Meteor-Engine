@@ -41,8 +41,8 @@ public:
 	virtual char * ConvertToNarrow(const wchar_t* Buffer) override;
 
 private:
-	constexpr const int evaluateMessageBoxFlags(const int Code) const noexcept;
+	constexpr const int32_t evaluateMessageBoxFlags(const int32_t Code) const noexcept;
 
-	constexpr const MessageBoxDecision evaluateMessageBoxReturn(const int Code) const noexcept;
+	constexpr const MessageBoxDecision evaluateMessageBoxReturn(const int32_t Code) const noexcept;
 };
 

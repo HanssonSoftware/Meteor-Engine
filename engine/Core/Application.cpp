@@ -21,7 +21,7 @@ Application::Application()
     appFramework = this;
 
 #ifdef _WIN64
-    WindowsWindowManager* wm = new WindowsWindowManager();
+    auto wm = new WindowsWindowManager();
 #else
 
 #endif // _WIN64
@@ -35,7 +35,7 @@ Application* Application::Get()
     return appFramework;
 }
 
-void Application::RequestExit(int Code)
+void Application::RequestExit(int32_t Code)
 {
     appFramework->exitCode = Code;
     appFramework->SetAppState(ECurrentApplicationState::SHUTDOWN);
@@ -55,13 +55,7 @@ void Application::Init()
 
     MR_LOG(LogApplication, Log, "Initializing application.");
 
-    WindowCreateInfo ci = {};
-    ci.windowName = appName;
-    ci.windowID = appNameNoSpaces;
-    ci.size.x = WindowData.x;
-    ci.size.y = WindowData.y;
-
-    windowManager->CreateNativeWindow(&ci);
+    windowManager->CreateWindow(appName, { WindowData.x, WindowData.y });
 
     SetAppState(ECurrentApplicationState::RUNNING);
 }
@@ -80,7 +74,7 @@ void Application::Shutdown()
     if (GetAppState() == ECurrentApplicationState::RESTARTING)
     {
         MR_LOG(LogApplication, Log, "Restarting application!");
-    
+
         windowManager->Shutdown();
 
         layerManager->Shutdown();
@@ -96,7 +90,7 @@ void Application::Shutdown()
         windowManager->Shutdown();
 
         layerManager->Shutdown();
-        
+
         Logger::Shutdown();
 
         MemoryManager::Shutdown();
@@ -112,7 +106,7 @@ Application::~Application()
 {
     if (windowManager)
         windowManager = nullptr;
-    
+
     if (layerManager)
         layerManager = nullptr;
 }

@@ -16,6 +16,12 @@ void WindowsWindowManager::Init()
 
 }
 
+WindowsWindowManager::~WindowsWindowManager() noexcept
+{
+    IWindowManager::~IWindowManager();
+}
+
+
 void WindowsWindowManager::Shutdown()
 {
     IWindowManager::Shutdown();
@@ -36,69 +42,82 @@ void WindowsWindowManager::Shutdown()
     }
 }
 
-IWindow* WindowsWindowManager::CreateNativeWindow(const WindowCreateInfo* CreateInfo)
+bool WindowsWindowManager::Present()
 {
-	if (CreateInfo->windowID.IsEmpty() || CreateInfo->size.x == 0 || CreateInfo->size.y == 0)
-	{
-		return nullptr;
-	}
-
-	if (!bIsWinAPIClassRegistered)
-	{
-		if (!RegisterWindowClass())
-		{
-            MR_LOG(LogWindowManager, Fatal, "Failed to register window class!");
-            return nullptr;
-		}
-	}
-
-	WindowsWindow* newWindow = new WindowsWindow(this);
-	if (newWindow->CreateNativeWindow(CreateInfo))
-	{
-		activeWindows.Add(newWindow);
-
-        ModuleManager::Get().LoadModule("Renderer");
-
-		if (GetFirstWindow() == newWindow)
-		{
-            newWindow->ShowWindow();
-		}
-
-		return newWindow;
-	}
-	else
-	{
-        MR_LOG(LogWindowManager, Error, "Failed to create window!");
-	}
-
-	return nullptr;
+    return false;
 }
 
-WindowsWindow* WindowsWindowManager::SearchForHWND(const HWND hWnd)
+bool WindowsWindowManager::CreateWindow(const String& name, const Vector2<uint32_t> size)
 {
-    for (IWindow* win : activeWindows)
+    if (size < 8)
+
+    WindowCreateInfo& aWindowData = this->windowData;
+    aWindowData = *windowData;
+
+    HINSTANCE Inst = GetModuleHandle(0);
+
+    RECT windowRect = { 0, 0, (LONG)windowData->size.x, (LONG)windowData->size.y };
+    AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, 0);
+    aWindowData.windowName = windowData->windowName;
+
+    const wchar_t* buffer = Layer::GetSystemLayer()->ConvertToWide(aWindowData.windowName.Chr());
+
+    const wchar_t* className = nullptr;
+    bool bIsFallback = false;
+    if (const Application* app = Application::Get())
     {
-        if (WindowsWindow* wina = (WindowsWindow*)win)
+        if (const WindowsWindowManager* wm = (WindowsWindowManager*)owner)
         {
-            if ((HWND)wina->GetWindowHandle() == hWnd)
-            {
-                return wina;
-            }
+            bIsFallback = wm->GetIsUsingFallbackClass();
+            className = bIsFallback ? GetDefaultApplicationName() : Layer::GetSystemLayer()->ConvertToWide(app->appNameNoSpaces.Chr());
         }
+    }
+
+    handle = ::CreateWindowExW(
+        /*WS_EX_ACCEPTFILES*/ 0,
+        className,
+        buffer,
+        windowData->flags == -1 ? WS_OVERLAPPEDWINDOW : windowData->flags,
+        CW_USEDEFAULT,
+        CW_USEDEFAULT,
+        windowRect.right - windowRect.left,
+        windowRect.bottom - windowRect.top,
+        0,
+        0,
+        Inst,
+        0
+    );
+
+    if (!bIsFallback) delete[] className;
+
+    SetWindowTextW(handle, buffer);
+    delete[] buffer;
+    if (handle == INVALID_HANDLE_VALUE)
+    {
+        MR_LOG(LogWindowManager, Error, "Failed to create WinAPI window!");
+        return false;
+    }
+
+
+    static const constexpr BOOL bCanIUseDarkWindowTitlebar = 1;
+    DwmSetWindowAttribute((HWND)handle, DWMWA_USE_IMMERSIVE_DARK_MODE, &bCanIUseDarkWindowTitlebar, sizeof(bCanIUseDarkWindowTitlebar));
+
+}
+
+IWindow* WindowsWindowManager::FindHWNDCorresponding(const HWND hWnd)
+{
+    for (IWindow* window : activeWindows)
+    {
+        if ((HWND)window->GetWindowHandle() == hWnd)
+            return window;
     }
 
     return nullptr;
 }
 
-
-WindowsWindowManager::~WindowsWindowManager()
-{
-
-}
-
 inline bool WindowsWindowManager::RegisterWindowClass()
 {
-	instance = GetModuleHandle(NULL);
+	instance = GetModuleHandle(nullptr);
 	HICON ico = (HICON)LoadImage(instance, MAKEINTRESOURCE(IDI_DEFAULTAPPICON), IMAGE_ICON, 64, 64, LR_DEFAULTCOLOR);
 
 	WNDCLASSEXW windowClass = {};
@@ -131,7 +150,7 @@ inline bool WindowsWindowManager::RegisterWindowClass()
 
 IWindow* WindowsWindowManager::GetFocusedWindow()
 {
-    return SearchForHWND(GetFocus());
+    return FindHWNDCorresponding(GetFocus());
 }
 
 LRESULT CALLBACK MeteorSpecifiedWindowProcedure(HWND wnd, UINT uint, WPARAM p1, LPARAM p2)

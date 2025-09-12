@@ -24,7 +24,7 @@ struct LogDescriptor
 	{
 		va_list d = nullptr;
 		va_start(d, file);
-		const int reqAmount = vsnprintf(nullptr, 0, Message, d);
+		const int32_t reqAmount = vsnprintf(nullptr, 0, Message, d);
 
 		char* big = new char[reqAmount + 1]();
 		vsnprintf(big, reqAmount + 1, Message, d);

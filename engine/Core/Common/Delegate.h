@@ -5,9 +5,17 @@
 
 
 /** Simple aliased function. */
+template<typename T, typename ...>
 struct Delegate
 {
+	Delegate() = default;
 
+	virtual ~Delegate() noexcept = default;
+
+	void Bind()
+	{
+
+	}
 };
 
 

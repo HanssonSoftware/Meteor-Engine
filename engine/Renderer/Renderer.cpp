@@ -4,10 +4,10 @@
 
 void Renderer::StartupModule()
 {
-
+	int32_t j = 532;
 }
 
 void Renderer::ShutdownModule()
 {
-
+	int32_t j = 532;
 }

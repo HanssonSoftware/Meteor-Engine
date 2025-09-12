@@ -3,6 +3,7 @@
 #pragma once
 #include <Platform/File.h>
 
+#include <Windows/Windows.h>
 
 class WindowsFile : public IFile
 {
@@ -21,7 +22,8 @@ public:
 	virtual void Close() override;
 
 	virtual void Delete() override;
+
 private:
-	void* /*HANDLE*/ fileHandle;
+	HANDLE fileHandle;
 };
 

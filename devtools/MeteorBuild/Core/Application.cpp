@@ -21,7 +21,7 @@ BuildSystemApplication::BuildSystemApplication()
 	appNameNoSpaces = "MeteorBuild";
 	appCodeName = "Apollo";
 
-	MemoryManager::SetMinimumSize(100'000);
+	Memory.memoryReserveInBytes = 100'000;
 }
 
 void BuildSystemApplication::Init()
@@ -29,23 +29,23 @@ void BuildSystemApplication::Init()
 	Application::Init();
 	String val;
 
-	if (Commandlet::Parse("-sourcedir", val))
+	if (Commandlet::Parse("-source", val))
 	{
 		if (ScriptParser::FindMainScript(val))
 		{
 			ScriptParser solution;
 
 			solution.OpenScript(val);
-			solution.ParseScript(ScriptParser::ParsingType::MainDescriptor);
+			solution.ParseScript(solution..Chr(), ScriptParser::ParsingType::MainDescriptor);
 		}
 
-		if (Commandlet::Parse("-intDir", val) || Commandlet::Parse("-int", val))
+		if (Commandlet::Parse("-int32_t", val))
 		{
 			Intermediate::SearchIntermediateFiles(val);
 		}
 
 
-		if (Commandlet::Parse("-sourcedir", val))
+		if (Commandlet::Parse("-source", val))
 		{
 			Array<String> pathToDiscoveredItems;
 			Locator::LocateSources(val, pathToDiscoveredItems);

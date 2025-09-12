@@ -11,7 +11,7 @@
 
 #pragma comment(lib, "Pathcch.lib")
 
-Module* Module::CreateModule(const String fullPathToModule)
+Module* Module::CreateModule(const String& fullPathToModule)
 {
 	MR_ASSERT(!fullPathToModule.IsEmpty(), "Module path is empty!");
 
@@ -25,8 +25,8 @@ Module* Module::CreateModule(const String fullPathToModule)
 	Locator::ListDirectory(path, super->includedSources);
 	delete[] path;
 	
-	int s = (int)super->includedSources.GetSize();
-	for (int i = 0; i < s; i++)
+	int32_t s = (int32_t)super->includedSources.GetSize();
+	for (int32_t i = 0; i < s; i++)
 	{
 		if (FileManager::IsEndingWith(super->includedSources[i], "mrbuild"))
 		{

@@ -17,23 +17,17 @@ SystemLayer* Layer::GetSystemLayer()
 	return nullptr;
 }
 
-Layer::Layer(const String Name) noexcept
+Layer::Layer(const String& Name) noexcept
 	: name(Name)
 {
 }
 
-const void Layer::privAttached() noexcept
+void Layer::Attached()
 {
-	Init();
-
 	MR_LOG(LogLayers, Verbose, "%s has been attached to the engine!", name.IsEmpty() ? "Unnamed Layer" : name.Chr());
-
-	Attached();
 }
 
-const void Layer::privRemoved() noexcept
+void Layer::Removed()
 {
 	MR_LOG(LogLayers, Verbose, "%s has been removed from the engine!", name.IsEmpty() ? "Unnamed Layer" : name.Chr());
-
-	Removed();
 }

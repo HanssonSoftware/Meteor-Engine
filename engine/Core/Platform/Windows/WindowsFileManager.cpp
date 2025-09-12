@@ -61,7 +61,7 @@ bool WindowsFileManager::CreateDirectory(const String& name, bool bToFullPath)
             *p = L'\\';
     }
 
-    const int result = SHCreateDirectoryExW(nullptr, dirName, nullptr);
+    const int32_t result = SHCreateDirectoryExW(nullptr, dirName, nullptr);
     if (result != ERROR_SUCCESS && result != ERROR_ALREADY_EXISTS)
     {
         if (PathIsRelativeW(dirName))
@@ -194,9 +194,9 @@ bool WindowsFileManager::IsEndingWith(const String& name, const String& extensio
 void WindowsFileManager::NormalizeDirectory(String& input)
 {
     char* buffer = input.Allocate();
-    uint32 size = (int)input.Length();
+    uint32_t size = (int32_t)input.Length();
 
-    for (uint32 i = 0; i < size; i++)
+    for (uint32_t i = 0; i < size; i++)
     {
         if (buffer[i] == '/' || buffer[i] == '//')
         {
@@ -204,7 +204,7 @@ void WindowsFileManager::NormalizeDirectory(String& input)
         }
     }
 
-    size = (uint32)strlen(buffer);
+    size = (uint32_t)strlen(buffer);
     buffer[size] = '\0';
 
     input = String(buffer);
@@ -212,7 +212,7 @@ void WindowsFileManager::NormalizeDirectory(String& input)
     delete[] buffer;
 }
 
-IFile* WindowsFileManager::CreateFileOperation(const String& pathA, int accessType, int sharingMode, FileOverrideRules createType, FileStatus& status)
+IFile* WindowsFileManager::CreateFileOperation(const String& pathA, int32_t accessType, int32_t sharingMode, FileOverrideRules createType, FileStatus& status)
 {
     MR_ASSERT(Layer::GetSystemLayer(), "System Layer does not initialized!");
 
@@ -248,9 +248,9 @@ IFile* WindowsFileManager::CreateFileOperation(const String& pathA, int accessTy
     return newWindowsFile;
 }
 
-constexpr const int WindowsFileManager::evaluateAccessTypeForCreateFileOperation(int accessType)
+constexpr const int32_t WindowsFileManager::evaluateAccessTypeForCreateFileOperation(int32_t accessType)
 {
-    int accessTypeFast = 0;
+    int32_t accessTypeFast = 0;
 
     if (accessType & OPENMODE_NONE) accessTypeFast |= 0;
     if (accessType & OPENMODE_READ) accessTypeFast |= GENERIC_READ;
@@ -259,9 +259,9 @@ constexpr const int WindowsFileManager::evaluateAccessTypeForCreateFileOperation
     return accessTypeFast;
 }
 
-constexpr const int WindowsFileManager::evaluateSharingModeForCreateFileOperation(int sharingMode)
+constexpr const int32_t WindowsFileManager::evaluateSharingModeForCreateFileOperation(int32_t sharingMode)
 {
-    int sharingModeFast = 0;
+    int32_t sharingModeFast = 0;
 
     if (sharingMode & SHAREMODE_NONE) sharingModeFast |= 0;
     if (sharingMode & SHAREMODE_READ) sharingModeFast |= FILE_SHARE_READ;
@@ -271,7 +271,7 @@ constexpr const int WindowsFileManager::evaluateSharingModeForCreateFileOperatio
     return sharingModeFast;
 }
 
-constexpr const int WindowsFileManager::evaluateCreateTypeForCreateFileOperation(FileOverrideRules createType)
+constexpr const int32_t WindowsFileManager::evaluateCreateTypeForCreateFileOperation(FileOverrideRules createType)
 {
     switch (createType)
     {
@@ -295,7 +295,7 @@ constexpr const int WindowsFileManager::evaluateCreateTypeForCreateFileOperation
 
 bool WindowsFileManager::startRecursiveCreate(wchar_t* dir)
 {
-    const size_t dirSize = wcslen(dir);
+    const uint32_t dirSize = (uint32_t)wcslen(dir);
 
     if (PathCchRemoveExtension(dir, dirSize) == S_OK)
         /*PathCchRemoveExtension*/ PathCchRemoveFileSpec(dir, dirSize);
@@ -307,7 +307,7 @@ bool WindowsFileManager::startRecursiveCreate(wchar_t* dir)
     wchar_t* superSuper;
     HRESULT result = PathAllocCombine(super, dir, PATHCCH_ALLOW_LONG_PATHS | PATHCCH_FORCE_ENABLE_LONG_NAME_PROCESS, &superSuper);
 
-    int resultA = SHCreateDirectory(0, superSuper);
+    int32_t resultA = SHCreateDirectory(0, superSuper);
     
     delete[] super;
     LocalFree(superSuper);

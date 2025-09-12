@@ -4,7 +4,7 @@
 
 Object::Object()
 {
-	int ia = 0;
+	//int32_t ia = 0;
 }
 
 void Object::Frame(float deltaTime)

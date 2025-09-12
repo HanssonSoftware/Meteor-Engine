@@ -17,7 +17,7 @@ class Layer
 public:
 	static SystemLayer* GetSystemLayer();
 
-	Layer(const String Name) noexcept;
+	Layer(const String& Name) noexcept;
 
 	Layer() = delete;
 
@@ -25,9 +25,9 @@ public:
 
 	virtual void Init() = 0;
 	
-	virtual void Attached() = 0;
+	virtual void Attached();
 
-	virtual void Removed() = 0;
+	virtual void Removed();
 
 	virtual void Update() = 0;
 
@@ -42,10 +42,7 @@ public:
 		return this->name == Layer.name;
 	}
 
-private:
-	const void privAttached() noexcept;
-
-	const void privRemoved() noexcept;
+protected:
 
 	String name;
 };

@@ -264,7 +264,7 @@ static INT_PTR WindowsLoggingDialogProcedure(HWND wnd, UINT msg, WPARAM ai1, LPA
 	return DefWindowProcW(wnd, msg, ai1, ai2);
 }
 
-int WindowsLog::TransmitAssertion(LogAssertion& Info)
+int32_t WindowsLog::TransmitAssertion(LogAssertion& Info)
 {
 	if (Info.bIgnoreThis || Info.bIgnoreFor > 0)
 		return -1;
@@ -296,5 +296,5 @@ int WindowsLog::TransmitAssertion(LogAssertion& Info)
 		const String j = systemLayer->GetError();
 	}
 
-	return (int)result;
+	return (int32_t)result;
 }

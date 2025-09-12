@@ -28,7 +28,7 @@ String::String(const char* Input)
 		return;
 	}
 
-	const size_t inputSize = strlen(Input);
+	const uint32_t inputSize = (uint32_t)strlen(Input);
 	if (inputSize <= SSO_MAX_CHARS)
 	{
 		memcpy(stackBuffer.ptr, Input, inputSize);
@@ -64,7 +64,7 @@ String::String(const wchar_t* Input)
 		return;
 	}
 
-	const size_t inputSize = wcslen(Input);
+	const uint32_t inputSize = (uint32_t)wcslen(Input);
 
 	if (inputSize <= SSO_MAX_CHARS)
 	{
@@ -95,9 +95,9 @@ String::String(const wchar_t* Input)
 #endif // MR_DEBUG
 }
 
-String::String(const int Input)
+String::String(const int32_t Input)
 {
-	const int inputSize = snprintf(nullptr, 0, "%d", Input);
+	const int32_t inputSize = snprintf(nullptr, 0, "%d", Input);
 
 	if (inputSize <= SSO_MAX_CHARS)
 	{
@@ -128,9 +128,9 @@ String::String(const int Input)
 #endif // MR_DEBUG
 }
 
-String::String(const uint32 Input)
+String::String(const uint32_t Input)
 {
-	const int inputSize = snprintf(nullptr, 0, "%u", Input);
+	const int32_t inputSize = snprintf(nullptr, 0, "%u", Input);
 
 	if (inputSize <= SSO_MAX_CHARS)
 	{
@@ -163,7 +163,7 @@ String::String(const uint32 Input)
 
 String::String(const float Input)
 {
-	const int inputSize = snprintf(nullptr, 0, "%f", Input);
+	const int32_t inputSize = snprintf(nullptr, 0, "%f", Input);
 
 	if (inputSize <= SSO_MAX_CHARS)
 	{
@@ -196,7 +196,7 @@ String::String(const float Input)
 
 String::String(const unsigned long Input)
 {
-	const int inputSize = snprintf(nullptr, 0, "%u", Input);
+	const int32_t inputSize = snprintf(nullptr, 0, "%u", Input);
 
 	if (inputSize <= SSO_MAX_CHARS)
 	{
@@ -289,7 +289,7 @@ String::String(const String& other)
 #endif // MR_DEBUG
 }
 
-String::String(const char* string, uint32 length)
+String::String(const char* string, uint32_t length)
 {
 	MakeEmpty();
 
@@ -297,8 +297,8 @@ String::String(const char* string, uint32 length)
 	
 	if (bIsUsingHeap)
 	{
-		heapBuffer.capacity = (size_t)(length + 1);
-		heapBuffer.length = (size_t)length;
+		heapBuffer.capacity = (uint32_t)(length + 1);
+		heapBuffer.length = (uint32_t)length;
 		heapBuffer.ptr = new char[heapBuffer.capacity]();
 
 		memcpy(heapBuffer.ptr, string, length);
@@ -336,7 +336,7 @@ String String::operator+(const String& Other)
 	//const char* otherBuffer = Other.buffer;
 	//const char* thisBuffer = buffer;
 
-	//const size_t size = strlen(thisBuffer) + strlen(otherBuffer) + 1;
+	//const uint32_t size = strlen(thisBuffer) + strlen(otherBuffer) + 1;
 
 	//char* super = new char[size]();
 
@@ -363,7 +363,7 @@ String operator+(const String& OtherA, const String& OtherB)
 	const char* otherABuffer = OtherA.Chr();
 	const char* otherBBuffer = OtherB.Chr();
 
-	const size_t size = strlen(otherABuffer) + strlen(otherBBuffer) + 1;
+	const uint32_t size = (uint32_t)(strlen(otherABuffer) + strlen(otherBBuffer) + 1);
 
 	char* super = new char[size]();
 
@@ -400,7 +400,7 @@ String String::operator+=(const String& other)
 	{
 		if (bIsUsingHeap)
 		{
-			const size_t length = Length() + (other.bIsUsingHeap ? other.heapBuffer.length : other.stackBuffer.length);
+			const uint32_t length = Length() + (other.bIsUsingHeap ? other.heapBuffer.length : other.stackBuffer.length);
 
 			strcat(heapBuffer.ptr, other.bIsUsingHeap ? other.heapBuffer.ptr : other.stackBuffer.ptr);
 
@@ -451,7 +451,7 @@ bool String::IsEmpty() const noexcept
 	return bIsUsingHeap ? heapBuffer.length == 0 : stackBuffer.length == 0;
 }
 
-int String::ToInt() const noexcept
+int32_t String::ToInt() const noexcept
 {
 	return strtol(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, nullptr, 0);
 }
@@ -461,9 +461,9 @@ float String::ToFloat() const noexcept
 	return strtof(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, nullptr);
 }
 
-uint32 String::Length() const noexcept
+uint32_t String::Length() const noexcept
 {
-	return bIsUsingHeap ? (uint32)heapBuffer.length : (uint32)stackBuffer.length;
+	return bIsUsingHeap ? (uint32_t)heapBuffer.length : (uint32_t)stackBuffer.length;
 }
 
 String String::Format(const String format, ...)
@@ -475,7 +475,7 @@ String String::Format(const String format, ...)
 
 	va_list a_cpy;
 	va_copy(a_cpy, a);
-	const uint32 sizeForVA = vsnprintf(nullptr, 0, formattingBuffer, a_cpy);
+	const uint32_t sizeForVA = vsnprintf(nullptr, 0, formattingBuffer, a_cpy);
 	va_end(a_cpy);
 
 	char* newFormattedBuffer = new char[sizeForVA + 1]();

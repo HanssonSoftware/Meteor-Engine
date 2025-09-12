@@ -1,7 +1,7 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <Platform/PlatformDefs.h>
+
 #include <basetsd.h>
 #include <vector>
 
@@ -12,13 +12,13 @@ struct MemoryManager
 
 	static void Shutdown();
 
-	static void* Allocate(const size_t& size);
+	static void* Allocate(const uint32_t& size);
 
 	static void Deallocate(void* data);
 
-	static constexpr uint32 GetSize(void* data);
+	static constexpr uint32_t GetSize(void* data);
 
-	static constexpr void SetMinimumSize(const size_t& requiredMinimumInBytes) noexcept
+	static constexpr void SetMinimumSize(const uint32_t& requiredMinimumInBytes) noexcept
 	{
 		if (!object)
 			object = new MemoryManager();
@@ -33,18 +33,18 @@ protected:
 
 	struct MemoryData
 	{
-		size_t offset = 0;
+		uint32_t offset = 0;
 
-		size_t size = 0;
+		uint32_t size = 0;
 
 		bool used = false;
 	};
 
-	static MemoryData FindAvailable(const size_t& size);
+	static MemoryData FindAvailable(const uint32_t& size);
 
-	size_t requiredMinimumInBytes = 1'000'000'000; // 1GB ~= 1000 MB
+	uint32_t requiredMinimumInBytes = 1'000'000'000; // 1GB ~= 1000 MB
 
-	size_t totalMemoryOnPC = 0;
+	uint32_t totalMemoryOnPC = 0;
 
 	char* begin = nullptr;
 

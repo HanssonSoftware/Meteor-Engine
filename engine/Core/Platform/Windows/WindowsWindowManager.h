@@ -7,22 +7,25 @@
 class WindowsWindowManager : public IWindowManager
 {
 public:
-	virtual ~WindowsWindowManager();
+	virtual ~WindowsWindowManager() noexcept;
 
 	virtual void Init() override;
 
 	virtual void Shutdown() override;
 
-	virtual IWindow* CreateNativeWindow(const WindowCreateInfo* CreateInfo) override;
-
-	virtual IWindow* GetFocusedWindow() override;
-
-	virtual WindowsWindow* SearchForHWND(const HWND hWnd);
+	virtual bool Present() override;
 
 	HINSTANCE GetInstance() const { return instance; }
 
+	virtual IWindow* GetFocusedWindow() override;
+
 	bool GetIsUsingFallbackClass() const { return bIsUsingFallbackClassName; };
-private:
+
+	virtual bool CreateWindow(const String& name, const Vector2<uint32_t> size) override;
+
+	virtual IWindow* FindHWNDCorresponding(const HWND hWnd);
+
+protected:
 	inline bool RegisterWindowClass();
 
 	bool bIsWinAPIClassRegistered = false;
@@ -33,7 +36,3 @@ private:
 };
 
 LRESULT CALLBACK MeteorSpecifiedWindowProcedure(HWND, UINT, WPARAM, LPARAM);
-
-//extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
-using WindowManager = WindowsWindowManager;

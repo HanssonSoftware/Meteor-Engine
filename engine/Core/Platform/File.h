@@ -28,7 +28,7 @@ public:
 
 	virtual void SetName(const String& content) { fileName = content; };
 	 
-	unsigned long long GetSize() const { return size; }
+	uint32_t GetSize() const { return size; }
 
 	bool IsValid() const
 	{
@@ -53,9 +53,11 @@ protected:
 
 	bool bWasInitSucceded = false;
 
-	unsigned long long size = 0;
+	uint32_t size = 0;
 
 	char* buffer;
+
+	String fullPath;
 
 	String fileName;
 };

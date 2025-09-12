@@ -1,10 +1,8 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <Platform/PlatformDefs.h>
 
-
-template<typename T = uint32>
+template<typename T>
 struct Vector2
 {
 	T x, y;
@@ -29,7 +27,10 @@ struct Vector2
 
 	}
 
-	~Vector2();
+	~Vector2()
+	{
+
+	}
 
 	const Vector2 operator+(const Vector2& Add)
 	{
@@ -59,10 +60,10 @@ struct Vector2
 		return A && B;
 	}		
 	
-	constexpr const bool operator==(const float& Equal)
+	constexpr const bool operator==(const T& Equal)
 	{
-		bool A = this->x == Equal;
-		bool B = this->y == Equal;
+		bool A = (T)this->x == Equal;
+		bool B = (T)this->y == Equal;
 		return A && B;
 	}	
 	
@@ -87,18 +88,12 @@ struct Vector2
 		return A && B;
 	}		
 	
-	constexpr bool operator==(const Vector2<T>& Equal)
+	bool operator==(Vector2<T>& Equal)
 	{
 		bool A = this->x == Equal;
 		bool B = this->y == Equal;
 		return A && B;
 	}	
-	
-	constexpr bool operator==(const int& Equal)
-	{
-		return (int)this->x == Equal && (int)this->y == Equal;
-	}
-
 };
 
 template<typename T>
@@ -269,11 +264,6 @@ inline Vector2<T>::Vector2()
 {
 	x = 0;
 	y = 0;
-}
-
-template<typename T>
-inline Vector2<T>::~Vector2()
-{
 }
 
 template<typename T>

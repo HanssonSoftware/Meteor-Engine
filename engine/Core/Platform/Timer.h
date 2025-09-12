@@ -1,19 +1,19 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <Platform/PlatformDefs.h>
+#include <stdint.h>
 
 class String;
 
 struct Time
 {
-    uint32 year = 0;
-    uint32 month = 0;
-    uint32 day = 0;
-    uint32 hour = 0;
-    uint32 minute = 0;
-    uint32 second = 0;
-    uint32 millisecond = 0;
+    uint32_t year = 0;
+    uint32_t month = 0;
+    uint32_t day = 0;
+    uint32_t hour = 0;
+    uint32_t minute = 0;
+    uint32_t second = 0;
+    uint32_t millisecond = 0;
 };
 
 class ITimer 
@@ -34,9 +34,9 @@ public:
     static Time Now() noexcept;
 
 protected:
-    uint64 begin = 0;
+    uint64_t begin = 0;
 
-    uint64 end = 0;
+    uint64_t end = 0;
 
     bool bRunning = false;
 };

@@ -36,12 +36,12 @@ void EditorApplication::Init()
 	Paths::GetSystemDirectory();
 	Paths::GetDocumentsDirectory();
 
-	int j = 76;
+	int32_t j = 76;
 
-	Array<int> is(4);
-	for (uint32 i = 0; i < is.GetSize(); i++)
+	Array<int32_t> is(4);
+	for (uint32_t i = 0; i < is.GetSize(); i++)
 	{
-		int& a = is[i];
+		int32_t& a = is[i];
 
 		a = i + 1000;
 	}
@@ -49,14 +49,14 @@ void EditorApplication::Init()
 	is.Add(j);
 	is.Pop(3);
 
-	for (int i : is)
+	for (int32_t i : is)
 	{
-		int jsa = 523;
+		int32_t jsa = 523;
 	}
 
 	//MemoryManager::Deallocate(asd);
 
-	EditorLayer Super("geci");
+	EditorLayer Super("Editor Layer");
 	Application::Get()->GetLayerManager()->PushLayer(&Super);
 
 	if (Layer::GetSystemLayer()->IsRunningAnAnotherInstance())

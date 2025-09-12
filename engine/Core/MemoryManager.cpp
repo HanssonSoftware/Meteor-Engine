@@ -28,8 +28,8 @@ void MemoryManager::Initialize(const double& RequiredMinimum)
 
 	object->totalMemoryOnPC = longlong.ullTotalPhys;
 
-	size_t requiredByPercent = (size_t)(longlong.ullTotalPhys * engineRecommendedPercent);
-	if (requiredByPercent < (size_t)object->requiredMinimumInBytes)
+	uint32_t requiredByPercent = (uint32_t)(longlong.ullTotalPhys * engineRecommendedPercent);
+	if (requiredByPercent < (uint32_t)object->requiredMinimumInBytes)
 	{
 		MR_LOG(LogArena, Fatal, "Your PC's memory is too low!");
 	}
@@ -55,7 +55,7 @@ void MemoryManager::Shutdown()
 	delete object;
 }
 
-void* MemoryManager::Allocate(const size_t& size)
+void* MemoryManager::Allocate(const uint32_t& size)
 {
 	MemoryData data = FindAvailable(size);
 
@@ -75,7 +75,7 @@ void MemoryManager::Deallocate(void* data)
 	if (!data)
 		return;
 
-	size_t offset = (char*)data - object->begin;
+	uint32_t offset = (char*)data - object->begin;
 
 	for (MemoryData& entry : heap)
 	{
@@ -89,23 +89,23 @@ void MemoryManager::Deallocate(void* data)
 	MR_LOG(LogArena, Warn, "Tried to deallocate unknown or already freed memory at offset %llu", offset);
 }
 
-constexpr uint32 MemoryManager::GetSize(void* data)
+constexpr uint32_t MemoryManager::GetSize(void* data)
 {
 	if (!data) return 0;
-	size_t offset = (char*)data - object->begin;
+	uint32_t offset = (char*)data - object->begin;
 
 	for (const MemoryData& entry : heap)
 	{
 		if (entry.offset == offset && entry.used)
-			return (uint32)entry.size;
+			return (uint32_t)entry.size;
 	}
 
 	return 0;
 }
 
-MemoryManager::MemoryData MemoryManager::FindAvailable(const size_t& size)
+MemoryManager::MemoryData MemoryManager::FindAvailable(const uint32_t& size)
 {
-	size_t currentOffset = 0;
+	uint32_t currentOffset = 0;
 
 	for (const MemoryData& entry : heap)
 	{

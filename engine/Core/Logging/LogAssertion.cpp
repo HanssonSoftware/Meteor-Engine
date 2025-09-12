@@ -4,7 +4,7 @@
 #include <cstdarg>
 #include <stdio.h>
 
-LogAssertion::LogAssertion(const char* inputFile, const int inputLine, const char* statement, const char* inputMessage, ...)
+LogAssertion::LogAssertion(const char* inputFile, const int32_t inputLine, const char* statement, const char* inputMessage, ...)
     : assertLocationInFile(inputFile)
     , assertLineInFile(inputLine)
     , assertStatement(statement)
@@ -13,7 +13,7 @@ LogAssertion::LogAssertion(const char* inputFile, const int inputLine, const cha
     {
         va_list a = 0;
         va_start(a, inputMessage);
-        const int requiredAmount = vsnprintf(nullptr, 0, inputMessage, a);
+        const int32_t requiredAmount = vsnprintf(nullptr, 0, inputMessage, a);
 
         if (requiredAmount == 0)
         {

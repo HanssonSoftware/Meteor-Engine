@@ -1,7 +1,7 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #define _CRT_SECURE_NO_WARNINGS
-#include <stdlib.h>
+//#include <stdlib.h>
 
 #ifdef MR_DEBUG
 #include <crtdbg.h>
@@ -18,12 +18,12 @@
 
 #pragma warning (disable : 28251)
 
-//typedef int (*LaunchApplication)(int ArgumentCount, char* Arguments[]);
+//typedef int32_t (*LaunchApplication)(int32_t ArgumentCount, char* Arguments[]);
 extern int LaunchApplication(int ArgumentCount, char* Arguments[]);
 
 int main(int ArgumentCount, char* Arguments[])
 {
-    //int Result = LaunchApplication(ArgumentCount, Arguments);
+    //int32_t Result = LaunchApplication(ArgumentCount, Arguments);
 #ifdef MR_DEBUG
     _CrtDumpMemoryLeaks();
 #endif // MR_DEBUG
@@ -49,7 +49,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
     LaunchApplication app = (LaunchApplication)GetProcAddress(entryPoint, "LaunchApplication");
     if (app)
     {
-        int Result = app(/* Unused --> */ 0, &lpCmdLine);
+        int32_t Result = app(/* Unused --> */ 0, &lpCmdLine);
 
         if (!FreeLibrary(entryPoint)) 
             return -1;

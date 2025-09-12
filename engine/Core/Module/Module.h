@@ -28,7 +28,7 @@ public:
 protected:
 #ifdef MR_PLATFORM_WINDOWS
 	HMODULE library;
-#endif // MR_PLATFORM
+#endif // MR_PLATFORM_WINDOWS
 
 	ELoadState moduleState;
 

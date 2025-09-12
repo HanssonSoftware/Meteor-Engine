@@ -15,21 +15,13 @@ public:
 
 	virtual void DestroyWindow() override;
 
-	virtual bool CreateNativeWindow(const WindowCreateInfo* windowData) override;
-
 	virtual void ShowWindow() override;
 
 	virtual void SetTitle(const String& newName) override;
 
-	virtual void HideWindow() override;
-
-	virtual void DrawAttention() override;
-
 	virtual void* GetWindowHandle() override;
 
 protected:
-	
-
 	HWND handle;
 };
 

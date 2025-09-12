@@ -38,7 +38,7 @@ void IFileManager::NormalizeDirectory(String& input)
 	
 }
 
-IFile* IFileManager::CreateFileOperation(const String& path, int accessType, int sharingMode, int createType, FileStatus& status)
+IFile* IFileManager::CreateFileOperation(const String& path, int32_t accessType, int32_t sharingMode, int32_t createType, FileStatus& status)
 {
 	return nullptr;
 }

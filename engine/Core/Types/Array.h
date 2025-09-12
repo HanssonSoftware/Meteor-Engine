@@ -1,11 +1,10 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <Platform/PlatformDefs.h>
+
 #include "Iterator.h"
 #include <cstring>
-
-
+#include <stdint.h>
 
 template <typename T>
 class Array
@@ -31,7 +30,7 @@ public:
 		capacity = 0, size = 0;
 	}
 
-	Array(const uint32& count)
+	Array(const uint32_t& count)
 	{
 		capacity = count + RECOMMENDED_CAPACITY_PADDING;
 		size = count;
@@ -41,12 +40,12 @@ public:
 
 	Array(const Array& other)
 	{
-		int j = 5;
+		int32_t j = 5;
 	};
 
 	Array(T* buffer)
 	{
-		int j = 5;
+		int32_t j = 5;
 	};
 
 	Array& operator=(const Array& other)
@@ -54,7 +53,7 @@ public:
 		return *this;
 	};
 
-	void Add(const T elem, const uint32& at)
+	void Add(const T elem, const uint32_t& at)
 	{
 		if (size <= at) size = at + 1;
 
@@ -72,7 +71,7 @@ public:
 		container[size++] = elem;
 	};
 
-	void Remove(const uint32& at)
+	void Remove(const uint32_t& at)
 	{
 		if (!IsOutOfBounds(at))
 		{
@@ -80,7 +79,7 @@ public:
 		}
 	};
 
-	void Pop(const uint32& at)
+	void Pop(const uint32_t& at)
 	{
 		if (!IsOutOfBounds(at))
 		{
@@ -94,14 +93,14 @@ public:
 		}
 	}
 
-	void Resize(const uint32 Num)
+	void Resize(const uint32_t Num)
 	{		
 		if (Num <= capacity) return;
 
 		capacity = Num;
 		T* newContainer = new T[capacity]();
 
-		for (uint32 i = 0; i < size; i++)
+		for (uint32_t i = 0; i < size; i++)
 		{
 			newContainer[i] = container[i];
 		}
@@ -112,7 +111,7 @@ public:
 
 	void Reset()
 	{
-		for (uint32 i = 0; i < capacity; i++)
+		for (uint32_t i = 0; i < capacity; i++)
 		{
 			container[i] = {};
 		}
@@ -123,12 +122,12 @@ public:
 		return container;
 	}
 
-	uint32 GetSize() const
+	uint32_t GetSize() const
 	{
 		return size;
 	};
 
-	T& operator[](const uint32& index)
+	T& operator[](const uint32_t& index)
 	{
 		if (IsOutOfBounds(index))
 		{
@@ -143,18 +142,18 @@ public:
 		return size > 0;
 	}
 
-	bool IsOutOfBounds(const uint32& index) { return index >= capacity; };
+	bool IsOutOfBounds(const uint32_t& index) { return index >= capacity; };
 
 	Iterator<T> begin() { return Iterator(&container[0]); }
 
 	Iterator<T> end() { return Iterator(&container[size]); }
 
 private:
-	static constexpr const uint32 RECOMMENDED_CAPACITY_PADDING = 4;
+	static constexpr const uint32_t RECOMMENDED_CAPACITY_PADDING = 4;
 
-	uint32 capacity = 0;
+	uint32_t capacity = 0;
 
-	uint32 size = 0;
+	uint32_t size = 0;
 
 	T* container = nullptr;
 };

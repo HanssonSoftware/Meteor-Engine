@@ -30,7 +30,7 @@ bool Locator::FindAllReferences(const String& sourceDirectory)
     {
         Module* t = Module::CreateModule(path);
 
-        int h = 5;
+        int32_t h = 5;
     }
 
     return true;

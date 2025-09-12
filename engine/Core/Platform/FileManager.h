@@ -25,7 +25,7 @@ struct IFileManager
 
 	static void NormalizeDirectory(String& input);
 
-	static IFile* CreateFileOperation(const String& path, int accessType, int sharingMode, int createType, FileStatus& status);
+	static IFile* CreateFileOperation(const String& path, int32_t accessType, int32_t sharingMode, int32_t createType, FileStatus& status);
 
 private:
 	IFileManager() = default;

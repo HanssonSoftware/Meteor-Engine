@@ -6,7 +6,7 @@
 class EditorLayer : public Layer
 {
 public:
-	EditorLayer(const String newName) noexcept;
+	EditorLayer(const String& newName) noexcept;
 
 	virtual void Init() override;
 

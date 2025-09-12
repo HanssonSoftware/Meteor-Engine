@@ -5,4 +5,9 @@ Solution "Meteor"
 		"Launch.cpp",
 		"Geci.cpp"
 	}
+
+	Valami:
+	{
+
+	}
 }

@@ -33,9 +33,9 @@ void Commandlet::Initialize()
 
 bool Commandlet::Parse(const String& inParam, String& returnVal)
 {
-	static uint32 count = parsedWords.GetSize();
+	static uint32_t count = parsedWords.GetSize();
 
-	for (uint32 i = 0; i < count; i++)
+	for (uint32_t i = 0; i < count; i++)
 	{
 		String& item = parsedWords[i];
 

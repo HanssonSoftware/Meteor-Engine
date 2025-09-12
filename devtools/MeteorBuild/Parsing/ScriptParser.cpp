@@ -25,7 +25,7 @@ static void ExecutableWord(const String& arg)
 ADD_SCRIPT_WORD(Executable, ExecutableWord);
 
 
-void ScriptParser::ParseScript(const ParsingType& type)
+void ScriptParser::ParseScript(const char* buffer, const ParsingType& type)
 {
 	switch (type)
 	{
@@ -33,53 +33,55 @@ void ScriptParser::ParseScript(const ParsingType& type)
 		{
 			// Parse main *.mrbuild script, which (should be) sits on the top of the passed directory.
 
-			const char* t = currentlyReadModule->GetBuffer();
-			if (t == nullptr)
+			if (!Expected(buffer, "Solution"))
 				return;
 
-			if (!Expected(t, "Solution"))
-				return;
+			SkipWhitspace(buffer);
 
-			SkipWhitspace(t);
-
-			projectName = GetValue(t);
+			projectName = GetValue(buffer);
 			if (projectName.IsEmpty())
 				return;
 
-			if (!ExpectedIdentifier(t, TokenIdentifier::OpenBrace, true))
+			if (!ExpectedIdentifier(buffer, TokenIdentifier::OpenBrace, true))
 				return;
 			
-			while (!ExpectedIdentifier(t, TokenIdentifier::EndOfFile, true))
+			while (!ExpectedIdentifier(buffer, TokenIdentifier::EndOfFile, true))
 			{
-				const String parsedWord = GetWord(t);
+				const String parsedWord = GetWord(buffer);
 
-				if (!parsedWord.IsEmpty() && ExpectedIdentifier(t, TokenIdentifier::Colon, true))
+				if (!parsedWord.IsEmpty() && ExpectedIdentifier(buffer, TokenIdentifier::Colon, true))
 				{
 					ScriptWordBase* word = ScriptWordBase::Find(parsedWord);
 					if (!word)
 					{
-						MR_LOG(LogScript, Fatal, "Unknown or invalid word! %s", *parsedWord);
+						MR_LOG(LogScript, Warn, "Unknown or invalid word! %s", *parsedWord);
+						continue;
 					}
 
-					const bool bCanStart = ExpectedIdentifier(t, TokenIdentifier::OpenBrace, true);
-					while (!ExpectedIdentifier(t, TokenIdentifier::CloseBrace, true) && bCanStart)
+					const bool bCanStart = ExpectedIdentifier(buffer, TokenIdentifier::OpenBrace, true);
+					if (bCanStart)
 					{
-						const String quotedValue = GetValue(t);
-						if (!quotedValue)
-							break;
+						SkipWhitspace(buffer);
 
-						word->Invoke(quotedValue);
+						const String firstValue = GetValue(buffer);
+						word->Invoke(firstValue);
 
-						continue;
+						while (
+							ExpectedIdentifier(buffer, TokenIdentifier::Comma, true) && 
+							!ExpectedIdentifier(buffer, TokenIdentifier::CloseBrace, false))
+						{
+							SkipWhitspace(buffer);
+
+							const String firstValue = GetValue(buffer);
+							word->Invoke(firstValue);
+						}
 					}
 
 				}
 
-				if (ExpectedIdentifier(t, TokenIdentifier::CloseBrace, false))
-					AdvanceACharacter(t);
+				if (ExpectedIdentifier(buffer, TokenIdentifier::CloseBrace, false))
+					AdvanceACharacter(buffer);
 			}
-
-			int j = 523;
 		}
 
 		break;
@@ -180,7 +182,7 @@ bool ScriptParser::FindMainScript(String& path)
 void ScriptParser::InputToContainer(ScriptWordBase& word)
 {
 
-	int j = 4;
+	int32_t j = 4;
 }
 
 bool ScriptParser::Expected(const char*& in, const char* ptr)
@@ -188,7 +190,7 @@ bool ScriptParser::Expected(const char*& in, const char* ptr)
 	const char* begin = in;
 	while (IsAlpha(*in)) in++;
 
-	String temp(begin, (uint32)(in - begin));
+	String temp(begin, (uint32_t)(in - begin));
 	if (strcmp(temp.Chr(), ptr) > 0)
 		return false;
 
@@ -259,7 +261,7 @@ String ScriptParser::GetValue(const char*& in)
 	const char* begin = in;
 	while (*in != '"') in++;
 
-	String val(begin, (uint32)(in - begin));
+	String val(begin, (uint32_t)(in - begin));
 
 	if (*in == '"')
 		in++;
@@ -272,6 +274,6 @@ String ScriptParser::GetWord(const char*& in)
 	const char* begin = in;
 	while (IsAlpha(*in)) in++;
 
-	String val(begin, (uint32)(in - begin));
+	String val(begin, (uint32_t)(in - begin));
 	return val;
 }

@@ -21,7 +21,7 @@ void LayerManager::Shutdown()
 	{
 		if (indexed)
 		{
-			indexed->privRemoved();
+			indexed->Removed();
 			indexed = nullptr;
 		}
 	}
@@ -33,18 +33,18 @@ void LayerManager::PushLayer(Layer* Instance)
 	if (!Instance)
 		return;
 
-	Instance->privAttached();
+	Instance->Attached();
 	layers.Add(Instance);
 }
 
 void LayerManager::RemoveLayer(const Layer* Instance)
 {
-	const size_t size = layers.GetSize();
-	for (int i = 0; i < size; i++)
+	const uint32_t size = layers.GetSize();
+	for (uint32_t i = 0; i < size; i++)
 	{
 		if (layers[i] == Instance)
 		{
-			layers[i]->privRemoved();
+			layers[i]->Removed();
 			layers[i] = nullptr;
 		}
 	}
@@ -52,12 +52,12 @@ void LayerManager::RemoveLayer(const Layer* Instance)
 
 void LayerManager::RemoveLayer(const String Name)
 {
-	const size_t size = layers.GetSize();
-	for (size_t i = 0; i < size; i++)
+	const uint32_t size = layers.GetSize();
+	for (uint32_t i = 0; i < size; i++)
 	{
 		if (layers[i]->GetName() == Name)
 		{
-			layers[i]->privRemoved();
+			layers[i]->Removed();
 			layers[i] = nullptr;
 		}
 	}

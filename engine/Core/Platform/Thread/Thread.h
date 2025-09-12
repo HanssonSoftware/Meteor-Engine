@@ -1,8 +1,9 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <Platform/PlatformDefs.h>
+
 #include "ThreadDescriptor.h"
+#include <stdint.h>
 
 class IThread
 {
@@ -19,6 +20,6 @@ class IThread
 protected:
 	bool bIsPaused = false;
 
-	int id = -1;
+	int32_t id = -1;
 };
 

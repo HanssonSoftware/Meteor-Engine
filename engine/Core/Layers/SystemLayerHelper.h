@@ -14,7 +14,7 @@ struct MessageBoxDescriptor
 	IWindow* dependentWindow;
 
 	/** Defines your message type, can be multiple: Immediate action / Question. */
-	int Type;
+	int32_t Type;
 };
 
 

@@ -8,6 +8,8 @@
 
 LOG_ADDCATEGORY(WindowManager);
 
+#undef CreateWindow
+
 class InputManager;
 
 inline static constexpr const wchar_t* GetDefaultApplicationName() noexcept
@@ -20,32 +22,21 @@ class IWindowManager
 public:
 	IWindowManager();
 
-	virtual ~IWindowManager() = default;
+	virtual ~IWindowManager() noexcept = default;
 
 	virtual void Init();
 
 	virtual void Shutdown();
 
-	virtual IWindow* CreateNativeWindow(const WindowCreateInfo* CreateInfo) = 0;
+	virtual bool Present() = 0;
 
-	IWindow* SearchFor(const String ID);
-
-	IWindow* GetFirstWindow();
-
-	void ShowWindow(const String ID);
-
-	void HideWindow(const String ID);
-
-	bool DrawAttention(const String ID);
-
-	bool DestroyWindow(const String ID);
+	virtual bool CreateWindow(const String& name, const Vector2<uint32_t> size) = 0;
 
 	/** Gets the current or last focused window, can be non-engine specific. */
 	virtual IWindow* GetFocusedWindow() = 0;
 
 	InputManager* GetInputManager() const { return inputManager; };
 protected:
-	IWindow* privSearchFor(const String Name);
 
 	InputManager* inputManager;
 

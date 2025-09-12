@@ -72,7 +72,7 @@ String WindowsLayer::GetError()
 
     //ConvertToNarrow((LPTSTR)buffer);
 
-    const int requiredSizeInBytes = WideCharToMultiByte(/*CP_UTF8*/ 65001, 0, (LPWSTR)buffer, -1, 0, 0, 0, 0);
+    const int32_t requiredSizeInBytes = WideCharToMultiByte(/*CP_UTF8*/ 65001, 0, (LPWSTR)buffer, -1, 0, 0, 0, 0);
     if (requiredSizeInBytes == 0) return "";
 
     char* super = new char[requiredSizeInBytes]();
@@ -104,7 +104,7 @@ String WindowsLayer::GetError(const /* HRESULT */ unsigned long code)
 
     //ConvertToNarrow((LPTSTR)buffer);
 
-    const int requiredSizeInBytes = WideCharToMultiByte(/*CP_UTF8*/ 65001, 0, (LPWSTR)buffer, -1, 0, 0, 0, 0);
+    const int32_t requiredSizeInBytes = WideCharToMultiByte(/*CP_UTF8*/ 65001, 0, (LPWSTR)buffer, -1, 0, 0, 0, 0);
     if (requiredSizeInBytes == 0) return "";
 
     char* super = new char[requiredSizeInBytes];
@@ -227,9 +227,9 @@ MessageBoxDecision WindowsLayer::AddMessageBox(const MessageBoxDescriptor* Info)
     const wchar_t* bufferDesc = ConvertToWide(Info->Description.Chr());
     const wchar_t* bufferTitle = ConvertToWide(Info->Title.Chr());
 
-    const uint32 flags = evaluateMessageBoxFlags(Info->Type);
+    const uint32_t flags = evaluateMessageBoxFlags(Info->Type);
 
-    const int returnCode = MessageBoxW(windowRef, bufferDesc, bufferTitle, flags);
+    const int32_t returnCode = MessageBoxW(windowRef, bufferDesc, bufferTitle, flags);
     delete[] bufferDesc, bufferTitle;
     if (returnCode == 0)
     {
@@ -249,7 +249,7 @@ wchar_t* WindowsLayer::ConvertToWide(const char* Buffer)
         return nullptr;
     }
 
-    const int requiredSize = MultiByteToWideChar(CP_UTF8, 0, Buffer, -1, 0, 0);
+    const int32_t requiredSize = MultiByteToWideChar(CP_UTF8, 0, Buffer, -1, 0, 0);
     if (requiredSize == 0)
     {
         MR_LOG(LogWindowsLayer, Error, "MultiByteToWideChar said: %s", GetError().Chr());
@@ -273,7 +273,7 @@ char* WindowsLayer::ConvertToNarrow(const wchar_t* Buffer)
         return nullptr;
     }
 
-    const int requiredSize = WideCharToMultiByte(65001 /*CP_UTF8*/, 0, Buffer, -1, 0, 0, 0, 0);
+    const int32_t requiredSize = WideCharToMultiByte(65001 /*CP_UTF8*/, 0, Buffer, -1, 0, 0, 0, 0);
     if (requiredSize == 0)
     {
         MR_LOG(LogWindowsLayer, Error, "WideCharToMultiByte said: %s", GetError().Chr());
@@ -289,9 +289,9 @@ char* WindowsLayer::ConvertToNarrow(const wchar_t* Buffer)
     return nullptr;
 }
 
-constexpr const int WindowsLayer::evaluateMessageBoxFlags(const int Code) const noexcept
+constexpr const int32_t WindowsLayer::evaluateMessageBoxFlags(const int32_t Code) const noexcept
 {
-    int flags = 0;
+    int32_t flags = 0;
 
     if (Code & MESSAGEBOXTYPE_INFORMATION) flags |= MB_ICONINFORMATION;
     else if (Code & MESSAGEBOXTYPE_WARNING) flags |= MB_ICONWARNING;
@@ -322,7 +322,7 @@ constexpr const int WindowsLayer::evaluateMessageBoxFlags(const int Code) const 
     return flags;
 }
 
-constexpr const MessageBoxDecision WindowsLayer::evaluateMessageBoxReturn(const int Code) const noexcept
+constexpr const MessageBoxDecision WindowsLayer::evaluateMessageBoxReturn(const int32_t Code) const noexcept
 {
     switch (Code)
     {

@@ -2,6 +2,7 @@
 
 #pragma once
 #include <Types/String.h>
+#include <stdint.h>
 
 struct LogAssertion
 {
@@ -11,7 +12,7 @@ struct LogAssertion
 
 	virtual ~LogAssertion() noexcept = default;
 
-	LogAssertion(const char* inputFile, const int inputLine, const char* statement, const char* inputMessage, ...);
+	LogAssertion(const char* inputFile, const int32_t inputLine, const char* statement, const char* inputMessage, ...);
 
 	const char* assertLocationInFile;
 
@@ -19,9 +20,9 @@ struct LogAssertion
 
 	String assertMessage;
 
-	unsigned int assertLineInFile = 0;
+	int32_t assertLineInFile = 0;
 
-	unsigned int bIgnoreFor = 0;
+	int32_t bIgnoreFor = 0;
 
 	bool bIgnoreThis = false;
 };

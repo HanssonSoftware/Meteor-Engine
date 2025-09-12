@@ -27,7 +27,7 @@ struct ScriptWordBase
 	static ScriptWordBase* Find(const String& word)
 	{
 		Array<ScriptWordBase*>& reg = GetRegistry();
-		for (uint32 i = 0; i < reg.GetSize(); i++)
+		for (uint32_t i = 0; i < reg.GetSize(); i++)
 		{
 			if (strcmp(word.Chr(), reg[i]->GetWord()) == 0)
 				return reg[i];
@@ -68,7 +68,7 @@ class ScriptParser
 public:
 	enum class ParsingType { MainDescriptor, Module };
 
-	void ParseScript(const ParsingType& type);
+	void ParseScript(const char* buffer, const ParsingType& type);
 
 	void SetBuffer(const char* newBuffer) { buffer = newBuffer; };
 

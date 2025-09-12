@@ -2,7 +2,7 @@
 
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
-#include <Platform/PlatformDefs.h>
+#include <stdint.h>
 
 /** Human readable piece of text. */
 class String
@@ -16,17 +16,17 @@ public:
 
 	String(const wchar_t* Input);
 
-	String(const int Input);
+	String(const int32_t Input);
 
 	String(const float Input);
 
 	String(const unsigned long Input);
 
-	String(const uint32 Input);
+	String(const uint32_t Input);
 
 	String(const String& other);
 
-	String(const char* string, uint32 length);
+	String(const char* string, uint32_t length);
 
 	String(String&& other) noexcept;
 
@@ -55,11 +55,11 @@ public:
 
 	bool IsEmpty() const noexcept;
 
-	int ToInt() const noexcept;
+	int32_t ToInt() const noexcept;
 
 	float ToFloat() const noexcept;
 
-	uint32 Length() const noexcept;
+	uint32_t Length() const noexcept;
 	
 	/** */
 	static String Format(const String format, ...);
@@ -86,22 +86,22 @@ private:
 		{
 			char* ptr = nullptr;
 
-			size_t length = 0;
+			uint32_t length = 0;
 
-			size_t capacity = 0;
+			uint32_t capacity = 0;
 
 		} heapBuffer;
 
 		struct
 		{ 
-			char ptr[sizeof(heapBuffer) - sizeof(unsigned short)] = {'\0'};
+			char ptr[sizeof(heapBuffer) - sizeof(uint16_t)] = {'\0'};
 
-			unsigned short length = 0;
+			uint16_t length = 0;
 
 		} stackBuffer;
 	};
 
-	static constexpr size_t SSO_MAX_CHARS = sizeof(heapBuffer) - sizeof(unsigned short) - 1;
+	static constexpr uint16_t SSO_MAX_CHARS = sizeof(heapBuffer) - sizeof(uint16_t) - 1;
 
 #ifdef MR_DEBUG
 	bool bIsInited = false;

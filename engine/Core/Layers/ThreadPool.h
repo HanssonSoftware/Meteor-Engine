@@ -14,9 +14,9 @@ public:
 
 	virtual IThread* CreateThread() = 0;
 
-	virtual void RemoveThread(const int ID) = 0;
+	virtual void RemoveThread(const int32_t ID) = 0;
 
-	virtual void SuspendThread(const int ID) = 0;
+	virtual void SuspendThread(const int32_t ID) = 0;
 
 	virtual void RemoveThread(const IThread* Specific) = 0;
 

@@ -2,6 +2,7 @@
 
 #pragma once
 #include <Logging/Log.h>
+#include <stdint.h>
 
 class IFile;
 
@@ -19,7 +20,7 @@ struct WindowsLog : public ILogger
 
 	static void HandleFatal();
 
-	static int TransmitAssertion(LogAssertion& Info);
+	static int32_t TransmitAssertion(LogAssertion& Info);
 
 	virtual void SendToOutputBuffer(const String& Buffer) override;
 

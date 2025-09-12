@@ -166,7 +166,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG;MR_CORE_ENABLED</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG;MR_CORE_ENABLED;MR_PLATFORM_WINDOWS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)engine\Core\Platform;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -202,7 +202,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_CORE_ENABLED</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_CORE_ENABLED;MR_PLATFORM_WINDOWS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)engine\Core\Platform;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -277,6 +277,7 @@
     <ClCompile Include="engine\Core\Platform\Windows\WindowsPaths.cpp" />
     <ClCompile Include="engine\Core\Module\Module.cpp" />
     <ClCompile Include="engine\Renderer\Renderer.cpp" />
+    <ClCompile Include="engine\Renderer\SwapChain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\Core\Platform\Thread\ThreadDescriptor.h" />
@@ -299,10 +300,8 @@
     <ClInclude Include="engine\Core\Platform\File.h" />
     <ClInclude Include="engine\Core\Logging\Log.h" />
     <ClInclude Include="engine\Core\Logging\LogMacros.h" />
-    <ClInclude Include="engine\Core\Math\Conversions.h" />
     <ClInclude Include="engine\Core\Platform\Timer.h" />
     <ClInclude Include="engine\Core\Types\Cast.h" />
-    <ClInclude Include="engine\Core\Platform\PlatformDefs.h" />
     <ClInclude Include="engine\Core\Types\String.h" />
     <ClInclude Include="engine\Core\Types\Vector.h" />
     <ClInclude Include="engine\Core\Platform\WindowManager\Window.h" />
@@ -418,6 +417,7 @@
     <ClInclude Include="engine\Core\Platform\Thread\ThreadManager.h" />
     <ClInclude Include="engine\Core\Platform\Windows\WindowsThreadManager.h" />
     <ClInclude Include="engine\Core\Platform\Windows\WindowsPaths.h" />
+    <ClInclude Include="engine\Renderer\SwapChain.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="engine\Core\CoreKit.mrbuild" />

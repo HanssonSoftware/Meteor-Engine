@@ -29,8 +29,8 @@ ModuleManager::~ModuleManager() noexcept
     for (Module*& module : modules)
     {
         module->ShutdownModule(); 
-#ifdef MR_PLATFORM_WINDOWS
-           
+
+#ifdef MR_PLATFORM_WINDOWS   
         if (!FreeLibrary(module->library))
         {
             MR_LOG(LogModuleManager, Error, "FreeLibrary returned: %s (%s)", *Layer::GetSystemLayer()->GetError(), module->GetName().Chr());
@@ -108,8 +108,8 @@ bool ModuleManager::LoadModule(const String& moduleName)
 
 bool ModuleManager::UnloadModule(const String& moduleName)
 {
-    const uint32 moduleSize = modules.GetSize();
-    for (uint32 i = 0; i < moduleSize; i++)
+    const uint32_t moduleSize = modules.GetSize();
+    for (uint32_t i = 0; i < moduleSize; i++)
     {
         Module*& module = modules[i];
         

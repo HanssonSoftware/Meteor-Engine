@@ -40,7 +40,7 @@ struct Application
 		{
 			String name;
 
-			int x = 0, y = 0;
+			int32_t x = 0, y = 0;
 
 		} WindowData;
 
@@ -72,9 +72,9 @@ struct Application
 
 	static Application* Get();
 
-	static void RequestExit(int Code);
+	static void RequestExit(int32_t Code);
 
-	int GetRequestExitCode() const { return appFramework->exitCode; };
+	int32_t GetRequestExitCode() const { return appFramework->exitCode; };
 
 	IWindowManager* GetWindowManager() const { return windowManager; };
 
@@ -84,15 +84,13 @@ struct Application
 
 	void SetLayerManager(LayerManager* NewValue) { layerManager = NewValue; };
 
-	IWindow* GetFirstWindow() const { return windowManager ? windowManager->GetFirstWindow() : nullptr; };
-
 	ECurrentApplicationState GetAppState() const { return state; };
 
 	void SetAppState(const ECurrentApplicationState& newState) { state = newState; };
 
 protected:
 
-	int exitCode = 0;
+	int32_t exitCode = 0;
 
 	IWindowManager* windowManager;
 
@@ -106,7 +104,7 @@ protected:
 Application* GetApplication();
 
 #define IMPLEMENT_APPLICATION(ApplicationClass) \
-	/*extern "C" __declspec(dllexport)*/ int LaunchApplication(int ArgumentCount, char* Arguments[]) \
+	/*extern "C" __declspec(dllexport)*/ int32_t LaunchApplication(int32_t ArgumentCount, char* Arguments[]) \
 	{	\
 		Commandlet::Initialize(); \
 		static ApplicationClass instance; \
