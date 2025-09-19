@@ -16,14 +16,8 @@ public:
 
 	Vector2<uint32_t> GetSize() const
 	{
-		return ;
+		return windowSize;
 	}
-
-	virtual void DestroyWindow() = 0;
-
-	virtual void ShowWindow() = 0;
-
-	virtual void SetTitle(const String& newName) = 0;
 
 	virtual void* GetWindowHandle() = 0;
 

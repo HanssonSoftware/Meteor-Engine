@@ -30,7 +30,7 @@ public:
 
 	virtual bool Present() = 0;
 
-	virtual bool CreateWindow(const String& name, const Vector2<uint32_t> size) = 0;
+	virtual bool CreateWindow(const String& name, const Vector2<uint32_t> size, bool bShowOnSuccess = true) = 0;
 
 	/** Gets the current or last focused window, can be non-engine specific. */
 	virtual IWindow* GetFocusedWindow() = 0;

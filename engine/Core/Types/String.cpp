@@ -394,28 +394,6 @@ bool String::operator!=(const String& Other) const
 	return strcmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) != 0;
 }
 
-String String::operator+=(const String& other)
-{
-	if (!other.IsEmpty())
-	{
-		if (bIsUsingHeap)
-		{
-			const uint32_t length = Length() + (other.bIsUsingHeap ? other.heapBuffer.length : other.stackBuffer.length);
-
-			strcat(heapBuffer.ptr, other.bIsUsingHeap ? other.heapBuffer.ptr : other.stackBuffer.ptr);
-
-			heapBuffer.length = length;
-			heapBuffer.capacity = length + 1;
-		}
-		else
-		{
-			MR_ASSERT(false, "This part is not implemented!");
-		}
-	}
-
-	return *this;
-}
-
 const char* String::Chr() const
 {
 	return bIsUsingHeap ? (heapBuffer.ptr || heapBuffer.length != 0 ? heapBuffer.ptr : "") : 
@@ -508,9 +486,9 @@ bool String::Contains(const char* buffer, const char* target)
 	return result;
 }
 
-constexpr void String::MakeEmpty()
+void String::MakeEmpty()
 {
-	stackBuffer.ptr[0] = '\0';
+	memset(stackBuffer.ptr, 0, SSO_MAX_CHARS);
 	stackBuffer.length = 0;
 }
 
@@ -531,7 +509,7 @@ constexpr void String::ResetBuffers()
 	}
 }
 
-String String::operator=(const String& other)
+String& String::operator=(const String& other)
 {
 	if (this != &other)
 	{
@@ -590,4 +568,59 @@ bool String::IsSpace(const char* buffer)
 bool String::IsAlpha(const char* buffer)
 {
 	return (buffer[0] >= 'a' && buffer[0] <= 'z' || buffer[0] >= 'A' && buffer[0] <= 'Z');
+}
+
+String& String::operator+=(const String& other)
+{
+	if (!other.IsEmpty())
+	{
+		const char* source = other.Chr();
+		char* destination = Data();
+
+		const uint32_t size = other.Length() + Length() + 1;
+
+		if (bIsUsingHeap && heapBuffer.capacity < size)
+		{
+			heapBuffer.capacity = size * 2;
+			char* newBuffer = new char[heapBuffer.capacity];
+			memset(newBuffer, 0, heapBuffer.capacity);
+
+			strncpy(newBuffer, destination, heapBuffer.length);
+			strncpy(newBuffer + Length(), source, other.Length());
+			heapBuffer.length = size - 1;
+
+			delete[] heapBuffer.ptr;
+			heapBuffer.ptr = newBuffer;
+		}
+		else if (bIsUsingHeap && heapBuffer.capacity >= size)
+		{
+			strncpy(heapBuffer.ptr + Length(), source, other.Length());
+			
+			int j = 434;
+		}
+		else if (!bIsUsingHeap && SSO_MAX_CHARS >= size)
+		{
+			strncpy(stackBuffer.ptr + Length(), source, other.Length());
+			stackBuffer.length = size - 1;
+		}
+		else if (SSO_MAX_CHARS < size)
+		{
+			const uint32_t stackLength = Length();
+
+			heapBuffer.capacity = size * 2;
+			char* buffer = new char[size];
+
+			memset(buffer, 0, size);
+
+			strncpy(buffer, destination, stackLength);
+			strncpy(buffer + stackLength, source, other.Length());
+		
+			heapBuffer.length = size - 1;
+
+			heapBuffer.ptr = buffer;
+			bIsUsingHeap = true;
+		}
+	}
+	
+	return *this;
 }

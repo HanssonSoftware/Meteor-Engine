@@ -10,7 +10,7 @@ EditorLayer::EditorLayer(const String& newName) noexcept
 
 void EditorLayer::Init()
 {
-	Layer::Init();
+
 }
 
 void EditorLayer::Attached()
@@ -25,5 +25,5 @@ void EditorLayer::Removed()
 
 void EditorLayer::Update()
 {
-	Layer::Update();
+
 }

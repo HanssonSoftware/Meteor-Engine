@@ -24,5 +24,7 @@ class Solution
 public:
 
 	Array<ProjectDefine*> projects;
+
+	bool Finalize(String* bufferToWrite);
 };
 

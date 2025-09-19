@@ -18,7 +18,7 @@
 
 #pragma warning (disable : 28251)
 
-//typedef int32_t (*LaunchApplication)(int32_t ArgumentCount, char* Arguments[]);
+//typedef int (*LaunchApplication)(int ArgumentCount, char* Arguments[]);
 extern int LaunchApplication(int ArgumentCount, char* Arguments[]);
 
 int main(int ArgumentCount, char* Arguments[])
@@ -40,7 +40,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
 
     AddDllDirectory(wcscat(path, L"\\bin\0"));
 
-    LaunchApplication(0, &lpCmdLine);
+    LaunchApplication(0, &lpCmdLine); // fixme
 #if 0
     HMODULE entryPoint = LoadLibraryExW(L"MeteorEngine-Core.dll", nullptr, LOAD_LIBRARY_SEARCH_APPLICATION_DIR | LOAD_LIBRARY_SEARCH_USER_DIRS);
     if (!entryPoint) 
@@ -49,7 +49,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
     LaunchApplication app = (LaunchApplication)GetProcAddress(entryPoint, "LaunchApplication");
     if (app)
     {
-        int32_t Result = app(/* Unused --> */ 0, &lpCmdLine);
+        int Result = app(/* Unused --> */ 0, &lpCmdLine);
 
         if (!FreeLibrary(entryPoint)) 
             return -1;

@@ -4,20 +4,15 @@
 #include <WindowManager/Window.h>
 #include <Windows/Windows.h>
 
-class WindowsWindowManager;
+//class WindowsWindowManager;
 
 class WindowsWindow : public IWindow
 {
+	friend class WindowsWindowManager;
 public:
 	WindowsWindow(WindowsWindowManager* owner);
 
 	virtual ~WindowsWindow() noexcept = default;
-
-	virtual void DestroyWindow() override;
-
-	virtual void ShowWindow() override;
-
-	virtual void SetTitle(const String& newName) override;
 
 	virtual void* GetWindowHandle() override;
 

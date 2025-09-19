@@ -14,6 +14,10 @@ void WindowsWindowManager::Init()
 {
     IWindowManager::Init();
 
+    if (!RegisterWindowClass())
+    {
+        MR_LOG(LogWindowManager, Fatal, "Failed to register window class!")
+    }
 }
 
 WindowsWindowManager::~WindowsWindowManager() noexcept
@@ -28,56 +32,48 @@ void WindowsWindowManager::Shutdown()
 
     if (bIsWinAPIClassRegistered)
     {
-        if (!bIsUsingFallbackClassName)
-        {
-            if (const Application* app = GetApplication())
-            {
-                UnregisterClassW(Layer::GetSystemLayer()->ConvertToWide(app->appNameNoSpaces.Chr()), instance);
-            }
-        }
-        else
-        {
-            UnregisterClassW(GetDefaultApplicationName(), instance);
-        }
+        UnregisterClassW(
+            !bIsUsingFallbackClassName ? 
+            Layer::GetSystemLayer()->ConvertToWide(GetApplication()->appNameNoSpaces.Chr()) :
+            GetDefaultApplicationName(),
+            instance);
     }
 }
 
 bool WindowsWindowManager::Present()
 {
-    return false;
+
+
+    return true;
 }
 
-bool WindowsWindowManager::CreateWindow(const String& name, const Vector2<uint32_t> size)
+bool WindowsWindowManager::CreateWindow(const String& name, const Vector2<uint32_t> size, bool bShowOnSuccess)
 {
     if (size < 8)
+        return false;
 
-    WindowCreateInfo& aWindowData = this->windowData;
-    aWindowData = *windowData;
+    WindowsWindow* instance = new WindowsWindow(this);
+    instance->windowTitle = name;
+    instance->windowSize = size;
 
-    HINSTANCE Inst = GetModuleHandle(0);
+    HINSTANCE Inst = GetModuleHandle(nullptr);
 
-    RECT windowRect = { 0, 0, (LONG)windowData->size.x, (LONG)windowData->size.y };
+    RECT windowRect = { 0, 0, (LONG)size.x, (LONG)size.y };
     AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, 0);
-    aWindowData.windowName = windowData->windowName;
-
-    const wchar_t* buffer = Layer::GetSystemLayer()->ConvertToWide(aWindowData.windowName.Chr());
+    wchar_t* buffer = Layer::GetSystemLayer()->ConvertToWide(name.Chr());
 
     const wchar_t* className = nullptr;
-    bool bIsFallback = false;
-    if (const Application* app = Application::Get())
+    bool bIsFallback = GetIsUsingFallbackClass();
+    if (const Application* app = GetApplication())
     {
-        if (const WindowsWindowManager* wm = (WindowsWindowManager*)owner)
-        {
-            bIsFallback = wm->GetIsUsingFallbackClass();
-            className = bIsFallback ? GetDefaultApplicationName() : Layer::GetSystemLayer()->ConvertToWide(app->appNameNoSpaces.Chr());
-        }
+        className = bIsFallback ? GetDefaultApplicationName() : Layer::GetSystemLayer()->ConvertToWide(app->appNameNoSpaces.Chr());
     }
 
-    handle = ::CreateWindowExW(
+    instance->handle = ::CreateWindowExW(
         /*WS_EX_ACCEPTFILES*/ 0,
         className,
         buffer,
-        windowData->flags == -1 ? WS_OVERLAPPEDWINDOW : windowData->flags,
+        WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
         windowRect.right - windowRect.left,
@@ -88,20 +84,27 @@ bool WindowsWindowManager::CreateWindow(const String& name, const Vector2<uint32
         0
     );
 
-    if (!bIsFallback) delete[] className;
-
-    SetWindowTextW(handle, buffer);
-    delete[] buffer;
-    if (handle == INVALID_HANDLE_VALUE)
+    if (!instance->handle)
     {
-        MR_LOG(LogWindowManager, Error, "Failed to create WinAPI window!");
+        MR_LOG(LogWindowManager, Error, "CreateWindowExW returned: %s", *Layer::GetSystemLayer()->GetError());
         return false;
     }
 
 
-    static const constexpr BOOL bCanIUseDarkWindowTitlebar = 1;
-    DwmSetWindowAttribute((HWND)handle, DWMWA_USE_IMMERSIVE_DARK_MODE, &bCanIUseDarkWindowTitlebar, sizeof(bCanIUseDarkWindowTitlebar));
+    if (!bIsFallback) delete[] className;
 
+    static const constexpr BOOL bCanIUseDarkWindowTitlebar = 1;
+    DwmSetWindowAttribute(instance->handle, DWMWA_USE_IMMERSIVE_DARK_MODE, &bCanIUseDarkWindowTitlebar, sizeof(bCanIUseDarkWindowTitlebar));
+
+    activeWindows.Add(instance);
+
+    if (bShowOnSuccess)
+    {
+        ::ShowWindow(instance->handle, SW_SHOWDEFAULT);
+    }
+
+    delete[] buffer;
+    return true;
 }
 
 IWindow* WindowsWindowManager::FindHWNDCorresponding(const HWND hWnd)

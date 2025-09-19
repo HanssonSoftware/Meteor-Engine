@@ -243,23 +243,24 @@ MessageBoxDecision WindowsLayer::AddMessageBox(const MessageBoxDescriptor* Info)
 
 wchar_t* WindowsLayer::ConvertToWide(const char* Buffer)
 {
-    if (!Buffer)
+    if (Buffer)
     {
-        MR_LOG(LogWindowsLayer, Error, "Attempted to convert an invalid buffer!");
-        return nullptr;
-    }
+        const int32_t requiredSize = MultiByteToWideChar(CP_UTF8, 0, Buffer, -1, 0, 0);
+        if (requiredSize == 0)
+        {
+            MR_LOG(LogWindowsLayer, Error, "MultiByteToWideChar said: %s", GetError().Chr());
+            return nullptr;
+        }
 
-    const int32_t requiredSize = MultiByteToWideChar(CP_UTF8, 0, Buffer, -1, 0, 0);
-    if (requiredSize == 0)
-    {
-        MR_LOG(LogWindowsLayer, Error, "MultiByteToWideChar said: %s", GetError().Chr());
-        return nullptr;
+        wchar_t* super = new wchar_t[requiredSize /*+ 1*/]();
+        if (MultiByteToWideChar(CP_UTF8, 0, Buffer, -1, super, requiredSize) == requiredSize)
+        {
+            return super;
+        }
     }
-
-    wchar_t* super = new wchar_t[requiredSize + 1];
-    if (MultiByteToWideChar(CP_UTF8, 0, Buffer, -1, super, requiredSize) == requiredSize)
+    else
     {
-        return super;
+        MR_LOG(LogWindowsLayer, Error, "Invalid buffer!");
     }
 
     return nullptr;

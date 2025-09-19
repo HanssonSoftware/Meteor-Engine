@@ -23,6 +23,8 @@ public:
 
 	virtual void ShutdownModule() = 0;
 
+	virtual void Update() = 0;
+
 	String GetName() const { return name; }
 
 protected:
@@ -37,7 +39,7 @@ protected:
 
 #define IMPLEMENT_MODULE(ModuleClass)																		 \
 	static_assert(std::is_base_of<Module, ModuleClass>::value, "ModuleClass does not inherit from Module!"); \
-	extern "C" __declspec(dllexport) Module* InitialiseModule()												 \
+	extern "C" /*__declspec(dllimport)*/ Module* InitialiseModule()												 \
 	{																										 \
 		return new ModuleClass();																			 \
 	}

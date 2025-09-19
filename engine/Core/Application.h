@@ -40,7 +40,7 @@ struct Application
 		{
 			String name;
 
-			int32_t x = 0, y = 0;
+			uint32_t x = 0, y = 0;
 
 		} WindowData;
 

@@ -28,8 +28,8 @@ void MemoryManager::Initialize(const double& RequiredMinimum)
 
 	object->totalMemoryOnPC = longlong.ullTotalPhys;
 
-	uint32_t requiredByPercent = (uint32_t)(longlong.ullTotalPhys * engineRecommendedPercent);
-	if (requiredByPercent < (uint32_t)object->requiredMinimumInBytes)
+	uint64_t requiredByPercent = (uint64_t)(longlong.ullTotalPhys * engineRecommendedPercent);
+	if (requiredByPercent < (uint64_t)object->requiredMinimumInBytes)
 	{
 		MR_LOG(LogArena, Fatal, "Your PC's memory is too low!");
 	}
@@ -75,7 +75,7 @@ void MemoryManager::Deallocate(void* data)
 	if (!data)
 		return;
 
-	uint32_t offset = (char*)data - object->begin;
+	uint64_t offset = (char*)data - object->begin;
 
 	for (MemoryData& entry : heap)
 	{
@@ -92,7 +92,7 @@ void MemoryManager::Deallocate(void* data)
 constexpr uint32_t MemoryManager::GetSize(void* data)
 {
 	if (!data) return 0;
-	uint32_t offset = (char*)data - object->begin;
+	uint64_t offset = (char*)data - object->begin;
 
 	for (const MemoryData& entry : heap)
 	{

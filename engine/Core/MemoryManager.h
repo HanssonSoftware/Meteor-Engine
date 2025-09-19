@@ -44,7 +44,7 @@ protected:
 
 	uint32_t requiredMinimumInBytes = 1'000'000'000; // 1GB ~= 1000 MB
 
-	uint32_t totalMemoryOnPC = 0;
+	uint64_t totalMemoryOnPC = 0;
 
 	char* begin = nullptr;
 

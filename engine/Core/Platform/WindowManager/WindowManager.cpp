@@ -17,7 +17,7 @@ void IWindowManager::Shutdown()
 {
 	for (IWindow*& window : activeWindows)
 	{
-		window->DestroyWindow();
+		delete window;
 		window = nullptr;
 	}
 }

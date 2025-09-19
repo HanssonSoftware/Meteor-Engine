@@ -32,7 +32,7 @@ struct Vector2
 
 	}
 
-	const Vector2 operator+(const Vector2& Add)
+	const Vector2 operator+(Vector2& Add)
 	{
 		Vector2 Temp;
 		Temp.x = this->x + Add.x;
@@ -41,59 +41,66 @@ struct Vector2
 		return Temp;
 	}	
 	
-	const void operator+=(const Vector2& Add)
+	const void operator+=(Vector2& Add)
 	{
 		this->x += Add.x;
 		this->y += Add.y;
 	}	
 	
-	const void operator=(const Vector2& Equal)
+	Vector2& operator=(Vector2 Equal)
 	{
 		this->x = Equal.x;
 		this->y = Equal.y;
+		
+		return *this;
 	}		
 	
-	constexpr bool operator!=(const Vector2& Equal)
+	bool operator!=(Vector2& Equal)
 	{
 		bool A = this->x != Equal.x;
 		bool B = this->y != Equal.y;
 		return A && B;
 	}		
 	
-	constexpr const bool operator==(const T& Equal)
+	const bool operator==(T& Equal)
 	{
 		bool A = (T)this->x == Equal;
 		bool B = (T)this->y == Equal;
 		return A && B;
 	}	
 	
-	constexpr bool operator>(const Vector2<T>& Equal)
+	bool operator>(Vector2<T>& Equal)
 	{
 		bool A = this->x > Equal.x;
 		bool B = this->y > Equal.y;
 		return A && B;
 	}		
 	
-	constexpr bool operator>(const T& Equal)
+	bool operator>(T Equal)
 	{
 		bool A = this->x > Equal;
 		bool B = this->y > Equal;
 		return A && B;
 	}			
 	
-	constexpr bool operator<(const T& Equal)
+	bool operator<(T Equal) const
 	{
-		bool A = this->x < Equal;
-		bool B = this->y < Equal;
-		return A && B;
+		return x < Equal && y < Equal;
 	}		
 	
-	bool operator==(Vector2<T>& Equal)
+	bool operator==(const Vector2<T>& Equal)
 	{
-		bool A = this->x == Equal;
-		bool B = this->y == Equal;
+		bool A = this->x == Equal.x;
+		bool B = this->y == Equal.y;
 		return A && B;
 	}	
+
+	bool operator<(const Vector2<T>& Equal)
+	{
+		bool A = this->x < Equal.x;
+		bool B = this->y < Equal.y;
+		return A && B;
+	}
 };
 
 template<typename T>

@@ -9,7 +9,11 @@ public:
 	virtual void StartupModule() override;
 
 	virtual void ShutdownModule() override;
+
+	virtual void Update() override;
+
+	static Renderer* InitModule(const String& name);
 };
 
 
-IMPLEMENT_MODULE(Renderer);
+//IMPLEMENT_MODULE(Renderer);

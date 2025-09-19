@@ -7,34 +7,11 @@
 #include <Platform/FileManager.h>
 #include <Layers/SystemLayer.h>
 #include <PathCch.h>
+#include <strsafe.h>
 
 #pragma comment(lib, "Pathcch.lib")
 
 LOG_ADDCATEGORY(Locator);
-
-bool Locator::FindAllReferences(const String& sourceDirectory)
-{
-    MR_ASSERT(!(!sourceDirectory), "Directory is empty! Consider checking via Debugger!");
-    
-
-
-    //if (!FileManager::IsPathExists(fullPath))
-    {
-        MR_LOG(LogLocator, Fatal, "Directory does not exist! (%s)", sourceDirectory.Chr());
-    }
-
-    Array<String> foundScripts;
-    //SearchExtensionSpecified(fullPath, "mrbuild", foundScripts);
-    
-    for (String& path : foundScripts)
-    {
-        Module* t = Module::CreateModule(path);
-
-        int32_t h = 5;
-    }
-
-    return true;
-}
 
 static bool bIsFirstCall = true;
 
@@ -167,3 +144,70 @@ void Locator::SearchExtensionSpecified(const String& directory, const String& ex
     delete[] path;
 }
 
+bool Locator::FindMainScript(String& path)
+{
+    wchar_t* fullPath = nullptr;
+
+    bool bIsPathWasRelative = false;
+    if (FileManager::IsPathRelative(path))
+    {
+        wchar_t* exeDir = Layer::GetSystemLayer()->ConvertToWide(Paths::GetExecutableDirctory());
+        wchar_t* convertedPath = Layer::GetSystemLayer()->ConvertToWide(path);
+
+        PathCchRemoveFileSpec(exeDir, wcslen(exeDir));
+        if (FAILED(PathAllocCombine(exeDir, convertedPath, PATHCCH_ALLOW_LONG_PATHS, &fullPath)))
+        {
+            MR_LOG(LogLocator, Fatal, "PathAllocCombine returned: %s", *Layer::GetSystemLayer()->GetError())
+        }
+
+        bIsPathWasRelative = true;
+        delete[] exeDir, convertedPath;
+    }
+    else
+    {
+        fullPath = Layer::GetSystemLayer()->ConvertToWide(path);
+    }
+
+    StringCchCatW(fullPath, wcslen(fullPath) + wcslen(L"\\*") + 1, L"\\*");
+
+    WIN32_FIND_DATAW data;
+    HANDLE firstFound = FindFirstFileW(fullPath, &data);
+
+    if (firstFound != INVALID_HANDLE_VALUE)
+    {
+        do
+        {
+            if (data.cFileName[0] == '.')
+                continue;
+
+            if (FileManager::IsEndingWith(data.cFileName, "mrbuild"))
+            {
+                fullPath[wcslen(fullPath) - 2] = L'\0';
+
+                path = String::Format("%ls\\%ls", fullPath, data.cFileName);
+                break;
+            }
+
+
+        } while (FindNextFileW(firstFound, &data));
+
+        if (bIsPathWasRelative)
+            LocalFree(fullPath);
+        else
+            delete[] fullPath;
+
+        LocalFree(firstFound);
+        return true;
+    }
+    else
+    {
+        MR_LOG(LogLocator, Fatal, "FindFirstFileW encountered an invalid handle! %s", *Layer::GetSystemLayer()->GetError());
+    }
+
+    if (bIsPathWasRelative)
+    LocalFree(fullPath);
+    else
+    delete[] fullPath;
+
+    return false;
+}

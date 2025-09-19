@@ -74,8 +74,6 @@ public:
 
 	bool OpenScript(const String& modulePath);
 
-	static bool FindMainScript(String& path);
-
 protected:
 	void InputToContainer(ScriptWordBase& word);
 

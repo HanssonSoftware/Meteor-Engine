@@ -7,9 +7,9 @@
 #include <Parsing/LocatingInterface.h>
 //#include <shellapi.h>
 #include <MemoryManager.h>
-#include <Caching/Intermediate.h>
 #include <FileManager.h>
 #include <Parsing/ScriptParser.h>
+#include <Parsing/Solution.h>
 
 //#pragma comment(lib, "Shell32.lib")
 
@@ -27,23 +27,34 @@ BuildSystemApplication::BuildSystemApplication()
 void BuildSystemApplication::Init()
 {
 	Application::Init();
-	String val;
+	
+	String val, temp;
+
+	if (Commandlet::Parse("-build", temp))
+	{
+
+	}
+
 
 	if (Commandlet::Parse("-source", val))
 	{
-		if (ScriptParser::FindMainScript(val))
+		if (true)
 		{
 			ScriptParser solution;
 
 			solution.OpenScript(val);
-			solution.ParseScript(solution..Chr(), ScriptParser::ParsingType::MainDescriptor);
+			//solution.ParseScript(solution.Chr(), ScriptParser::ParsingType::MainDescriptor);
 		}
 
-		if (Commandlet::Parse("-int32_t", val))
+		if (Commandlet::Parse("-int", val))
 		{
-			Intermediate::SearchIntermediateFiles(val);
+			//Intermediate::SearchIntermediateFiles(val);
 		}
 
+		String b;
+
+		Solution a;
+		a.Finalize(&b);
 
 		if (Commandlet::Parse("-source", val))
 		{

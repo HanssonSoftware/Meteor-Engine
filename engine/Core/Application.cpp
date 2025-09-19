@@ -15,6 +15,7 @@
 #endif // MR_DEBUG
 #include <Platform/PerformanceTimer.h>
 #include <Module/ModuleManager.h>
+#include <Renderer/Renderer.h>
 
 Application::Application()
 {
@@ -55,7 +56,11 @@ void Application::Init()
 
     MR_LOG(LogApplication, Log, "Initializing application.");
 
-    windowManager->CreateWindow(appName, { WindowData.x, WindowData.y });
+    if (windowManager->CreateWindow(appName, { WindowData.x, WindowData.y }, true))
+    {
+        Renderer::InitModule("Vulkan");
+    }
+
 
     SetAppState(ECurrentApplicationState::RUNNING);
 }

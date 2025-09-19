@@ -21,7 +21,7 @@ public:
 
 	bool GetIsUsingFallbackClass() const { return bIsUsingFallbackClassName; };
 
-	virtual bool CreateWindow(const String& name, const Vector2<uint32_t> size) override;
+	virtual bool CreateWindow(const String& name, const Vector2<uint32_t> size, bool bShowOnSuccess = true) override;
 
 	virtual IWindow* FindHWNDCorresponding(const HWND hWnd);
 

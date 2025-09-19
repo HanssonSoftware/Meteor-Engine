@@ -4,6 +4,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdint.h>
 
+
 /** Human readable piece of text. */
 class String
 {
@@ -30,7 +31,7 @@ public:
 
 	String(String&& other) noexcept;
 
-	String operator=(const String& other);
+	String& operator=(const String& other);
 
 	String operator+(const String& Other);
 
@@ -39,8 +40,8 @@ public:
 	bool operator!=(const String& Other) const;
 
 	bool operator!() const;
-	
-	String operator+=(const String& other);
+
+	String& operator+=(const String& other);
 	
 	const char* operator*() { return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr; };
 
@@ -74,9 +75,11 @@ public:
 	static bool IsAlpha(const char* buffer);
 
 private:
-	constexpr void MakeEmpty();
+	void MakeEmpty();
 
 	constexpr void ResetBuffers();
+
+	char* Data() { return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr; };
 
 	bool bIsUsingHeap = false;
 
