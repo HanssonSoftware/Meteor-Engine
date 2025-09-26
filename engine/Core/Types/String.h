@@ -43,9 +43,9 @@ public:
 
 	String& operator+=(const String& other);
 	
-	const char* operator*() { return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr; };
+	const char* operator*() const;
 
-	operator const char* () const { return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr; };
+	operator const char* () const;
 
 	const char* Chr() const;	
 

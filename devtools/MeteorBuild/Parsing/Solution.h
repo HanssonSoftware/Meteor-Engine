@@ -8,7 +8,7 @@
 
 struct ProjectDefine
 {
-	GUID projectType;
+	static constexpr const char* projectType = "";
 
 	String projectName;
 

@@ -55,12 +55,6 @@ void Locator::LocateSources(const String& fullDirectoryToAll, Array<String>& ret
     }
 
     ListDirectory(fullPath, returned);
-
-    //for (String& temp : returned)
-    //{
-    //    OutputDebugStringA(temp.Chr());
-    //    OutputDebugStringA("\n");
-    //}
 }
 
 void Locator::ListDirectory(const String& directory, Array<String>& returned)

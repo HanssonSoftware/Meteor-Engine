@@ -11,3 +11,7 @@ Time ITimer::Now() noexcept
 	return {};
 }
 
+String ITimer::Format(const String& formatting)
+{
+	return String();
+}

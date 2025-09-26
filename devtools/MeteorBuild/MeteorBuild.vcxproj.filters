@@ -27,7 +27,7 @@
     <ClCompile Include="Parsing\VisualStudio\VSSolution.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Parsing\ScriptParser.cpp">
+    <ClCompile Include="Parsing\ModuleProcessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Parsing\Solution.cpp">
@@ -50,7 +50,7 @@
     <ClInclude Include="Parsing\VisualStudio\VSSolution.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Parsing\ScriptParser.h">
+    <ClInclude Include="Parsing\ModuleProcessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Parsing\Solution.h">

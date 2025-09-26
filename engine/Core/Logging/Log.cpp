@@ -31,9 +31,9 @@ void ILogger::Shutdown()
 {
     if (instance->bIsUsingFile && instance->buffer)
     {
-        const Time current = Timer::Now();
+        const String current = Timer::Format("yyyy-MM-dd HH:mm:ss");
 
-        instance->buffer->Write(String::Format("Logging closed at %d-%d-%d %d:%d.\n", current.year, current.month, current.day, current.hour, current.minute));
+        instance->buffer->Write(String::Format("Logging closed at %s.\n", *current));
         instance->buffer->Close();
     }
 }
@@ -85,22 +85,22 @@ void ILogger::TransmitMessage(LogDescriptor* Descriptor)
     SetActualLog(Descriptor);
 
     String fullMessage;
-    Time current = Timer::Now();
+    const String current = Timer::Format("yyyy-MM-dd HH:mm:ss");
 
     if (Descriptor->severity == Fatal)
     {
         fullMessage = String::Format(
-            "=============[ Fatal error ]=============\nWhere:\t\t%s\nWhen:\t\t%d-%d-%d %d:%d\nMessage:\t%s\n\nFile:\t%s\n",
+            "=============[ Fatal error ]=============\nWhere:\t\t%s\nWhen:\t\t%s\nMessage:\t%s\n\nFile:\t%s\n",
             Descriptor->function,
-            current.year, current.month, current.day, current.hour, current.minute,
+            *current,
             Descriptor->message.Chr(),
             Descriptor->file
         );
     }
     else
     {
-        fullMessage = String::Format("[%d-%d-%d %d:%d] %s: %s\n", 
-            current.year, current.month, current.day, current.hour, current.minute,
+        fullMessage = String::Format("[%s] %s: %s\n", 
+            *current,
             Descriptor->team, 
             *Descriptor->message
         );

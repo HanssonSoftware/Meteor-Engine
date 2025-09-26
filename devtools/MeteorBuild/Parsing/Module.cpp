@@ -2,7 +2,7 @@
 
 #include "Module.h"
 #include <Platform/FileManager.h>
-#include "ScriptParser.h"
+#include "ModuleProcessor.h"
 
 #include <Windows/Windows.h>
 #include <PathCch.h>
@@ -11,10 +11,12 @@
 
 #pragma comment(lib, "Pathcch.lib")
 
+
 Module* Module::CreateModule(const String& fullPathToModule)
 {
 	MR_ASSERT(!fullPathToModule.IsEmpty(), "Module path is empty!");
 
+	static bool bIsMainModuleCreated = false;
 	Module* super = new Module();
 
 	super->fullPath = fullPathToModule;
@@ -25,8 +27,8 @@ Module* Module::CreateModule(const String& fullPathToModule)
 	Locator::ListDirectory(path, super->includedSources);
 	delete[] path;
 	
-	int32_t s = (int32_t)super->includedSources.GetSize();
-	for (int32_t i = 0; i < s; i++)
+	uint32_t s = super->includedSources.GetSize();
+	for (uint32_t i = 0; i < s; i++)
 	{
 		if (FileManager::IsEndingWith(super->includedSources[i], "mrbuild"))
 		{
@@ -35,11 +37,13 @@ Module* Module::CreateModule(const String& fullPathToModule)
 		}
 	}
 
-	//if (ScriptParser::OpenScript(super))
-	//{
-	//	ScriptParser::ParseScript();
-	//}
+	ModuleProcessor mpr;
+	if (mpr.OpenScript(fullPathToModule))
+	{
+		mpr.ParseScript(mpr.GetBuffer(), bIsMainModuleCreated ? ModuleProcessor::ParsingType::Module : ModuleProcessor::ParsingType::MainDescriptor);
+	}
 	
+	bIsMainModuleCreated = true;
 	return super;
 }
 

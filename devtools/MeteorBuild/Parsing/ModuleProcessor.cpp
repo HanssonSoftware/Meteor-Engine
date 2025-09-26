@@ -1,6 +1,6 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
-#include "ScriptParser.h"
+#include "ModuleProcessor.h"
 #include <Logging/LogMacros.h>
 #include "Module.h"
 #include <FileManager.h>
@@ -25,7 +25,7 @@ static void ExecutableWord(const String& arg)
 ADD_SCRIPT_WORD(Executable, ExecutableWord);
 
 
-void ScriptParser::ParseScript(const char* buffer, const ParsingType& type)
+void ModuleProcessor::ParseScript(const char* buffer, const ParsingType& type)
 {
 	switch (type)
 	{
@@ -42,25 +42,49 @@ void ScriptParser::ParseScript(const char* buffer, const ParsingType& type)
 			if (projectName.IsEmpty())
 				return;
 
-			if (!ExpectedIdentifier(buffer, TokenIdentifier::OpenBrace, true))
-				return;
-			
+			static uint32_t scopes = 0;
 			while (!ExpectedIdentifier(buffer, TokenIdentifier::EndOfFile, true))
 			{
+				if (ExpectedIdentifier(buffer, TokenIdentifier::OpenBrace, true))
+					scopes++;
+				
 				const String parsedWord = GetWord(buffer);
+				if (!parsedWord)
+				{
+					if (ExpectedIdentifier(buffer, TokenIdentifier::OpenBrace, true))
+					{
+						scopes++;
 
-				if (!parsedWord.IsEmpty() && ExpectedIdentifier(buffer, TokenIdentifier::Colon, true))
+						while (!ExpectedIdentifier(buffer, TokenIdentifier::CloseBrace, true))
+							AdvanceACharacter(buffer);
+
+						scopes--;
+					}
+				}
+
+
+				if (ExpectedIdentifier(buffer, TokenIdentifier::Colon, true))
 				{
 					ScriptWordBase* word = ScriptWordBase::Find(parsedWord);
 					if (!word)
 					{
-						MR_LOG(LogScript, Warn, "Unknown or invalid word! %s", *parsedWord);
-						continue;
+						MR_LOG(LogScript, Warn, "Invalid word: %s. Parsing would be skipped in that block.", parsedWord.Chr());
+						
+						if (ExpectedIdentifier(buffer, TokenIdentifier::OpenBrace, true))
+						{
+							scopes++;
+
+							while (!ExpectedIdentifier(buffer, TokenIdentifier::CloseBrace, true))
+								AdvanceACharacter(buffer);
+
+							scopes--;
+						}
 					}
 
 					const bool bCanStart = ExpectedIdentifier(buffer, TokenIdentifier::OpenBrace, true);
 					if (bCanStart)
 					{
+						scopes++;
 						SkipWhitspace(buffer);
 
 						const String firstValue = GetValue(buffer);
@@ -77,6 +101,22 @@ void ScriptParser::ParseScript(const char* buffer, const ParsingType& type)
 						}
 					}
 
+					if (ExpectedIdentifier(buffer, TokenIdentifier::CloseBrace, true))
+						scopes--;
+				}
+				else
+				{
+					MR_LOG(LogScript, Warn, "No colon passed after word: %s, Did you mean \"%s:\"?", parsedWord.Chr(), parsedWord.Chr());
+
+					if (ExpectedIdentifier(buffer, TokenIdentifier::OpenBrace, true))
+					{
+						scopes++;
+
+						while (!ExpectedIdentifier(buffer, TokenIdentifier::CloseBrace, true))
+							AdvanceACharacter(buffer);
+
+						scopes--;
+					}
 				}
 
 				if (ExpectedIdentifier(buffer, TokenIdentifier::CloseBrace, false))
@@ -98,7 +138,7 @@ void ScriptParser::ParseScript(const char* buffer, const ParsingType& type)
 	}
 }
 
-bool ScriptParser::OpenScript(const String& modulePath)
+bool ModuleProcessor::OpenScript(const String& modulePath)
 {
 	FileStatus stat;
 
@@ -112,13 +152,13 @@ bool ScriptParser::OpenScript(const String& modulePath)
 }
 
 
-void ScriptParser::InputToContainer(ScriptWordBase& word)
+void ModuleProcessor::InputToContainer(ScriptWordBase& word)
 {
 
 	int32_t j = 4;
 }
 
-bool ScriptParser::Expected(const char*& in, const char* ptr)
+bool ModuleProcessor::Expected(const char*& in, const char* ptr)
 {
 	const char* begin = in;
 	while (IsAlpha(*in)) in++;
@@ -130,9 +170,9 @@ bool ScriptParser::Expected(const char*& in, const char* ptr)
 	return true;
 }
 
-bool ScriptParser::ExpectedIdentifier(const char*& in, const TokenIdentifier& identifier, bool bStep = false)
+bool ModuleProcessor::ExpectedIdentifier(const char*& in, const int& identifier, bool bStep = false)
 {
-	if (IsWhitspace(in)) SkipWhitspace(in);
+	SkipWhitspace(in);
 
 	const bool bResult = GetIdentifier(in) == identifier;
 
@@ -142,7 +182,7 @@ bool ScriptParser::ExpectedIdentifier(const char*& in, const TokenIdentifier& id
 	return bResult;
 }
 
-TokenIdentifier ScriptParser::GetIdentifier(const char*& in)
+int ModuleProcessor::GetIdentifier(const char*& in)
 {
 	if (IsWhitspace(in)) SkipWhitspace(in);
 
@@ -155,7 +195,7 @@ TokenIdentifier ScriptParser::GetIdentifier(const char*& in)
 	return TokenIdentifier::Unknown;
 }
 
-String ScriptParser::TokenIndetifierToString(const TokenIdentifier& identifier) const
+String ModuleProcessor::TokenIndetifierToString(const TokenIdentifier& identifier) const
 {
 	switch (identifier)
 	{
@@ -187,7 +227,7 @@ String ScriptParser::TokenIndetifierToString(const TokenIdentifier& identifier) 
 	return "";
 }
 
-String ScriptParser::GetValue(const char*& in)
+String ModuleProcessor::GetValue(const char*& in)
 {
 	in++;
 
@@ -202,8 +242,10 @@ String ScriptParser::GetValue(const char*& in)
 	return val;
 }
 
-String ScriptParser::GetWord(const char*& in)
+String ModuleProcessor::GetWord(const char*& in)
 {
+	SkipWhitspace(in);
+
 	const char* begin = in;
 	while (IsAlpha(*in)) in++;
 

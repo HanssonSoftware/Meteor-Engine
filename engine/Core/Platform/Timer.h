@@ -33,6 +33,7 @@ public:
 
     static Time Now() noexcept;
 
+    static String Format(const String& formatting);
 protected:
     uint64_t begin = 0;
 

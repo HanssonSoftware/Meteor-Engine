@@ -7,15 +7,21 @@
 
 class Module
 {
-	friend class ScriptParser;
+	friend class ModuleProcessor;
 public:
-	virtual ~Module() noexcept = default;
+	Module(const String& name)
+		: moduleName(name)
+	{
+
+	}
 
 	static Module* CreateModule(const String& fullPathToModule);
 
+	virtual ~Module() noexcept = default;
+
 	void OpenPath(const String& fullPathToModule);
 
-	IFile* GetModuleBuffer() const { return moduleDescriptor; }
+	IFile* GetModuleFile() const { return moduleDescriptor; }
 
 protected:
 	Module() = default;

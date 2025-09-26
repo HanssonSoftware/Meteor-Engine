@@ -18,6 +18,8 @@ public:
 	virtual void Reset() override;
 
 	static Time Now() noexcept;
+
+	static String Format(const String& formatting);
 private:
 	HANDLE timer;
 };

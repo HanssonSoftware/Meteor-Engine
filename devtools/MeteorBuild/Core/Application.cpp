@@ -8,7 +8,7 @@
 //#include <shellapi.h>
 #include <MemoryManager.h>
 #include <FileManager.h>
-#include <Parsing/ScriptParser.h>
+#include <Parsing/ModuleProcessor.h>
 #include <Parsing/Solution.h>
 
 //#pragma comment(lib, "Shell32.lib")
@@ -30,31 +30,15 @@ void BuildSystemApplication::Init()
 	
 	String val, temp;
 
-	if (Commandlet::Parse("-build", temp))
-	{
-
-	}
-
+	RedirectRoutingVerb(temp);
 
 	if (Commandlet::Parse("-source", val))
 	{
-		if (true)
+		String mainScriptLocation;
+		if (Locator::FindMainScript(val))
 		{
-			ScriptParser solution;
-
-			solution.OpenScript(val);
-			//solution.ParseScript(solution.Chr(), ScriptParser::ParsingType::MainDescriptor);
+			Module* topDirectoryScript = Module::CreateModule(val);
 		}
-
-		if (Commandlet::Parse("-int", val))
-		{
-			//Intermediate::SearchIntermediateFiles(val);
-		}
-
-		String b;
-
-		Solution a;
-		a.Finalize(&b);
 
 		if (Commandlet::Parse("-source", val))
 		{
@@ -69,6 +53,18 @@ void BuildSystemApplication::Init()
 	else
 	{
 		MR_LOG(LogBuildSystemApplication, Fatal, "No source directory passed!");
+	}
+}
+
+void BuildSystemApplication::RedirectRoutingVerb(String& temp)
+{
+	if (Commandlet::Parse("-build", temp))
+	{
+		verb = Build;
+	}
+	else if (Commandlet::Parse("-rebuild", temp))
+	{
+		verb = Rebuild;
 	}
 }
 

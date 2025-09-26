@@ -8,6 +8,8 @@
 
 LOG_ADDCATEGORY(BuildSystemApplication);
 
+enum ECurrentlyUsedVerb { Build, Rebuild };
+
 struct BuildSystemApplication : public Application 
 {
 public:
@@ -15,9 +17,16 @@ public:
 
 	virtual void Init() override;
 
+	void RedirectRoutingVerb(String& temp);
+
 	virtual void Run() override;
 
 	virtual void Shutdown() override;
+
+	ECurrentlyUsedVerb GetUsedVerb() const { return verb; }
+
+protected:
+	ECurrentlyUsedVerb verb;
 };
 
 IMPLEMENT_APPLICATION(BuildSystemApplication);

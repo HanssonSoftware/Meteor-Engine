@@ -3,8 +3,8 @@
 #pragma once
 #include <Types/String.h>
 #include <Types/Array.h>
+#include <Platform/File.h>
 
-class IFile;
 class Module;
 struct ScriptWordBase 
 {
@@ -51,37 +51,36 @@ private:
     static ScriptWord_##Name Global_WordInstance_##Name
 
 
-enum class TokenIdentifier
+enum TokenIdentifier
 {
-	Identifier,         // Project, IncludePath, Modules
-	StringLiteral,      // "Renderer", "Meteor", "CoreKit"
-	Colon,              // :
-	Comma,              // ,
-	OpenBrace,          // {
-	CloseBrace,         // }
-	EndOfFile,			// \0
-	Unknown
+	Identifier			= 1 << 0,         // Project, IncludePath, Modules
+	StringLiteral		= 1 << 1,		  // "Renderer", "Meteor", "CoreKit"
+	Colon				= 1 << 2,		  // :
+	Comma				= 1 << 3,         // ,
+	OpenBrace			= 1 << 4,         // {
+	CloseBrace			= 1 << 5,         // }
+	EndOfFile			= 1 << 6,		  // \0
+	Unknown				= 0 << 7,
 };
 
-class ScriptParser
+class ModuleProcessor
 {
 public:
 	enum class ParsingType { MainDescriptor, Module };
 
 	void ParseScript(const char* buffer, const ParsingType& type);
 
-	void SetBuffer(const char* newBuffer) { buffer = newBuffer; };
-
 	bool OpenScript(const String& modulePath);
 
+	const char* GetBuffer() { return currentlyReadModule ? currentlyReadModule->GetBuffer() : ""; }
 protected:
 	void InputToContainer(ScriptWordBase& word);
 
 	bool Expected(const char*& in, const char* ptr);
 
-	bool ExpectedIdentifier(const char*& in, const TokenIdentifier& identifier, bool bStep);
+	bool ExpectedIdentifier(const char*& in, const int& identifier, bool bStep);
 
-	TokenIdentifier GetIdentifier(const char*& in);
+	int GetIdentifier(const char*& in);
 
 	String TokenIndetifierToString(const TokenIdentifier& identifier) const;
 
@@ -101,7 +100,7 @@ protected:
 
 	bool IsAlpha(const char& input) { return (input >= 'a' && input <= 'z' || input >= 'A' && input <= 'Z'); };
 
-	const char* buffer = nullptr;
+	// const char* buffer = nullptr; buffer is already in the class below!
 
 	IFile* currentlyReadModule = nullptr;
 

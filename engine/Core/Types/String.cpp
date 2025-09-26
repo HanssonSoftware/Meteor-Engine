@@ -394,6 +394,12 @@ bool String::operator!=(const String& Other) const
 	return strcmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) != 0;
 }
 
+String::operator const char*() const
+{
+	return bIsUsingHeap ? (heapBuffer.ptr || heapBuffer.length != 0 ? heapBuffer.ptr : "") :
+		stackBuffer.ptr || stackBuffer.length != 0 ? stackBuffer.ptr : "";
+}
+
 const char* String::Chr() const
 {
 	return bIsUsingHeap ? (heapBuffer.ptr || heapBuffer.length != 0 ? heapBuffer.ptr : "") : 
@@ -411,6 +417,12 @@ char* String::Allocate()
 bool String::operator!() const
 {
 	return bIsUsingHeap ? !heapBuffer.ptr : !stackBuffer.ptr;
+}
+
+const char* String::operator*() const
+{
+	return bIsUsingHeap ? (heapBuffer.ptr || heapBuffer.length != 0 ? heapBuffer.ptr : "") :
+		stackBuffer.ptr || stackBuffer.length != 0 ? stackBuffer.ptr : "";
 }
 
 String String::Delim(const String character, bool first)

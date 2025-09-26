@@ -180,7 +180,7 @@
     <ClCompile Include="Parsing\Module.cpp" />
     <ClCompile Include="Parsing\LocatingInterface.cpp" />
     <ClCompile Include="Parsing\VisualStudio\VSSolution.cpp" />
-    <ClCompile Include="Parsing\ScriptParser.cpp" />
+    <ClCompile Include="Parsing\ModuleProcessor.cpp" />
     <ClCompile Include="Parsing\Solution.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -189,7 +189,7 @@
     <ClInclude Include="Parsing\LocatingInterface.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Parsing\VisualStudio\VSSolution.h" />
-    <ClInclude Include="Parsing\ScriptParser.h" />
+    <ClInclude Include="Parsing\ModuleProcessor.h" />
     <ClInclude Include="Parsing\Solution.h" />
   </ItemGroup>
   <ItemGroup>

@@ -274,14 +274,14 @@ char* WindowsLayer::ConvertToNarrow(const wchar_t* Buffer)
         return nullptr;
     }
 
-    const int32_t requiredSize = WideCharToMultiByte(65001 /*CP_UTF8*/, 0, Buffer, -1, 0, 0, 0, 0);
+    const int32_t requiredSize = WideCharToMultiByte(CP_UTF8, 0, Buffer, -1, 0, 0, 0, 0);
     if (requiredSize == 0)
     {
         MR_LOG(LogWindowsLayer, Error, "WideCharToMultiByte said: %s", GetError().Chr());
         return nullptr;
     }
 
-    char* super = new char[requiredSize + 1];
+    char* super = new char[requiredSize + 1]();
     if (WideCharToMultiByte(CP_UTF8, 0, Buffer, -1, super, requiredSize, 0, 0) == requiredSize)
     {
         return super;
