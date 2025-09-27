@@ -25,116 +25,103 @@ static void ExecutableWord(const String& arg)
 ADD_SCRIPT_WORD(Executable, ExecutableWord);
 
 
-void ModuleProcessor::ParseScript(const char* buffer, const ParsingType& type)
+void ModuleProcessor::ParseScript(const char* buffer)
 {
-	switch (type)
+
+}
+
+void ModuleProcessor::ParseSolutionDescriptor(const char* buffer)
+{
+	// Parse main *.mrbuild script, which (should be) sits on the top of the passed directory.
+
+	if (!Expected(buffer, "Solution"))
+		return;
+
+	SkipWhitspace(buffer);
+
+	projectName = GetValue(buffer);
+	if (projectName.IsEmpty())
+		return;
+
+	static uint32_t scopes = 0;
+	while (!ExpectedIdentifier(buffer, TokenIdentifier::EndOfFile, true))
 	{
-	case ParsingType::MainDescriptor:
+		if (ExpectedIdentifier(buffer, TokenIdentifier::OpenBrace, true))
+			scopes++;
+		
+		const String parsedWord = GetWord(buffer);
+		if (!parsedWord)
 		{
-			// Parse main *.mrbuild script, which (should be) sits on the top of the passed directory.
-
-			if (!Expected(buffer, "Solution"))
-				return;
-
-			SkipWhitspace(buffer);
-
-			projectName = GetValue(buffer);
-			if (projectName.IsEmpty())
-				return;
-
-			static uint32_t scopes = 0;
-			while (!ExpectedIdentifier(buffer, TokenIdentifier::EndOfFile, true))
+			if (ExpectedIdentifier(buffer, TokenIdentifier::OpenBrace, true))
 			{
-				if (ExpectedIdentifier(buffer, TokenIdentifier::OpenBrace, true))
-					scopes++;
-				
-				const String parsedWord = GetWord(buffer);
-				if (!parsedWord)
-				{
-					if (ExpectedIdentifier(buffer, TokenIdentifier::OpenBrace, true))
-					{
-						scopes++;
+				scopes++;
 
-						while (!ExpectedIdentifier(buffer, TokenIdentifier::CloseBrace, true))
-							AdvanceACharacter(buffer);
-
-						scopes--;
-					}
-				}
-
-
-				if (ExpectedIdentifier(buffer, TokenIdentifier::Colon, true))
-				{
-					ScriptWordBase* word = ScriptWordBase::Find(parsedWord);
-					if (!word)
-					{
-						MR_LOG(LogScript, Warn, "Invalid word: %s. Parsing would be skipped in that block.", parsedWord.Chr());
-						
-						if (ExpectedIdentifier(buffer, TokenIdentifier::OpenBrace, true))
-						{
-							scopes++;
-
-							while (!ExpectedIdentifier(buffer, TokenIdentifier::CloseBrace, true))
-								AdvanceACharacter(buffer);
-
-							scopes--;
-						}
-					}
-
-					const bool bCanStart = ExpectedIdentifier(buffer, TokenIdentifier::OpenBrace, true);
-					if (bCanStart)
-					{
-						scopes++;
-						SkipWhitspace(buffer);
-
-						const String firstValue = GetValue(buffer);
-						word->Invoke(firstValue);
-
-						while (
-							ExpectedIdentifier(buffer, TokenIdentifier::Comma, true) && 
-							!ExpectedIdentifier(buffer, TokenIdentifier::CloseBrace, false))
-						{
-							SkipWhitspace(buffer);
-
-							const String firstValue = GetValue(buffer);
-							word->Invoke(firstValue);
-						}
-					}
-
-					if (ExpectedIdentifier(buffer, TokenIdentifier::CloseBrace, true))
-						scopes--;
-				}
-				else
-				{
-					MR_LOG(LogScript, Warn, "No colon passed after word: %s, Did you mean \"%s:\"?", parsedWord.Chr(), parsedWord.Chr());
-
-					if (ExpectedIdentifier(buffer, TokenIdentifier::OpenBrace, true))
-					{
-						scopes++;
-
-						while (!ExpectedIdentifier(buffer, TokenIdentifier::CloseBrace, true))
-							AdvanceACharacter(buffer);
-
-						scopes--;
-					}
-				}
-
-				if (ExpectedIdentifier(buffer, TokenIdentifier::CloseBrace, false))
+				while (!ExpectedIdentifier(buffer, TokenIdentifier::CloseBrace, true))
 					AdvanceACharacter(buffer);
+
+				scopes--;
 			}
 		}
 
-		break;
-	case ParsingType::Module:
+
+		if (ExpectedIdentifier(buffer, TokenIdentifier::Colon, true))
 		{
-			
+			ScriptWordBase* word = ScriptWordBase::Find(parsedWord);
+			if (!word)
+			{
+				MR_LOG(LogScript, Warn, "Invalid word: %s. Parsing would be skipped in that block.", parsedWord.Chr());
+				
+				if (ExpectedIdentifier(buffer, TokenIdentifier::OpenBrace, true))
+				{
+					scopes++;
 
+					while (!ExpectedIdentifier(buffer, TokenIdentifier::CloseBrace, true))
+						AdvanceACharacter(buffer);
 
+					scopes--;
+				}
+			}
+
+			const bool bCanStart = ExpectedIdentifier(buffer, TokenIdentifier::OpenBrace, true);
+			if (bCanStart)
+			{
+				scopes++;
+				SkipWhitspace(buffer);
+
+				const String firstValue = GetValue(buffer);
+				word->Invoke(firstValue);
+
+				while (
+					ExpectedIdentifier(buffer, TokenIdentifier::Comma, true) && 
+					!ExpectedIdentifier(buffer, TokenIdentifier::CloseBrace, false))
+				{
+					SkipWhitspace(buffer);
+
+					const String firstValue = GetValue(buffer);
+					word->Invoke(firstValue);
+				}
+			}
+
+			if (ExpectedIdentifier(buffer, TokenIdentifier::CloseBrace, true))
+				scopes--;
+		}
+		else
+		{
+			MR_LOG(LogScript, Warn, "No colon passed after word: %s, Did you mean \"%s:\"?", parsedWord.Chr(), parsedWord.Chr());
+
+			if (ExpectedIdentifier(buffer, TokenIdentifier::OpenBrace, true))
+			{
+				scopes++;
+
+				while (!ExpectedIdentifier(buffer, TokenIdentifier::CloseBrace, true))
+					AdvanceACharacter(buffer);
+
+				scopes--;
+			}
 		}
 
-		break;
-	default:
-		break;
+		if (ExpectedIdentifier(buffer, TokenIdentifier::CloseBrace, false))
+			AdvanceACharacter(buffer);
 	}
 }
 

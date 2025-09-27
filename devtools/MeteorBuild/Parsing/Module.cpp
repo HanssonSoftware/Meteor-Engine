@@ -7,7 +7,7 @@
 #include <Windows/Windows.h>
 #include <PathCch.h>
 #include <Layers/SystemLayer.h>
-#include "LocatingInterface.h"
+#include "Finder.h"
 
 #pragma comment(lib, "Pathcch.lib")
 
@@ -15,8 +15,7 @@
 Module* Module::CreateModule(const String& fullPathToModule)
 {
 	MR_ASSERT(!fullPathToModule.IsEmpty(), "Module path is empty!");
-
-	static bool bIsMainModuleCreated = false;
+	
 	Module* super = new Module();
 
 	super->fullPath = fullPathToModule;
@@ -24,7 +23,7 @@ Module* Module::CreateModule(const String& fullPathToModule)
 	wchar_t* path = Layer::GetSystemLayer()->ConvertToWide(fullPathToModule);
 	PathCchRemoveFileSpec(path, wcslen(path));
 	
-	Locator::ListDirectory(path, super->includedSources);
+	Finder::ListDirectory(path, super->includedSources);
 	delete[] path;
 	
 	uint32_t s = super->includedSources.GetSize();
@@ -40,10 +39,9 @@ Module* Module::CreateModule(const String& fullPathToModule)
 	ModuleProcessor mpr;
 	if (mpr.OpenScript(fullPathToModule))
 	{
-		mpr.ParseScript(mpr.GetBuffer(), bIsMainModuleCreated ? ModuleProcessor::ParsingType::Module : ModuleProcessor::ParsingType::MainDescriptor);
+		mpr.ParseScript(mpr.GetBuffer());
 	}
 	
-	bIsMainModuleCreated = true;
 	return super;
 }
 

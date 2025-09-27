@@ -68,7 +68,9 @@ class ModuleProcessor
 public:
 	enum class ParsingType { MainDescriptor, Module };
 
-	void ParseScript(const char* buffer, const ParsingType& type);
+	void ParseScript(const char* buffer);
+
+	void ParseSolutionDescriptor(const char* buffer);
 
 	bool OpenScript(const String& modulePath);
 

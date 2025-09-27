@@ -4,12 +4,12 @@
 #include "Application.h"
 #include <Types/String.h>
 #include <Platform/PerformanceTimer.h>
-#include <Parsing/LocatingInterface.h>
+#include <Parsing/Finder.h>
 //#include <shellapi.h>
 #include <MemoryManager.h>
 #include <FileManager.h>
 #include <Parsing/ModuleProcessor.h>
-#include <Parsing/Solution.h>
+#include <Parsing/SolutionDescriptor.h>
 
 //#pragma comment(lib, "Shell32.lib")
 
@@ -27,33 +27,6 @@ BuildSystemApplication::BuildSystemApplication()
 void BuildSystemApplication::Init()
 {
 	Application::Init();
-	
-	String val, temp;
-
-	RedirectRoutingVerb(temp);
-
-	if (Commandlet::Parse("-source", val))
-	{
-		String mainScriptLocation;
-		if (Locator::FindMainScript(val))
-		{
-			Module* topDirectoryScript = Module::CreateModule(val);
-		}
-
-		if (Commandlet::Parse("-source", val))
-		{
-			Array<String> pathToDiscoveredItems;
-			Locator::LocateSources(val, pathToDiscoveredItems);
-		}
-		else
-		{
-
-		}
-	}
-	else
-	{
-		MR_LOG(LogBuildSystemApplication, Fatal, "No source directory passed!");
-	}
 }
 
 void BuildSystemApplication::RedirectRoutingVerb(String& temp)
@@ -66,11 +39,47 @@ void BuildSystemApplication::RedirectRoutingVerb(String& temp)
 	{
 		verb = Rebuild;
 	}
+	else if (Commandlet::Parse("-gen", temp) || Commandlet::Parse("-generate", temp))
+	{
+		verb = GenerateProjects;
+	}
 }
 
 void BuildSystemApplication::Run()
 {
+	// Application::RequestExit(0); should be added somewhere, if not the app will loop over this function
+	
+	String val, temp;
 
+	RedirectRoutingVerb(temp);
+
+	if (Commandlet::Parse("-source", val))
+	{
+		if (Finder::FindMainScript(val))
+		{
+			SolutionDescriptor sd;
+			sd.OpenProject(val);
+
+			
+			Module* topDirectoryScript = Module::CreateModule(val);
+		}
+
+		if (Commandlet::Parse("-source", val))
+		{
+			Array<String> pathToDiscoveredItems;
+			Finder::LocateSources(val, pathToDiscoveredItems);
+		}
+		else
+		{
+
+		}
+
+		Application::RequestExit(0);
+	}
+	else
+	{
+		MR_LOG(LogBuildSystemApplication, Fatal, "No source directory passed!");
+	}
 }
 
 void BuildSystemApplication::Shutdown()

@@ -178,19 +178,19 @@
   <ItemGroup>
     <ClCompile Include="Core\Application.cpp" />
     <ClCompile Include="Parsing\Module.cpp" />
-    <ClCompile Include="Parsing\LocatingInterface.cpp" />
+    <ClCompile Include="Parsing\Finder.cpp" />
     <ClCompile Include="Parsing\VisualStudio\VSSolution.cpp" />
     <ClCompile Include="Parsing\ModuleProcessor.cpp" />
-    <ClCompile Include="Parsing\Solution.cpp" />
+    <ClCompile Include="Parsing\SolutionDescriptor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Application.h" />
     <ClInclude Include="Parsing\Module.h" />
-    <ClInclude Include="Parsing\LocatingInterface.h" />
+    <ClInclude Include="Parsing\Finder.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Parsing\VisualStudio\VSSolution.h" />
     <ClInclude Include="Parsing\ModuleProcessor.h" />
-    <ClInclude Include="Parsing\Solution.h" />
+    <ClInclude Include="Parsing\SolutionDescriptor.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MeteorBuild.aps" />

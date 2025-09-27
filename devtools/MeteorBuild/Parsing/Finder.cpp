@@ -1,6 +1,6 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
-#include "LocatingInterface.h"
+#include "Finder.h"
 #include <Types/String.h>
 #include <Paths.h>
 #include <Windows/Windows.h>
@@ -15,7 +15,7 @@ LOG_ADDCATEGORY(Locator);
 
 static bool bIsFirstCall = true;
 
-void Locator::LocateSources(const String& fullDirectoryToAll, Array<String>& returned)
+void Finder::LocateSources(const String& fullDirectoryToAll, Array<String>& returned)
 {
     String fullPath = fullDirectoryToAll;
     if (bIsFirstCall)
@@ -57,7 +57,7 @@ void Locator::LocateSources(const String& fullDirectoryToAll, Array<String>& ret
     ListDirectory(fullPath, returned);
 }
 
-void Locator::ListDirectory(const String& directory, Array<String>& returned)
+void Finder::ListDirectory(const String& directory, Array<String>& returned)
 {
     WIN32_FIND_DATAW find;
 
@@ -96,7 +96,7 @@ void Locator::ListDirectory(const String& directory, Array<String>& returned)
     delete[] path;
 }
 
-void Locator::SearchExtensionSpecified(const String& directory, const String& extension, Array<String>& returned)
+void Finder::SearchExtensionSpecified(const String& directory, const String& extension, Array<String>& returned)
 {
     WIN32_FIND_DATAW find;
 
@@ -138,7 +138,7 @@ void Locator::SearchExtensionSpecified(const String& directory, const String& ex
     delete[] path;
 }
 
-bool Locator::FindMainScript(String& path)
+bool Finder::FindMainScript(String& path)
 {
     wchar_t* fullPath = nullptr;
 

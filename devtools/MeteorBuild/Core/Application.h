@@ -8,7 +8,7 @@
 
 LOG_ADDCATEGORY(BuildSystemApplication);
 
-enum ECurrentlyUsedVerb { Build, Rebuild };
+enum ECurrentlyUsedVerb { Build, Rebuild, GenerateProjects };
 
 struct BuildSystemApplication : public Application 
 {

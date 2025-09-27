@@ -1,9 +1,9 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
-#include "Parsing/Solution.h"
+#include "Parsing/SolutionDescriptor.h"
 
-class VSSolution : public Solution
+class VSSolution : public SolutionDescriptor
 {
 };
 

@@ -6,7 +6,7 @@
 
 class String;
 
-struct Locator
+struct Finder
 {
 	static void LocateSources(const String& fullDirectoryToAll, Array<String>& returned);
 
