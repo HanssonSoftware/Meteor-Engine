@@ -8,6 +8,7 @@
 #include <PathCch.h>
 #include <Layers/SystemLayer.h>
 #include "Finder.h"
+#include <Platform/Platform.h>
 
 #pragma comment(lib, "Pathcch.lib")
 
@@ -20,11 +21,10 @@ Module* Module::CreateModule(const String& fullPathToModule)
 
 	super->fullPath = fullPathToModule;
 
-	wchar_t* path = Layer::GetSystemLayer()->ConvertToWide(fullPathToModule);
-	PathCchRemoveFileSpec(path, wcslen(path));
+	ScopedPtr<wchar_t> path = Platform::ConvertToWide(fullPathToModule);
+	PathCchRemoveFileSpec(path.Get(), wcslen(path.Get()));
 	
-	Finder::ListDirectory(path, super->includedSources);
-	delete[] path;
+	Finder::ListDirectory(path.Get(), super->includedSources);
 	
 	uint32_t s = super->includedSources.GetSize();
 	for (uint32_t i = 0; i < s; i++)

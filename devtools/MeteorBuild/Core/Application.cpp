@@ -11,6 +11,8 @@
 #include <Parsing/ModuleProcessor.h>
 #include <Parsing/SolutionDescriptor.h>
 
+#include <Platform.h>
+
 //#pragma comment(lib, "Shell32.lib")
 
 
@@ -60,8 +62,7 @@ void BuildSystemApplication::Run()
 			SolutionDescriptor sd;
 			sd.OpenProject(val);
 
-			
-			Module* topDirectoryScript = Module::CreateModule(val);
+			//Module* topDirectoryScript = Module::CreateModule(val);
 		}
 
 		if (Commandlet::Parse("-source", val))

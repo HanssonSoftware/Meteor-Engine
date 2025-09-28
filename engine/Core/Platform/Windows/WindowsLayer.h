@@ -34,9 +34,11 @@ public:
 
 	virtual MessageBoxDecision AddMessageBox(const MessageBoxDescriptor* Info);
 
+	/** This function is deprecated! Please use the corresponding from the Platform function collection.*/
 	/** Converts your "skinny" buffer to "fat". You must release, after working with it! */
 	virtual wchar_t * ConvertToWide(const char* Buffer) override;
 	
+	/** This function is deprecated! Please use the corresponding from the Platform function collection.*/
 	/** Converts your "fat" buffer to "skinny". You must release, after working with it! */
 	virtual char * ConvertToNarrow(const wchar_t* Buffer) override;
 

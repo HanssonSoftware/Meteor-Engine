@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <cstdlib>
 #include <Layers/SystemLayer.h>
+#include <Platform.h>
 
 #pragma warning(disable : 26495)
 
@@ -68,11 +69,12 @@ String::String(const wchar_t* Input)
 
 	if (inputSize <= SSO_MAX_CHARS)
 	{
-		wcstombs(stackBuffer.ptr, Input, inputSize);
+		stackBuffer.length = (unsigned short)inputSize;
+
+		ScopedPtr<char> ptr = Platform::ConvertToNarrow(Input);
+		memcpy(stackBuffer.ptr, ptr.Get(), stackBuffer.length);
 
 		stackBuffer.ptr[inputSize] = '\0';
-
-		stackBuffer.length = (unsigned short)inputSize;
 	
 		bIsUsingHeap = false;
 	}
@@ -83,7 +85,8 @@ String::String(const wchar_t* Input)
 
 		heapBuffer.ptr = new char[heapBuffer.capacity]();
 
-		wcstombs(heapBuffer.ptr, Input, inputSize);
+		ScopedPtr<char> ptr = Platform::ConvertToNarrow(Input);
+		memcpy(heapBuffer.ptr, ptr.Get(), heapBuffer.length);
 
 		heapBuffer.ptr[inputSize] = '\0';
 

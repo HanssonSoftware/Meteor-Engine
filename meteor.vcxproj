@@ -243,6 +243,7 @@
     <ClCompile Include="engine\Core\Layers\Layer.cpp" />
     <ClCompile Include="engine\Core\Layers\LayerManager.cpp" />
     <ClCompile Include="engine\Core\Common\Delegate.cpp" />
+    <ClCompile Include="engine\Core\Platform\Windows\WindowsPlatform.cpp" />
     <ClCompile Include="engine\Launch.cpp">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">false</DeploymentContent>
@@ -281,12 +282,14 @@
     <ClCompile Include="engine\Vulkan\Vulkan.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="engine\Core\Platform\Platform.h" />
     <ClInclude Include="engine\Core\Platform\Thread\ThreadDescriptor.h" />
     <ClInclude Include="engine\Core\Common\Math.h" />
     <ClInclude Include="engine\Core\Layers\SystemLayerHelper.h" />
     <ClInclude Include="engine\Core\Logging\LogHelpers.h" />
     <ClInclude Include="engine\Core\Platform\FileHelpers.h" />
     <ClInclude Include="engine\Core\Platform\PlatformLayout.h" />
+    <ClInclude Include="engine\Core\Platform\Windows\WindowsPlatform.h" />
     <ClInclude Include="engine\Core\Platform\Windows\Windows.h" />
     <ClInclude Include="engine\Core\Layers\SystemLayer.h" />
     <ClInclude Include="engine\Core\Common\Conversions.h" />

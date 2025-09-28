@@ -31,7 +31,7 @@ void MemoryManager::Initialize(const double& RequiredMinimum)
 	uint64_t requiredByPercent = (uint64_t)(longlong.ullTotalPhys * engineRecommendedPercent);
 	if (requiredByPercent < (uint64_t)object->requiredMinimumInBytes)
 	{
-		MR_LOG(LogArena, Fatal, "Your PC's memory is too low!");
+		MR_LOG(LogArena, Fatal, "Your PC's memory is too low! Consider buying more RAM.");
 	}
 
 	object->begin = (char*)VirtualAlloc(nullptr, requiredByPercent, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
