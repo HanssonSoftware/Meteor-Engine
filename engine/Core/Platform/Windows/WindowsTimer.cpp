@@ -4,6 +4,7 @@
 #include "Windows/Windows.h"
 #include <Logging/LogMacros.h>
 #include <Layers/SystemLayer.h>
+#include <Platform/Platform.h>
 
 LOG_ADDCATEGORY(Timer);
 
@@ -58,12 +59,12 @@ Time WindowsTimer::Now() noexcept
 
 String WindowsTimer::Format(const String& formatting)
 {
-	wchar_t* buffer = Layer::GetSystemLayer()->ConvertToWide(formatting.Chr());
+	ScopedPtr<wchar_t> buffer = Platform::ConvertToWide(formatting.Chr());
 
 	wchar_t fixed[128] = {};
-	if (!GetDateFormatEx(LOCALE_NAME_USER_DEFAULT, 0, nullptr, buffer, fixed, 128, nullptr))
+	if (!GetDateFormatEx(LOCALE_NAME_USER_DEFAULT, 0, nullptr, buffer.Get(), fixed, 128, nullptr))
 	{
-		const String err = Layer::GetSystemLayer()->GetError();
+		const String err = Platform::GetError();
 
 		int j = 325;
 	}
@@ -71,12 +72,11 @@ String WindowsTimer::Format(const String& formatting)
 
 	if (!GetTimeFormatEx(LOCALE_NAME_USER_DEFAULT, TIME_FORCE24HOURFORMAT, nullptr, fixed, fixed, 128))
 	{
-		const String err = Layer::GetSystemLayer()->GetError();
+		const String err = Platform::GetError();
 
 		int j = 325;
 	}
 
-	delete[] buffer;
 	return fixed;
 }
 

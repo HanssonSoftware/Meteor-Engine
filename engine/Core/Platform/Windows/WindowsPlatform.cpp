@@ -6,6 +6,7 @@
 #include <Windows/Windows.h>
 #include <Types/String.h>
 #include <Layers/SystemLayer.h>
+#include <Application.h>
 
 LOG_ADDCATEGORY(Platform);
 
@@ -36,9 +37,9 @@ ScopedPtr<char> WindowsPlatform::ConvertToNarrow(const wchar_t* fat)
 	if (fatLength != 0)
 	{
 		ScopedPtr<char> buffer;
-
 		buffer = new char[fatLength + 1]();
-		if (!WideCharToMultiByte(CP_UTF8, 0, fat, fatLength, buffer.Get(), fatLength * sizeof(char), 0, 0))
+
+		if (!WideCharToMultiByte(CP_UTF8, 0, fat, -1, buffer.Get(), fatLength * sizeof(char), 0, 0))
 		{
 			MR_LOG(LogPlatform, Error, "Failed to convert wide characters: %s", *GetError());
 			return nullptr;
@@ -76,4 +77,21 @@ String WindowsPlatform::GetError()
 
 	LocalFree(str);
 	return end;
+}
+
+bool WindowsPlatform::IsRunningAnAnotherInstance()
+{
+	if (const Application* app = GetApplication())
+	{
+		ScopedPtr<wchar_t> wide = ConvertToWide(app->appCodeName);
+		HANDLE appMtx = CreateMutexW(nullptr, 1, wide.Get());
+
+		if (GetLastError() == ERROR_ALREADY_EXISTS)
+		{
+			if (appMtx) CloseHandle(appMtx);	
+			return true;
+		}
+	}
+
+	return false;
 }

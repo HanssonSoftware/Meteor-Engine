@@ -11,6 +11,8 @@ struct IPlatform
 	static ScopedPtr<char> ConvertToNarrow(const wchar_t* fat) {};
 
 	static String GetError() {};
+
+	static bool IsRunningAnAnotherInstance() {};
 };
 
 

@@ -8,6 +8,8 @@
 #include <dwmapi.h>
 #include <Module/ModuleManager.h>
 
+#include <Platform/Platform.h>
+
 #pragma comment (lib, "UxTheme.lib")
 
 void WindowsWindowManager::Init()
@@ -60,18 +62,18 @@ bool WindowsWindowManager::CreateWindow(const String& name, const Vector2<uint32
 
     RECT windowRect = { 0, 0, (LONG)size.x, (LONG)size.y };
     AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, 0);
-    wchar_t* buffer = Layer::GetSystemLayer()->ConvertToWide(name.Chr());
+    wchar_t* buffer = Platform::ConvertToWide(name.Chr()).Get();
 
-    const wchar_t* className = nullptr;
+    ScopedPtr<wchar_t> className;
     bool bIsFallback = GetIsUsingFallbackClass();
     if (const Application* app = GetApplication())
     {
-        className = bIsFallback ? GetDefaultApplicationName() : Layer::GetSystemLayer()->ConvertToWide(app->appNameNoSpaces.Chr());
+        className = Platform::ConvertToWide(app->appNameNoSpaces.Chr());
     }
 
     instance->handle = ::CreateWindowExW(
         /*WS_EX_ACCEPTFILES*/ 0,
-        className,
+        className.Get(),
         buffer,
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT,
@@ -86,12 +88,9 @@ bool WindowsWindowManager::CreateWindow(const String& name, const Vector2<uint32
 
     if (!instance->handle)
     {
-        MR_LOG(LogWindowManager, Error, "CreateWindowExW returned: %s", *Layer::GetSystemLayer()->GetError());
+        MR_LOG(LogWindowManager, Error, "CreateWindowExW returned: %s", *Platform::GetError());
         return false;
     }
-
-
-    if (!bIsFallback) delete[] className;
 
     static const constexpr BOOL bCanIUseDarkWindowTitlebar = 1;
     DwmSetWindowAttribute(instance->handle, DWMWA_USE_IMMERSIVE_DARK_MODE, &bCanIUseDarkWindowTitlebar, sizeof(bCanIUseDarkWindowTitlebar));
@@ -132,7 +131,8 @@ inline bool WindowsWindowManager::RegisterWindowClass()
 
     if (const Application* app = Application::Get())
     {
-        windowClass.lpszClassName = Layer::GetSystemLayer()->ConvertToWide(app->appNameNoSpaces.Chr());
+        ScopedPtr<wchar_t> appNameWiden = Platform::ConvertToWide(app->appNameNoSpaces.Chr());
+        windowClass.lpszClassName = appNameWiden.Get();
     }
     else
     {

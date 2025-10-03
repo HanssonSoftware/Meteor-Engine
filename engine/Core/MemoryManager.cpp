@@ -4,6 +4,7 @@
 #include <Platform/PlatformLayout.h>
 #include <Logging/LogMacros.h>
 #include <Layers/SystemLayer.h>
+#include <Platform/Platform.h>
 
 #include <Windows/Windows.h>
 
@@ -46,7 +47,7 @@ void MemoryManager::Shutdown()
 {
 	if (!VirtualFree(object->begin, 0, MEM_RELEASE))
 	{
-		MR_LOG(LogArena, Fatal, "VirtualFree failed with: %s", *Layer::GetSystemLayer()->GetError());
+		MR_LOG(LogArena, Fatal, "VirtualFree failed with: %s", *Platform::GetError());
 	}
 
 	object->begin = nullptr;
@@ -113,6 +114,7 @@ MemoryManager::MemoryData MemoryManager::FindAvailable(const uint32_t& size)
 		{
 			return { entry.offset, size, true };
 		}
+
 		currentOffset = std::max(currentOffset, entry.offset + entry.size);
 	}
 

@@ -5,6 +5,11 @@
 #include <basetsd.h>
 #include <vector>
 
+//	OC = Occupied // AV = Available
+//	----------------------------------------------
+//	|	OC	| AV	|	OC	|					|
+//	----------------------------------------------
+
 
 struct MemoryManager
 {

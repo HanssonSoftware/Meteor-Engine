@@ -15,6 +15,7 @@
 #include <Platform/PerformanceTimer.h>
 #include <Types/Pointers.h>
 #include <Platform/Paths.h>
+#include <Platform/Platform.h>
 
 EditorApplication::EditorApplication() 
 	: Application()
@@ -59,7 +60,7 @@ void EditorApplication::Init()
 	EditorLayer Super("Editor Layer");
 	Application::Get()->GetLayerManager()->PushLayer(&Super);
 
-	if (Layer::GetSystemLayer()->IsRunningAnAnotherInstance())
+	if (Platform::IsRunningAnAnotherInstance())
 	{
 		MessageBoxDescriptor info = {};
 		info.Title = "Multiple Instances found!";

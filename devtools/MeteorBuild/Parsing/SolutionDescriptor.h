@@ -7,6 +7,7 @@
 #include <rpc.h>
 
 class IFile;
+class Solution;
 
 enum class EProjectType
 {
@@ -30,27 +31,9 @@ struct ProjectDefine
 class SolutionDescriptor
 {
 public:
-	bool Finalize(String* bufferToWrite);
+	static bool Finalize(Solution* slnToOutput, String* bufferToWrite);
 	
-	bool OpenProject(const String& projectPath);
+	static IFile* OpenProject(const String& projectPath);
 
-	static constexpr const char* GetGUIDToString(EProjectType type);
-	
-	Array<ProjectDefine*> projects;
-
-	IFile* file = nullptr;
+	bool ParseDescriptor();
 };
-
-constexpr const char* SolutionDescriptor::GetGUIDToString(EProjectType type)
-{
-	switch (type)
-	{
-		case EProjectType::CPP:
-			return "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}";
-		case EProjectType::Folder:
-			return "{2150E333-8FDC-42A3-9474-1A3956D46DE8}";
-	}
-	
-	return "";
-}
-

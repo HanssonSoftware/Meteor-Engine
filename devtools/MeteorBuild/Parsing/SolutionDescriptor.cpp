@@ -4,8 +4,9 @@
 
 #include "File.h"
 #include "Windows/WindowsFileManager.h"
+#include "ModuleProcessor.h"
 
-bool SolutionDescriptor::Finalize(String* bufferToWrite)
+bool SolutionDescriptor::Finalize(Solution* slnToOutput, String* bufferToWrite)
 {
 	*bufferToWrite = "\nMicrosoft Visual Studio Solution File, Format Version 12.00\n# Visual Studio Version 17\nVisualStudioVersion = 17.11.35327.3\nMinimumVisualStudioVersion = 10.0.40219.1\n";
 
@@ -13,18 +14,33 @@ bool SolutionDescriptor::Finalize(String* bufferToWrite)
 	return false;
 }
 
-bool SolutionDescriptor::OpenProject(const String& projectPath)
+IFile* SolutionDescriptor::OpenProject(const String& projectPath)
 {
 	FileStatus stat;
-	file = FileManager::CreateFileOperation(
+	IFile* newFile;
+
+	newFile = FileManager::CreateFileOperation(
 		projectPath,
 		OPENMODE_READ,
 		SHAREMODE_READ,
 		OVERRIDERULE_OPEN_ONLY_IF_EXISTS,
 		stat);
 
-	if (!file) return false;
+	if (!newFile) return nullptr;
 
-	file->Read();
-	return true;
+	newFile->Read();
+	return newFile;
+}
+
+bool SolutionDescriptor::ParseDescriptor()
+{
+	//if (file)
+	//{
+	//	ModuleProcessor mp;
+	//	mp.ParseSolutionDescriptor(file->GetBuffer());
+
+	//	return true;
+	//}
+
+	return false;
 }

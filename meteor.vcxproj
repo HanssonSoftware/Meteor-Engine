@@ -277,8 +277,6 @@
     <ClCompile Include="engine\Core\Platform\Paths.cpp" />
     <ClCompile Include="engine\Core\Platform\Windows\WindowsPaths.cpp" />
     <ClCompile Include="engine\Core\Module\Module.cpp" />
-    <ClCompile Include="engine\Renderer\Renderer.cpp" />
-    <ClCompile Include="engine\Renderer\SwapChain.cpp" />
     <ClCompile Include="engine\Vulkan\Vulkan.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -403,7 +401,6 @@
     <ClInclude Include="engine\Core\Types\Iterator.h" />
     <ClInclude Include="engine\Core\Platform\Paths.h" />
     <ClInclude Include="engine\Core\Module\Module.h" />
-    <ClInclude Include="engine\Renderer\Renderer.h" />
     <ClInclude Include="resources\assertbox.h" />
     <ClInclude Include="resources\resource.h" />
     <ClInclude Include="engine\Core\Platform\Windows\WindowsWindowManager.h" />
@@ -421,7 +418,6 @@
     <ClInclude Include="engine\Core\Platform\Thread\ThreadManager.h" />
     <ClInclude Include="engine\Core\Platform\Windows\WindowsThreadManager.h" />
     <ClInclude Include="engine\Core\Platform\Windows\WindowsPaths.h" />
-    <ClInclude Include="engine\Renderer\SwapChain.h" />
     <ClInclude Include="engine\Vulkan\Vulkan.h" />
   </ItemGroup>
   <ItemGroup>

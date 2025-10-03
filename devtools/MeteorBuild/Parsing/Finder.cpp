@@ -5,7 +5,7 @@
 #include <Paths.h>
 #include <Windows/Windows.h>
 #include <Platform/FileManager.h>
-#include <Layers/SystemLayer.h>
+#include <Platform/Platform.h>
 #include <PathCch.h>
 #include <strsafe.h>
 
@@ -25,25 +25,22 @@ void Finder::LocateSources(const String& fullDirectoryToAll, Array<String>& retu
         if (FileManager::IsPathRelative(fullDirectoryToAll))
         {
             fullPath = Paths::GetExecutableDirctory();
-            if (SystemLayer* systemLayer = Layer::GetSystemLayer())
+
+            ScopedPtr<wchar_t> wideExecutableDirectory = Platform::ConvertToWide(fullPath.Chr());
+
+            PathCchRemoveFileSpec(wideExecutableDirectory.Get(), wcslen(wideExecutableDirectory.Get()));
+            fullPath = String::Format("%ls\\%s", wideExecutableDirectory.Get(), fullDirectoryToAll.Chr());
+            ScopedPtr<wchar_t> wideExecutableDirectoryNoFile = Platform::ConvertToWide(fullPath.Chr());
+
+            wchar_t* canonicalizedPath = nullptr;
+            if (PathAllocCanonicalize(wideExecutableDirectoryNoFile.Get(), PATHCCH_ALLOW_LONG_PATHS, &canonicalizedPath) != S_OK)
             {
-                wchar_t* wideExecutableDirectory = systemLayer->ConvertToWide(fullPath.Chr());
-
-                PathCchRemoveFileSpec(wideExecutableDirectory, wcslen(wideExecutableDirectory));
-                fullPath = String::Format("%ls\\%s", wideExecutableDirectory, fullDirectoryToAll.Chr());
-                wchar_t* wideExecutableDirectoryNoFile = systemLayer->ConvertToWide(fullPath.Chr());
-
-                wchar_t* canonicalizedPath = nullptr;
-                if (PathAllocCanonicalize(wideExecutableDirectoryNoFile, PATHCCH_ALLOW_LONG_PATHS, &canonicalizedPath) != S_OK)
-                {
-                    MR_LOG(LogLocator, Fatal, "PathAllocCanonicalize returned: %s", systemLayer->GetError().Chr());
-                }
-
-                fullPath = canonicalizedPath;
-
-                LocalFree(canonicalizedPath);
-                delete[] wideExecutableDirectory;
+                MR_LOG(LogLocator, Fatal, "PathAllocCanonicalize returned: %s", Platform::GetError().Chr());
             }
+
+            fullPath = canonicalizedPath;
+
+            LocalFree(canonicalizedPath);
         }
         else
         {
@@ -61,8 +58,8 @@ void Finder::ListDirectory(const String& directory, Array<String>& returned)
 {
     WIN32_FIND_DATAW find;
 
-    wchar_t* path = Layer::GetSystemLayer()->ConvertToWide(String::Format("%s\\*", directory.Chr()));
-    HANDLE file = FindFirstFileW(path, &find);
+    ScopedPtr<wchar_t> path = Platform::ConvertToWide(String::Format("%s\\*", directory.Chr()));
+    HANDLE file = FindFirstFileW(path.Get(), &find);
 
     if (file != INVALID_HANDLE_VALUE)
     {
@@ -92,16 +89,14 @@ void Finder::ListDirectory(const String& directory, Array<String>& returned)
     {
         MR_LOG(LogLocator, Error, "Directory handle invalid!");
     }
-
-    delete[] path;
 }
 
 void Finder::SearchExtensionSpecified(const String& directory, const String& extension, Array<String>& returned)
 {
     WIN32_FIND_DATAW find;
 
-    wchar_t* path = Layer::GetSystemLayer()->ConvertToWide(String::Format("%s\\*", directory.Chr()));
-    HANDLE file = FindFirstFileW(path, &find);
+    ScopedPtr<wchar_t> path = Platform::ConvertToWide(String::Format("%s\\*", directory.Chr()));
+    HANDLE file = FindFirstFileW(path.Get(), &find);
 
     if (file != INVALID_HANDLE_VALUE)
     {
@@ -134,38 +129,35 @@ void Finder::SearchExtensionSpecified(const String& directory, const String& ext
     {
         MR_LOG(LogLocator, Error, "Directory handle invalid!");
     }
-
-    delete[] path;
 }
 
 bool Finder::FindMainScript(String& path)
 {
-    wchar_t* fullPath = nullptr;
+    ScopedPtr<wchar_t> fullPath = nullptr;
 
     bool bIsPathWasRelative = false;
     if (FileManager::IsPathRelative(path))
     {
-        wchar_t* exeDir = Layer::GetSystemLayer()->ConvertToWide(Paths::GetExecutableDirctory());
-        wchar_t* convertedPath = Layer::GetSystemLayer()->ConvertToWide(path);
+        ScopedPtr<wchar_t> exeDir = Platform::ConvertToWide(Paths::GetExecutableDirctory());
+        ScopedPtr<wchar_t> convertedPath = Platform::ConvertToWide(path);
 
-        PathCchRemoveFileSpec(exeDir, wcslen(exeDir));
-        if (FAILED(PathAllocCombine(exeDir, convertedPath, PATHCCH_ALLOW_LONG_PATHS, &fullPath)))
+        PathCchRemoveFileSpec(exeDir.Get(), wcslen(exeDir.Get()));
+        if (FAILED(PathAllocCombine(exeDir.Get(), convertedPath.Get(), PATHCCH_ALLOW_LONG_PATHS, &fullPath)))
         {
-            MR_LOG(LogLocator, Fatal, "PathAllocCombine returned: %s", *Layer::GetSystemLayer()->GetError())
+            MR_LOG(LogLocator, Fatal, "PathAllocCombine returned: %s", *Platform::GetError())
         }
 
         bIsPathWasRelative = true;
-        delete[] exeDir, convertedPath;
     }
     else
     {
-        fullPath = Layer::GetSystemLayer()->ConvertToWide(path);
+        fullPath = Platform::ConvertToWide(path);
     }
 
-    StringCchCatW(fullPath, wcslen(fullPath) + wcslen(L"\\*") + 1, L"\\*");
+    StringCchCatW(fullPath.Get(), wcslen(fullPath.Get()) + wcslen(L"\\*") + 1, L"\\*");
 
     WIN32_FIND_DATAW data;
-    HANDLE firstFound = FindFirstFileW(fullPath, &data);
+    HANDLE firstFound = FindFirstFileW(fullPath.Get(), &data);
 
     if (firstFound != INVALID_HANDLE_VALUE)
     {
@@ -176,32 +168,22 @@ bool Finder::FindMainScript(String& path)
 
             if (FileManager::IsEndingWith(data.cFileName, "mrbuild"))
             {
-                fullPath[wcslen(fullPath) - 2] = L'\0';
+                fullPath.Get()[wcslen(fullPath.Get()) - 2] = L'\0';
 
-                path = String::Format("%ls\\%ls", fullPath, data.cFileName);
+                path = String::Format("%ls\\%ls", fullPath.Get(), data.cFileName);
                 break;
             }
 
 
         } while (FindNextFileW(firstFound, &data));
 
-        if (bIsPathWasRelative)
-            LocalFree(fullPath);
-        else
-            delete[] fullPath;
-
         LocalFree(firstFound);
         return true;
     }
     else
     {
-        MR_LOG(LogLocator, Fatal, "FindFirstFileW encountered an invalid handle! %s", *Layer::GetSystemLayer()->GetError());
+        MR_LOG(LogLocator, Fatal, "FindFirstFileW encountered an invalid handle! %s", *Platform::GetError());
     }
-
-    if (bIsPathWasRelative)
-    LocalFree(fullPath);
-    else
-    delete[] fullPath;
 
     return false;
 }

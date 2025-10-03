@@ -126,13 +126,7 @@
     <ClCompile Include="engine\Core\Platform\Windows\WindowsPaths.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Renderer\Renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\Core\Module\Module.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Renderer\SwapChain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Vulkan\Vulkan.cpp">
@@ -548,13 +542,7 @@
     <ClInclude Include="engine\Core\Platform\Windows\WindowsPaths.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Renderer\Renderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\Core\Module\Module.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Renderer\SwapChain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Vulkan\Vulkan.h">

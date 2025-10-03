@@ -179,7 +179,7 @@ int ModuleProcessor::GetIdentifier(const char*& in)
 	if (*in == ':') return TokenIdentifier::Colon;
 	if (*in == ',') return TokenIdentifier::Comma;
 	
-	return TokenIdentifier::Unknown;
+	return TokenIdentifier::UnknownIdentifier;
 }
 
 String ModuleProcessor::TokenIndetifierToString(const TokenIdentifier& identifier) const
@@ -207,7 +207,7 @@ String ModuleProcessor::TokenIndetifierToString(const TokenIdentifier& identifie
 	case TokenIdentifier::EndOfFile:	// \0
 		return "null terminator";
 	
-	case TokenIdentifier::Unknown:
+	case TokenIdentifier::UnknownIdentifier:
 		return "";
 	}
 

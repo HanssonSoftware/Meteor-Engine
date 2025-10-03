@@ -45,6 +45,11 @@ public:
 		return this->ptr;
 	}
 
+	T** operator&()
+	{
+		return &this->ptr;
+	}
+
 	ScopedPtr(const ScopedPtr&) = delete;
 
 	ScopedPtr& operator=(const ScopedPtr&) = delete;
@@ -57,7 +62,7 @@ public:
 
 	ScopedPtr& operator=(ScopedPtr&& other) noexcept
 	{
-		if (this != &other)
+		//if (this != &other)
 		{
 			if (ptr) {}
 

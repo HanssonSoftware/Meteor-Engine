@@ -60,7 +60,7 @@ enum TokenIdentifier
 	OpenBrace			= 1 << 4,         // {
 	CloseBrace			= 1 << 5,         // }
 	EndOfFile			= 1 << 6,		  // \0
-	Unknown				= 0 << 7,
+	UnknownIdentifier	= 0 << 7,
 };
 
 class ModuleProcessor

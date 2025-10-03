@@ -1,4 +1,32 @@
-﻿
+/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
+
+#pragma once
+#include <Types/Array.h>
+#include <Types/String.h>
+#include "SolutionDescriptor.h"
+
+class IFile;
+
+class Solution
+{
+public:
+	Solution() = default;
+
+	virtual ~Solution() noexcept = default;
+
+	void SetFileHandle(IFile* newHandle) { file = newHandle; }
+
+	IFile* GetFileHandle() const { return file; }
+protected:
+	Array<ProjectDefine*> projects;
+
+	IFile* file = nullptr;
+
+	String projectName;
+};
+
+/*
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35327.3
@@ -49,3 +77,4 @@ Global
 		SolutionGuid = {7442A397-EEB5-400C-B726-B1A2CAA77F66}
 	EndGlobalSection
 EndGlobal
+*/

@@ -9,9 +9,11 @@
 #include <MemoryManager.h>
 #include <FileManager.h>
 #include <Parsing/ModuleProcessor.h>
-#include <Parsing/SolutionDescriptor.h>
+//#include <Parsing/SolutionDescriptor.h>
 
 #include <Platform.h>
+#include <Parsing/Solution.h>
+#include <Parsing/SolutionDescriptor.h>
 
 //#pragma comment(lib, "Shell32.lib")
 
@@ -59,8 +61,9 @@ void BuildSystemApplication::Run()
 	{
 		if (Finder::FindMainScript(val))
 		{
-			SolutionDescriptor sd;
-			sd.OpenProject(val);
+			Solution sln;
+			
+			SolutionDescriptor::OpenProject(val);
 
 			//Module* topDirectoryScript = Module::CreateModule(val);
 		}

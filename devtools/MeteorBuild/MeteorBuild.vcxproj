@@ -182,6 +182,7 @@
     <ClCompile Include="Parsing\VisualStudio\VSSolution.cpp" />
     <ClCompile Include="Parsing\ModuleProcessor.cpp" />
     <ClCompile Include="Parsing\SolutionDescriptor.cpp" />
+    <ClCompile Include="Parsing\Solution.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Application.h" />
@@ -191,6 +192,7 @@
     <ClInclude Include="Parsing\VisualStudio\VSSolution.h" />
     <ClInclude Include="Parsing\ModuleProcessor.h" />
     <ClInclude Include="Parsing\SolutionDescriptor.h" />
+    <ClInclude Include="Parsing\Solution.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MeteorBuild.aps" />

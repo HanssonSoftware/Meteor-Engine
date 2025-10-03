@@ -65,7 +65,7 @@ void LayerManager::RemoveLayer(const String Name)
 
 void LayerManager::UpdateLayer()
 {
-	systemLayer->Update();
+	//systemLayer->Update();
 
 	for (Layer*& indexed : layers)
 	{

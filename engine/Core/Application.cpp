@@ -49,8 +49,7 @@ void Application::Init()
 #endif // MR_DEBUG
 
     MemoryManager::Initialize(appFramework->Memory.memoryReservePercent);
-    layerManager->Init();
-
+    
     windowManager->Init();
     Logger::Initialize();
 
@@ -58,7 +57,7 @@ void Application::Init()
 
     if (windowManager->CreateWindow(appName, { WindowData.x, WindowData.y }, true))
     {
-        Renderer::InitModule("Vulkan");
+        //Renderer::InitModule("Vulkan");
     }
 
 

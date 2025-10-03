@@ -30,6 +30,7 @@ public:
 
 	virtual String GetMachineName() override;
 
+	/** This function is deprecated! Please use the corresponding from the Platform function collection.*/
 	virtual bool IsRunningAnAnotherInstance() override;
 
 	virtual MessageBoxDecision AddMessageBox(const MessageBoxDescriptor* Info);
