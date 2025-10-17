@@ -6,7 +6,7 @@
 
 struct LogAssertion
 {
-	friend struct ILogger;
+	friend class ILogger;
 
 	LogAssertion() = delete;
 

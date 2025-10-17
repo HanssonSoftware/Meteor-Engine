@@ -164,7 +164,7 @@
     <ClInclude Include="engine\Core\Logging\Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Logging\LogMacros.h">
+    <ClInclude Include="engine\Core\Logging\LogMacros.inl">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Platform\Timer.h">
@@ -495,9 +495,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Layers\SystemLayerHelper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Core\Logging\LogHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Platform\WindowManager\WindowMenu.h">

@@ -4,7 +4,7 @@
 #include "FileHelpers.h"
 
 #include <Types/String.h>
-#include <Logging/LogMacros.h>
+#include <Logging/Log.h>
 #include <Types/Pointers.h>
 
 LOG_ADDCATEGORY(FileSystem);

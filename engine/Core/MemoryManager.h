@@ -4,31 +4,58 @@
 
 #include <basetsd.h>
 #include <vector>
+#include <Logging/Log.h>
+
+//
+#include <Windows/Windows.h>
 
 //	OC = Occupied // AV = Available
 //	----------------------------------------------
-//	|	OC	| AV	|	OC	|					|
+//	|	OC	| AV |	OC	|						 |
 //	----------------------------------------------
 
 
 struct MemoryManager
 {
-	static void Initialize(const double& RequiredMinimum);
+	static MemoryManager& Get();
 
-	static void Shutdown();
+	void Initialize(const double& RequiredMinimum);
 
-	static void* Allocate(const uint32_t& size);
+	void Shutdown();
 
-	static void Deallocate(void* data);
-
-	static constexpr uint32_t GetSize(void* data);
-
-	static constexpr void SetMinimumSize(const uint32_t& requiredMinimumInBytes) noexcept
+	template<typename T>
+	T* Allocate(const uint64_t& size)
 	{
-		if (!object)
-			object = new MemoryManager();
+#ifdef MR_PLATFORM_WINDOWS
+		void* raw = VirtualAlloc(object->begin + object->currentOffset, size, MEM_COMMIT, PAGE_READWRITE);
+#endif // MR_PLATFORM_WINDOWS
+		MR_ASSERT((object->begin + object->currentOffset) < object->end, "Page out of range!");
 
-		object->requiredMinimumInBytes = requiredMinimumInBytes;
+		if (!raw)
+		{
+			//MR_LOG(LogArena, Fatal, "Out of memory. Could not allocate %llu bytes.", size);
+			return nullptr;
+		}
+
+		T* ptr = new(raw) T();
+		object->currentOffset += size;
+		return ptr;
+	};
+
+	template<typename T>
+	void Deallocate(T* data)
+	{
+		if (!data)
+			return;
+
+		data->~T();
+		if (!VirtualFree(data, sizeof(T), MEM_DECOMMIT))
+		{
+			//MR_LOG(LogArena, Fatal, "%s", *Platform::GetError());
+		}
+
+		memset(data, 0xCD, sizeof(T));
+		object->currentOffset -= sizeof(T);
 	};
 
 protected:
@@ -43,7 +70,7 @@ protected:
 		uint32_t size = 0;
 
 		bool used = false;
-	};
+	};                            
 
 	static MemoryData FindAvailable(const uint32_t& size);
 
@@ -51,12 +78,13 @@ protected:
 
 	uint64_t totalMemoryOnPC = 0;
 
+	uint64_t currentOffset = 0;
+
 	char* begin = nullptr;
 
 	char* end = nullptr;
 
 	static inline std::vector<MemoryData> heap;
 
-	static inline MemoryManager* object;
+	MemoryManager* object;
 };
-

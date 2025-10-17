@@ -1,7 +1,7 @@
 ﻿/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #include "WindowsWindow.h"
-#include <Logging/LogMacros.h>
+#include <Logging/Log.h>
 #include <Windows/WindowsWindowManager.h>
 #include <Layers/SystemLayer.h>
 

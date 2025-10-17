@@ -3,7 +3,7 @@
 #pragma once
 #include <Types/Vector.h>
 #include <Types/String.h>
-#include <Logging/LogMacros.h>
+#include <Logging/Log.h>
 #include <WindowManager/WindowManager.h>
 //#include <Windows/Windows.h>
 
@@ -106,9 +106,9 @@ Application* GetApplication();
 #define IMPLEMENT_APPLICATION(ApplicationClass) \
 	/*extern "C" __declspec(dllexport)*/ int32_t LaunchApplication(int32_t ArgumentCount, char* Arguments[]) \
 	{	\
-		Commandlet::Initialize(); \
 		static ApplicationClass instance; \
         instance.Init(); \
+		Commandlet::Initialize(); \
         instance.Run(); \
         instance.Shutdown(); \
         return instance.GetRequestExitCode(); \

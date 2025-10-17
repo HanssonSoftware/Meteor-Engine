@@ -1,9 +1,8 @@
 ﻿/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
-#include "Log.h"
-#include "LogAssertion.h"
-#include <type_traits>
+//#include "LogAssertion.h"
+//#include <type_traits>
 
 #define MERGE(x, y) x##y
 #define MERGE2(x) #x

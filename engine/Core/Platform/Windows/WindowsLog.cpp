@@ -2,7 +2,7 @@
 
 #include "WindowsLog.h"
 #include <Windows/Windows.h>
-#include <Logging/LogMacros.h>
+#include <Logging/Log.h>
 #include <Application.h>
 #include <Layers/SystemLayer.h>
 #include <Version.h>

@@ -15,15 +15,13 @@ ScopedPtr<wchar_t> WindowsPlatform::ConvertToWide(const char* skinny)
 	const uint32_t skinnyLength = (uint32_t)MultiByteToWideChar(CP_UTF8, 0, skinny, -1, nullptr, 0);
 	if (skinnyLength != 0)
 	{
-		ScopedPtr<wchar_t> buffer;
+		ScopedPtr<wchar_t> buffer = MemoryManager::Get().Allocate<wchar_t>((skinnyLength + 1) * sizeof(wchar_t));;
 
-		buffer = new wchar_t[skinnyLength + 1]();
 		if (!MultiByteToWideChar(CP_UTF8, 0, skinny, skinnyLength * sizeof(char), buffer.Get(), skinnyLength))
 		{
 			MR_LOG(LogPlatform, Error, "Failed to convert narrow characters: %s", *GetError());
 			return nullptr;
 		}
-
 
 		return buffer;
 	}
@@ -36,8 +34,7 @@ ScopedPtr<char> WindowsPlatform::ConvertToNarrow(const wchar_t* fat)
 	const uint32_t fatLength = (uint32_t)WideCharToMultiByte(CP_UTF8, 0, fat, -1, nullptr, 0, 0, 0);
 	if (fatLength != 0)
 	{
-		ScopedPtr<char> buffer;
-		buffer = new char[fatLength + 1]();
+		ScopedPtr<char> buffer = MemoryManager::Get().Allocate<char>((fatLength + 1) * sizeof(char));;
 
 		if (!WideCharToMultiByte(CP_UTF8, 0, fat, -1, buffer.Get(), fatLength * sizeof(char), 0, 0))
 		{

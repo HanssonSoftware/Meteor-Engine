@@ -1,11 +1,13 @@
 ﻿/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #include "String.h"
-#include <Logging/LogMacros.h>
+#include <Logging/Log.h>
 #include <stdio.h>
 #include <cstdlib>
 #include <Layers/SystemLayer.h>
 #include <Platform.h>
+
+#include <MemoryManager.h>
 
 #pragma warning(disable : 26495)
 
@@ -83,7 +85,7 @@ String::String(const wchar_t* Input)
 		heapBuffer.length = inputSize;
 		heapBuffer.capacity = inputSize + 1;
 
-		heapBuffer.ptr = new char[heapBuffer.capacity]();
+		heapBuffer.ptr = MemoryManager::Allocate<char>(heapBuffer.capacity);
 
 		ScopedPtr<char> ptr = Platform::ConvertToNarrow(Input);
 		memcpy(heapBuffer.ptr, ptr.Get(), heapBuffer.length);
@@ -320,7 +322,7 @@ String::~String() noexcept
 {
 	if (bIsUsingHeap && heapBuffer.ptr)
 	{
-		delete[] heapBuffer.ptr;
+		MemoryManager::Deallocate(heapBuffer.ptr);
 		heapBuffer.ptr = nullptr;
 
 		heapBuffer.length = 0;

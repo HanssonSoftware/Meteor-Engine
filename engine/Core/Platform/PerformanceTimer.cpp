@@ -4,7 +4,7 @@
 #include <Windows/Windows.h>
 
 LARGE_INTEGER lg;
-#include <Logging/LogMacros.h>
+#include <Logging/Log.h>
 
 LOG_ADDCATEGORY(HighPerformanceTimer);
 

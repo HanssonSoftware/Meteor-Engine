@@ -48,12 +48,12 @@ void Application::Init()
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF);
 #endif // MR_DEBUG
 
-    MemoryManager::Initialize(appFramework->Memory.memoryReservePercent);
+    MemoryManager::Get().Initialize(appFramework->Memory.memoryReservePercent);
     
     windowManager->Init();
     Logger::Initialize();
 
-    MR_LOG(LogApplication, Log, "Initializing application.");
+    MR_LOG(LogApplication, Log, "Initializing application.%s", "h");
 
     if (windowManager->CreateWindow(appName, { WindowData.x, WindowData.y }, true))
     {

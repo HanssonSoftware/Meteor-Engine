@@ -1,7 +1,6 @@
 ﻿/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #include "Log.h"
-#include "LogMacros.h"
 #include <Commandlet.h>
 #include <Core/Application.h>
 #include <Platform/Timer.h>
@@ -9,7 +8,6 @@
 #include <Layers/SystemLayer.h>
 #include <Platform/FileManager.h>
 #include "LogAssertion.h"
-
 
 LOG_ADDCATEGORY(Standard);
 
@@ -29,23 +27,23 @@ ILogger* ILogger::Get()
 
 void ILogger::Shutdown()
 {
-    if (instance->bIsUsingFile && instance->buffer)
+    if (bIsUsingFile && buffer)
     {
         const String current = Timer::Format("yyyy-MM-dd HH:mm:ss");
 
-        instance->buffer->Write(String::Format("Logging closed at %s.\n", *current));
-        instance->buffer->Close();
+        buffer->Write(String::Format("Logging closed at %s.\n", *current));
+        buffer->Close();
     }
 }
 
 void ILogger::Initialize()
 {
     String val;
-    instance->bIsUsingVerbose = Commandlet::Parse("-verbose", val);
+    bIsUsingVerbose = Commandlet::Parse("-verbose", val);
 
-    instance->bIsUsingFile = !Commandlet::Parse("-nofilelogging", val);
+    bIsUsingFile = !Commandlet::Parse("-nofilelogging", val);
 
-    if (instance->bIsUsingFile && false)
+    if (bIsUsingFile && false)
     {
         //if (const Application* app = GetApplication())
         //{
@@ -77,7 +75,7 @@ void ILogger::HandleFatal()
 
 void ILogger::SetActualLog(LogDescriptor* newDescriptor)
 {
-    instance->actualDescriptor = newDescriptor;
+    actualDescriptor = newDescriptor;
 }
 
 void ILogger::TransmitMessage(LogDescriptor* Descriptor)
@@ -106,27 +104,23 @@ void ILogger::TransmitMessage(LogDescriptor* Descriptor)
         );
     }
     
-
-    instance->SendToOutputBuffer(fullMessage);
+    SendToOutputBuffer(fullMessage);
 }
 
 void ILogger::TransmitAssertion(const LogAssertion* Info)
 {
-	if (!Info) return;
+	//if (!Info) return;
 
-    if (SystemLayer* systemLayer = Layer::GetSystemLayer())
-    {
-        MessageBoxDescriptor mbxInfo = {};
-        mbxInfo.Description = String::Format(
-            "Assertion failed: %s\tLine: %d\tFile: %s\n",
-            Info->assertStatement,
-            Info->assertLineInFile,
-            Info->assertLocationInFile
-        );
-        mbxInfo.Title = "Assertion failed";
+ //   MessageBoxDescriptor mbxInfo = {};
+ //   mbxInfo.Description = String::Format(
+ //       "Assertion failed: %s\tLine: %d\tFile: %s\n",
+ //       Info->assertStatement,
+ //       Info->assertLineInFile,
+ //       Info->assertLocationInFile
+ //   );
+ //   mbxInfo.Title = "Assertion failed";
 
-        systemLayer->AddMessageBox(&mbxInfo);
-    }
+    //systemLayer->AddMessageBox(&mbxInfo);
 }
 
 bool ILogger::IsDebuggerAttached()
@@ -136,9 +130,9 @@ bool ILogger::IsDebuggerAttached()
 
 void ILogger::SendToOutputBuffer(const String& Buffer)
 {
-    if (!Buffer.IsEmpty() && instance->buffer)
+    if (!Buffer.IsEmpty() && buffer)
     {
-        instance->buffer->Write(Buffer);
+        buffer->Write(Buffer);
     }
 }
 
@@ -159,4 +153,19 @@ static constexpr const char* FormatSeverity(LogSeverity Severity) noexcept
     }
 
     return "???";
+}
+
+LogDescriptor::LogDescriptor(const char* entry, LogSeverity severity, const char* Message, const char* function, const char* file, ...) noexcept
+    : team(entry), severity(severity), function(function), file(file)
+{
+    va_list d = nullptr;
+    va_start(d, file);
+    const int32_t reqAmount = vsnprintf(nullptr, 0, Message, d);
+
+    char* big = MemoryManager::Get().Allocate<char>(reqAmount + 1);
+    vsnprintf(big, reqAmount + 1, Message, d);
+    va_end(d);
+
+    message = big;
+    MemoryManager::Get().Deallocate(big);
 }

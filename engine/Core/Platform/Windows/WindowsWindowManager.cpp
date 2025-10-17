@@ -129,17 +129,8 @@ inline bool WindowsWindowManager::RegisterWindowClass()
 	windowClass.hIconSm = ico;
 	windowClass.lpfnWndProc = MeteorSpecifiedWindowProcedure;
 
-    if (const Application* app = Application::Get())
-    {
-        ScopedPtr<wchar_t> appNameWiden = Platform::ConvertToWide(app->appNameNoSpaces.Chr());
-        windowClass.lpszClassName = appNameWiden.Get();
-    }
-    else
-    {
-        MR_LOG(LogWindowManager, Error, "Failed to get application codename, using fallback name! Multiple instance detection may not work!");
-        bIsUsingFallbackClassName = true;
-        windowClass.lpszClassName = GetDefaultApplicationName();
-    }
+    ScopedPtr<wchar_t> appNameWiden = Platform::ConvertToWide(GetApplication()->appNameNoSpaces.Chr());
+    windowClass.lpszClassName = appNameWiden.Get();
 
 	if (!RegisterClassExW(&windowClass))
 	{

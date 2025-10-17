@@ -1,8 +1,6 @@
 ﻿/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
-#include "LogHelpers.h"
-
 
 #ifdef MR_DEBUG
 static constexpr const bool bIsRunningDebugMode = true;
@@ -16,31 +14,62 @@ class IFile;
 
 struct LogEntry {};
 
-struct ILogger
+enum LogSeverity : short
 {
-	static void Initialize();
+	Log, /** Logging standard, you will use this as most. */
+	Verbose, /** Ctrl+C, Ctrl+V from Info. Also this message won't be saved, only for console screen.*/
+	Warn, /** User warning type, text color is different, to draw user attention to console screen.*/
+	Error, /** Indicating an error, which needs some attention.*/
+	Fatal /** Very dangerous situation, this will terminate the app.*/
+};
 
-	static void Shutdown();
+
+struct LogDescriptor
+{
+	LogDescriptor() = delete;
+
+	LogDescriptor(const char* entry, LogSeverity severity, const char* Message, const char* function, const char* file, ...) noexcept;
+
+	const char* team;
+
+	LogSeverity severity;
+
+	String message;
+
+	const char* function;
+
+	const char* file;
+};
+
+
+
+class ILogger
+{
+public:
+	static ILogger* Get();
+
+	void Initialize();
+
+	void Shutdown();
 
 	virtual ~ILogger() noexcept;
 
-	static ILogger* Get();
+	LogDescriptor* GetActualEntry() { return Get()->actualDescriptor; };
 
-	static LogDescriptor* GetActualEntry() { return Get()->actualDescriptor; };
+	void SetActualLog(LogDescriptor* newDescriptor);
 
-	static void HandleFatal();
+	virtual void TransmitMessage(LogDescriptor* Descriptor);
 
-	static void SetActualLog(LogDescriptor* newDescriptor);
+	virtual void TransmitAssertion(const LogAssertion* Info);
 
-	static void TransmitMessage(LogDescriptor * Descriptor);
-
-	static void TransmitAssertion(const LogAssertion* Info);
-
-	static inline bool IsDebuggerAttached();
+	inline bool IsDebuggerAttached();
 
 	virtual void SendToOutputBuffer(const String& Buffer);
+
 protected:
 	ILogger();
+
+	void HandleFatal();
 
 	LogDescriptor* actualDescriptor = nullptr;
 		
@@ -60,3 +89,6 @@ protected:
 #else
 
 #endif // MR_PLATFORM_WINDOWS
+
+
+#include "LogMacros.inl"

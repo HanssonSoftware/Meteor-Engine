@@ -284,7 +284,6 @@
     <ClInclude Include="engine\Core\Platform\Thread\ThreadDescriptor.h" />
     <ClInclude Include="engine\Core\Common\Math.h" />
     <ClInclude Include="engine\Core\Layers\SystemLayerHelper.h" />
-    <ClInclude Include="engine\Core\Logging\LogHelpers.h" />
     <ClInclude Include="engine\Core\Platform\FileHelpers.h" />
     <ClInclude Include="engine\Core\Platform\PlatformLayout.h" />
     <ClInclude Include="engine\Core\Platform\Windows\WindowsPlatform.h" />
@@ -301,7 +300,7 @@
     <ClInclude Include="engine\Core\Common\Delegate.h" />
     <ClInclude Include="engine\Core\Platform\File.h" />
     <ClInclude Include="engine\Core\Logging\Log.h" />
-    <ClInclude Include="engine\Core\Logging\LogMacros.h" />
+    <ClInclude Include="engine\Core\Logging\LogMacros.inl" />
     <ClInclude Include="engine\Core\Platform\Timer.h" />
     <ClInclude Include="engine\Core\Types\Cast.h" />
     <ClInclude Include="engine\Core\Types\String.h" />

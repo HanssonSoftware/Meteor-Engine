@@ -3,7 +3,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 #include "WindowsFileManager.h"
-#include <Logging/LogMacros.h>
+#include <Logging/Log.h>
 #include <Layers/Layer.h>
 #include <Application.h>
 #include <Layers/SystemLayer.h>

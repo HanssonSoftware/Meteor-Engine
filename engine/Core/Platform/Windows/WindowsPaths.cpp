@@ -2,7 +2,7 @@
 
 #include "WindowsPaths.h"
 #include <Types/String.h>
-#include <Logging/LogMacros.h>
+#include <Logging/Log.h>
 
 #include <Windows/Windows.h>
 #include <Shlobj.h>

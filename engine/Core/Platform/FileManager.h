@@ -1,7 +1,7 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <Logging/LogMacros.h>
+#include <Logging/Log.h>
 #include <Platform/FileHelpers.h>
 #undef CreateDirectory
 
