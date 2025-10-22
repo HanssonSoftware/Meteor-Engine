@@ -1,13 +1,13 @@
 ﻿/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
-//#include "LogAssertion.h"
-//#include <type_traits>
+#include "LogAssertion.h"
+#include <type_traits>
 
 #define MERGE(x, y) x##y
 #define MERGE2(x) #x
 
-/** Creates a logging category, do NOT insert Log before, just the word (automatically appends a Log)! */
+/** Creates a logging category, do NOT insert Log before, just the word (automatically appends Log)! */
 #define LOG_ADDCATEGORY(CategoryName) \
     /* Generated log name! */ \
     struct Log##CategoryName : public LogEntry \
@@ -26,11 +26,10 @@ LOG_ADDCATEGORY(Temp);
     {\
         do { \
             \
-                LogDescriptor Log##Line = LogDescriptor(#CategoryName, Severity, Message, __FUNCTION__, __FILE__, __VA_ARGS__); \
-                Logger::TransmitMessage(&Log##Line); \
+                LogDescriptor Log##Line; Log##Line.SetValues(#CategoryName, Severity, __FUNCTION__, __FILE__, __LINE__); ILogger::Get()->TransmitMessage(&Log##Line); \
                 if constexpr (Severity == Fatal) \
                 { \
-                    Logger::HandleFatal(); \
+                    ILogger::Get()->HandleFatal(); \
                 } \
         } while (0); \
     }
@@ -41,7 +40,7 @@ LOG_ADDCATEGORY(Temp);
         if (!(expression)) \
         {   \
             LogAssertion asserta(__FILE__, __LINE__, #expression, message, __VA_ARGS__);\
-            if (Logger::TransmitAssertion(asserta) == 1) __debugbreak(); \
+            if (/*ILogger::Get()->TransmitAssertion(&asserta) == 1*/0) __debugbreak(); \
                                                              \
         }                                                                      \
     } while (0)

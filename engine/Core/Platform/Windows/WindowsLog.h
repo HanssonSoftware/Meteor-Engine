@@ -6,27 +6,26 @@
 
 class IFile;
 
-struct WindowsLog : public ILogger
+class WindowsLogger : public ILogger
 {
-	WindowsLog();
+	friend class ILogger;
+public:
+	virtual ~WindowsLogger() noexcept;
 
-	virtual ~WindowsLog() noexcept;
+	virtual void Initialize() override;
 
-	static void Initialize();
+	virtual void Shutdown() override;
 
-	static void Shutdown();
+	virtual void HandleFatal() override;
 
-	static inline bool IsDebuggerAttached();
-
-	static void HandleFatal();
-
-	static int32_t TransmitAssertion(LogAssertion& Info);
+	//int32_t TransmitAssertion(LogAssertion& Info);
 
 	virtual void SendToOutputBuffer(const String& Buffer) override;
 
+	static inline bool IsDebuggerAttached();
+
 protected:
+	WindowsLogger();
+
 	IFile* consoleBuffer = nullptr;
 };
-
-
-using Logger = WindowsLog;

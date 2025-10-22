@@ -7,27 +7,28 @@
 #include <Layers/SystemLayer.h>
 #include <Version.h>
 #include "WindowsFile.h"
+#include <Platform/Platform.h>
 
 #include <DbgHelp.h>
 #include <assertbox.h>
 #pragma warning(disable : 6001) // Using uninitialized memory 'X'
 
-LOG_ADDCATEGORY(AssertionSystem);
+//LOG_ADDCATEGORY(Assertion);
 
 static HANDLE hConsole;
 
-WindowsLog::WindowsLog()
+WindowsLogger::WindowsLogger()
 	: ILogger()
 {
 	
 }
 
-WindowsLog::~WindowsLog() noexcept
+WindowsLogger::~WindowsLogger() noexcept
 {
 
 }
 
-void WindowsLog::Initialize()
+void WindowsLogger::Initialize()
 {
 #ifdef MR_DEBUG
 	if constexpr (bIsRunningDebugMode)
@@ -69,20 +70,14 @@ void WindowsLog::Initialize()
 				SetConsoleCursorInfo(hConsole, &cf);
 
 			
-				if (SystemLayer* systemLayer = Layer::GetSystemLayer())
+				if (!SetStdHandle(STD_OUTPUT_HANDLE, hConsole))
+					Application::RequestExit(-1);
+
+				ScopedPtr<wchar_t> buffer = Platform::ConvertToWide(String::Format("%s developer console (b%d)", Application::Get()->appName.Chr(), BUILD_NUMBER).Chr());
+
+				if (!SetConsoleTitleW(buffer.Get()))
 				{
-					if (!SetStdHandle(STD_OUTPUT_HANDLE, hConsole))
-						Application::RequestExit(-1);
-
-					wchar_t* buffer = systemLayer->ConvertToWide(String::Format("%s developer console (b%d)", Application::Get()->appName.Chr(), BUILD_NUMBER).Chr());
-
-					if (!SetConsoleTitleW(buffer))
-					{
-						delete[] buffer;
-						Application::RequestExit(-1);
-					}
-
-					delete[] buffer; // Using uninitialized memory 'X'
+					Application::RequestExit(-1);
 				}
 			}
 		}
@@ -92,7 +87,7 @@ void WindowsLog::Initialize()
 	ILogger::Initialize();
 }
 
-void WindowsLog::Shutdown()
+void WindowsLogger::Shutdown()
 {
 #ifdef MR_DEBUG
 	if constexpr (bIsRunningDebugMode)
@@ -110,57 +105,50 @@ void WindowsLog::Shutdown()
 }
 
 
-void WindowsLog::SendToOutputBuffer(const String& Buffer)
+void WindowsLogger::SendToOutputBuffer(const String& Buffer)
 {
 #ifdef MR_DEBUG
 	if constexpr (bIsRunningDebugMode)
 	{
-		if (SystemLayer* systemLayer = Layer::GetSystemLayer())
+		ScopedPtr<wchar_t> message = Platform::ConvertToWide(Buffer.Chr());
+
+		const LogDescriptor* actualDescriptor = ILogger::Get()->GetActualEntry();
+		if (!actualDescriptor)
+			return;
+
+		switch (actualDescriptor->severity)
 		{
-			wchar_t* message = systemLayer->ConvertToWide(Buffer.Chr());
-
-			const LogDescriptor* actualDescriptor = ILogger::Get()->GetActualEntry();
-			if (!actualDescriptor)
-			{
-				delete[] message;
-				return;
-			}
-
-			switch (actualDescriptor->severity)
-			{
-			case Log:
-				SetConsoleTextAttribute(hConsole, 0x7);
-				break;
-			case Verbose:
-				SetConsoleTextAttribute(hConsole, 0x9);
-				break;
-			case Error:
-				SetConsoleTextAttribute(hConsole, 0xC);
-				break;
-			case Warn:
-				SetConsoleTextAttribute(hConsole, 0x6);
-				break;
-			case Fatal:
-				SetConsoleTextAttribute(hConsole, 0x4);
-				break;
-			}
-
-			DWORD written = 0;
-			if (!WriteConsoleW(hConsole, message, (DWORD)wcslen(message), &written, 0))
-				return ILogger::SendToOutputBuffer(Buffer);
-
-			if (IsDebuggerAttached())
-				OutputDebugStringW(message);
-
-			delete[] message;
+		case Log:
+			SetConsoleTextAttribute(hConsole, 0x7);
+			break;
+		case Verbose:
+			SetConsoleTextAttribute(hConsole, 0x9);
+			break;
+		case Error:
+			SetConsoleTextAttribute(hConsole, 0xC);
+			break;
+		case Warn:
+			SetConsoleTextAttribute(hConsole, 0x6);
+			break;
+		case Fatal:
+			SetConsoleTextAttribute(hConsole, 0x4);
+			break;
 		}
+
+		DWORD written = 0;
+		if (!WriteConsoleW(hConsole, message.Get(), (DWORD)wcslen(message.Get()), &written, 0))
+			return ILogger::SendToOutputBuffer(Buffer);
+
+		if (IsDebuggerAttached())
+			OutputDebugStringW(message.Get());
+
 	}
 #endif // MR_DEBUG
 
 	ILogger::SendToOutputBuffer(Buffer);
 }
 
-void WindowsLog::HandleFatal()
+void WindowsLogger::HandleFatal()
 {
 	if (SystemLayer* systemLayer = Layer::GetSystemLayer())
 	{
@@ -173,10 +161,9 @@ void WindowsLog::HandleFatal()
 			return;
 		}
 
-		const wchar_t* convertedFatalText = systemLayer->ConvertToWide(actualDescriptor->message.Chr());
+		ScopedPtr<wchar_t> convertedFatalText = Platform::ConvertToWide(actualDescriptor->message);
 
-		MessageBoxW(nullptr, convertedFatalText, L"Engine Error!", MB_OK);
-		delete[] convertedFatalText;
+		MessageBoxW(nullptr, convertedFatalText.Get(), L"Engine Error!", MB_OK);
 	}
 	else
 	{
@@ -186,7 +173,7 @@ void WindowsLog::HandleFatal()
 	TerminateProcess(GetCurrentProcess(), -1);
 }
 
-bool WindowsLog::IsDebuggerAttached()
+bool WindowsLogger::IsDebuggerAttached()
 {
 	return IsDebuggerPresent() ? true : false;
 }
@@ -199,37 +186,32 @@ static INT_PTR WindowsLoggingDialogProcedure(HWND wnd, UINT msg, WPARAM ai1, LPA
 	case WM_INITDIALOG:
 		if (const LogAssertion* pkg = reinterpret_cast<const LogAssertion*>(ai2))
 		{
-			SystemLayer* systemLayer = Layer::GetSystemLayer();
-			if (systemLayer)
-			{
-				wchar_t* fileName = systemLayer->ConvertToWide(pkg->assertLocationInFile);
-				SetDlgItemTextW(wnd, IDC_ASSERTIONFILESTATEMENT, fileName);
+			/*wchar_t* fileName = Platform::ConvertToWide(pkg->assertLocationInFile);
+			SetDlgItemTextW(wnd, IDC_ASSERTIONFILESTATEMENT, fileName);
 
-				wchar_t* statement = systemLayer->ConvertToWide(pkg->assertStatement);
-				SetDlgItemTextW(wnd, IDC_ASSERTIONSTATEMENT, statement);
+			wchar_t* statement = Platform::ConvertToWide(pkg->assertStatement);
+			SetDlgItemTextW(wnd, IDC_ASSERTIONSTATEMENT, statement);
 
-				wchar_t* line = systemLayer->ConvertToWide(String(pkg->assertLineInFile));
-				SetDlgItemTextW(wnd, IDC_ASSERTIONLINESTATEMENT, line);
+			wchar_t* line = Platform::ConvertToWide(String(pkg->assertLineInFile));
+			SetDlgItemTextW(wnd, IDC_ASSERTIONLINESTATEMENT, line);
 				
-				delete[] statement, fileName, line;
+			delete[] statement, fileName, line;
 
-				if (!Logger::IsDebuggerAttached())
-					EnableWindow(GetDlgItem(wnd, IDBREAKONDEBUGGER), 0);
+			if (!ILogger::IsDebuggerAttached())
+				EnableWindow(GetDlgItem(wnd, IDBREAKONDEBUGGER), 0);
 
-				if (!pkg->assertMessage.IsEmpty())
-				{
-					wchar_t* message = systemLayer->ConvertToWide(pkg->assertMessage.Chr());
-					SetDlgItemTextW(wnd, IDC_ASSERTIONLINEMESSAGE, message);
+			if (!pkg->assertMessage.IsEmpty())
+			{
+				wchar_t* message = Platform::ConvertToWide(pkg->assertMessage.Chr());
+				SetDlgItemTextW(wnd, IDC_ASSERTIONLINEMESSAGE, message);
 
-					delete[] message;
-				}
-				else
-				{
-					ShowWindow(GetDlgItem(wnd, IDC_ASSERTIONLINEMESSAGE), SW_HIDE);
-					ShowWindow(GetDlgItem(wnd, IDC_ASSERTIONMESSAGE), SW_HIDE);
-				}
+				delete[] message;
 			}
-			
+			else
+			{
+				ShowWindow(GetDlgItem(wnd, IDC_ASSERTIONLINEMESSAGE), SW_HIDE);
+				ShowWindow(GetDlgItem(wnd, IDC_ASSERTIONMESSAGE), SW_HIDE);
+			}*/
 		}
 	break;
 	case WM_COMMAND:
@@ -264,37 +246,37 @@ static INT_PTR WindowsLoggingDialogProcedure(HWND wnd, UINT msg, WPARAM ai1, LPA
 	return DefWindowProcW(wnd, msg, ai1, ai2);
 }
 
-int32_t WindowsLog::TransmitAssertion(LogAssertion& Info)
-{
-	if (Info.bIgnoreThis || Info.bIgnoreFor > 0)
-		return -1;
-
-	auto result = DialogBoxParamW(
-		GetModuleHandleW(0), 
-		MAKEINTRESOURCEW(IDD_ASSERTIONDIALOG), 
-		0, 
-		WindowsLoggingDialogProcedure, 
-		(LPARAM)&Info
-	);
-
-	switch (result)
-	{
-	case -2:
-		ExitProcess(-1);
-		break;
-	case 2:		
-		Info.bIgnoreThis = true;
-		MR_LOG(LogAssertionSystem, Warn, "Assert is supressed! %s:%d", Info.assertLocationInFile, Info.assertLineInFile);
-		break;
-
-	default:
-		break;
-	}
-
-	if (SystemLayer* systemLayer = Layer::GetSystemLayer())
-	{
-		const String j = systemLayer->GetError();
-	}
-
-	return (int32_t)result;
-}
+//int32_t WindowsLogger::TransmitAssertion(LogAssertion& Info)
+//{
+//	if (Info.bIgnoreThis || Info.bIgnoreFor > 0)
+//		return -1;
+//
+//	auto result = DialogBoxParamW(
+//		GetModuleHandleW(0), 
+//		MAKEINTRESOURCEW(IDD_ASSERTIONDIALOG), 
+//		0, 
+//		WindowsLoggingDialogProcedure, 
+//		(LPARAM)&Info
+//	);
+//
+//	switch (result)
+//	{
+//	case -2:
+//		ExitProcess(-1);
+//		break;
+//	case 2:		
+//		Info.bIgnoreThis = true;
+//		MR_LOG(LogAssertionSystem, Warn, "Assert is supressed! %s:%d", Info.assertLocationInFile, Info.assertLineInFile);
+//		break;
+//
+//	default:
+//		break;
+//	}
+//
+//	if (SystemLayer* systemLayer = Layer::GetSystemLayer())
+//	{
+//		const String j = systemLayer->GetError();
+//	}
+//
+//	return (int32_t)result;
+//}

@@ -26,31 +26,36 @@ enum LogSeverity : short
 
 struct LogDescriptor
 {
-	LogDescriptor() = delete;
+	LogDescriptor() = default;
 
 	LogDescriptor(const char* entry, LogSeverity severity, const char* Message, const char* function, const char* file, ...) noexcept;
+
+	constexpr void SetValues(const char* category, LogSeverity severity, const char* function, const char* file, const int line);
 
 	const char* team;
 
 	LogSeverity severity;
 
-	String message;
+	const char* message;
 
 	const char* function;
 
 	const char* file;
+
+	int line;
 };
 
 
 
 class ILogger
 {
+	friend class WindowsLogger;
 public:
 	static ILogger* Get();
 
-	void Initialize();
+	virtual void Initialize();
 
-	void Shutdown();
+	virtual void Shutdown();
 
 	virtual ~ILogger() noexcept;
 
@@ -62,14 +67,14 @@ public:
 
 	virtual void TransmitAssertion(const LogAssertion* Info);
 
-	inline bool IsDebuggerAttached();
+	static inline bool IsDebuggerAttached();
 
 	virtual void SendToOutputBuffer(const String& Buffer);
 
+	virtual void HandleFatal();
+
 protected:
 	ILogger();
-
-	void HandleFatal();
 
 	LogDescriptor* actualDescriptor = nullptr;
 		
@@ -81,14 +86,5 @@ protected:
 
 	IFile* buffer = nullptr;
 };
-
-#include <Platform/PlatformLayout.h>
-
-#ifdef MR_PLATFORM_WINDOWS
-#include <Windows/WindowsLog.h>
-#else
-
-#endif // MR_PLATFORM_WINDOWS
-
 
 #include "LogMacros.inl"

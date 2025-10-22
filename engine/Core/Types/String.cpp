@@ -85,7 +85,7 @@ String::String(const wchar_t* Input)
 		heapBuffer.length = inputSize;
 		heapBuffer.capacity = inputSize + 1;
 
-		heapBuffer.ptr = MemoryManager::Allocate<char>(heapBuffer.capacity);
+		heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
 
 		ScopedPtr<char> ptr = Platform::ConvertToNarrow(Input);
 		memcpy(heapBuffer.ptr, ptr.Get(), heapBuffer.length);
@@ -322,7 +322,7 @@ String::~String() noexcept
 {
 	if (bIsUsingHeap && heapBuffer.ptr)
 	{
-		MemoryManager::Deallocate(heapBuffer.ptr);
+		MemoryManager::Get().Deallocate(heapBuffer.ptr);
 		heapBuffer.ptr = nullptr;
 
 		heapBuffer.length = 0;

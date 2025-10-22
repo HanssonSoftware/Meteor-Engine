@@ -2,18 +2,26 @@
 
 #include "Log.h"
 #include <Commandlet.h>
-#include <Core/Application.h>
-#include <Platform/Timer.h>
+
 #include <Platform/File.h>
-#include <Layers/SystemLayer.h>
-#include <Platform/FileManager.h>
-#include "LogAssertion.h"
+#include <Platform/PlatformLayout.h>
+#include <Platform/Timer.h>
+
+
+
+#ifdef MR_PLATFORM_WINDOWS
+#include <Windows/WindowsLog.h>
+#else
+
+#endif // MR_PLATFORM_WINDOWS
+
+//#include <Core/Application.h>
+//#include <Layers/SystemLayer.h>
+//#include <Platform/FileManager.h>
+//#include "LogAssertion.h"
 
 LOG_ADDCATEGORY(Standard);
 
-static_assert(!std::is_same_v<Logger, ILogger>, "ILogger must be extended!");
-
-static Logger* instance = new Logger();
 
 ILogger::ILogger()
 {
@@ -22,7 +30,11 @@ ILogger::ILogger()
 
 ILogger* ILogger::Get()
 {
-    return instance;
+#ifdef MR_PLATFORM_WINDOWS
+    static WindowsLogger instance;
+#endif // MR_PLATFORM_WINDOWS
+
+    return &instance;
 }
 
 void ILogger::Shutdown()
@@ -91,7 +103,7 @@ void ILogger::TransmitMessage(LogDescriptor* Descriptor)
             "=============[ Fatal error ]=============\nWhere:\t\t%s\nWhen:\t\t%s\nMessage:\t%s\n\nFile:\t%s\n",
             Descriptor->function,
             *current,
-            Descriptor->message.Chr(),
+            Descriptor->message,
             Descriptor->file
         );
     }
@@ -100,7 +112,7 @@ void ILogger::TransmitMessage(LogDescriptor* Descriptor)
         fullMessage = String::Format("[%s] %s: %s\n", 
             *current,
             Descriptor->team, 
-            *Descriptor->message
+            Descriptor->message
         );
     }
     
@@ -168,4 +180,12 @@ LogDescriptor::LogDescriptor(const char* entry, LogSeverity severity, const char
 
     message = big;
     MemoryManager::Get().Deallocate(big);
+}
+
+constexpr void LogDescriptor::SetValues(const char* category, LogSeverity severity, const char* function, const char* file, const int line)
+{
+    this->team = category;
+    this->severity = severity;
+    this->function = function;
+    this->line = line;
 }

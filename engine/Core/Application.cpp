@@ -51,7 +51,7 @@ void Application::Init()
     MemoryManager::Get().Initialize(appFramework->Memory.memoryReservePercent);
     
     windowManager->Init();
-    Logger::Initialize();
+    ILogger::Get()->Initialize();
 
     MR_LOG(LogApplication, Log, "Initializing application.%s", "h");
 
@@ -83,7 +83,7 @@ void Application::Shutdown()
 
         layerManager->Shutdown();
 
-        Logger::Shutdown();
+        ILogger::Get()->Shutdown();
 
         appFramework->Init();
     }
@@ -95,9 +95,9 @@ void Application::Shutdown()
 
         layerManager->Shutdown();
 
-        Logger::Shutdown();
+        ILogger::Get()->Shutdown();
 
-        MemoryManager::Shutdown();
+        MemoryManager::Get().Shutdown();
     }
 }
 
