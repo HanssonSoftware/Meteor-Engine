@@ -4,10 +4,10 @@
 #include <Commandlet.h>
 
 #include <Platform/File.h>
+#include <Platform/Paths.h>
 #include <Platform/PlatformLayout.h>
 #include <Platform/Timer.h>
-
-
+#include <Platform/FileManager.h>
 
 #ifdef MR_PLATFORM_WINDOWS
 #include <Windows/WindowsLog.h>
@@ -17,7 +17,6 @@
 
 //#include <Core/Application.h>
 //#include <Layers/SystemLayer.h>
-//#include <Platform/FileManager.h>
 //#include "LogAssertion.h"
 
 LOG_ADDCATEGORY(Standard);
@@ -41,9 +40,9 @@ void ILogger::Shutdown()
 {
     if (bIsUsingFile && buffer)
     {
-        const String current = Timer::Format("yyyy-MM-dd HH:mm:ss");
+        const String formatted = String::Format("Logging closed at %s.\n", *Timer::Format("yyyy-MM-dd HH:mm:ss"));
 
-        buffer->Write(String::Format("Logging closed at %s.\n", *current));
+        buffer->Write(&formatted);
         buffer->Close();
     }
 }
@@ -55,23 +54,20 @@ void ILogger::Initialize()
 
     bIsUsingFile = !Commandlet::Parse("-nofilelogging", val);
 
-    if (bIsUsingFile && false)
+    if (bIsUsingFile)
     {
-        //if (const Application* app = GetApplication())
-        //{
-        //    FileStatus stat;
-        //    instance->buffer = FileManager::CreateFileOperation(
-        //        String::Format(
-        //            "E:\\Logging\\%s-%s.txt", 
-        //            app->GetAppInfo().appName.Chr(), 
-        //            ITimer::Now("%H.%M.%S").Chr()),
+        auto b = Paths::GetEngineDirectory();
+        //buffer = FileManager::CreateFileOperation(
+        //    String::Format(
+        //        "E:\\Logging\\%s-%s.txt", 
+        //        app->GetAppInfo().appName.Chr(), 
+        //        ITimer::Now("%H.%M.%S").Chr()),
 
-        //        OPENMODE_WRITE | OPENMODE_READ, SHAREMODE_READ | SHAREMODE_WRITE, OVERRIDERULE_CREATE_NEW_DONT_MIND, 
-        //        stat
-        //    );
+        //    OPENMODE_WRITE | OPENMODE_READ, SHAREMODE_READ | SHAREMODE_WRITE, OVERRIDERULE_CREATE_NEW_DONT_MIND, 
+        //    stat
+        //);
 
-        //    if (instance->buffer) instance->buffer->Write(String::Format("Logging started at %s.\n", ITimer::Now("%Y/%m/%d-%H:%M:%S").Chr()));
-        //}
+        if (buffer) buffer->Write(nullptr);
     }
 }
 
@@ -104,18 +100,16 @@ void ILogger::TransmitMessage(LogDescriptor* Descriptor)
             Descriptor->function,
             *current,
             Descriptor->message,
-            Descriptor->file
-        );
+            Descriptor->file);
     }
     else
     {
         fullMessage = String::Format("[%s] %s: %s\n", 
-            *current,
-            Descriptor->team, 
-            Descriptor->message
-        );
+            current.Chr(),
+            Descriptor->team,
+            *Descriptor->message);
     }
-    
+
     SendToOutputBuffer(fullMessage);
 }
 
@@ -144,7 +138,7 @@ void ILogger::SendToOutputBuffer(const String& Buffer)
 {
     if (!Buffer.IsEmpty() && buffer)
     {
-        buffer->Write(Buffer);
+        buffer->Write(&Buffer);
     }
 }
 
@@ -167,25 +161,16 @@ static constexpr const char* FormatSeverity(LogSeverity Severity) noexcept
     return "???";
 }
 
-LogDescriptor::LogDescriptor(const char* entry, LogSeverity severity, const char* Message, const char* function, const char* file, ...) noexcept
-    : team(entry), severity(severity), function(function), file(file)
+void LogDescriptor::SetMessage(const char* message, ...)
 {
     va_list d = nullptr;
-    va_start(d, file);
-    const int32_t reqAmount = vsnprintf(nullptr, 0, Message, d);
+    va_start(d, message);
+    const int32_t reqAmount = vsnprintf(nullptr, 0, message, d);
 
     char* big = MemoryManager::Get().Allocate<char>(reqAmount + 1);
-    vsnprintf(big, reqAmount + 1, Message, d);
+    vsnprintf(big, reqAmount + 1, message, d);
     va_end(d);
 
-    message = big;
+    this->message = big;
     MemoryManager::Get().Deallocate(big);
-}
-
-constexpr void LogDescriptor::SetValues(const char* category, LogSeverity severity, const char* function, const char* file, const int line)
-{
-    this->team = category;
-    this->severity = severity;
-    this->function = function;
-    this->line = line;
 }

@@ -2,7 +2,7 @@
 
 #include "WindowsLog.h"
 #include <Windows/Windows.h>
-#include <Logging/Log.h>
+#include <Types/String.h>
 #include <Application.h>
 #include <Layers/SystemLayer.h>
 #include <Version.h>
@@ -79,6 +79,8 @@ void WindowsLogger::Initialize()
 				{
 					Application::RequestExit(-1);
 				}
+
+				bHasConsoleWindow = true;
 			}
 		}
 	}
@@ -108,7 +110,7 @@ void WindowsLogger::Shutdown()
 void WindowsLogger::SendToOutputBuffer(const String& Buffer)
 {
 #ifdef MR_DEBUG
-	if constexpr (bIsRunningDebugMode)
+	if (bIsRunningDebugMode && bHasConsoleWindow)
 	{
 		ScopedPtr<wchar_t> message = Platform::ConvertToWide(Buffer.Chr());
 
@@ -150,25 +152,18 @@ void WindowsLogger::SendToOutputBuffer(const String& Buffer)
 
 void WindowsLogger::HandleFatal()
 {
-	if (SystemLayer* systemLayer = Layer::GetSystemLayer())
-	{
-		const LogDescriptor* actualDescriptor = ILogger::Get()->GetActualEntry();
-		if (!actualDescriptor)
-		{
-			MessageBoxW(nullptr, L"Unknown error!", L"Engine Error!", MB_OK);
-
-			TerminateProcess(GetCurrentProcess(), -1);
-			return;
-		}
-
-		ScopedPtr<wchar_t> convertedFatalText = Platform::ConvertToWide(actualDescriptor->message);
-
-		MessageBoxW(nullptr, convertedFatalText.Get(), L"Engine Error!", MB_OK);
-	}
-	else
+	const LogDescriptor* actualDescriptor = ILogger::Get()->GetActualEntry();
+	if (!actualDescriptor)
 	{
 		MessageBoxW(nullptr, L"Unknown error!", L"Engine Error!", MB_OK);
+
+		TerminateProcess(GetCurrentProcess(), -1);
+		return;
 	}
+
+	ScopedPtr<wchar_t> convertedFatalText = Platform::ConvertToWide(actualDescriptor->message);
+
+	MessageBoxW(nullptr, convertedFatalText.Get(), L"Engine Error!", MB_OK);
 
 	TerminateProcess(GetCurrentProcess(), -1);
 }

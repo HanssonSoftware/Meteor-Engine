@@ -46,7 +46,7 @@ String::String(const char* Input)
 		heapBuffer.length = inputSize;
 		heapBuffer.capacity = inputSize + 1;
 
-		heapBuffer.ptr = new char[heapBuffer.capacity]();
+		heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
 		memcpy(heapBuffer.ptr, Input, inputSize);
 		
 		heapBuffer.ptr[inputSize] = '\0';
@@ -119,7 +119,7 @@ String::String(const int32_t Input)
 		heapBuffer.length = inputSize;
 		heapBuffer.capacity = inputSize + 1;
 
-		heapBuffer.ptr = new char[heapBuffer.capacity]();
+		heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
 
 		snprintf(heapBuffer.ptr, inputSize + 1, "%d", Input);
 
@@ -152,7 +152,7 @@ String::String(const uint32_t Input)
 		heapBuffer.length = inputSize;
 		heapBuffer.capacity = inputSize + 1;
 
-		heapBuffer.ptr = new char[heapBuffer.capacity]();
+		heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
 
 		snprintf(heapBuffer.ptr, inputSize + 1, "%u", Input);
 
@@ -185,7 +185,7 @@ String::String(const float Input)
 		heapBuffer.length = inputSize;
 		heapBuffer.capacity = inputSize + 1;
 
-		heapBuffer.ptr = new char[heapBuffer.capacity]();
+		heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
 
 		snprintf(heapBuffer.ptr, inputSize + 1, "%f", Input);
 
@@ -218,7 +218,7 @@ String::String(const unsigned long Input)
 		heapBuffer.length = inputSize;
 		heapBuffer.capacity = inputSize + 1;
 
-		heapBuffer.ptr = new char[heapBuffer.capacity]();
+		heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
 
 		snprintf(heapBuffer.ptr, inputSize + 1, "%u", Input);
 
@@ -243,7 +243,7 @@ String::String(String&& other) noexcept
 		heapBuffer.capacity = other.heapBuffer.capacity;
 		heapBuffer.length = other.heapBuffer.length;
 
-		heapBuffer.ptr = new char[heapBuffer.capacity]();
+		heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
 
 		memmove(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
 		heapBuffer.ptr[heapBuffer.length] = '\0';
@@ -274,7 +274,7 @@ String::String(const String& other)
 		heapBuffer.capacity = other.heapBuffer.capacity;
 		heapBuffer.length = other.heapBuffer.length;
 
-		heapBuffer.ptr = new char[heapBuffer.capacity]();
+		heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
 
 		memcpy(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
 		heapBuffer.ptr[heapBuffer.length] = '\0';
@@ -304,7 +304,7 @@ String::String(const char* string, uint32_t length)
 	{
 		heapBuffer.capacity = (uint32_t)(length + 1);
 		heapBuffer.length = (uint32_t)length;
-		heapBuffer.ptr = new char[heapBuffer.capacity]();
+		heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
 
 		memcpy(heapBuffer.ptr, string, length);
 		heapBuffer.ptr[heapBuffer.length] = '\0';
@@ -370,7 +370,7 @@ String operator+(const String& OtherA, const String& OtherB)
 
 	const uint32_t size = (uint32_t)(strlen(otherABuffer) + strlen(otherBBuffer) + 1);
 
-	char* super = new char[size]();
+	char* super = MemoryManager::Get().Allocate<char>(size);
 
 	if (super == nullptr)
 	{
@@ -384,7 +384,6 @@ String operator+(const String& OtherA, const String& OtherB)
 
 	String newStringBuffer(super);
 
-	delete[] super;
 	return newStringBuffer;
 }
 
@@ -413,7 +412,7 @@ const char* String::Chr() const
 
 char* String::Allocate()
 {
-	char* buffer = new char[bIsUsingHeap ? heapBuffer.capacity : stackBuffer.length + 1]();
+	char* buffer = MemoryManager::Get().Allocate<char>(bIsUsingHeap ? heapBuffer.capacity : stackBuffer.length + 1);
 	memcpy(buffer, Chr(), bIsUsingHeap ? heapBuffer.length : stackBuffer.length);
 	
 	return buffer;
@@ -461,26 +460,25 @@ uint32_t String::Length() const noexcept
 	return bIsUsingHeap ? (uint32_t)heapBuffer.length : (uint32_t)stackBuffer.length;
 }
 
-String String::Format(const String format, ...)
+String String::Format(const String& format, ...)
 {
-	const char* formattingBuffer = format.Chr();
-
 	va_list a;
-	va_start(a, format);
+	va_start(a, *format);
+
+	const char* formattingBuffer = format.Chr();
 
 	va_list a_cpy;
 	va_copy(a_cpy, a);
-	const uint32_t sizeForVA = vsnprintf(nullptr, 0, formattingBuffer, a_cpy);
+	const int sizeForVA = vsnprintf(nullptr, 0, formattingBuffer, a_cpy);
 	va_end(a_cpy);
 
-	char* newFormattedBuffer = new char[sizeForVA + 1]();
+	char* newFormattedBuffer = MemoryManager::Get().Allocate<char>(sizeForVA + 1);
 
-	vsnprintf(newFormattedBuffer, sizeForVA + 1 ,formattingBuffer, a);
+	const int result = vsnprintf(newFormattedBuffer, sizeForVA + 1 ,formattingBuffer, a);
 	va_end(a);
 
 	String stringized(newFormattedBuffer);
 
-	delete[] newFormattedBuffer;
 	return stringized;
 }
 
@@ -509,11 +507,11 @@ void String::MakeEmpty()
 	stackBuffer.length = 0;
 }
 
-constexpr void String::ResetBuffers()
+void String::ResetBuffers()
 {
 	if (bIsUsingHeap)
 	{
-		delete[] heapBuffer.ptr;
+		MemoryManager::Get().Deallocate<char>(heapBuffer.ptr);
 		heapBuffer.ptr = nullptr;
 
 		heapBuffer.capacity = 0;
@@ -539,7 +537,7 @@ String& String::operator=(const String& other)
 			heapBuffer.capacity = other.heapBuffer.capacity;
 			heapBuffer.length = other.heapBuffer.length;
 
-			heapBuffer.ptr = new char[heapBuffer.capacity]();
+			heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
 			strncpy(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
 			
 			heapBuffer.ptr[heapBuffer.length] = '\0';
@@ -599,7 +597,7 @@ String& String::operator+=(const String& other)
 		if (bIsUsingHeap && heapBuffer.capacity < size)
 		{
 			heapBuffer.capacity = size * 2;
-			char* newBuffer = new char[heapBuffer.capacity];
+			char* newBuffer = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
 			memset(newBuffer, 0, heapBuffer.capacity);
 
 			strncpy(newBuffer, destination, heapBuffer.length);
@@ -625,7 +623,7 @@ String& String::operator+=(const String& other)
 			const uint32_t stackLength = Length();
 
 			heapBuffer.capacity = size * 2;
-			char* buffer = new char[size];
+			char* buffer = MemoryManager::Get().Allocate<char>(size);
 
 			memset(buffer, 0, size);
 

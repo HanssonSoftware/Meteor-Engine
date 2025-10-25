@@ -1,14 +1,13 @@
 ﻿/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #include "WindowsFile.h"
-// #include <Windows/Windows.h>
+
+#include <Application.h>
+#include <Platform/Platform.h>
 
 #include <handleapi.h>
 #include <PathCch.h>
 #include <Shlwapi.h>
-
-#include <Application.h>
-#include <Layers/SystemLayer.h>
 
 #pragma comment(lib, "Pathcch.lib")
 #pragma comment(lib, "Shlwapi.lib")
@@ -34,8 +33,7 @@ void WindowsFile::Close()
 	{
 		if (buffer)
 		{
-			delete[] buffer;
-			buffer = nullptr;
+			MemoryManager::Get().Deallocate(buffer);
 		}
 
 		FlushFileBuffers(fileHandle);
@@ -43,41 +41,39 @@ void WindowsFile::Close()
 		fileHandle = nullptr;
 	}
 
-	delete this;
+	MemoryManager::Get().Deallocate(this);
 }
 
 void WindowsFile::Delete()
 {
-	if (SystemLayer* systemLayer = Layer::GetSystemLayer())
-	{
-		wchar_t* fullName = systemLayer->ConvertToWide(fullPath);
+	ScopedPtr<wchar_t> fullName = Platform::ConvertToWide(fullPath);
 	
-		if (!::DeleteFileW(fullName))
-		{
-			MR_LOG(LogFileSystem, Error, "Unable to delete file! %s", *Layer::GetSystemLayer()->GetError());
-		}
-
-		delete[] fullName;
+	if (!::DeleteFileW(fullName.Get()))
+	{
+		MR_LOG(LogFileSystem, Error, "Unable to delete file! %s", *Platform::GetError());
 	}
 }
 
-void WindowsFile::Write(const String& buffer) const
+void WindowsFile::Write(const String* buffer) const
 {
-	if (fileHandle != INVALID_HANDLE_VALUE)
+	if (buffer != nullptr)
 	{
-		DWORD written = 0;
-		if (!WriteFile(fileHandle, buffer.Chr(), (DWORD)buffer.Length(), &written, nullptr))
+		if (fileHandle != INVALID_HANDLE_VALUE)
 		{
-			MR_LOG(LogFileSystem, Error, "WriteFile error! %s", *Layer::GetSystemLayer()->GetError());
+			DWORD written = 0;
+			if (!WriteFile(fileHandle, buffer->Chr(), (DWORD)buffer->Length(), &written, nullptr))
+			{
+				MR_LOG(LogFileSystem, Error, "WriteFile error! %s", *Platform::GetError());
+				return;
+			}
+
+			FlushFileBuffers(fileHandle);
+		}
+		else
+		{
+			MR_LOG(LogFileSystem, Error, "File handle is invalid!");
 			return;
 		}
-
-		FlushFileBuffers(fileHandle);
-	}
-	else
-	{
-		MR_LOG(LogFileSystem, Error, "File handle is invalid!");
-		return;
 	}
 }
 
@@ -88,7 +84,7 @@ void WindowsFile::Read()
 		LARGE_INTEGER lg;
 		if (!GetFileSizeEx(fileHandle, &lg))
 		{
-			MR_LOG(LogFileSystem, Error, "GetFileSizeEx returned: %s", *Layer::GetSystemLayer()->GetError());
+			MR_LOG(LogFileSystem, Error, "GetFileSizeEx returned: %s", *Platform::GetError());
 			return;
 		}
 
@@ -100,7 +96,7 @@ void WindowsFile::Read()
 
 			if (!ReadFile(fileHandle, buffer, (DWORD)lg.QuadPart, &write, nullptr))
 			{
-				MR_LOG(LogFileSystem, Error, "ReadFile returned: %s", *Layer::GetSystemLayer()->GetError());
+				MR_LOG(LogFileSystem, Error, "ReadFile returned: %s", *Platform::GetError());
 				return;
 			}
 

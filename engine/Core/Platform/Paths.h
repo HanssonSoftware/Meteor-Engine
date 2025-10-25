@@ -4,7 +4,6 @@
 class String;
 
 
-
 struct IPaths
 {
 	static String GetSystemDirectory();

@@ -74,6 +74,10 @@ public:
 		return *this;
 	}
 
+	operator T*()
+	{
+		return ptr;
+	}
 private:
 	T* ptr = nullptr;
 };

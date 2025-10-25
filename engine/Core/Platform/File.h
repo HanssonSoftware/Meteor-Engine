@@ -18,7 +18,7 @@ public:
 
 	virtual void* GetFileHandle() = 0;
 
-	virtual void Write(const String& buffer) const = 0;
+	virtual void Write(const String* buffer) const = 0;
 
 	virtual void Read() = 0;
 
@@ -28,7 +28,7 @@ public:
 
 	virtual void SetName(const String& content) { fileName = content; };
 	 
-	uint32_t GetSize() const { return size; }
+	uint64_t GetSize() const { return size; }
 
 	bool IsValid() const
 	{
@@ -46,6 +46,11 @@ public:
 	const char* GetBuffer() const noexcept
 	{
 		return buffer;
+	}
+
+	operator bool() const
+	{
+		return buffer != nullptr && bWasInitSucceded;
 	}
 
 protected:

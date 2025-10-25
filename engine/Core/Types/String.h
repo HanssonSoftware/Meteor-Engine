@@ -63,7 +63,7 @@ public:
 	uint32_t Length() const noexcept;
 	
 	/** */
-	static String Format(const String format, ...);
+	static String Format(const String& format, ...);
 
 	static bool Contains(const char* buffer, const char* target);
 	
@@ -77,7 +77,7 @@ public:
 private:
 	void MakeEmpty();
 
-	constexpr void ResetBuffers();
+	void ResetBuffers();
 
 	char* Data() { return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr; };
 

@@ -15,7 +15,7 @@ public:
 
 	virtual void* GetFileHandle();
 
-	virtual void Write(const String& buffer) const override;
+	virtual void Write(const String* buffer) const override;
 
 	virtual void Read() override;
 

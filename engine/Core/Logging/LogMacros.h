@@ -1,11 +1,50 @@
 ﻿/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
-#include "LogAssertion.h"
+#include <Types/String.h>
 #include <type_traits>
 
 #define MERGE(x, y) x##y
 #define MERGE2(x) #x
+
+
+enum LogSeverity : short
+{
+    Log,
+    Verbose,
+    Warn,
+    Error,
+    Fatal
+};
+
+struct LogDescriptor
+{
+    LogDescriptor() = default;
+
+    constexpr void SetValues(const char* category, int severity, const char* function, const char* file, const int line) noexcept
+    {
+        this->team = category;
+        this->severity = severity;
+        this->function = function;
+        this->line = line;
+        this->file = file;
+    }
+
+    void SetMessage(const char* message, ...);
+
+    const char* team;
+
+    int severity;
+
+    String message;
+
+    const char* function;
+
+    const char* file;
+
+    int line;
+};
+
 
 /** Creates a logging category, do NOT insert Log before, just the word (automatically appends Log)! */
 #define LOG_ADDCATEGORY(CategoryName) \
@@ -26,7 +65,7 @@ LOG_ADDCATEGORY(Temp);
     {\
         do { \
             \
-                LogDescriptor Log##Line; Log##Line.SetValues(#CategoryName, Severity, __FUNCTION__, __FILE__, __LINE__); ILogger::Get()->TransmitMessage(&Log##Line); \
+                LogDescriptor Log##LINE; Log##LINE.SetValues(#CategoryName, Severity, __FUNCTION__, __FILE__, __LINE__);Log##LINE.SetMessage(Message, __VA_ARGS__); ILogger::Get()->TransmitMessage(&Log##LINE); \
                 if constexpr (Severity == Fatal) \
                 { \
                     ILogger::Get()->HandleFatal(); \
@@ -39,7 +78,7 @@ LOG_ADDCATEGORY(Temp);
     do { \
         if (!(expression)) \
         {   \
-            LogAssertion asserta(__FILE__, __LINE__, #expression, message, __VA_ARGS__);\
+            /*LogAssertion asserta(__FILE__, __LINE__, #expression, message, __VA_ARGS__);*/\
             if (/*ILogger::Get()->TransmitAssertion(&asserta) == 1*/0) __debugbreak(); \
                                                              \
         }                                                                      \

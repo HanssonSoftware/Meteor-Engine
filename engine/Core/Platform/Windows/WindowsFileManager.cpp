@@ -25,28 +25,21 @@
 
 bool WindowsFileManager::CreateDirectory(const String& name, bool bToFullPath)
 {
-    MR_ASSERT(Layer::GetSystemLayer() != nullptr, "System Layer does not initialized!");
-
     if (name.IsEmpty())
     {
         MR_LOG(LogFileManager, Error, "Invalid directory name!");
         return false;
     }
 
-    wchar_t* dirName = Layer::GetSystemLayer()->ConvertToWide(name.Chr());
-    if (!dirName)
-    {
-        MR_LOG(LogFileManager, Error, "Invalid wide buffer!");
-        return false;
-    }
+    ScopedPtr<wchar_t> dirName = Platform::ConvertToWide(name.Chr());
 
-    if (IsPathRelative(name))
+    if (IsPathRelative(&name))
     {
         wchar_t* dirAbsoluteConvert = Layer::GetSystemLayer()->ConvertToWide(Paths::GetExecutableDirctory().Chr());
         PathCchRemoveFileSpec(dirAbsoluteConvert, wcslen(dirAbsoluteConvert));
 
         wchar_t* combined = nullptr;
-        if (FAILED(PathAllocCombine(dirAbsoluteConvert, dirName, PATHCCH_ALLOW_LONG_PATHS, &combined)))
+        if (FAILED(PathAllocCombine(dirAbsoluteConvert, dirName.Get(), PATHCCH_ALLOW_LONG_PATHS, &combined)))
         {
             MR_LOG(LogFileManager, Error, "Failed to convert to full path: %s", *Layer::GetSystemLayer()->GetError());
             return false;
@@ -56,7 +49,7 @@ bool WindowsFileManager::CreateDirectory(const String& name, bool bToFullPath)
         dirName = combined;
     }
 
-    for (wchar_t* p = dirName; *p; ++p)
+    for (wchar_t* p = dirName.Get(); *p; ++p)
     {
         if (*p == L'/')
             *p = L'\\';
@@ -65,9 +58,7 @@ bool WindowsFileManager::CreateDirectory(const String& name, bool bToFullPath)
     const int32_t result = SHCreateDirectoryExW(nullptr, dirName, nullptr);
     if (result != ERROR_SUCCESS && result != ERROR_ALREADY_EXISTS)
     {
-        if (PathIsRelativeW(dirName))
-            delete[] dirName;
-        else
+        if (!PathIsRelativeW(dirName.Get()))
             LocalFree(dirName);
 
         MR_LOG(LogFileManager, Error, "SHCreateDirectory returned: %s", *Layer::GetSystemLayer()->GetError());
@@ -85,56 +76,56 @@ bool WindowsFileManager::CreateDirectory(const String& name, bool bToFullPath)
 
 bool WindowsFileManager::DeleteDirectory(const String& name, bool bToFullPath)
 {
-    MR_ASSERT(Layer::GetSystemLayer() != nullptr, "System Layer does not initialized!");
+    ScopedPtr<wchar_t> dirName = Platform::ConvertToWide(name.Chr());
 
-    wchar_t* dirName = Layer::GetSystemLayer()->ConvertToWide(name.Chr());
-    if (!dirName)
+    if (!RemoveDirectoryW(dirName.Get()))
     {
-        MR_LOG(LogFileManager, Error, "Invalid wide buffer!");
-        return false;
-    }
-
-    if (!RemoveDirectoryW(dirName))
-    {
-        delete[] dirName;
         MR_LOG(LogFileManager, Error, "RemoveDirectoryW returned: %s", *Layer::GetSystemLayer()->GetError());
-        
         return false;
     }
 
-    delete[] dirName;
     return true;
 } 
 
-bool WindowsFileManager::IsPathExists(const String& name)
+bool WindowsFileManager::IsPathExists(const String* name)
 {
-    ScopedPtr<wchar_t> dirName = Platform::ConvertToWide(name.Chr());
-
-    if (!dirName.Get())
+    if (name != nullptr)
     {
-        MR_LOG(LogFileManager, Error, "Invalid wide buffer!");
-        return false;
-    }
+        ScopedPtr<wchar_t> dirName = Platform::ConvertToWide(name->Chr());
 
-    if (!::PathFileExistsW(dirName.Get()))
-    {
-        if (GetLastError() != ERROR_FILE_NOT_FOUND)
+        if (!dirName.Get())
         {
-            MR_LOG(LogFileManager, Error, "IsPathExists returned: %s", Platform::GetError());
+            MR_LOG(LogFileManager, Error, "Invalid wide buffer!");
+            return false;
         }
 
-        return false;
+        if (!::PathFileExistsW(dirName.Get()))
+        {
+            if (GetLastError() != ERROR_FILE_NOT_FOUND)
+            {
+                MR_LOG(LogFileManager, Error, "IsPathExists returned: %s", Platform::GetError());
+            }
+
+            return false;
+        }
+
+        return true;
     }
-   
-    return true;
+
+    return false;
 }
 
 /** Returns true if the path is qualified, or false otherwise. */
-bool WindowsFileManager::IsPathRelative(const String& path)
+bool WindowsFileManager::IsPathRelative(const String* path)
 {
-    ScopedPtr<wchar_t> buffer = Platform::ConvertToWide(path.Chr());
+    if (path != nullptr)
+    {
+        ScopedPtr<wchar_t> buffer = Platform::ConvertToWide(path->Chr());
 
-    return PathIsRelativeW(buffer.Get()) ? true : false;
+        return PathIsRelativeW(buffer.Get()) ? true : false;
+    }
+    
+    return false;
 }
 
 bool WindowsFileManager::IsEndingWith(const String& name, const String& extension)
@@ -185,37 +176,40 @@ void WindowsFileManager::NormalizeDirectory(String& input)
     delete[] buffer;
 }
 
-IFile* WindowsFileManager::CreateFileOperation(const String& pathA, int32_t accessType, int32_t sharingMode, FileOverrideRules createType, FileStatus& status)
+IFile* WindowsFileManager::CreateFileOperation(String* pathToCreate, int32_t accessType, int32_t sharingMode, FileOverrideRules createType)
 {
-    String path = pathA;
-    NormalizeDirectory(path);
-
-    ScopedPtr<wchar_t> name = Platform::ConvertToWide(path.Chr());
-
-    if (!IsPathExists(path))
-        FileManager::CreateDirectory(path, true);
-
-    HANDLE file = CreateFileW(
-        name.Get(),
-        evaluateAccessTypeForCreateFileOperation(accessType),
-        evaluateSharingModeForCreateFileOperation(sharingMode),
-        nullptr,
-        evaluateCreateTypeForCreateFileOperation(createType),
-        FILE_ATTRIBUTE_NORMAL,
-        nullptr
-    );
-
-    if (file == INVALID_HANDLE_VALUE)
+    if (pathToCreate != nullptr)
     {
-        MR_LOG(LogFileManager, Error, "%s", *Platform::GetError());
-        return nullptr;
+        NormalizeDirectory(*pathToCreate);
+
+        ScopedPtr<wchar_t> name = Platform::ConvertToWide(pathToCreate->Chr());
+
+        if (!IsPathExists(pathToCreate)) FileManager::CreateDirectory(*pathToCreate, true);
+
+        HANDLE file = CreateFileW(
+            name.Get(),
+            evaluateAccessTypeForCreateFileOperation(accessType),
+            evaluateSharingModeForCreateFileOperation(sharingMode),
+            nullptr,
+            evaluateCreateTypeForCreateFileOperation(createType),
+            FILE_ATTRIBUTE_NORMAL,
+            nullptr
+        );
+
+        if (file == INVALID_HANDLE_VALUE)
+        {
+            MR_LOG(LogFileManager, Error, "%s", *Platform::GetError());
+            return nullptr;
+        }
+
+        WindowsFile* newWindowsFile = new WindowsFile();
+        newWindowsFile->fileHandle = file;
+        newWindowsFile->fileName = name.Get();
+
+        return newWindowsFile;
     }
 
-    WindowsFile* newWindowsFile = new WindowsFile();
-    newWindowsFile->fileHandle = file;
-    newWindowsFile->fileName = name.Get();
-
-    return newWindowsFile;
+    return nullptr;
 }
 
 constexpr const int32_t WindowsFileManager::evaluateAccessTypeForCreateFileOperation(int32_t accessType)

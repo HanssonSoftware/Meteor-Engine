@@ -26,19 +26,15 @@ struct MemoryManager
 	template<typename T>
 	T* Allocate(const uint64_t& size)
 	{
-#ifdef MR_PLATFORM_WINDOWS
-		void* raw = VirtualAlloc(object->begin + object->currentOffset, size, MEM_COMMIT, PAGE_READWRITE);
-#endif // MR_PLATFORM_WINDOWS
-		MR_ASSERT((object->begin + object->currentOffset) < object->end, "Page out of range!");
+		constexpr uint64_t objectSize = sizeof(T);
 
-		if (!raw)
-		{
-			//MR_LOG(LogArena, Fatal, "Out of memory. Could not allocate %llu bytes.", size);
+		if ((begin + currentOffset + objectSize) > end)
 			return nullptr;
-		}
+
+		void* raw = begin + currentOffset;
 
 		T* ptr = new(raw) T();
-		object->currentOffset += size;
+		currentOffset += size;
 		return ptr;
 	};
 
@@ -49,13 +45,13 @@ struct MemoryManager
 			return;
 
 		data->~T();
-		if (!VirtualFree(data, sizeof(T), MEM_DECOMMIT))
+		if (/*!VirtualFree(data, sizeof(T), MEM_DECOMMIT)*/false)
 		{
 			//MR_LOG(LogArena, Fatal, "%s", *Platform::GetError());
 		}
 
-		memset(data, 0xCD, sizeof(T));
-		object->currentOffset -= sizeof(T);
+		//memset(data, 0xCD, sizeof(T));
+		currentOffset -= sizeof(T);
 	};
 
 protected:
@@ -65,14 +61,20 @@ protected:
 
 	struct MemoryData
 	{
-		uint32_t offset = 0;
+		/*
+		--------------------------------------
+		|	offset | INSTANCE OF THIS	size |
+		--------------------------------------
+		*/
 
-		uint32_t size = 0;
+		uint64_t offset = 0;
+
+		uint64_t size = 0;
 
 		bool used = false;
 	};                            
 
-	static MemoryData FindAvailable(const uint32_t& size);
+	MemoryData FindAvailable(const uint64_t& size);
 
 	uint32_t requiredMinimumInBytes = 1'000'000'000; // 1GB ~= 1000 MB
 
@@ -84,7 +86,7 @@ protected:
 
 	char* end = nullptr;
 
-	static inline std::vector<MemoryData> heap;
+	static inline std::vector<MemoryData> block;
 
 	MemoryManager* object;
 };

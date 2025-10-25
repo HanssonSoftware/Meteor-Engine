@@ -7,6 +7,7 @@
 
 #include <Platform/Platform.h>
 
+#include <vector>
 
 LOG_ADDCATEGORY(Arena);
 
@@ -20,7 +21,6 @@ MemoryManager& MemoryManager::Get()
 
 void MemoryManager::Initialize(const double& RequiredMinimum)
 {
-	if (!object) object = new MemoryManager();
 	engineRecommendedPercent = (RequiredMinimum > 0.0 && RequiredMinimum <= 1.0) ? RequiredMinimum : 0.1;
 
 #ifdef MR_PLATFORM_WINDOWS
@@ -32,31 +32,35 @@ void MemoryManager::Initialize(const double& RequiredMinimum)
 		MR_LOG(LogArena, Fatal, "GlobalMemoryStatusEx failed with: %s", *Platform::GetError());
 	}
 
-	object->totalMemoryOnPC = longlong.ullTotalPhys;
+	totalMemoryOnPC = longlong.ullTotalPhys;
 
 	uint64_t requiredByPercent = (uint64_t)(longlong.ullTotalPhys * engineRecommendedPercent);
-	if (requiredByPercent < (uint64_t)object->requiredMinimumInBytes)
+	if (requiredByPercent < (uint64_t)requiredMinimumInBytes)
 	{
 		MR_LOG(LogArena, Fatal, "Your PC's memory is too low! Consider buying more RAM.");
 	}
 
-	object->begin = (char*)VirtualAlloc(nullptr, requiredByPercent, MEM_RESERVE, PAGE_READWRITE);
+	begin = (char*)VirtualAlloc(nullptr, requiredByPercent, MEM_RESERVE, PAGE_READWRITE);
 	
-	MR_ASSERT(object->begin != nullptr, "Failed to reserve, the engine recommended memory! Application exiting...");
+	MR_ASSERT(begin != nullptr, "Failed to reserve, the engine recommended memory! Application exiting...");
 #endif // MR_PLATFORM_WINDOWS
 
-	object->end = (char*)object->begin + requiredByPercent;
+	end = (char*)begin + requiredByPercent;
 }
 
 void MemoryManager::Shutdown()
 {
-	if (!VirtualFree(object->begin, 0, MEM_RELEASE | MEM_DECOMMIT))
+	if (!VirtualFree(begin, 0, MEM_RELEASE))
 	{
 		MR_LOG(LogArena, Fatal, "VirtualFree failed with: %s", *Platform::GetError());
 	}
 
-	object->begin = nullptr;
-	object->end = nullptr;
+	begin, end = nullptr;
 
 	delete object;
+}
+
+MemoryManager::MemoryData MemoryManager::FindAvailable(const uint64_t& size)
+{
+	return MemoryData();
 }
