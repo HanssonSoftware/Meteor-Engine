@@ -49,10 +49,9 @@ void ILogger::Shutdown()
 
 void ILogger::Initialize()
 {
-    String val;
-    bIsUsingVerbose = Commandlet::Parse("-verbose", val);
+    bIsUsingVerbose = Commandlet::Parse("-verbose", nullptr);
 
-    bIsUsingFile = !Commandlet::Parse("-nofilelogging", val);
+    bIsUsingFile = !Commandlet::Parse("-nofilelogging", nullptr);
 
     if (bIsUsingFile)
     {

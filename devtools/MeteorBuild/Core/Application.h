@@ -6,9 +6,9 @@
 #include <Platform/WindowManager/WindowManager.h>
 #include <Commandlet.h>
 
-LOG_ADDCATEGORY(BuildSystemApplication);
+#include "BuildSystem.h"
 
-enum ECurrentlyUsedVerb { Build, Rebuild, GenerateProjects };
+LOG_ADDCATEGORY(BuildSystemApplication);
 
 struct BuildSystemApplication : public Application 
 {
@@ -17,16 +17,12 @@ public:
 
 	virtual void Init() override;
 
-	void RedirectRoutingVerb(String& temp);
-
 	virtual void Run() override;
 
 	virtual void Shutdown() override;
 
-	ECurrentlyUsedVerb GetUsedVerb() const { return verb; }
-
 protected:
-	ECurrentlyUsedVerb verb;
+	BuildSystem buildSystemApp;
 };
 
 IMPLEMENT_APPLICATION(BuildSystemApplication);

@@ -35,9 +35,7 @@ void WindowsWindowManager::Shutdown()
     if (bIsWinAPIClassRegistered)
     {
         UnregisterClassW(
-            !bIsUsingFallbackClassName ? 
-            Layer::GetSystemLayer()->ConvertToWide(GetApplication()->appNameNoSpaces.Chr()) :
-            GetDefaultApplicationName(),
+            Platform::ConvertToWide(GetApplication()->appNameNoSpaces.Chr()),
             instance);
     }
 }

@@ -13,7 +13,7 @@ struct Commandlet
 {
 	static void Initialize();
 
-	static bool Parse(const String& inParam, String& returnVal);
+	static bool Parse(const String& inParam, String* returnVal);
 
 protected:
 	static inline Array<String> parsedWords;

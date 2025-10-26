@@ -133,26 +133,20 @@ bool WindowsFileManager::IsEndingWith(const String& name, const String& extensio
     if (name.IsEmpty() && extension.IsEmpty())
         return false;
 
-    if (SystemLayer* systemLayer = Layer::GetSystemLayer())
-    {
-        wchar_t* buffer = systemLayer->ConvertToWide(name.Chr());
+    ScopedPtr<wchar_t> buffer = Platform::ConvertToWide(name.Chr());
 
-        LPWSTR result = PathFindExtensionW(buffer);
-        if (wcslen(result) == 0)
-            return false;
+    LPWSTR result = PathFindExtensionW(buffer);
+    if (wcslen(result) == 0)
+        return false;
 
-        memmove(result, result + 1, (wcslen(result) + 1) * sizeof(wchar_t));
+    memmove(result, result + 1, (wcslen(result) + 1) * sizeof(wchar_t));
 
-        bool bIsGood = false;
-        wchar_t* extensionConverted = systemLayer->ConvertToWide(extension.Chr());
+    bool bIsGood = false;
+    ScopedPtr<wchar_t> extensionConverted = Platform::ConvertToWide(extension.Chr());
 
-        bIsGood = wcscmp(result, extensionConverted) == 0 ? true : false;
-        delete[] buffer, extensionConverted;
+    bIsGood = wcscmp(result, extensionConverted) == 0 ? true : false;
 
-        return bIsGood ? true : false;
-    }
-
-    return false;
+    return bIsGood ? true : false;
 }
 
 void WindowsFileManager::NormalizeDirectory(String& input)
@@ -173,7 +167,7 @@ void WindowsFileManager::NormalizeDirectory(String& input)
 
     input = String(buffer);
 
-    delete[] buffer;
+    MemoryManager::Get().Deallocate(buffer);
 }
 
 IFile* WindowsFileManager::CreateFileOperation(String* pathToCreate, int32_t accessType, int32_t sharingMode, FileOverrideRules createType)

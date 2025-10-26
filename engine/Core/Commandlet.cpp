@@ -32,9 +32,9 @@ void Commandlet::Initialize()
 	MemoryManager::Get().Deallocate(cli);
 }
 
-bool Commandlet::Parse(const String& inParam, String& returnVal)
+bool Commandlet::Parse(const String& inParam, String* returnVal)
 {
-	static uint32_t count = parsedWords.GetSize();
+	uint32_t count = parsedWords.GetSize();
 
 	for (uint32_t i = 0; i < count; i++)
 	{
@@ -42,7 +42,9 @@ bool Commandlet::Parse(const String& inParam, String& returnVal)
 
 		if (item == inParam)
 		{
-			returnVal = parsedWords.IsOutOfBounds(i + 1) ? parsedWords[i] : parsedWords[i + 1];
+			if (returnVal != nullptr) 
+				*returnVal = parsedWords.IsOutOfBounds(i + 1) ? parsedWords[i] : parsedWords[i + 1];
+			
 			return true;
 		}
 	}

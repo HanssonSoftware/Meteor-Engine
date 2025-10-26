@@ -33,57 +33,24 @@ void BuildSystemApplication::Init()
 	Application::Init();
 }
 
-void BuildSystemApplication::RedirectRoutingVerb(String& temp)
-{
-	if (Commandlet::Parse("-build", temp))
-	{
-		verb = Build;
-	}
-	else if (Commandlet::Parse("-rebuild", temp))
-	{
-		verb = Rebuild;
-	}
-	else if (Commandlet::Parse("-gen", temp) || Commandlet::Parse("-generate", temp))
-	{
-		verb = GenerateProjects;
-	}
-}
+	//if (Commandlet::Parse("-build", temp))
+	//{
+	//	verb = Build;
+	//}
+	//else if (Commandlet::Parse("-rebuild", temp))
+	//{
+	//	verb = Rebuild;
+	//}
+	//else if (Commandlet::Parse("-gen", temp) || Commandlet::Parse("-generate", temp))
+	//{
+	//	verb = GenerateProjects;
 
 void BuildSystemApplication::Run()
 {
 	// Application::RequestExit(0); should be added somewhere, if not the app will loop over this function
-	
-	String val, temp;
 
-	RedirectRoutingVerb(temp);
-
-	if (Commandlet::Parse("-source", val))
-	{
-		if (Finder::FindMainScript(val))
-		{
-			Solution sln;
-			
-			SolutionDescriptor::OpenProject(&val);
-
-			//Module* topDirectoryScript = Module::CreateModule(val);
-		}
-
-		if (Commandlet::Parse("-source", val))
-		{
-			Array<String> pathToDiscoveredItems;
-			Finder::LocateSources(val, pathToDiscoveredItems);
-		}
-		else
-		{
-
-		}
-
-		Application::RequestExit(0);
-	}
-	else
-	{
-		MR_LOG(LogBuildSystemApplication, Fatal, "No source directory passed!");
-	}
+	buildSystemApp.ReadAndParseArguments();
+	buildSystemApp.SearchScriptFiles();
 }
 
 void BuildSystemApplication::Shutdown()

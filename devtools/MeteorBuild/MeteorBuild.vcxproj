@@ -176,6 +176,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Core\BuildSystem.cpp" />
     <ClCompile Include="Core\Application.cpp" />
     <ClCompile Include="Parsing\Module.cpp" />
     <ClCompile Include="Parsing\Finder.cpp" />
@@ -185,6 +186,7 @@
     <ClCompile Include="Parsing\Solution.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Core\BuildSystem.h" />
     <ClInclude Include="Core\Application.h" />
     <ClInclude Include="Parsing\Module.h" />
     <ClInclude Include="Parsing\Finder.h" />
