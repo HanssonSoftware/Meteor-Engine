@@ -4,6 +4,7 @@
 
 #include <Commandlet.h>
 #include <Parsing/Finder.h>
+#include <FileManager.h>
 
 LOG_ADDCATEGORY(BuildSystemFramework);
 
@@ -30,9 +31,24 @@ void BuildSystem::SearchScriptFiles()
 	{
 		Finder::LocateSources(sourceDirectoryFromLaunchParameter, pathToDiscoveredItems);
 
-		for (auto& a : pathToDiscoveredItems)
+		for (auto& pathToDiscoveredItemsIndexed : pathToDiscoveredItems)
 		{
-			MR_LOG(LogBuildSystemFramework, Log, "Found: %s", *a);
+			if (FileManager::IsEndingWith(pathToDiscoveredItemsIndexed, "mrbuild"))
+			{
+				scripts.Add(pathToDiscoveredItemsIndexed);
+				MR_LOG(LogBuildSystemFramework, Log, "Found: %s", *pathToDiscoveredItemsIndexed);
+			}
 		}
+	}
+}
+
+void BuildSystem::ParseDescriptorScript()
+{
+	IFile* slnDescriptor = FileManager::CreateFileOperation(&scripts[scripts.GetSize()], FileAccessMode::OPENMODE_READ, FileShareMode::SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS);
+	if (slnDescriptor != nullptr)
+	{
+		slnDescriptor->Read();
+
+		return;
 	}
 }

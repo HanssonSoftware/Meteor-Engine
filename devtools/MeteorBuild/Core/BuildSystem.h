@@ -18,9 +18,13 @@ public:
 
 	void SearchScriptFiles();
 
+	void ParseDescriptorScript();
+
 	const ERequestedCommandToDo GetBuildCommand() const { return command; }
 
 protected:
 	Array<String> pathToDiscoveredItems;
+
+	Array<String> scripts;
 };
 

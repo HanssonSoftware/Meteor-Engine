@@ -103,7 +103,7 @@ bool WindowsFileManager::IsPathExists(const String* name)
         {
             if (GetLastError() != ERROR_FILE_NOT_FOUND)
             {
-                MR_LOG(LogFileManager, Error, "IsPathExists returned: %s", Platform::GetError());
+                MR_LOG(LogFileManager, Error, "IsPathExists returned: %s", *Platform::GetError());
             }
 
             return false;

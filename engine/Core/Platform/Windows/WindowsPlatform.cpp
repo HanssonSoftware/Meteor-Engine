@@ -34,7 +34,7 @@ ScopedPtr<char> WindowsPlatform::ConvertToNarrow(const wchar_t* fat)
 	const uint32_t fatLength = (uint32_t)WideCharToMultiByte(CP_UTF8, 0, fat, -1, nullptr, 0, 0, 0);
 	if (fatLength != 0)
 	{
-		ScopedPtr<char> buffer = MemoryManager::Get().Allocate<char>((fatLength + 1) * sizeof(char));;
+		ScopedPtr<char> buffer = MemoryManager::Get().Allocate<char>(fatLength + 1);
 
 		if (!WideCharToMultiByte(CP_UTF8, 0, fat, -1, buffer.Get(), fatLength * sizeof(char), 0, 0))
 		{

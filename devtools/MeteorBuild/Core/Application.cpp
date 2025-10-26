@@ -51,6 +51,7 @@ void BuildSystemApplication::Run()
 
 	buildSystemApp.ReadAndParseArguments();
 	buildSystemApp.SearchScriptFiles();
+	buildSystemApp.ParseDescriptorScript();
 }
 
 void BuildSystemApplication::Shutdown()
