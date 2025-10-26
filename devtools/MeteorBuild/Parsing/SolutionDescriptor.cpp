@@ -14,17 +14,16 @@ bool SolutionDescriptor::Finalize(Solution* slnToOutput, String* bufferToWrite)
 	return false;
 }
 
-IFile* SolutionDescriptor::OpenProject(const String& projectPath)
+IFile* SolutionDescriptor::OpenProject(String* projectPath)
 {
-	FileStatus stat;
 	IFile* newFile;
 
 	newFile = FileManager::CreateFileOperation(
 		projectPath,
 		OPENMODE_READ,
 		SHAREMODE_READ,
-		OVERRIDERULE_OPEN_ONLY_IF_EXISTS,
-		stat);
+		OVERRIDERULE_OPEN_ONLY_IF_EXISTS
+		);
 
 	if (!newFile) return nullptr;
 

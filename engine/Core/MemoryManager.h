@@ -26,16 +26,10 @@ struct MemoryManager
 	template<typename T>
 	T* Allocate(const uint64_t& size)
 	{
-		constexpr uint64_t objectSize = sizeof(T);
-
-		if ((begin + currentOffset + objectSize) > end)
-			return nullptr;
-
 		void* raw = begin + currentOffset;
 
-		T* ptr = new(raw) T();
-		currentOffset += size;
-		return ptr;
+		currentOffset += size * sizeof(T);
+		return reinterpret_cast<T*>(raw);
 	};
 
 	template<typename T>
@@ -44,14 +38,14 @@ struct MemoryManager
 		if (!data)
 			return;
 
-		data->~T();
+		//data->~T();
 		if (/*!VirtualFree(data, sizeof(T), MEM_DECOMMIT)*/false)
 		{
 			//MR_LOG(LogArena, Fatal, "%s", *Platform::GetError());
 		}
 
 		//memset(data, 0xCD, sizeof(T));
-		currentOffset -= sizeof(T);
+		//currentOffset -= sizeof(T);
 	};
 
 protected:

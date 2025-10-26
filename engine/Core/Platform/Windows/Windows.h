@@ -1,10 +1,7 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
-#ifdef _WINDOWS_
-#error Windows.h should not be included!
-#endif // _WINDOWS_
-
 #pragma once
+
 #if defined(_WIN32) || defined(_WIN64)
 #pragma comment(linker, "/SUBSYSTEM:WINDOWS")
 

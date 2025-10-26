@@ -33,7 +33,7 @@ class SolutionDescriptor
 public:
 	static bool Finalize(Solution* slnToOutput, String* bufferToWrite);
 	
-	static IFile* OpenProject(const String& projectPath);
+	static IFile* OpenProject(String* projectPath);
 
 	bool ParseDescriptor();
 };

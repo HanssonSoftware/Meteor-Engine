@@ -9,6 +9,7 @@
 #ifdef MR_PLATFORM_WINDOWS
 #include <Windows/Windows.h>
 #endif // MR_PLATFORM_WINDOWS
+#include <MemoryManager.h>
 
 #pragma warning(disable : 6031)
 
@@ -28,7 +29,7 @@ void Commandlet::Initialize()
 		token = strtok(nullptr, " ");
 	}
 
-	delete[] cli;
+	MemoryManager::Get().Deallocate(cli);
 }
 
 bool Commandlet::Parse(const String& inParam, String& returnVal)

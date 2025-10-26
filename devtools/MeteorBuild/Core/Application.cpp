@@ -63,7 +63,7 @@ void BuildSystemApplication::Run()
 		{
 			Solution sln;
 			
-			SolutionDescriptor::OpenProject(val);
+			SolutionDescriptor::OpenProject(&val);
 
 			//Module* topDirectoryScript = Module::CreateModule(val);
 		}

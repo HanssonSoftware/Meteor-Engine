@@ -15,7 +15,7 @@ public:
 
 	}
 
-	static Module* CreateModule(const String& fullPathToModule);
+	static Module* CreateModule(String* fullPathToModule);
 
 	virtual ~Module() noexcept = default;
 

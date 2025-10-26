@@ -72,7 +72,7 @@ public:
 
 	void ParseSolutionDescriptor(const char* buffer);
 
-	bool OpenScript(const String& modulePath);
+	bool OpenScript(String* modulePath);
 
 	const char* GetBuffer() { return currentlyReadModule ? currentlyReadModule->GetBuffer() : ""; }
 protected:

@@ -92,14 +92,11 @@ void WindowsLogger::Initialize()
 void WindowsLogger::Shutdown()
 {
 #ifdef MR_DEBUG
-	if constexpr (bIsRunningDebugMode)
+	if (bIsRunningDebugMode && bHasConsoleWindow)
 	{
 		CloseHandle(hConsole);
 
-		if (!FreeConsole())
-		{
-			Application::RequestExit(-1);
-		}
+		FreeConsole();
 	}
 #endif // MR_DEBUG
 
@@ -155,7 +152,7 @@ void WindowsLogger::HandleFatal()
 	const LogDescriptor* actualDescriptor = ILogger::Get()->GetActualEntry();
 	if (!actualDescriptor)
 	{
-		MessageBoxW(nullptr, L"Unknown error!", L"Engine Error!", MB_OK);
+		MessageBoxW(nullptr, L"Unknown error!", L"Engine Error!", MB_OK | MB_ICONERROR);
 
 		TerminateProcess(GetCurrentProcess(), -1);
 		return;
@@ -163,7 +160,7 @@ void WindowsLogger::HandleFatal()
 
 	ScopedPtr<wchar_t> convertedFatalText = Platform::ConvertToWide(actualDescriptor->message);
 
-	MessageBoxW(nullptr, convertedFatalText.Get(), L"Engine Error!", MB_OK);
+	MessageBoxW(nullptr, convertedFatalText.Get(), L"Engine Error!", MB_OK | MB_ICONERROR);
 
 	TerminateProcess(GetCurrentProcess(), -1);
 }

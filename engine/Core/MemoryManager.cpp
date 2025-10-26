@@ -40,17 +40,18 @@ void MemoryManager::Initialize(const double& RequiredMinimum)
 		MR_LOG(LogArena, Fatal, "Your PC's memory is too low! Consider buying more RAM.");
 	}
 
-	begin = (char*)VirtualAlloc(nullptr, requiredByPercent, MEM_RESERVE, PAGE_READWRITE);
+	begin = (char*)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, requiredByPercent);
 	
 	MR_ASSERT(begin != nullptr, "Failed to reserve, the engine recommended memory! Application exiting...");
 #endif // MR_PLATFORM_WINDOWS
 
 	end = (char*)begin + requiredByPercent;
+
 }
 
 void MemoryManager::Shutdown()
 {
-	if (!VirtualFree(begin, 0, MEM_RELEASE))
+	if (!HeapFree(GetProcessHeap(), 0, begin))
 	{
 		MR_LOG(LogArena, Fatal, "VirtualFree failed with: %s", *Platform::GetError());
 	}

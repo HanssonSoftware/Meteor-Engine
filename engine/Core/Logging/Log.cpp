@@ -99,7 +99,7 @@ void ILogger::TransmitMessage(LogDescriptor* Descriptor)
             "=============[ Fatal error ]=============\nWhere:\t\t%s\nWhen:\t\t%s\nMessage:\t%s\n\nFile:\t%s\n",
             Descriptor->function,
             *current,
-            Descriptor->message,
+            *Descriptor->message,
             Descriptor->file);
     }
     else
@@ -170,6 +170,8 @@ void LogDescriptor::SetMessage(const char* message, ...)
     char* big = MemoryManager::Get().Allocate<char>(reqAmount + 1);
     vsnprintf(big, reqAmount + 1, message, d);
     va_end(d);
+
+    big[reqAmount + 1] = '\0';
 
     this->message = big;
     MemoryManager::Get().Deallocate(big);

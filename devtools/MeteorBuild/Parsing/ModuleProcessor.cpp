@@ -125,11 +125,9 @@ void ModuleProcessor::ParseSolutionDescriptor(const char* buffer)
 	}
 }
 
-bool ModuleProcessor::OpenScript(const String& modulePath)
+bool ModuleProcessor::OpenScript(String* modulePath)
 {
-	FileStatus stat;
-
-	currentlyReadModule = FileManager::CreateFileOperation(modulePath, OPENMODE_READ, SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS, stat);
+	currentlyReadModule = FileManager::CreateFileOperation(modulePath, OPENMODE_READ, SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS);
 	if (!currentlyReadModule)
 		return false;
 

@@ -13,15 +13,15 @@
 #pragma comment(lib, "Pathcch.lib")
 
 
-Module* Module::CreateModule(const String& fullPathToModule)
+Module* Module::CreateModule(String* fullPathToModule)
 {
-	MR_ASSERT(!fullPathToModule.IsEmpty(), "Module path is empty!");
+	MR_ASSERT(!fullPathToModule->IsEmpty(), "Module path is empty!");
 	
 	Module* super = new Module();
 
-	super->fullPath = fullPathToModule;
+	super->fullPath = *fullPathToModule;
 
-	ScopedPtr<wchar_t> path = Platform::ConvertToWide(fullPathToModule);
+	ScopedPtr<wchar_t> path = Platform::ConvertToWide(*fullPathToModule);
 	PathCchRemoveFileSpec(path.Get(), wcslen(path.Get()));
 	
 	Finder::ListDirectory(path.Get(), super->includedSources);

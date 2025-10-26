@@ -15,7 +15,7 @@ ScopedPtr<wchar_t> WindowsPlatform::ConvertToWide(const char* skinny)
 	const uint32_t skinnyLength = (uint32_t)MultiByteToWideChar(CP_UTF8, 0, skinny, -1, nullptr, 0);
 	if (skinnyLength != 0)
 	{
-		ScopedPtr<wchar_t> buffer = MemoryManager::Get().Allocate<wchar_t>((skinnyLength + 1) * sizeof(wchar_t));;
+		ScopedPtr<wchar_t> buffer = MemoryManager::Get().Allocate<wchar_t>(skinnyLength + 1);
 
 		if (!MultiByteToWideChar(CP_UTF8, 0, skinny, skinnyLength * sizeof(char), buffer.Get(), skinnyLength))
 		{

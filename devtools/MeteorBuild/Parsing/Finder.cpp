@@ -22,7 +22,7 @@ void Finder::LocateSources(const String& fullDirectoryToAll, Array<String>& retu
     {
         bIsFirstCall = false;
 
-        if (FileManager::IsPathRelative(fullDirectoryToAll))
+        if (FileManager::IsPathRelative(&fullDirectoryToAll))
         {
             fullPath = Paths::GetExecutableDirctory();
 
@@ -44,7 +44,7 @@ void Finder::LocateSources(const String& fullDirectoryToAll, Array<String>& retu
         }
         else
         {
-            if (!FileManager::IsPathExists(fullDirectoryToAll))
+            if (!FileManager::IsPathExists(&fullDirectoryToAll))
             {
                 MR_LOG(LogLocator, Fatal, "Directory does not exist! (%s)", fullDirectoryToAll.Chr());
             }
@@ -136,7 +136,7 @@ bool Finder::FindMainScript(String& path)
     ScopedPtr<wchar_t> fullPath = nullptr;
 
     bool bIsPathWasRelative = false;
-    if (FileManager::IsPathRelative(path))
+    if (FileManager::IsPathRelative(&path))
     {
         ScopedPtr<wchar_t> exeDir = Platform::ConvertToWide(Paths::GetExecutableDirctory());
         ScopedPtr<wchar_t> convertedPath = Platform::ConvertToWide(path);
