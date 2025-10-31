@@ -580,7 +580,6 @@
     <None Include="engine\ThirdParty\assimp\vector3.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="engine\Core\CoreKit.mrbuild" />
     <None Include="engine\Engine.mrbuild" />
   </ItemGroup>
   <ItemGroup>

@@ -3,6 +3,10 @@
 #pragma once
 #include <Types/Array.h>
 #include <Types/String.h>
+#include <Module/Module.h>
+
+#include <Platform/File.h>
+
 
 class BuildSystem
 {
@@ -14,17 +18,16 @@ protected:
 
 	} command;
 public:
-	void ReadAndParseArguments();
+	bool InitFramework();
 
-	void SearchScriptFiles();
-
-	void ParseDescriptorScript();
+protected:
+	bool ReadArguments();
 
 	const ERequestedCommandToDo GetBuildCommand() const { return command; }
 
 protected:
-	Array<String> pathToDiscoveredItems;
 
-	Array<String> scripts;
+
+	Array<Module> loadedModules;
 };
 

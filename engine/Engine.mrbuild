@@ -1,13 +1,13 @@
-Solution "Meteor"
+Project "Meteor"
 {
 	Executable:
 	{
-		"Launch.cpp",
-		"Geci.cpp"
+		"Launch.cpp"
 	}
 
-	Valami:
+	GlobalDefines:
 	{
-
+		"MR_DEBUG",
+		"MR_PLATFORM_WINDOWS"
 	}
 }

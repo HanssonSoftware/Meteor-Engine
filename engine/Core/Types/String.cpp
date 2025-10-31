@@ -479,6 +479,7 @@ String String::Format(const String& format, ...)
 
 	String stringized(newFormattedBuffer);
 
+	MemoryManager::Get().Deallocate(newFormattedBuffer);
 	return stringized;
 }
 

@@ -100,7 +100,6 @@ bool WindowsWindowManager::CreateWindow(const String& name, const Vector2<uint32
         ::ShowWindow(instance->handle, SW_SHOWDEFAULT);
     }
 
-    delete[] buffer;
     return true;
 }
 

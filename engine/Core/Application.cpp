@@ -53,7 +53,7 @@ void Application::Init()
     windowManager->Init();
     ILogger::Get()->Initialize();
 
-    MR_LOG(LogApplication, Log, "Initializing application.%s", "h");
+    MR_LOG(LogApplication, Log, "Initializing application.");
 
     if (windowManager->CreateWindow(appName, { WindowData.x, WindowData.y }, true))
     {

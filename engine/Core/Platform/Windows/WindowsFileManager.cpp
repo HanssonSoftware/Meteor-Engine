@@ -35,13 +35,13 @@ bool WindowsFileManager::CreateDirectory(const String& name, bool bToFullPath)
 
     if (IsPathRelative(&name))
     {
-        wchar_t* dirAbsoluteConvert = Layer::GetSystemLayer()->ConvertToWide(Paths::GetExecutableDirctory().Chr());
+        ScopedPtr<wchar_t> dirAbsoluteConvert = Platform::ConvertToWide(Paths::GetExecutableDirctory().Chr());
         PathCchRemoveFileSpec(dirAbsoluteConvert, wcslen(dirAbsoluteConvert));
 
         wchar_t* combined = nullptr;
         if (FAILED(PathAllocCombine(dirAbsoluteConvert, dirName.Get(), PATHCCH_ALLOW_LONG_PATHS, &combined)))
         {
-            MR_LOG(LogFileManager, Error, "Failed to convert to full path: %s", *Layer::GetSystemLayer()->GetError());
+            MR_LOG(LogFileManager, Error, "Failed to convert to full path: %s", *Platform::GetError());
             return false;
         }
 

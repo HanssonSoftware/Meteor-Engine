@@ -420,7 +420,6 @@
     <ClInclude Include="engine\Vulkan\Vulkan.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="engine\Core\CoreKit.mrbuild" />
     <None Include="engine\Engine.mrbuild" />
     <None Include="engine\ThirdParty\assimp\color4.inl" />
     <None Include="engine\ThirdParty\assimp\material.inl" />

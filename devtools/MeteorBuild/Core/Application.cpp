@@ -1,19 +1,11 @@
 ﻿/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
-#define _CRT_SECURE_NO_WARNINGS
 #include "Application.h"
 #include <Types/String.h>
-#include <Platform/PerformanceTimer.h>
-#include <Parsing/Finder.h>
-//#include <shellapi.h>
 #include <MemoryManager.h>
 #include <FileManager.h>
-#include <Parsing/ModuleProcessor.h>
-//#include <Parsing/SolutionDescriptor.h>
 
 #include <Platform.h>
-#include <Parsing/Solution.h>
-#include <Parsing/SolutionDescriptor.h>
 
 //#pragma comment(lib, "Shell32.lib")
 
@@ -49,9 +41,12 @@ void BuildSystemApplication::Run()
 {
 	// Application::RequestExit(0); should be added somewhere, if not the app will loop over this function
 
-	buildSystemApp.ReadAndParseArguments();
-	buildSystemApp.SearchScriptFiles();
-	buildSystemApp.ParseDescriptorScript();
+	if (!buildSystemApp.InitFramework())
+	{
+		MR_LOG(LogBuildSystemApplication, Fatal, "Build system error!");
+	}
+
+	Application::RequestExit(0);
 }
 
 void BuildSystemApplication::Shutdown()
