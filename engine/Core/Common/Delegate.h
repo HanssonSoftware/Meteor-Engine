@@ -1,28 +1,37 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
-
+#include <Types/Array.h>
 
 
 /** Simple aliased function. */
-template<typename T, typename ...>
+template<typename ...>
 struct Delegate
 {
 	Delegate() = default;
 
 	virtual ~Delegate() noexcept = default;
 
-	void Bind()
+	typedef void(*function)(...);
+
+	template<class T, void(T::*Func)(...)>
+	void Bind(T* object, Func same)
 	{
 
 	}
+
+	void Broadcast(...)
+	{
+		
+	}
+
+	Array<function> functions;
 };
 
 
-#define spawnDelegate(Name, ...) typedef void (*Name)(__VA_ARGS__)
-#define spawnDelegateWRetVal(RetVal, Name, ...) typedef RetVal (*Name)(__VA_ARGS__)
+#define spawnDelegate(RetVal, Name, ...) typedef RetVal (*Name)(__VA_ARGS__)
 
-#define CREATE_DELEGATE(Name, ...) spawnDelegate(Name, __VA_ARGS__);
+#define CREATE_DELEGATE(Name, ...) spawnDelegate(void, Name, __VA_ARGS__);
 
-#define CREATE_DELEGATE_RETVAL(RetVal, Name, ...) spawnDelegateWRetVal(RetVal, Name, __VA_ARGS__)
+#define CREATE_DELEGATE_RETVAL(RetVal, Name, ...) 
 

@@ -12,8 +12,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Editor", "editor\Editor.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeteorBuild", "devtools\MeteorBuild\MeteorBuild.vcxproj", "{E75C5354-0747-4518-9E9B-B4FDFF214314}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Renderer", "engine\Renderer\Renderer.vcxproj", "{244D5E70-1DF7-4426-B141-C2059F72BF7F}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
 Global
@@ -34,16 +32,9 @@ Global
 		{E75C5354-0747-4518-9E9B-B4FDFF214314}.Debug|x64.Build.0 = Debug|x64
 		{E75C5354-0747-4518-9E9B-B4FDFF214314}.Shipping|x64.ActiveCfg = Debug|x64
 		{E75C5354-0747-4518-9E9B-B4FDFF214314}.Shipping|x64.Build.0 = Debug|x64
-		{244D5E70-1DF7-4426-B141-C2059F72BF7F}.Debug|x64.ActiveCfg = Debug|x64
-		{244D5E70-1DF7-4426-B141-C2059F72BF7F}.Debug|x64.Build.0 = Debug|x64
-		{244D5E70-1DF7-4426-B141-C2059F72BF7F}.Shipping|x64.ActiveCfg = Release|x64
-		{244D5E70-1DF7-4426-B141-C2059F72BF7F}.Shipping|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{244D5E70-1DF7-4426-B141-C2059F72BF7F} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7442A397-EEB5-400C-B726-B1A2CAA77F66}

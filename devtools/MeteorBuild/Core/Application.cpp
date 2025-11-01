@@ -5,6 +5,7 @@
 #include <MemoryManager.h>
 #include <FileManager.h>
 
+#include <Common/Delegate.h>
 #include <Platform.h>
 
 //#pragma comment(lib, "Shell32.lib")
@@ -23,6 +24,9 @@ BuildSystemApplication::BuildSystemApplication()
 void BuildSystemApplication::Init()
 {
 	Application::Init();
+
+	Delegate<int> k;
+	k.Bind()
 }
 
 	//if (Commandlet::Parse("-build", temp))

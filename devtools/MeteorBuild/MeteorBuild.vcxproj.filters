@@ -30,6 +30,9 @@
     <ClCompile Include="Module\ProjectScript.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WordDelegate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Application.h">
@@ -48,6 +51,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Module\ProjectScript.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WordDelegate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

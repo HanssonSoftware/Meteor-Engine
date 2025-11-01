@@ -60,7 +60,6 @@ void Utils::ListDirectory(String* name, Array<String>& container)
 		
 			FindClose(fileHandle);
 		}
-
 	}
 }
 
@@ -71,14 +70,10 @@ ECharacterType Utils::GetCharacterType(const char* str)
 	char* c = const_cast<char*>(str);
 	if (isalpha((int)*c))
 	{
-		int i = 0;
 		while (!isspace((int)*c))
-		{
-
-
-			i++;
 			c++;
-		}
+
+		return Word;
 	}
 
 	if (str[0] == '{')
@@ -103,6 +98,32 @@ ECharacterType Utils::GetCharacterType(const char* str)
 	}
 
 	return None;
+}
+
+void Utils::SkipCharacterType(const char*& str, ECharacterType type)
+{
+	switch (type)
+	{
+	case Word:
+	{
+		if (isalpha((int)*str))
+		{
+			while (!isspace((int)*str))
+				str++;
+
+			return;
+		}
+		break;
+	}
+	default:
+		str++;
+		break;
+	}
+}
+
+bool Utils::Expected(const char*& in, const char* word, bool b)
+{
+	return false;
 }
 
 bool Utils::IsSpace(const char* buffer)

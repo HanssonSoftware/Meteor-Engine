@@ -181,6 +181,7 @@
     <ClCompile Include="Module\Module.cpp" />
     <ClCompile Include="Core\Utils.cpp" />
     <ClCompile Include="Module\ProjectScript.cpp" />
+    <ClCompile Include="WordDelegate.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\BuildSystem.h" />
@@ -189,6 +190,7 @@
     <ClInclude Include="Module\ProjectScript.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Core\Utils.h" />
+    <ClInclude Include="WordDelegate.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MeteorBuild.aps" />

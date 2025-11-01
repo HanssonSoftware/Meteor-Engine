@@ -20,5 +20,9 @@ struct Utils
 
 	static ECharacterType GetCharacterType(const char* str);
 
+	static void SkipCharacterType(const char*& str, ECharacterType type);
+
+	static bool Expected(const char*& in, const char* word, bool b);
+
 	static bool IsSpace(const char* str);
 };
