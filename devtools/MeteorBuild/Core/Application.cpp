@@ -5,7 +5,6 @@
 #include <MemoryManager.h>
 #include <FileManager.h>
 
-#include <Common/Delegate.h>
 #include <Platform.h>
 
 //#pragma comment(lib, "Shell32.lib")
@@ -21,12 +20,17 @@ BuildSystemApplication::BuildSystemApplication()
 	Memory.memoryReserveInBytes = 100'000;
 }
 
+static void fasz(int j)
+{
+	int bv = 234;
+}
+
 void BuildSystemApplication::Init()
 {
 	Application::Init();
+	SampleDelegate.Bind<&fasz>();
 
-	Delegate<int> k;
-	k.Bind()
+	SampleDelegate.Broadcast(64);
 }
 
 	//if (Commandlet::Parse("-build", temp))

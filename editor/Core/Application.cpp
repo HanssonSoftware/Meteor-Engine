@@ -3,7 +3,6 @@
 #include "Application.h"
 #include <MemoryManager.h>
 #include <Types/String.h>
-#include <Common/Delegate.h>
 #include <Layers/LayerManager.h>
 #include <iostream>
 #include <Platform/File.h>

@@ -1,16 +1,11 @@
 ﻿/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <Types/Vector.h>
-#include <Types/String.h>
-#include <Logging/Log.h>
+#include "Logging/Log.h"
 #include <WindowManager/WindowManager.h>
-//#include <Windows/Windows.h>
 
-#ifdef _WIN64
-#include <Windows/WindowsWindowManager.h>
-#else
-#endif // _WIN64
+#include "Commandlet.h"
+#include <cstdint>
 
 
 class String;

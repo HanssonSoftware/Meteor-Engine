@@ -5,6 +5,7 @@
 #include <Logging/LogMacros.h>
 #include <Platform/WindowManager/WindowManager.h>
 #include <Commandlet.h>
+#include <Types/Delegate.h>
 
 #include "BuildSystem.h"
 

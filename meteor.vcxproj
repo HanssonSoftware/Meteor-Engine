@@ -242,7 +242,6 @@
     <ClCompile Include="engine\Core\Platform\InputManager.cpp" />
     <ClCompile Include="engine\Core\Layers\Layer.cpp" />
     <ClCompile Include="engine\Core\Layers\LayerManager.cpp" />
-    <ClCompile Include="engine\Core\Common\Delegate.cpp" />
     <ClCompile Include="engine\Core\Platform\Windows\WindowsPlatform.cpp" />
     <ClCompile Include="engine\Launch.cpp">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</DeploymentContent>
@@ -297,13 +296,14 @@
     <ClInclude Include="engine\Core\Layers\Layer.h" />
     <ClInclude Include="engine\Core\Layers\LayerManager.h" />
     <ClInclude Include="engine\Core\Types\Array.h" />
-    <ClInclude Include="engine\Core\Common\Delegate.h" />
+    <ClInclude Include="engine\Core\Types\Delegate.h" />
     <ClInclude Include="engine\Core\Platform\File.h" />
     <ClInclude Include="engine\Core\Logging\Log.h" />
     <ClInclude Include="engine\Core\Logging\LogMacros.h" />
     <ClInclude Include="engine\Core\Platform\Timer.h" />
     <ClInclude Include="engine\Core\Types\Cast.h" />
     <ClInclude Include="engine\Core\Types\String.h" />
+    <ClInclude Include="engine\Core\Types\Traits.h" />
     <ClInclude Include="engine\Core\Types\Vector.h" />
     <ClInclude Include="engine\Core\Platform\WindowManager\Window.h" />
     <ClInclude Include="engine\Core\Platform\WindowManager\WindowManager.h" />

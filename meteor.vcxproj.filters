@@ -30,9 +30,6 @@
     <ClCompile Include="engine\Core\Layers\LayerManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Common\Delegate.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\Core\Logging\Log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -155,7 +152,7 @@
     <ClInclude Include="engine\Core\Types\Array.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Common\Delegate.h">
+    <ClInclude Include="engine\Core\Types\Delegate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Platform\File.h">
@@ -549,6 +546,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Platform\Windows\WindowsPlatform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Types\Traits.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -2,7 +2,6 @@
 
 #pragma once
 #include <Types/String.h>
-#include <Common/Delegate.h>
 #include <Logging/Log.h>
 
 class SystemLayer;
