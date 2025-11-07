@@ -5,6 +5,8 @@
 #include <Platform/File.h>
 #include <Core/Utils.h>
 
+LOG_ADDCATEGORY(Parser);
+
 void Module::Parse(String* modulePath)
 {
 	IFile* module = FileManager::CreateFileOperation(modulePath, FileAccessMode::OPENMODE_READ, FileShareMode::SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS);
@@ -14,10 +16,81 @@ void Module::Parse(String* modulePath)
 
 		const char* buffer = module->GetBuffer();
 
-		while (buffer != "\0")
+		if (Utils::GetWord(buffer, false) == "Module")
 		{
-			Utils::GetCharacterType(buffer);
-			buffer++;
+			Utils::SkipWord(buffer);  // Skip "Module"
+
+			moduleName = Utils::GetWord(buffer, true);
+
+			if (Utils::GetCharacterType(buffer) == Colon)
+			{
+				dependsOn = Utils::GetWord(buffer, true);
+
+				while (*buffer != '\0')
+				{
+					if (Utils::GetCharacterType(buffer) == OpenBrace)
+					{
+						Utils::SkipCharacterType(buffer, OpenBrace);
+
+						while (Utils::GetCharacterType(buffer) != ClosedBrace)
+						{
+							const String flagWord = Utils::GetWord(buffer, true);
+						}
+					}
+
+					buffer++;
+				}
+			}
+		}
+		else if (Utils::GetWord(buffer, false) == "Project")
+		{
+			Utils::SkipWord(buffer);  // Skip "Project"
+
+			moduleName = Utils::GetWord(buffer, true);
+
+			
+			if (Utils::GetCharacterType(buffer) == OpenBrace)
+			{
+				Utils::SkipCharacterType(buffer, OpenBrace);
+
+				while (*buffer != '\0')
+				{
+					while (Utils::GetCharacterType(buffer) != ClosedBrace
+						&& Utils::GetCharacterType(buffer) != None)
+					{
+						const String flagWord = Utils::GetWord(buffer, true);
+						if (!flagWord.IsEmpty() && Utils::GetCharacterType(buffer) == Colon)
+						{
+							Utils::SkipCharacterType(buffer, Colon);
+
+							if (Utils::GetCharacterType(buffer) == OpenBrace)
+							{
+								Utils::SkipCharacterType(buffer, OpenBrace);
+								while (Utils::GetCharacterType(buffer) != ClosedBrace)
+								{
+									MR_LOG(LogParser, Log, "%s", *Utils::GetWord(buffer, true));
+									if (Utils::GetCharacterType(buffer) == Comma)
+										Utils::SkipCharacterType(buffer, Comma);
+								}
+							}
+
+							int J = 5;
+						}
+						else if (Utils::GetCharacterType(buffer) != Colon)
+						{
+							MR_LOG(LogParser, Fatal, "Missing colon after word! %s", flagWord.Chr());
+						}
+						else
+						{
+							MR_LOG(LogParser, Fatal, "Unknown error!");
+						}
+					}
+
+					Utils::SkipCharacterType(buffer, ClosedBrace);
+				}
+
+				//buffer++;
+			}
 		}
 
 		module->Close();

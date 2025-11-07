@@ -36,6 +36,8 @@ public:
 	String operator+(const String& Other);
 
 	bool operator==(const String& Other) const;
+
+	bool operator==(const char* Other) const;
 		
 	bool operator!=(const String& Other) const;
 

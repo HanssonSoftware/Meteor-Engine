@@ -17,6 +17,11 @@
 
 static HANDLE hConsole;
 
+static LONG ExceptionHandler(EXCEPTION_POINTERS* ptr)
+{
+	return 4;
+}
+
 WindowsLogger::WindowsLogger()
 	: ILogger()
 {
@@ -83,6 +88,8 @@ void WindowsLogger::Initialize()
 				bHasConsoleWindow = true;
 			}
 		}
+
+		SetUnhandledExceptionFilter(ExceptionHandler);
 	}
 #endif // MR_DEBUG
 

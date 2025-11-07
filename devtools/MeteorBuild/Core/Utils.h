@@ -18,11 +18,13 @@ struct Utils
 {
 	static void ListDirectory(String* name, Array<String>& container);
 
-	static ECharacterType GetCharacterType(const char* str);
+	static ECharacterType GetCharacterType(const char*& str);
 
 	static void SkipCharacterType(const char*& str, ECharacterType type);
 
-	static bool Expected(const char*& in, const char* word, bool b);
+	static String GetWord(const char*& in, bool bStep);
+
+	static void SkipWord(const char*& in);
 
 	static bool IsSpace(const char* str);
 };

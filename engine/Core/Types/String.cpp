@@ -393,6 +393,11 @@ bool String::operator==(const String& Other) const
 	return strcmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) == 0;
 }
 
+bool String::operator==(const char* Other) const
+{
+	return strcmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other) == 0;
+}
+
 bool String::operator!=(const String& Other) const
 {
 	return strcmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) != 0;

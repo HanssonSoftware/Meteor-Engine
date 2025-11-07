@@ -8,6 +8,8 @@
 #include <Platform/Platform.h>
 #include "Utils.h"
 
+//#include <vector>
+
 LOG_ADDCATEGORY(BuildSystemFramework);
 
 bool BuildSystem::InitFramework()
@@ -30,7 +32,10 @@ bool BuildSystem::InitFramework()
 				}
 			}
 
-			
+
+			Module super;
+			super.Parse(&scriptsFound[scriptsFound.GetSize() - 1]);
+
 			for (auto& temp : scriptsFound)
 			{
 				Module mdl;

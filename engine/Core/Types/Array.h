@@ -142,6 +142,16 @@ public:
 		return size > 0;
 	}
 
+	T* operator&(const uint32_t& index)
+	{
+		if (IsOutOfBounds(index))
+		{
+			return &container[0];
+		}
+
+		return &container[index];
+	}
+
 	bool IsOutOfBounds(const uint32_t& index) { return index >= capacity; };
 
 	Iterator<T> begin() { return Iterator(&container[0]); }

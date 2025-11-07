@@ -63,36 +63,40 @@ void Utils::ListDirectory(String* name, Array<String>& container)
 	}
 }
 
-ECharacterType Utils::GetCharacterType(const char* str)
+ECharacterType Utils::GetCharacterType(const char*& str)
 {
 	if (!str) return None;
 
-	char* c = const_cast<char*>(str);
-	if (isalpha((int)*c))
+	while (isspace(*str))
+		str++;
+
+	const char* constStr = str;
+	if (isalpha(*constStr))
 	{
-		while (!isspace((int)*c))
-			c++;
+		
+		while (!isspace(*constStr))
+			constStr++;
 
 		return Word;
 	}
 
-	if (str[0] == '{')
+	if (*constStr == '{')
 	{
 		return OpenBrace;
 	}
-	else if (str[0] == '}')
+	else if (*constStr == '}')
 	{
 		return ClosedBrace;
 	}
-	else if (str[0] == ',')
+	else if (*constStr == ',')
 	{
 		return Comma;
 	}
-	else if (str[0] == ';')
+	else if (*constStr == ';')
 	{
 		
 	}
-	else if (str[0] == ':')
+	else if (*constStr == ':')
 	{
 		return Colon;
 	}
@@ -102,28 +106,73 @@ ECharacterType Utils::GetCharacterType(const char* str)
 
 void Utils::SkipCharacterType(const char*& str, ECharacterType type)
 {
-	switch (type)
+	if (str)
 	{
-	case Word:
-	{
-		if (isalpha((int)*str))
+		switch (type)
 		{
-			while (!isspace((int)*str))
+		case Word:
+		{
+			if (isalpha(*str))
+			{
+				while (!isspace(*str))
+					str++;
+
+				return;
+			}
+			break;
+		}
+		default:
+			if (Utils::GetCharacterType(str) == type)
 				str++;
 
-			return;
+			break;
 		}
-		break;
-	}
-	default:
-		str++;
-		break;
 	}
 }
 
-bool Utils::Expected(const char*& in, const char* word, bool b)
+String Utils::GetWord(const char*& in, bool bStep)
 {
-	return false;
+	while (isspace(int(*in)))
+		in++;
+
+	const char* begin = in;
+	const char* end = nullptr;
+	uint32_t chars = 0;
+
+	if (*begin == '"')
+	{
+		begin++; // "
+		end = begin;
+
+		while (*end && /*isalpha(*end)*/ *end != '"')
+		{
+			chars++;
+			end++;
+		}
+		
+		end++;
+	}
+	else
+	{
+		end = in;
+		while (*end && !isspace(*end) && !ispunct(*end)) end++;
+
+		chars = end - begin;
+	}
+
+	String returned(begin, chars);
+	if (bStep) in = end;
+
+	return returned;
+}
+
+void Utils::SkipWord(const char*& in)
+{
+	if (in)
+	{
+		while (*in && !isspace(*in))
+			in++;
+	}
 }
 
 bool Utils::IsSpace(const char* buffer)
