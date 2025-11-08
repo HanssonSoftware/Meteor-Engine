@@ -9,7 +9,7 @@ class Module
 public:
 	Module() = default;
 
-	void Parse(String* modulePath);
+	bool Parse(String* modulePath);
 
 	String moduleName;
 

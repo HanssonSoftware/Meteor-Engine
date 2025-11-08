@@ -7,8 +7,10 @@
 
 LOG_ADDCATEGORY(Parser);
 
-void Module::Parse(String* modulePath)
+bool Module::Parse(String* modulePath)
 {
+	bool bFailed = false;
+
 	IFile* module = FileManager::CreateFileOperation(modulePath, FileAccessMode::OPENMODE_READ, FileShareMode::SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS);
 	if (module != nullptr)
 	{
@@ -72,64 +74,24 @@ void Module::Parse(String* modulePath)
 						Utils::SkipCharacterType(buffer, ClosedBrace);
 					}
 				}
+				else
+				{
+					bFailed = true;
+				}
+			}
+			else
+			{
+				bFailed = true;
 			}
 		}
-		else if (Utils::GetWord(buffer, false) == "Project")
+		else
 		{
-			Utils::SkipWord(buffer);  // Skip "Project"
-
-			MR_LOG(LogParser, Verbose, "Opening %s as ProjectScript!", *module->GetName());
-
-			moduleName = Utils::GetWord(buffer, true);
-
-			
-			if (Utils::GetCharacterType(buffer) == OpenBrace)
-			{
-				Utils::SkipCharacterType(buffer, OpenBrace);
-
-				while (*buffer != '\0')
-				{
-					while (Utils::GetCharacterType(buffer) != ClosedBrace
-						&& Utils::GetCharacterType(buffer) != None)
-					{
-						const String flagWord = Utils::GetWord(buffer, true);
-						if (flagWord && Utils::GetCharacterType(buffer) == Colon)
-						{
-							Utils::SkipCharacterType(buffer, Colon);
-
-							if (Utils::GetCharacterType(buffer) == OpenBrace)
-							{
-								Utils::SkipCharacterType(buffer, OpenBrace);
-								while (Utils::GetCharacterType(buffer) != ClosedBrace)
-								{
-									const String value = Utils::GetWord(buffer, true);
-									if (value)
-									{
-										MR_LOG(LogParser, Verbose, "Adding %s property to %s", *value, *flagWord);
-									}
-
-									if (Utils::GetCharacterType(buffer) == Comma)
-										Utils::SkipCharacterType(buffer, Comma);
-								}
-							}
-						}
-						else if (Utils::GetCharacterType(buffer) != Colon)
-						{
-							MR_LOG(LogParser, Fatal, "Missing colon after word! %s", flagWord.Chr());
-						}
-						else
-						{
-							MR_LOG(LogParser, Fatal, "Unknown error!");
-						}
-					}
-
-					Utils::SkipCharacterType(buffer, ClosedBrace);
-				}
-
-				//buffer++;
-			}
+			bFailed = true;
 		}
 
 		module->Close();
+		return !bFailed;
 	}
+
+	return !bFailed;
 }

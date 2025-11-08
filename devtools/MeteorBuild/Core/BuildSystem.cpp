@@ -32,23 +32,29 @@ bool BuildSystem::InitFramework()
 				}
 			}
 
-			const uint32_t max = scriptsFound.GetSize() - 1 /* Be aware! The last one is always should be the project script!*/;
+			const uint32_t max = scriptsFound.GetSize() /* Be aware! The last one is always should be the project script!*/;
 			for (uint32_t i = 0; i < max; i++)
 			{
 				FoundScriptData& indexed = scriptsFound[i];
 
 				Module mdl;
-				mdl.Parse(&indexed.full);
-
-				Array<FoundScriptData> sd;
-				Utils::ListDirectory(&indexed.path, sd);
-
-				for (auto& temp : sd)
+				if (mdl.Parse(&indexed.full))
 				{
-					MR_LOG(LogBuildSystemFramework, Verbose, "%s script included file: %s", *mdl.moduleName, *temp.full);
-				}
+					Array<FoundScriptData> sd;
+					Utils::ListDirectory(&indexed.path, sd);
 
-				loadedModules.Add(mdl);
+					for (auto& temp : sd)
+					{
+						MR_LOG(LogBuildSystemFramework, Verbose, "%s script included file: %s", *mdl.moduleName, *temp.full);
+					}
+
+					loadedModules.Add(mdl);
+				}
+			}
+
+			for (auto& a : loadedModules)
+			{
+				int j = 5345;
 			}
 		}
 
