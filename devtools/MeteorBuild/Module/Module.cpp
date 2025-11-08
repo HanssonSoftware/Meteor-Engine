@@ -24,21 +24,49 @@ void Module::Parse(String* modulePath)
 
 			if (Utils::GetCharacterType(buffer) == Colon)
 			{
+				Utils::SkipCharacterType(buffer, Colon);
 				dependsOn = Utils::GetWord(buffer, true);
 
-				while (*buffer != '\0')
+				if (Utils::GetCharacterType(buffer) == OpenBrace)
 				{
-					if (Utils::GetCharacterType(buffer) == OpenBrace)
-					{
-						Utils::SkipCharacterType(buffer, OpenBrace);
+					Utils::SkipCharacterType(buffer, OpenBrace);
 
-						while (Utils::GetCharacterType(buffer) != ClosedBrace)
+					while (*buffer != '\0')
+					{
+						while (Utils::GetCharacterType(buffer) != ClosedBrace
+							&& Utils::GetCharacterType(buffer) != None)
 						{
 							const String flagWord = Utils::GetWord(buffer, true);
-						}
-					}
+							if (!flagWord.IsEmpty() && Utils::GetCharacterType(buffer) == Colon)
+							{
+								Utils::SkipCharacterType(buffer, Colon);
 
-					buffer++;
+								if (Utils::GetCharacterType(buffer) == OpenBrace)
+								{
+									Utils::SkipCharacterType(buffer, OpenBrace);
+									while (Utils::GetCharacterType(buffer) != ClosedBrace)
+									{
+										MR_LOG(LogParser, Log, "%s", *Utils::GetWord(buffer, true));
+										if (Utils::GetCharacterType(buffer) == Comma)
+											Utils::SkipCharacterType(buffer, Comma);
+									}
+								}
+
+								int J = 5;
+							}
+							else if (Utils::GetCharacterType(buffer) != Colon)
+							{
+								MR_LOG(LogParser, Fatal, "Missing colon after word! %s", flagWord.Chr());
+							}
+							else
+							{
+								MR_LOG(LogParser, Fatal, "Unknown error!");
+							}
+						}
+
+						Utils::SkipCharacterType(buffer, ClosedBrace);
+
+					}
 				}
 			}
 		}
