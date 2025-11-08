@@ -15,6 +15,8 @@ public:
 
 	String dependsOn;
 
+	Array<String> files;
+
 	Array<String> includePaths;
 };
 

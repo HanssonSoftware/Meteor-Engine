@@ -1,0 +1,7 @@
+Module "Renderer" : "Meteor"
+{
+	IncludePaths:
+	{
+		""
+	}
+}

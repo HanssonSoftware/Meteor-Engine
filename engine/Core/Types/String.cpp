@@ -338,28 +338,29 @@ String::~String() noexcept
 
 String String::operator+(const String& Other)
 {
-	//const char* otherBuffer = Other.buffer;
-	//const char* thisBuffer = buffer;
+	const char* thisData = Data();
+	const char* otherData = Other.Chr();
 
-	//const uint32_t size = strlen(thisBuffer) + strlen(otherBuffer) + 1;
+	const uint32_t thisSize = strlen(thisData);
+	const uint32_t otherSize = strlen(otherData);
 
-	//char* super = new char[size]();
+	this->bIsUsingHeap = thisSize + otherSize > SSO_MAX_CHARS ? true : false;
 
-	//if (super == nullptr)
-	//{
-	//	delete[] super;
-	//	MR_LOG(LogTemp, Error, "String concencation failed! Wide buffer is null!");
-	//	return String("");
-	//}
+	if (this->bIsUsingHeap)
+	{
+		ScopedPtr<char> newBuffer = MemoryManager::Get().Allocate<char>(thisSize + otherSize + 1u);
+		memcpy(newBuffer.Get(), thisData, thisSize);
+		memcpy(newBuffer.Get() + thisSize, otherData, otherSize);
 
-	//strcpy(super, thisBuffer);
-	//strcat(super, otherBuffer);
 
-	//String newStringBuffer(super);
+		thisData = newBuffer.Get();
+	}
+	else
+	{
 
-	//delete[] super;
-	//return newStringBuffer;
-	return String("");
+	}
+
+	return *this;
 }
 
 String operator+(const String& OtherA, const String& OtherB)
@@ -409,29 +410,12 @@ String::operator const char*() const
 		stackBuffer.ptr || stackBuffer.length != 0 ? stackBuffer.ptr : "";
 }
 
-const char* String::Chr() const
-{
-	return bIsUsingHeap ? (heapBuffer.ptr || heapBuffer.length != 0 ? heapBuffer.ptr : "") : 
-		stackBuffer.ptr || stackBuffer.length != 0 ? stackBuffer.ptr : "";
-}
-
 char* String::Allocate()
 {
 	char* buffer = MemoryManager::Get().Allocate<char>(bIsUsingHeap ? heapBuffer.capacity : stackBuffer.length + 1);
 	memcpy(buffer, Chr(), bIsUsingHeap ? heapBuffer.length : stackBuffer.length);
 	
 	return buffer;
-}
-
-bool String::operator!() const
-{
-	return bIsUsingHeap ? !heapBuffer.ptr : !stackBuffer.ptr;
-}
-
-const char* String::operator*() const
-{
-	return bIsUsingHeap ? (heapBuffer.ptr || heapBuffer.length != 0 ? heapBuffer.ptr : "") :
-		stackBuffer.ptr || stackBuffer.length != 0 ? stackBuffer.ptr : "";
 }
 
 String String::Delim(const String character, bool first)
@@ -458,11 +442,6 @@ int32_t String::ToInt() const noexcept
 float String::ToFloat() const noexcept
 {
 	return strtof(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, nullptr);
-}
-
-uint32_t String::Length() const noexcept
-{
-	return bIsUsingHeap ? (uint32_t)heapBuffer.length : (uint32_t)stackBuffer.length;
 }
 
 String String::Format(const String& format, ...)

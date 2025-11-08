@@ -5,7 +5,6 @@
 #include <Commandlet.h>
 #include <FileManager.h>
 
-#include <Platform/Platform.h>
 #include "Utils.h"
 
 //#include <vector>
@@ -19,28 +18,35 @@ bool BuildSystem::InitFramework()
 		String sourceDirectoryFromLaunchParameter;
 		if (Commandlet::Parse("-source", &sourceDirectoryFromLaunchParameter))
 		{
-			Array<String> filesFoundInSources;
-			Array<String> scriptsFound;
+			Array<FoundScriptData> filesFoundInSources;
+			Array<FoundScriptData> scriptsFound;
 
 			Utils::ListDirectory(&sourceDirectoryFromLaunchParameter, filesFoundInSources);
 			for (auto& pathToDiscoveredItemsIndexed : filesFoundInSources)
 			{
-				if (FileManager::IsEndingWith(pathToDiscoveredItemsIndexed, "mrbuild"))
+				//const String combined = String::Format("%s\\%s", *pathToDiscoveredItemsIndexed.path, *pathToDiscoveredItemsIndexed.name);
+				if (FileManager::IsEndingWith(pathToDiscoveredItemsIndexed.full, "mrbuild"))
 				{
 					scriptsFound.Add(pathToDiscoveredItemsIndexed);
-					MR_LOG(LogBuildSystemFramework, Verbose, "Found: %s", *pathToDiscoveredItemsIndexed);
+					MR_LOG(LogBuildSystemFramework, Verbose, "Found script: %s", *pathToDiscoveredItemsIndexed.full);
 				}
 			}
 
-
-			Module super;
-			super.Parse(&scriptsFound[scriptsFound.GetSize() - 1]);
-
-			for (auto& temp : scriptsFound)
+			const uint32_t max = scriptsFound.GetSize() - 1 /* Be aware! The last one is always should be the project script!*/;
+			for (uint32_t i = 0; i < max; i++)
 			{
-				Module mdl;
+				FoundScriptData& indexed = scriptsFound[i];
 
-				mdl.Parse(&temp);
+				Module mdl;
+				mdl.Parse(&indexed.full);
+
+				Array<FoundScriptData> sd;
+				Utils::ListDirectory(&indexed.path, sd);
+
+				for (auto& temp : sd)
+				{
+					MR_LOG(LogBuildSystemFramework, Verbose, "%s script included file: %s", *mdl.moduleName, *temp.full);
+				}
 
 				loadedModules.Add(mdl);
 			}

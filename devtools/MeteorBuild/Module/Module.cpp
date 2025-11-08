@@ -18,6 +18,8 @@ void Module::Parse(String* modulePath)
 
 		if (Utils::GetWord(buffer, false) == "Module")
 		{
+			MR_LOG(LogParser, Verbose, "Opening %s as ModuleScript!", *module->GetName());
+
 			Utils::SkipWord(buffer);  // Skip "Module"
 
 			moduleName = Utils::GetWord(buffer, true);
@@ -37,7 +39,7 @@ void Module::Parse(String* modulePath)
 							&& Utils::GetCharacterType(buffer) != None)
 						{
 							const String flagWord = Utils::GetWord(buffer, true);
-							if (!flagWord.IsEmpty() && Utils::GetCharacterType(buffer) == Colon)
+							if (flagWord && Utils::GetCharacterType(buffer) == Colon)
 							{
 								Utils::SkipCharacterType(buffer, Colon);
 
@@ -46,13 +48,16 @@ void Module::Parse(String* modulePath)
 									Utils::SkipCharacterType(buffer, OpenBrace);
 									while (Utils::GetCharacterType(buffer) != ClosedBrace)
 									{
-										MR_LOG(LogParser, Log, "%s", *Utils::GetWord(buffer, true));
+										const String value = Utils::GetWord(buffer, true);
+										if (value)
+										{
+											MR_LOG(LogParser, Verbose, "Adding %s property to %s", *value, *flagWord);
+										}
+
 										if (Utils::GetCharacterType(buffer) == Comma)
 											Utils::SkipCharacterType(buffer, Comma);
 									}
 								}
-
-								int J = 5;
 							}
 							else if (Utils::GetCharacterType(buffer) != Colon)
 							{
@@ -65,7 +70,6 @@ void Module::Parse(String* modulePath)
 						}
 
 						Utils::SkipCharacterType(buffer, ClosedBrace);
-
 					}
 				}
 			}
@@ -73,6 +77,8 @@ void Module::Parse(String* modulePath)
 		else if (Utils::GetWord(buffer, false) == "Project")
 		{
 			Utils::SkipWord(buffer);  // Skip "Project"
+
+			MR_LOG(LogParser, Verbose, "Opening %s as ProjectScript!", *module->GetName());
 
 			moduleName = Utils::GetWord(buffer, true);
 
@@ -87,7 +93,7 @@ void Module::Parse(String* modulePath)
 						&& Utils::GetCharacterType(buffer) != None)
 					{
 						const String flagWord = Utils::GetWord(buffer, true);
-						if (!flagWord.IsEmpty() && Utils::GetCharacterType(buffer) == Colon)
+						if (flagWord && Utils::GetCharacterType(buffer) == Colon)
 						{
 							Utils::SkipCharacterType(buffer, Colon);
 
@@ -96,13 +102,16 @@ void Module::Parse(String* modulePath)
 								Utils::SkipCharacterType(buffer, OpenBrace);
 								while (Utils::GetCharacterType(buffer) != ClosedBrace)
 								{
-									MR_LOG(LogParser, Log, "%s", *Utils::GetWord(buffer, true));
+									const String value = Utils::GetWord(buffer, true);
+									if (value)
+									{
+										MR_LOG(LogParser, Verbose, "Adding %s property to %s", *value, *flagWord);
+									}
+
 									if (Utils::GetCharacterType(buffer) == Comma)
 										Utils::SkipCharacterType(buffer, Comma);
 								}
 							}
-
-							int J = 5;
 						}
 						else if (Utils::GetCharacterType(buffer) != Colon)
 						{

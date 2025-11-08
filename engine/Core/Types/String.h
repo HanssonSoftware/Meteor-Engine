@@ -41,15 +41,31 @@ public:
 		
 	bool operator!=(const String& Other) const;
 
-	bool operator!() const;
+	bool operator!() const
+	{
+		return bIsUsingHeap ? !heapBuffer.ptr : !stackBuffer.ptr;
+	}
+
+	operator bool() const
+	{
+		return Length() > 0;
+	}
 
 	String& operator+=(const String& other);
 	
-	const char* operator*() const;
+	const char* operator*() const
+	{
+		return bIsUsingHeap ? (heapBuffer.ptr || heapBuffer.length != 0 ? heapBuffer.ptr : "") :
+			stackBuffer.ptr || stackBuffer.length != 0 ? stackBuffer.ptr : "";
+	}
 
 	operator const char* () const;
 
-	const char* Chr() const;	
+	const char* Chr() const
+	{
+		return bIsUsingHeap ? (heapBuffer.ptr || heapBuffer.length != 0 ? heapBuffer.ptr : "") :
+			stackBuffer.ptr || stackBuffer.length != 0 ? stackBuffer.ptr : "";
+	}
 
 	/** Creates an allocated string, straight from this container. Do not forget to delete! */
 	char* Allocate();	
@@ -62,7 +78,10 @@ public:
 
 	float ToFloat() const noexcept;
 
-	uint32_t Length() const noexcept;
+	uint32_t Length() const noexcept
+	{
+		return bIsUsingHeap ? (uint32_t)heapBuffer.length : (uint32_t)stackBuffer.length;
+	}
 	
 	/** */
 	static String Format(const String& format, ...);
@@ -82,8 +101,6 @@ private:
 	void ResetBuffers();
 
 	char* Data() { return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr; };
-
-	bool bIsUsingHeap = false;
 
 	union
 	{
@@ -107,6 +124,8 @@ private:
 	};
 
 	static constexpr uint16_t SSO_MAX_CHARS = sizeof(heapBuffer) - sizeof(uint16_t) - 1;
+
+	bool bIsUsingHeap = false;
 
 #ifdef MR_DEBUG
 	bool bIsInited = false;

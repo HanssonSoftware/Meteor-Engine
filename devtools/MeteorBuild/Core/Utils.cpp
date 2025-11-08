@@ -8,7 +8,7 @@
 
 #include <PathCch.h>
 
-void Utils::ListDirectory(String* name, Array<String>& container)
+void Utils::ListDirectory(String* name, Array<FoundScriptData>& container)
 {
 	if (name != nullptr)
 	{
@@ -51,7 +51,13 @@ void Utils::ListDirectory(String* name, Array<String>& container)
 
 					case FILE_ATTRIBUTE_ARCHIVE:
 					{
-						container.Add(String::Format("%s\\%ls", name->Chr(), foundFile.cFileName));
+						FoundScriptData fd;
+
+						fd.name = foundFile.cFileName;
+						fd.path = *name;
+						fd.full = String::Format("%s\\%s", *fd.path, *fd.name);
+
+						container.Add(fd);
 						break;
 					}
 				}

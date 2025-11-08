@@ -30,7 +30,7 @@
     <ClCompile Include="Module\ProjectScript.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Module\WordDelegate.cpp">
+    <ClCompile Include="Module\VerbLibrary.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -53,7 +53,7 @@
     <ClInclude Include="Module\ProjectScript.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Module\WordDelegate.h">
+    <ClInclude Include="Module\VerbLibrary.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

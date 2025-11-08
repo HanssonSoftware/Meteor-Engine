@@ -3,8 +3,9 @@
 #pragma once
 
 #include "Iterator.h"
-#include <cstring>
 #include <stdint.h>
+
+#include <vector>
 
 template <typename T>
 class Array

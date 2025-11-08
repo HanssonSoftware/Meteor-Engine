@@ -14,9 +14,18 @@ enum ECharacterType
 	EndOfFile
 };
 
+struct FoundScriptData
+{
+	String name;
+
+	String path;
+
+	String full;
+};
+
 struct Utils
 {
-	static void ListDirectory(String* name, Array<String>& container);
+	static void ListDirectory(String* name, Array<FoundScriptData>& container);
 
 	static ECharacterType GetCharacterType(const char*& str);
 
