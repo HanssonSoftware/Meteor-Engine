@@ -26,6 +26,6 @@ public:
 
 	bool Finalize(String& output);
 
-	void Parse(String* input);
+	bool Parse(String* input);
 };
 

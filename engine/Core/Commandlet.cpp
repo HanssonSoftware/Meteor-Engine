@@ -42,8 +42,8 @@ bool Commandlet::Parse(const String& inParam, String* returnVal)
 
 		if (item == inParam)
 		{
-			if (returnVal != nullptr) 
-				*returnVal = parsedWords.IsOutOfBounds(i + 1) ? parsedWords[i] : parsedWords[i + 1];
+			if (returnVal != nullptr && i + 1 <= count) 
+				*returnVal = parsedWords[i + 1];
 			
 			return true;
 		}

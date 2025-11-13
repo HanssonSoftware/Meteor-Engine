@@ -7,6 +7,11 @@
 
 LOG_ADDCATEGORY(ProjectScriptParser);
 
+static void AddVerbDetail(const String& verb, const String& value)
+{
+
+}
+
 bool ProjectScript::Finalize(String& output)
 {
 	output += "# This file is generated with MeteorBuild(R)\nMicrosoft Visual Studio Solution File, Format Version 12.00\nVisualStudioVersion = 17.11.35327.3\nMinimumVisualStudioVersion = 10.0.40219.1";
@@ -14,7 +19,7 @@ bool ProjectScript::Finalize(String& output)
 	return false;
 }
 
-void ProjectScript::Parse(String* input)
+bool ProjectScript::Parse(String* input)
 {
 	IFile* module = FileManager::CreateFileOperation(input, FileAccessMode::OPENMODE_READ, FileShareMode::SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS);
 	if (module != nullptr)
@@ -23,6 +28,7 @@ void ProjectScript::Parse(String* input)
 
 		const char* buffer = module->GetBuffer();
 
+		bool bHasBeenParsedOneWordAtLeast = false;
 		if (Utils::GetWord(buffer, false) == "Project")
 		{
 			Utils::SkipWord(buffer);  // Skip "Project"
@@ -53,6 +59,9 @@ void ProjectScript::Parse(String* input)
 									const String value = Utils::GetWord(buffer, true);
 									if (value)
 									{
+										if (!bHasBeenParsedOneWordAtLeast) bHasBeenParsedOneWordAtLeast = true;
+
+										AddVerbDetail(flagWord, value);
 										MR_LOG(LogProjectScriptParser, Verbose, "Adding %s property to %s", *value, *flagWord);
 									}
 
@@ -77,5 +86,8 @@ void ProjectScript::Parse(String* input)
 		}
 
 		module->Close();
+		return bHasBeenParsedOneWordAtLeast;
 	}
+
+	return false;
 }

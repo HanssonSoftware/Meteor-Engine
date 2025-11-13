@@ -4,4 +4,9 @@ Module "Renderer" : "Meteor"
 	{
 		""
 	}
+
+	Dependencies:
+	{
+		"Core"
+	}
 }

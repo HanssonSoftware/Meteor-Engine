@@ -3,7 +3,7 @@
 #include "String.h"
 #include <Logging/Log.h>
 #include <stdio.h>
-#include <cstdlib>
+
 #include <Layers/SystemLayer.h>
 #include <Platform.h>
 
@@ -388,17 +388,6 @@ String operator+(const String& OtherA, const String& OtherB)
 	return newStringBuffer;
 }
 
-
-bool String::operator==(const String& Other) const
-{
-	return strcmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) == 0;
-}
-
-bool String::operator==(const char* Other) const
-{
-	return strcmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other) == 0;
-}
-
 bool String::operator!=(const String& Other) const
 {
 	return strcmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) != 0;
@@ -447,7 +436,7 @@ float String::ToFloat() const noexcept
 String String::Format(const String& format, ...)
 {
 	va_list a;
-	va_start(a, *format);
+	va_start(a, format.Chr());
 
 	const char* formattingBuffer = format.Chr();
 

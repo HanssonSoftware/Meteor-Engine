@@ -3,7 +3,7 @@
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdint.h>
-
+#include <string>
 
 /** Human readable piece of text. */
 class String
@@ -35,9 +35,15 @@ public:
 
 	String operator+(const String& Other);
 
-	bool operator==(const String& Other) const;
+	bool operator==(const String& Other) const
+	{
+		return strcmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) == 0;
+	}
 
-	bool operator==(const char* Other) const;
+	bool operator==(const char* Other) const
+	{
+		return strcmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other) == 0;
+	}
 		
 	bool operator!=(const String& Other) const;
 

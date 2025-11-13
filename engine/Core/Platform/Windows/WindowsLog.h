@@ -18,7 +18,7 @@ public:
 
 	virtual void HandleFatal() override;
 
-	//int32_t TransmitAssertion(LogAssertion& Info);
+	void TransmitAssertion(const LogAssertion* Info);
 
 	virtual void SendToOutputBuffer(const String& Buffer) override;
 

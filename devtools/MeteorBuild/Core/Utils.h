@@ -8,6 +8,7 @@ enum ECharacterType
 	None,
 	Word,
 	Colon,
+	SemiColon,
 	Comma,
 	OpenBrace,
 	ClosedBrace,

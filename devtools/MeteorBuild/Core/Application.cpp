@@ -46,6 +46,12 @@ void BuildSystemApplication::Run()
 		MR_LOG(LogBuildSystemApplication, Fatal, "Build system error!");
 	}
 
+	buildSystemApp.OrderModules();
+	if (!buildSystemApp.BuildProjectFiles())
+	{
+		MR_LOG(LogBuildSystemApplication, Fatal, "Failed to create project files!");
+	}
+
 	Application::RequestExit(0);
 }
 

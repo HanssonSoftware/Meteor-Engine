@@ -79,7 +79,7 @@ LOG_ADDCATEGORY(Temp);
         if (!(expression)) \
         {   \
             /*LogAssertion asserta(__FILE__, __LINE__, #expression, message, __VA_ARGS__);*/\
-            if (/*ILogger::Get()->TransmitAssertion(&asserta) == 1*/0) __debugbreak(); \
+            if (/*ILogger::Get()->TransmitAssertion(&asserta) == 1*/1) __debugbreak(); \
                                                              \
         }                                                                      \
     } while (0)

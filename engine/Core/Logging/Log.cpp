@@ -55,7 +55,7 @@ void ILogger::Initialize()
 
     if (bIsUsingFile)
     {
-        auto b = Paths::GetEngineDirectory();
+        auto b = Paths::GetExecutableDirctory();
         //buffer = FileManager::CreateFileOperation(
         //    String::Format(
         //        "E:\\Logging\\%s-%s.txt", 

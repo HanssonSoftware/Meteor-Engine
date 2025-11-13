@@ -5,166 +5,181 @@
 #include "Iterator.h"
 #include <stdint.h>
 
-#include <vector>
+#include <Logging/Log.h>
+//#include <vector>
 
 template <typename T>
 class Array
 {
 public:
 	Array()
+		: container(nullptr), size(0), capacity(0)
 	{
-		capacity = RECOMMENDED_CAPACITY_PADDING;
-		size = 0;
+		Reserve(2);
+	}
 
-		container = new T[capacity]();
+	Array(uint32_t count)
+		: container(nullptr), size(0), capacity(0)
+	{
+		Reserve(count);
+		for (uint32_t i = 0; i < count; ++i) container[i] = T{};
+		size = count;
+	}
+
+	Array(const Array& other)
+		: container(nullptr), size(0), capacity(0)
+	{
+		Reserve(other.size);
+		for (uint32_t i = 0; i < other.size; ++i) container[i] = other.container[i];
+		size = other.size;
+	}
+
+	Array(Array&& other) noexcept
+		: container(other.container), size(other.size), capacity(other.capacity)
+	{
+		other.container = nullptr;
+		other.size = 0;
+		other.capacity = 0;
+	}
+
+	Array& operator=(Array other) noexcept
+	{
+		swap(other);
+		return *this;
 	}
 
 	~Array()
 	{
-		if (container)
-		{
-			delete[] container;
-			container = nullptr;
-
-		}
-			
-		capacity = 0, size = 0;
+		Clear();
+		//delete[] container;
 	}
 
-	Array(const uint32_t& count)
+	void Add(const T& elem)
 	{
-		capacity = count + RECOMMENDED_CAPACITY_PADDING;
-		size = count;
-
-		container = new T[capacity]();
-	}
-
-	Array(const Array& other)
-	{
-		int32_t j = 5;
-	};
-
-	Array(T* buffer)
-	{
-		int32_t j = 5;
-	};
-
-	Array& operator=(const Array& other)
-	{
-		return *this;
-	};
-
-	void Add(const T elem, const uint32_t& at)
-	{
-		if (size <= at) size = at + 1;
-
-		if (!IsOutOfBounds(at))
-		{
-			container[at] = elem;
-		}
-	};
-
-	void Add(const T elem)
-	{
-		if (size >= capacity)
-			Resize(capacity + RECOMMENDED_CAPACITY_PADDING);
-
+		if (size >= capacity) Reserve(capacity ? capacity + RESIZE_PAD : 2);
 		container[size++] = elem;
-	};
+	}
 
-	void Remove(const uint32_t& at)
+	void Add(T&& elem)
 	{
-		if (!IsOutOfBounds(at))
-		{
-			container[at] = {};
-		}
-	};
+		if (size >= capacity) Reserve(capacity ? capacity + RESIZE_PAD : 2);
+		container[size++] = std::move(elem);
+	}
 
-	void Pop(const uint32_t& at)
+	void Add(const T& elem, uint32_t at)
 	{
-		if (!IsOutOfBounds(at))
+		MR_ASSERT(at <= size, "");
+		if (size >= capacity) Reserve(capacity ? capacity + RESIZE_PAD : 2);
+		for (uint32_t i = size; i > at; --i) container[i] = std::move(container[i - 1]);
+		container[at] = elem;
+		++size;
+	}
+
+	void Swap(uint32_t from, uint32_t to)
+	{
+		if (from < capacity || to < capacity)
 		{
-			container[at] = {};
-		}
-		
-		if (at < size)
-		{
-			memmove(&container[at], &container[at + 1u], (size - at - 1) * sizeof(T));
-			size--;
+			auto a = container[from];
+			auto b = container[to];
+
+			container[from] = b;
+			container[to] = a;
 		}
 	}
 
-	void Resize(const uint32_t Num)
-	{		
-		if (Num <= capacity) return;
+	void Remove(uint32_t at)
+	{
+		MR_ASSERT(at < size, "");
+		container[at] = T{};
+	}
 
-		capacity = Num;
-		T* newContainer = new T[capacity]();
+	void Pop(uint32_t at)
+	{
+		MR_ASSERT(at < size, "");
+		for (uint32_t i = at; i + 1 < size; ++i) container[i] = std::move(container[i + 1]);
+		container[size - 1].~T();
+		--size;
+	}
 
-		for (uint32_t i = 0; i < size; i++)
+	void Resize(uint32_t newSize)
+	{
+		if (newSize > capacity) Reserve(newSize);
+		if (newSize > size)
 		{
-			newContainer[i] = container[i];
+			for (uint32_t i = size; i < newSize; ++i) container[i] = T{};
 		}
+		else
+		{
+			for (uint32_t i = newSize; i < size; ++i) container[i].~T();
+		}
+		size = newSize;
+	}
 
+	void Reserve(uint32_t newCap)
+	{
+		if (newCap <= capacity) return;
+		T* dst = new T[newCap];
+		for (uint32_t i = 0; i < size; ++i) dst[i] = std::move(container[i]);
 		delete[] container;
-		container = newContainer;
-	};
+		container = dst;
+		capacity = newCap;
+	}
 
 	void Reset()
 	{
-		for (uint32_t i = 0; i < capacity; i++)
-		{
-			container[i] = {};
-		}
-	};
-
-	T* Data()
-	{
-		return container;
+		for (uint32_t i = 0; i < size; ++i) container[i] = T{};
 	}
 
-	uint32_t GetSize() const
+	void Clear()
 	{
-		return size;
-	};
+		for (uint32_t i = 0; i < size; ++i) container[i].~T();
+		size = 0;
+	}
 
-	T& operator[](const uint32_t& index)
+	T* Data() { return container; }
+	const T* Data() const { return container; }
+
+	uint32_t GetSize() const { return size; }
+	uint32_t GetCapacity() const { return capacity; }
+
+	T& operator[](uint32_t index)
 	{
-		if (IsOutOfBounds(index))
-		{
-			return container[0];
-		}
-
+		MR_ASSERT(index < size, "");
 		return container[index];
-	};
-
-	operator bool()
-	{
-		return size > 0;
 	}
 
-	T* operator&(const uint32_t& index)
+	const T& operator[](uint32_t index) const
 	{
-		if (IsOutOfBounds(index))
-		{
-			return &container[0];
-		}
+		MR_ASSERT(index < size, "");
+		return container[index];
+	}
 
+	operator bool() const { return size > 0; }
+
+	T* operator&(uint32_t index)
+	{
+		MR_ASSERT(index < size, "");
 		return &container[index];
 	}
 
-	bool IsOutOfBounds(const uint32_t& index) { return index >= capacity; };
+	T* begin() { return container; }
+	T* end() { return container + size; }
+	const T* begin() const { return container; }
+	const T* end() const { return container + size; }
 
-	Iterator<T> begin() { return Iterator(&container[0]); }
-
-	Iterator<T> end() { return Iterator(&container[size]); }
+	void swap(Array& other) noexcept
+	{
+		std::swap(container, other.container);
+		std::swap(size, other.size);
+		std::swap(capacity, other.capacity);
+	}
 
 private:
-	static constexpr const uint32_t RECOMMENDED_CAPACITY_PADDING = 4;
+	static constexpr uint32_t RESIZE_PAD = 4;
 
-	uint32_t capacity = 0;
+	T* container;
 
-	uint32_t size = 0;
+	uint32_t size;
 
-	T* container = nullptr;
-};
+	uint32_t capacity;
+}; 

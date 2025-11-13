@@ -7,6 +7,14 @@
 
 LOG_ADDCATEGORY(Parser);
 
+static void AddVerbDetail(Module* moduleToWrite, const String& verb, const String& value)
+{
+	if (verb == "IncludePath" || verb == "IncludePaths") { moduleToWrite->includePaths.Add(value); return; }
+	if (verb == "Dependencies") { moduleToWrite->requires.Add(value); return; }
+
+	MR_LOG(LogParser, Error, "Unknown verb: %s", *verb);
+}
+
 bool Module::Parse(String* modulePath)
 {
 	bool bFailed = false;
@@ -53,6 +61,7 @@ bool Module::Parse(String* modulePath)
 										const String value = Utils::GetWord(buffer, true);
 										if (value)
 										{
+											AddVerbDetail(this, flagWord, value);
 											MR_LOG(LogParser, Verbose, "Adding %s property to %s", *value, *flagWord);
 										}
 
@@ -72,6 +81,14 @@ bool Module::Parse(String* modulePath)
 						}
 
 						Utils::SkipCharacterType(buffer, ClosedBrace);
+					}
+
+					if (*buffer == '\0')
+					{
+						if (SUCCEEDED(CoCreateGuid(&identification)))
+						{
+							MR_LOG(LogParser, Verbose, "Successfully generated GUID, for module %s!", *moduleName);
+						}
 					}
 				}
 				else

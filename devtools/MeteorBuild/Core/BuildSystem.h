@@ -6,7 +6,7 @@
 #include <Module/Module.h>
 
 #include <Platform/File.h>
-
+#include <Module/ProjectScript.h>
 
 class BuildSystem
 {
@@ -20,13 +20,16 @@ protected:
 public:
 	bool InitFramework();
 
+	void OrderModules();
+
+	bool BuildProjectFiles();
 protected:
 	bool ReadArguments();
 
 	const ERequestedCommandToDo GetBuildCommand() const { return command; }
 
 protected:
-
+	ProjectScript ps;
 
 	Array<Module> loadedModules;
 };

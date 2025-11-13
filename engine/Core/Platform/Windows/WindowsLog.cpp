@@ -9,8 +9,7 @@
 #include "WindowsFile.h"
 #include <Platform/Platform.h>
 
-#include <DbgHelp.h>
-#include <assertbox.h>
+#include <Logging/LogAssertion.h>
 #pragma warning(disable : 6001) // Using uninitialized memory 'X'
 
 //LOG_ADDCATEGORY(Assertion);
@@ -172,110 +171,16 @@ void WindowsLogger::HandleFatal()
 	TerminateProcess(GetCurrentProcess(), -1);
 }
 
+void WindowsLogger::TransmitAssertion(const LogAssertion* Info)
+{
+	ScopedPtr<wchar_t> converted = Platform::ConvertToWide(Info->assertMessage);
+
+	MessageBoxW(nullptr, converted, L"Engine Error - Assertion failed!", MB_OK | MB_ICONERROR);
+
+	TerminateProcess(GetCurrentProcess(), -1);
+}
+
 bool WindowsLogger::IsDebuggerAttached()
 {
 	return IsDebuggerPresent() ? true : false;
 }
-
-
-static INT_PTR WindowsLoggingDialogProcedure(HWND wnd, UINT msg, WPARAM ai1, LPARAM ai2)
-{
-	switch (msg)
-	{
-	case WM_INITDIALOG:
-		if (const LogAssertion* pkg = reinterpret_cast<const LogAssertion*>(ai2))
-		{
-			/*wchar_t* fileName = Platform::ConvertToWide(pkg->assertLocationInFile);
-			SetDlgItemTextW(wnd, IDC_ASSERTIONFILESTATEMENT, fileName);
-
-			wchar_t* statement = Platform::ConvertToWide(pkg->assertStatement);
-			SetDlgItemTextW(wnd, IDC_ASSERTIONSTATEMENT, statement);
-
-			wchar_t* line = Platform::ConvertToWide(String(pkg->assertLineInFile));
-			SetDlgItemTextW(wnd, IDC_ASSERTIONLINESTATEMENT, line);
-				
-			delete[] statement, fileName, line;
-
-			if (!ILogger::IsDebuggerAttached())
-				EnableWindow(GetDlgItem(wnd, IDBREAKONDEBUGGER), 0);
-
-			if (!pkg->assertMessage.IsEmpty())
-			{
-				wchar_t* message = Platform::ConvertToWide(pkg->assertMessage.Chr());
-				SetDlgItemTextW(wnd, IDC_ASSERTIONLINEMESSAGE, message);
-
-				delete[] message;
-			}
-			else
-			{
-				ShowWindow(GetDlgItem(wnd, IDC_ASSERTIONLINEMESSAGE), SW_HIDE);
-				ShowWindow(GetDlgItem(wnd, IDC_ASSERTIONMESSAGE), SW_HIDE);
-			}*/
-		}
-	break;
-	case WM_COMMAND:
-		switch (LOWORD(ai1))
-		{
-		case IDBREAKONDEBUGGER:
-			EndDialog(wnd, 1);
-			return TRUE;
-		case IDIGNORETHIS:
-			EndDialog(wnd, 2);
-			return TRUE;
-		case IDEXIT:
-			EndDialog(wnd, -2);
-			return TRUE;
-
-
-
-		default:
-			break;
-		}
-
-	break;
-
-	case WM_CLOSE:
-		EndDialog(wnd, -2);
-		return TRUE;
-
-	default:
-		return DefWindowProcW(wnd, msg, ai1, ai2);
-	}
-
-	return DefWindowProcW(wnd, msg, ai1, ai2);
-}
-
-//int32_t WindowsLogger::TransmitAssertion(LogAssertion& Info)
-//{
-//	if (Info.bIgnoreThis || Info.bIgnoreFor > 0)
-//		return -1;
-//
-//	auto result = DialogBoxParamW(
-//		GetModuleHandleW(0), 
-//		MAKEINTRESOURCEW(IDD_ASSERTIONDIALOG), 
-//		0, 
-//		WindowsLoggingDialogProcedure, 
-//		(LPARAM)&Info
-//	);
-//
-//	switch (result)
-//	{
-//	case -2:
-//		ExitProcess(-1);
-//		break;
-//	case 2:		
-//		Info.bIgnoreThis = true;
-//		MR_LOG(LogAssertionSystem, Warn, "Assert is supressed! %s:%d", Info.assertLocationInFile, Info.assertLineInFile);
-//		break;
-//
-//	default:
-//		break;
-//	}
-//
-//	if (SystemLayer* systemLayer = Layer::GetSystemLayer())
-//	{
-//		const String j = systemLayer->GetError();
-//	}
-//
-//	return (int32_t)result;
-//}

@@ -100,7 +100,7 @@ ECharacterType Utils::GetCharacterType(const char*& str)
 	}
 	else if (*constStr == ';')
 	{
-		
+		return SemiColon;
 	}
 	else if (*constStr == ':')
 	{
@@ -163,7 +163,7 @@ String Utils::GetWord(const char*& in, bool bStep)
 		end = in;
 		while (*end && !isspace(*end) && !ispunct(*end)) end++;
 
-		chars = end - begin;
+		chars = (uint32_t)(end - begin);
 	}
 
 	String returned(begin, chars);
