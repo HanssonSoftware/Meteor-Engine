@@ -5,13 +5,17 @@
 #include <stdio.h>
 
 #include <Layers/SystemLayer.h>
-#include <Platform.h>
+
+#include <Platform/Platform.h>
+#include <Platform/PlatformLayout.h>
+#include <Windows/Windows.h>
 
 #include <MemoryManager.h>
+#include "Pointers.h"
 
 #pragma warning(disable : 26495)
 
-static_assert(sizeof(char) == 1, "Advanced string handling required!");
+LOG_ADDCATEGORY(StringSet);
 
 String::String() noexcept
 	: bIsUsingHeap(false)
@@ -25,34 +29,21 @@ String::String() noexcept
 
 String::String(const char* Input)
 {
-	if (!Input || Input[0] == '\0')
-	{
-		MakeEmpty();
-		return;
-	}
+	NullOut();
 
-	const uint32_t inputSize = (uint32_t)strlen(Input);
-	if (inputSize <= SSO_MAX_CHARS)
+#ifdef MR_PLATFORM_WINDOWS
+	const uint32_t skinnyLength = (uint32_t)MultiByteToWideChar(CP_UTF8, 0, Input, -1, nullptr, 0);
+	if (skinnyLength != 0)
 	{
-		memcpy(stackBuffer.ptr, Input, inputSize);
-		stackBuffer.ptr[inputSize] = '\0';
+		ScopedPtr<wchar_t> buffer = MemoryManager::Get().Allocate<wchar_t>(skinnyLength + 1);
 
-		stackBuffer.length = (unsigned short)inputSize;
-	
-		bIsUsingHeap = false;
+		if (!MultiByteToWideChar(CP_UTF8, 0, Input, skinnyLength * sizeof(char), buffer.Get(), skinnyLength))
+		{
+			MR_LOG(LogStringSet, Error, "MultiByteToWideChar (Windows Specific) returned: %s", *Platform::GetError());
+			return;
+		}
 	}
-	else
-	{
-		heapBuffer.length = inputSize;
-		heapBuffer.capacity = inputSize + 1;
-
-		heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
-		memcpy(heapBuffer.ptr, Input, inputSize);
-		
-		heapBuffer.ptr[inputSize] = '\0';
-		
-		bIsUsingHeap = true;
-	}
+#endif // MR_PLATFORM_WINDOWS
 
 #ifdef MR_DEBUG
 	bIsInited = true;
