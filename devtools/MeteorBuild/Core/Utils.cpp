@@ -158,6 +158,12 @@ String Utils::GetWord(const char*& in, bool bStep)
 		
 		end++;
 	}
+	else if (*begin == '$')
+	{
+		end = begin;
+		while (*end && !isspace(*end)) end++;
+		chars = (uint32_t)(end - begin);
+	}
 	else
 	{
 		end = in;

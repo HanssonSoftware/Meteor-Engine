@@ -72,7 +72,7 @@ bool Module::Parse(String* modulePath)
 							}
 							else if (Utils::GetCharacterType(buffer) != Colon)
 							{
-								MR_LOG(LogParser, Fatal, "Missing colon after word! %s", flagWord.Chr());
+								MR_LOG(LogParser, Fatal, "Missing colon after word %s!", flagWord.Chr());
 							}
 							else
 							{

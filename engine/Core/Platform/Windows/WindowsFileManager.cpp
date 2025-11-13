@@ -31,7 +31,7 @@ bool WindowsFileManager::CreateDirectory(const String& name, bool bToFullPath)
         return false;
     }
 
-    ScopedPtr<wchar_t> dirName = Platform::ConvertToWide(name.Chr());
+    wchar_t* dirName = Platform::ConvertToWide(name.Chr()).Get();
 
     if (IsPathRelative(&name))
     {
@@ -39,17 +39,17 @@ bool WindowsFileManager::CreateDirectory(const String& name, bool bToFullPath)
         PathCchRemoveFileSpec(dirAbsoluteConvert, wcslen(dirAbsoluteConvert));
 
         wchar_t* combined = nullptr;
-        if (FAILED(PathAllocCombine(dirAbsoluteConvert, dirName.Get(), PATHCCH_ALLOW_LONG_PATHS, &combined)))
+        if (FAILED(PathAllocCombine(dirAbsoluteConvert, dirName, PATHCCH_ALLOW_LONG_PATHS, &combined)))
         {
             MR_LOG(LogFileManager, Error, "Failed to convert to full path: %s", *Platform::GetError());
             return false;
         }
 
-        delete[] dirAbsoluteConvert, dirName;
+        delete[] dirName;
         dirName = combined;
     }
 
-    for (wchar_t* p = dirName.Get(); *p; ++p)
+    for (wchar_t* p = dirName; *p; ++p)
     {
         if (*p == L'/')
             *p = L'\\';
@@ -58,10 +58,10 @@ bool WindowsFileManager::CreateDirectory(const String& name, bool bToFullPath)
     const int32_t result = SHCreateDirectoryExW(nullptr, dirName, nullptr);
     if (result != ERROR_SUCCESS && result != ERROR_ALREADY_EXISTS)
     {
-        if (!PathIsRelativeW(dirName.Get()))
+        if (!PathIsRelativeW(dirName))
             LocalFree(dirName);
 
-        MR_LOG(LogFileManager, Error, "SHCreateDirectory returned: %s", *Layer::GetSystemLayer()->GetError());
+        MR_LOG(LogFileManager, Error, "SHCreateDirectory returned: %s", *Platform::GetError());
         
         return false;
     }
@@ -80,7 +80,7 @@ bool WindowsFileManager::DeleteDirectory(const String& name, bool bToFullPath)
 
     if (!RemoveDirectoryW(dirName.Get()))
     {
-        MR_LOG(LogFileManager, Error, "RemoveDirectoryW returned: %s", *Layer::GetSystemLayer()->GetError());
+        MR_LOG(LogFileManager, Error, "RemoveDirectoryW returned: %s", *Platform::GetError());
         return false;
     }
 
