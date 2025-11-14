@@ -8,7 +8,7 @@
 
 static_assert(!std::is_same_v<FileManager, IFileManager>, "File Manager is using BASE type!");
 
-bool IFileManager::CreateDirectory(const String& name, bool bForceCreate)
+bool IFileManager::CreateDirectory(const String* name, bool bForceCreate)
 {
 	return false;
 }

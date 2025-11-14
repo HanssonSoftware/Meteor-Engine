@@ -50,12 +50,33 @@ bool ModuleManager::LoadModule(const String& moduleName)
     if (IsModuleLoaded(moduleName))
         return true;
 
-    if (SystemLayer* layer = Layer::GetSystemLayer())
-    {
 #ifdef MR_PLATFORM_WINDOWS
-        wchar_t* libraryName = layer->ConvertToWide(String::Format("%s-%s.dll", *Application::Get()->appNameNoSpaces, moduleName.Chr()));
+    String libraryName = String::Format("%s-%s.dll", *Application::Get()->appNameNoSpaces, moduleName.Chr());
 
-        HMODULE module = LoadLibraryW(libraryName);
+    HMODULE module = LoadLibraryW(libraryName);
+    if (module != nullptr)
+    {
+        fv moduleInstantiation = (fv)GetProcAddress(module, "InitialiseModule");
+
+        if (moduleInstantiation)
+        {
+            Module* newModule = moduleInstantiation();
+            newModule->name = moduleName;
+            newModule->library = module;
+            newModule->StartupModule();
+
+            modules.Add(newModule);
+
+            delete[] libraryName;
+            return true;
+        }
+    }
+    else
+    {
+        delete[] libraryName;
+        libraryName = String::Format("%s-%s.dll", defaultEngineName, moduleName.Chr());
+
+        module = LoadLibraryW(libraryName);
         if (module != nullptr)
         {
             fv moduleInstantiation = (fv)GetProcAddress(module, "InitialiseModule");
@@ -73,35 +94,11 @@ bool ModuleManager::LoadModule(const String& moduleName)
                 return true;
             }
         }
-        else
-        {
-            delete[] libraryName;
-            libraryName = layer->ConvertToWide(String::Format("%s-%s.dll", defaultEngineName, moduleName.Chr()));
-
-            module = LoadLibraryW(libraryName);
-            if (module != nullptr)
-            {
-                fv moduleInstantiation = (fv)GetProcAddress(module, "InitialiseModule");
-
-                if (moduleInstantiation)
-                {
-                    Module* newModule = moduleInstantiation();
-                    newModule->name = moduleName;
-                    newModule->library = module;
-                    newModule->StartupModule();
-
-                    modules.Add(newModule);
-
-                    delete[] libraryName;
-                    return true;
-                }
-            }
-        }
-
-        delete[] libraryName;
-        return false;
-#endif // MR_PLATFORM_WINDOWS
     }
+
+    delete[] libraryName;
+#endif // MR_PLATFORM_WINDOWS
+
 
     return false;
 }

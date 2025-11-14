@@ -160,17 +160,17 @@ static constexpr const char* FormatSeverity(LogSeverity Severity) noexcept
     return "???";
 }
 
-void LogDescriptor::SetMessage(const char* message, ...)
+void LogDescriptor::SetMessage(const wchar_t* message, ...)
 {
     va_list d = nullptr;
     va_start(d, message);
-    const int32_t reqAmount = vsnprintf(nullptr, 0, message, d);
+    const int32_t reqAmount = vswprintf(nullptr, 0, message, d);
 
-    char* big = MemoryManager::Get().Allocate<char>(reqAmount + 1);
-    vsnprintf(big, reqAmount + 1, message, d);
+    wchar_t* big = MemoryManager::Get().Allocate<wchar_t>(reqAmount + 1);
+    vswprintf(big, reqAmount + 1, message, d);
     va_end(d);
 
-    big[reqAmount + 1] = '\0';
+    big[reqAmount] = '\0';
 
     this->message = big;
     MemoryManager::Get().Deallocate(big);

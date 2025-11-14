@@ -59,10 +59,8 @@ Time WindowsTimer::Now() noexcept
 
 String WindowsTimer::Format(const String& formatting)
 {
-	ScopedPtr<wchar_t> buffer = Platform::ConvertToWide(formatting.Chr());
-
 	wchar_t fixed[128] = {};
-	if (!GetDateFormatEx(LOCALE_NAME_USER_DEFAULT, 0, nullptr, buffer.Get(), fixed, 128, nullptr))
+	if (!GetDateFormatEx(LOCALE_NAME_USER_DEFAULT, 0, nullptr, formatting, fixed, 128, nullptr))
 	{
 		const String err = Platform::GetError();
 

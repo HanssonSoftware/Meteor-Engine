@@ -19,33 +19,21 @@ public:
 #endif // MR_DEBUG
 	}
 
-	virtual ~String() noexcept
-	{
-		if (bIsUsingHeap && heapBuffer.ptr)
-			MemoryManager::Get().Deallocate<wchar_t>(heapBuffer.ptr);
-
-		NullOut();
-
-#ifdef MR_DEBUG
-		bIsInited = false;
-#endif // MR_DEBUG
-	}
+	virtual ~String() noexcept;
 
 	String(const char* Input);
 
 	String(const wchar_t* Input);
 
-	String(const int32_t Input);
+	String(int Input);
 
-	String(const float Input);
+	String(float Input);
 
-	String(const unsigned long Input);
+	String(uint32_t Input);
 
-	String(const uint32_t Input);
+	String(String& other);
 
-	String(const String& other);
-
-	String(const char* string, uint32_t length);
+	String(const wchar_t* string, uint32_t length);
 
 	String(String&& other) noexcept;
 
@@ -63,7 +51,10 @@ public:
 		return wcscmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other) == 0;
 	}
 		
-	bool operator!=(const String& Other) const;
+	bool operator!=(const String& Other) const
+	{
+		return wcscmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) != 0;
+	}
 
 	bool operator!() const
 	{
@@ -100,11 +91,22 @@ public:
 
 	String Delim(const String character, bool first);
 
-	bool IsEmpty() const noexcept;
+	bool IsEmpty() const noexcept
+	{
+		return bIsUsingHeap ? 
+			heapBuffer.length == 0 || heapBuffer.ptr == nullptr : 
+			stackBuffer.length == 0 || stackBuffer.ptr[0] == L'\0';
+	}
 
-	int ToInt() const noexcept;
+	int ToInt() const noexcept
+	{
+		return wcstol(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, nullptr, 0);
+	}
 
-	float ToFloat() const noexcept;
+	float ToFloat() const noexcept
+	{
+		return wcstof(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, nullptr);
+	}
 
 	const uint32_t Length() const noexcept
 	{
@@ -116,6 +118,7 @@ public:
 
 	static bool Contains(const char* buffer, const char* target);
 
+	wchar_t* Data() { return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr; };
 private:
 	void MakeEmpty();
 
@@ -125,7 +128,7 @@ private:
 	{
 		bIsUsingHeap = false;
 
-		if (heapBuffer.ptr) memset(heapBuffer.ptr, 0, heapBuffer.capacity);
+		//if (heapBuffer.ptr != nullptr) memset(heapBuffer.ptr, 0, heapBuffer.capacity);
 		heapBuffer.ptr = nullptr;
 		heapBuffer.capacity = 0;
 		heapBuffer.length = 0;
@@ -138,21 +141,7 @@ private:
 #endif // MR_DEBUG
 	}
 
-	wchar_t* DetermineLocation(uint32_t size)
-	{
-		bIsUsingHeap = size > SSO_MAX_CHARS;
-		if (bIsUsingHeap)
-		{
-			
-		}
-		else
-		{
-
-		}
-
-	}
-
-	wchar_t* Data() { return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr; };
+	wchar_t* DetermineLocation(uint32_t size);
 
 	union
 	{

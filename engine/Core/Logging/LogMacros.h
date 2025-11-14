@@ -21,7 +21,7 @@ struct LogDescriptor
 {
     LogDescriptor() = default;
 
-    constexpr void SetValues(const char* category, int severity, const char* function, const char* file, const int line) noexcept
+    constexpr void SetValues(const wchar_t* category, int severity, const wchar_t* function, const wchar_t* file, const int line) noexcept
     {
         this->team = category;
         this->severity = severity;
@@ -30,17 +30,17 @@ struct LogDescriptor
         this->file = file;
     }
 
-    void SetMessage(const char* message, ...);
+    void SetMessage(const wchar_t* message, ...);
 
-    const char* team;
+    const wchar_t* team;
 
     int severity;
 
     String message;
 
-    const char* function;
+    const wchar_t* function;
 
-    const char* file;
+    const wchar_t* file;
 
     int line;
 };
@@ -57,6 +57,7 @@ struct LogDescriptor
 LOG_ADDCATEGORY(Temp);
 
 #define LINE _CRT_WIDE(__LINE__)
+#define Lize(x) L##x
 
 #define MR_LOG(CategoryName, Severity, Message, ...) \
 	/*static_assert(!std::is_same<decltype(_exception::retval), const wchar_t*>::value, "Formatting must be either TEXT() or L'Text'"); */\
@@ -65,7 +66,7 @@ LOG_ADDCATEGORY(Temp);
     {\
         do { \
             \
-                LogDescriptor Log##LINE; Log##LINE.SetValues(#CategoryName, Severity, __FUNCTION__, __FILE__, __LINE__);Log##LINE.SetMessage(Message, __VA_ARGS__); ILogger::Get()->TransmitMessage(&Log##LINE); \
+                LogDescriptor Log##LINE; Log##LINE.SetValues(Lize(#CategoryName), Severity, __FUNCTIONW__, __FILEW__, __LINE__);Log##LINE.SetMessage(Lize(Message), __VA_ARGS__); ILogger::Get()->TransmitMessage(&Log##LINE); \
                 if constexpr (Severity == Fatal) \
                 { \
                     ILogger::Get()->HandleFatal(); \

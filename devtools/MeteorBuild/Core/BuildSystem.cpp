@@ -76,14 +76,14 @@ bool BuildSystem::InitFramework()
 /** WARNING! This function uses, std::string from C++ standard. */
 void BuildSystem::OrderModules()
 {
-	std::unordered_map<std::string, uint32_t> ordering;
+	std::unordered_map<std::wstring, uint32_t> ordering;
 	const uint32_t size = loadedModules.GetSize();
 
 	for (auto& module : loadedModules)
 	{
 		for (auto& dependency : module.requires)
 		{
-			std::string depName = *dependency;
+			std::wstring depName = *dependency;
 			ordering[depName]++;
 		}
 	}
@@ -147,24 +147,16 @@ bool BuildSystem::BuildProjectFiles()
 		{
 			String exeDir = Paths::GetExecutableDirctory();
 
-			ScopedPtr<wchar_t> exeDirWide = Platform::ConvertToWide(exeDir);
-			PathCchRemoveFileSpec(exeDirWide.Get(), wcslen(exeDirWide));
-
-			ScopedPtr<wchar_t> nameWide = Platform::ConvertToWide(*intermediateLocation);
+			PathCchRemoveFileSpec(exeDir.Data(), exeDir.Length());
 
 			PWSTR combinedPathNonCanonicalized;
-			PathAllocCombine(exeDirWide, nameWide, PATHCCH_ALLOW_LONG_PATHS, &combinedPathNonCanonicalized);
+			PathAllocCombine(exeDir, intermediateLocation, PATHCCH_ALLOW_LONG_PATHS, &combinedPathNonCanonicalized);
 
 			intermediateLocation = combinedPathNonCanonicalized;
 			LocalFree(combinedPathNonCanonicalized);
 		}
 
-
-		ScopedPtr<wchar_t> fullPath = Platform::ConvertToWide(intermediateLocation);
-
-
-
-		FileManager::CreateDirectory(intermediateLocation, true);
+		FileManager::CreateDirectory(&intermediateLocation, true);
 
 		const uint32_t size = loadedModules.GetSize();
 		for (uint32_t i = 0; i < size; i++)

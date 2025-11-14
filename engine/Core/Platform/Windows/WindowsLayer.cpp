@@ -21,7 +21,7 @@ WindowsLayer::WindowsLayer(const String Name) noexcept
 void WindowsLayer::Init()
 {
     const String version = GetMachineVersion();
-    if (strcmp(version.Chr(), "6.1") == 0 || strcmp(version.Chr(), "6.2") == 0)
+    if (wcscmp(version.Chr(), L"6.1") == 0 || wcscmp(version.Chr(), L"6.2") == 0)
     {
         MessageBoxDescriptor unsupportedInfo = {};
         unsupportedInfo.Description = "This Windows version is not supported!";
@@ -222,23 +222,23 @@ MessageBoxDecision WindowsLayer::AddMessageBox(const MessageBoxDescriptor* Info)
     if (!Info) return MESSAGEBOXDECISION_INVALID;
 
     HWND windowRef = nullptr;
-    if (Info->dependentWindow) windowRef = (HWND)Info->dependentWindow->GetWindowHandle();
+    //if (Info->dependentWindow) windowRef = (HWND)Info->dependentWindow->GetWindowHandle();
 
-    const wchar_t* bufferDesc = ConvertToWide(Info->Description.Chr());
-    const wchar_t* bufferTitle = ConvertToWide(Info->Title.Chr());
+    //const wchar_t* bufferDesc = ConvertToWide(Info->Description.Chr());
+    //const wchar_t* bufferTitle = ConvertToWide(Info->Title.Chr());
 
-    const uint32_t flags = evaluateMessageBoxFlags(Info->Type);
+    //const uint32_t flags = evaluateMessageBoxFlags(Info->Type);
 
-    const int32_t returnCode = MessageBoxW(windowRef, bufferDesc, bufferTitle, flags);
-    delete[] bufferDesc, bufferTitle;
-    if (returnCode == 0)
-    {
-        MR_LOG(LogWindowsLayer, Error, "MessageBox returned: %s", GetError().Chr());
-        return MESSAGEBOXDECISION_INVALID;
-    }
+    //const int32_t returnCode = MessageBoxW(windowRef, bufferDesc, bufferTitle, flags);
+    //delete[] bufferDesc, bufferTitle;
+    //if (returnCode == 0)
+    //{
+    //    MR_LOG(LogWindowsLayer, Error, "MessageBox returned: %s", GetError().Chr());
+    //    return MESSAGEBOXDECISION_INVALID;
+    //}
 
 
-    return evaluateMessageBoxReturn(returnCode);
+    return evaluateMessageBoxReturn(1);
 }
 
 wchar_t* WindowsLayer::ConvertToWide(const char* Buffer)

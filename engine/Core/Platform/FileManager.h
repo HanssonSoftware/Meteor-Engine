@@ -13,7 +13,7 @@ LOG_ADDCATEGORY(FileManager);
 
 struct IFileManager
 {
-	static bool CreateDirectory(const String& name, bool bForceCreate);
+	static bool CreateDirectory(const String* name, bool bForceCreate);
 
 	static bool DeleteDirectory(const String& name, bool bToFullPath);
 	

@@ -20,16 +20,16 @@ void Commandlet::Initialize()
 	commandLine = GetCommandLineW();
 #endif // MR_PLATFORM_WINDOWS
 
-	char* cli = commandLine.Allocate();
-	
-	char* token = strtok(cli, " ");
-	while (token != nullptr)
-	{
-		parsedWords.Add(String(token));
-		token = strtok(nullptr, " ");
-	}
+	//char* cli = commandLine.Allocate();
+	//
+	//char* token = strtok(cli, " ");
+	//while (token != nullptr)
+	//{
+	//	parsedWords.Add(String(token));
+	//	token = strtok(nullptr, " ");
+	//}
 
-	MemoryManager::Get().Deallocate(cli);
+	//MemoryManager::Get().Deallocate(cli);
 }
 
 bool Commandlet::Parse(const String& inParam, String* returnVal)

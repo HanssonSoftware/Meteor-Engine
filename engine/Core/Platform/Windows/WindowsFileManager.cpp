@@ -23,62 +23,51 @@
 #pragma comment (lib, "Shell32.lib")
 
 
-bool WindowsFileManager::CreateDirectory(const String& name, bool bToFullPath)
+bool WindowsFileManager::CreateDirectory(const String* name, bool bToFullPath)
 {
-    if (name.IsEmpty())
+    if (!name)
     {
         MR_LOG(LogFileManager, Error, "Invalid directory name!");
         return false;
     }
 
-    wchar_t* dirName = Platform::ConvertToWide(name.Chr()).Get();
-
-    if (IsPathRelative(&name))
+    String newName = *name;
+    if (IsPathRelative(name))
     {
-        ScopedPtr<wchar_t> dirAbsoluteConvert = Platform::ConvertToWide(Paths::GetExecutableDirctory().Chr());
-        PathCchRemoveFileSpec(dirAbsoluteConvert, wcslen(dirAbsoluteConvert));
+        String dirAbsoluteConvert = Paths::GetExecutableDirctory();
+        PathCchRemoveFileSpec(dirAbsoluteConvert.Data(), wcslen(dirAbsoluteConvert));
 
         wchar_t* combined = nullptr;
-        if (FAILED(PathAllocCombine(dirAbsoluteConvert, dirName, PATHCCH_ALLOW_LONG_PATHS, &combined)))
+        if (FAILED(PathAllocCombine(dirAbsoluteConvert, newName, PATHCCH_ALLOW_LONG_PATHS, &combined)))
         {
             MR_LOG(LogFileManager, Error, "Failed to convert to full path: %s", *Platform::GetError());
             return false;
         }
 
-        delete[] dirName;
-        dirName = combined;
+        newName = combined;
+        LocalFree(combined);
     }
 
-    for (wchar_t* p = dirName; *p; ++p)
+    for (wchar_t* p = newName.Data(); *p; ++p)
     {
         if (*p == L'/')
             *p = L'\\';
     }
 
-    const int32_t result = SHCreateDirectoryExW(nullptr, dirName, nullptr);
+    const int32_t result = SHCreateDirectoryExW(nullptr, newName, nullptr);
     if (result != ERROR_SUCCESS && result != ERROR_ALREADY_EXISTS)
     {
-        if (!PathIsRelativeW(dirName))
-            LocalFree(dirName);
-
         MR_LOG(LogFileManager, Error, "SHCreateDirectory returned: %s", *Platform::GetError());
         
         return false;
     }
-
-    if (!PathIsRelativeW(dirName))
-        LocalFree(dirName);
-    else
-        delete[] dirName;
 
     return true;
 }
 
 bool WindowsFileManager::DeleteDirectory(const String& name, bool bToFullPath)
 {
-    ScopedPtr<wchar_t> dirName = Platform::ConvertToWide(name.Chr());
-
-    if (!RemoveDirectoryW(dirName.Get()))
+    if (!RemoveDirectoryW(*name))
     {
         MR_LOG(LogFileManager, Error, "RemoveDirectoryW returned: %s", *Platform::GetError());
         return false;
@@ -91,15 +80,7 @@ bool WindowsFileManager::IsPathExists(const String* name)
 {
     if (name != nullptr)
     {
-        ScopedPtr<wchar_t> dirName = Platform::ConvertToWide(name->Chr());
-
-        if (!dirName.Get())
-        {
-            MR_LOG(LogFileManager, Error, "Invalid wide buffer!");
-            return false;
-        }
-
-        if (!::PathFileExistsW(dirName.Get()))
+        if (!::PathFileExistsW(*name))
         {
             if (GetLastError() != ERROR_FILE_NOT_FOUND)
             {
@@ -120,9 +101,7 @@ bool WindowsFileManager::IsPathRelative(const String* path)
 {
     if (path != nullptr)
     {
-        ScopedPtr<wchar_t> buffer = Platform::ConvertToWide(path->Chr());
-
-        return PathIsRelativeW(buffer.Get()) ? true : false;
+        return PathIsRelativeW(*path) ? true : false;
     }
     
     return false;
@@ -133,36 +112,33 @@ bool WindowsFileManager::IsEndingWith(const String& name, const String& extensio
     if (name.IsEmpty() && extension.IsEmpty())
         return false;
 
-    ScopedPtr<wchar_t> buffer = Platform::ConvertToWide(name.Chr());
-
-    LPWSTR result = PathFindExtensionW(buffer);
+    LPWSTR result = PathFindExtensionW(name);
     if (wcslen(result) == 0)
         return false;
 
     memmove(result, result + 1, (wcslen(result) + 1) * sizeof(wchar_t));
 
     bool bIsGood = false;
-    ScopedPtr<wchar_t> extensionConverted = Platform::ConvertToWide(extension.Chr());
 
-    bIsGood = wcscmp(result, extensionConverted) == 0 ? true : false;
+    bIsGood = wcscmp(result, extension) == 0 ? true : false;
 
     return bIsGood ? true : false;
 }
 
 void WindowsFileManager::NormalizeDirectory(String& input)
 {
-    char* buffer = input.Allocate();
     uint32_t size = (int32_t)input.Length();
 
+    wchar_t* buffer = input.Data();
     for (uint32_t i = 0; i < size; i++)
     {
-        if (buffer[i] == '/' || buffer[i] == '//')
+        if (buffer[i] == L'/' || buffer[i] == L'//')
         {
-            buffer[i] = '\\';
+            buffer[i] = L'\\';
         }
     }
 
-    size = (uint32_t)strlen(buffer);
+    size = (uint32_t)wcslen(buffer);
     buffer[size] = '\0';
 
     input = String(buffer);
@@ -176,12 +152,10 @@ IFile* WindowsFileManager::CreateFileOperation(String* pathToCreate, int32_t acc
     {
         NormalizeDirectory(*pathToCreate);
 
-        ScopedPtr<wchar_t> name = Platform::ConvertToWide(pathToCreate->Chr());
-
-        if (!IsPathExists(pathToCreate)) FileManager::CreateDirectory(*pathToCreate, true);
+        if (!IsPathExists(pathToCreate)) FileManager::CreateDirectory(pathToCreate, true);
 
         HANDLE file = CreateFileW(
-            name.Get(),
+            *pathToCreate,
             evaluateAccessTypeForCreateFileOperation(accessType),
             evaluateSharingModeForCreateFileOperation(sharingMode),
             nullptr,
@@ -198,7 +172,7 @@ IFile* WindowsFileManager::CreateFileOperation(String* pathToCreate, int32_t acc
 
         WindowsFile* newWindowsFile = new WindowsFile();
         newWindowsFile->fileHandle = file;
-        newWindowsFile->fileName = name.Get();
+        newWindowsFile->fileName = *pathToCreate;
 
         return newWindowsFile;
     }

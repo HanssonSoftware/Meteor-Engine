@@ -78,16 +78,12 @@ String WindowsPlatform::GetError()
 
 bool WindowsPlatform::IsRunningAnAnotherInstance()
 {
-	if (const Application* app = GetApplication())
-	{
-		ScopedPtr<wchar_t> wide = ConvertToWide(app->appCodeName);
-		HANDLE appMtx = CreateMutexW(nullptr, 1, wide.Get());
+	HANDLE appMtx = CreateMutexW(nullptr, 1, GetApplication()->appCodeName);
 
-		if (GetLastError() == ERROR_ALREADY_EXISTS)
-		{
-			if (appMtx) CloseHandle(appMtx);	
-			return true;
-		}
+	if (GetLastError() == ERROR_ALREADY_EXISTS)
+	{
+		if (appMtx) CloseHandle(appMtx);	
+		return true;
 	}
 
 	return false;

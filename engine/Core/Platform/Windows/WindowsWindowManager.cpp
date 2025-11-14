@@ -35,7 +35,7 @@ void WindowsWindowManager::Shutdown()
     if (bIsWinAPIClassRegistered)
     {
         UnregisterClassW(
-            Platform::ConvertToWide(GetApplication()->appNameNoSpaces.Chr()),
+            GetApplication()->appNameNoSpaces,
             instance);
     }
 }
@@ -60,19 +60,11 @@ bool WindowsWindowManager::CreateWindow(const String& name, const Vector2<uint32
 
     RECT windowRect = { 0, 0, (LONG)size.x, (LONG)size.y };
     AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, 0);
-    wchar_t* buffer = Platform::ConvertToWide(name.Chr()).Get();
-
-    ScopedPtr<wchar_t> className;
-    bool bIsFallback = GetIsUsingFallbackClass();
-    if (const Application* app = GetApplication())
-    {
-        className = Platform::ConvertToWide(app->appNameNoSpaces.Chr());
-    }
 
     instance->handle = ::CreateWindowExW(
         /*WS_EX_ACCEPTFILES*/ 0,
-        className.Get(),
-        buffer,
+        GetApplication()->appCodeName,
+        name,
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
@@ -125,9 +117,7 @@ inline bool WindowsWindowManager::RegisterWindowClass()
 	windowClass.hIcon = ico;
 	windowClass.hIconSm = ico;
 	windowClass.lpfnWndProc = MeteorSpecifiedWindowProcedure;
-
-    ScopedPtr<wchar_t> appNameWiden = Platform::ConvertToWide(GetApplication()->appNameNoSpaces.Chr());
-    windowClass.lpszClassName = appNameWiden.Get();
+    windowClass.lpszClassName = GetApplication()->appNameNoSpaces;
 
 	if (!RegisterClassExW(&windowClass))
 	{

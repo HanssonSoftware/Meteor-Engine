@@ -45,10 +45,8 @@ void WindowsFile::Close()
 }
 
 void WindowsFile::Delete()
-{
-	ScopedPtr<wchar_t> fullName = Platform::ConvertToWide(fullPath);
-	
-	if (!::DeleteFileW(fullName.Get()))
+{	
+	if (!::DeleteFileW(fileName))
 	{
 		MR_LOG(LogFileSystem, Error, "Unable to delete file! %s", *Platform::GetError());
 	}

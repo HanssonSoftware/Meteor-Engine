@@ -17,13 +17,16 @@
 
 LOG_ADDCATEGORY(StringSet);
 
-String::String() noexcept
-	: bIsUsingHeap(false)
+
+String::~String() noexcept
 {
-	MakeEmpty();
+	if (bIsUsingHeap && heapBuffer.ptr)
+		MemoryManager::Get().Deallocate<wchar_t>(heapBuffer.ptr);
+
+	NullOut();
 
 #ifdef MR_DEBUG
-	bIsInited = true;
+	bIsInited = false;
 #endif // MR_DEBUG
 }
 
@@ -38,9 +41,8 @@ String::String(const char* Input)
 	const uint32_t skinnyLength = (uint32_t)MultiByteToWideChar(CP_UTF8, 0, Input, -1, nullptr, 0);
 	if (skinnyLength > 0)
 	{
-		ScopedPtr<wchar_t> buffer = MemoryManager::Get().Allocate<wchar_t>(skinnyLength + 1);
-
-		if (!MultiByteToWideChar(CP_UTF8, 0, Input, skinnyLength * sizeof(char), buffer.Get(), skinnyLength))
+		wchar_t* redirectedData = DetermineLocation(skinnyLength);
+		if (!MultiByteToWideChar(CP_UTF8, 0, Input, skinnyLength * sizeof(char), redirectedData, skinnyLength))
 		{
 			MR_LOG(LogStringSet, Error, "MultiByteToWideChar returned: %s", *Platform::GetError());
 			return;
@@ -65,157 +67,41 @@ String::String(const wchar_t* Input)
 	if (!Input || *Input == '\0')
 		return;
 
-#ifdef MR_PLATFORM_WINDOWS
+	const uint32_t size = wcslen(Input);
+	wchar_t* target = DetermineLocation(size);
 	
-#endif // MR_PLATFORM_WINDOWS
-
-	const uint32_t stringSize = wcslen(Input);
-	if (stringSize > SSO_MAX_CHARS)
-	{
-		heapBuffer.ptr = MemoryManager::Get().Allocate<wchar_t>((stringSize + 1) * sizeof(wchar_t));
-
-		wcsncpy(heapBuffer.ptr, Input, );
-		heapBuffer.ptr[stringSize] = L'\0';
-
-		heapBuffer.capacity
-	}
-	else
-	{
-
-	}
+	wcsncpy(target, Input, size);
 
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
 }
 
-String::String(const int32_t Input)
+String::String(int Input)
 {
-	const int32_t inputSize = snprintf(nullptr, 0, "%d", Input);
-
-	if (inputSize <= SSO_MAX_CHARS)
-	{
-		snprintf(stackBuffer.ptr, inputSize + 1, "%d", Input);
-
-		//stackBuffer.ptr[inputSize] = '\0'; // optional
-
-		stackBuffer.length = (unsigned short)inputSize;
-
-		bIsUsingHeap = false;
-	}
-	else
-	{
-		heapBuffer.length = inputSize;
-		heapBuffer.capacity = inputSize + 1;
-
-		heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
-
-		snprintf(heapBuffer.ptr, inputSize + 1, "%d", Input);
-
-		heapBuffer.ptr[inputSize] = '\0';
-
-		bIsUsingHeap = true;
-	}
+	swprintf(stackBuffer.ptr, 14, L"%d", Input);
 
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
 }
 
-String::String(const uint32_t Input)
+String::String(uint32_t Input)
 {
-	const int32_t inputSize = snprintf(nullptr, 0, "%u", Input);
-
-	if (inputSize <= SSO_MAX_CHARS)
-	{
-		snprintf(stackBuffer.ptr, inputSize + 1, "%u", Input);
-
-		//stackBuffer.ptr[inputSize] = '\0'; // optional
-
-		stackBuffer.length = (unsigned short)inputSize;
-
-		bIsUsingHeap = false;
-	}
-	else
-	{
-		heapBuffer.length = inputSize;
-		heapBuffer.capacity = inputSize + 1;
-
-		heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
-
-		snprintf(heapBuffer.ptr, inputSize + 1, "%u", Input);
-
-		heapBuffer.ptr[inputSize] = '\0';
-
-		bIsUsingHeap = true;
-	}
+	swprintf(stackBuffer.ptr, 14, L"%ud", Input);
 
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
 }
 
-String::String(const float Input)
+String::String(float Input)
 {
-	const int32_t inputSize = snprintf(nullptr, 0, "%f", Input);
-
-	if (inputSize <= SSO_MAX_CHARS)
-	{
-		snprintf(stackBuffer.ptr, inputSize + 1, "%f", Input);
-
-		//stackBuffer.ptr[inputSize] = '\0'; // optional
-
-		stackBuffer.length = (unsigned short)inputSize;
-
-		bIsUsingHeap = false;
-	}
-	else
-	{
-		heapBuffer.length = inputSize;
-		heapBuffer.capacity = inputSize + 1;
-
-		heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
-
-		snprintf(heapBuffer.ptr, inputSize + 1, "%f", Input);
-
-		heapBuffer.ptr[inputSize] = '\0';
-
-		bIsUsingHeap = true;
-	}
+	swprintf(stackBuffer.ptr, 14, L"%ud", Input);
 
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
-}
-
-String::String(const unsigned long Input)
-{
-	const int32_t inputSize = snprintf(nullptr, 0, "%u", Input);
-
-	if (inputSize <= SSO_MAX_CHARS)
-	{
-		snprintf(stackBuffer.ptr, inputSize + 1, "%u", Input);
-
-		//stackBuffer.ptr[inputSize] = '\0'; // optional
-
-		stackBuffer.length = (unsigned short)inputSize;
-
-		bIsUsingHeap = false;
-	}
-	else
-	{
-		heapBuffer.length = inputSize;
-		heapBuffer.capacity = inputSize + 1;
-
-		heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
-
-		snprintf(heapBuffer.ptr, inputSize + 1, "%u", Input);
-
-		heapBuffer.ptr[inputSize] = '\0';
-
-		bIsUsingHeap = true;
-	}
-
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
@@ -227,27 +113,27 @@ String::String(String&& other) noexcept
 	
 	bIsUsingHeap = other.bIsUsingHeap;
 
-	if (other.bIsUsingHeap)
-	{
-		heapBuffer.capacity = other.heapBuffer.capacity;
-		heapBuffer.length = other.heapBuffer.length;
+	//if (other.bIsUsingHeap)
+	//{
+	//	heapBuffer.capacity = other.heapBuffer.capacity;
+	//	heapBuffer.length = other.heapBuffer.length;
 
-		heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
+	//	heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
 
-		memmove(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
-		heapBuffer.ptr[heapBuffer.length] = '\0';
+	//	memmove(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
+	//	heapBuffer.ptr[heapBuffer.length] = '\0';
 
-		other.ResetBuffers();
-	}
-	else
-	{
-		stackBuffer.length = other.stackBuffer.length;
+	//	other.ResetBuffers();
+	//}
+	//else
+	//{
+	//	stackBuffer.length = other.stackBuffer.length;
 
-		memmove(stackBuffer.ptr, other.stackBuffer.ptr, stackBuffer.length);
-		stackBuffer.ptr[stackBuffer.length] = '\0';
+	//	memmove(stackBuffer.ptr, other.stackBuffer.ptr, stackBuffer.length);
+	//	stackBuffer.ptr[stackBuffer.length] = '\0';
 
-		other.ResetBuffers();
-	}
+	//	other.ResetBuffers();
+	//}
 
 #ifdef MR_DEBUG
 	bIsInited = true;
@@ -256,142 +142,114 @@ String::String(String&& other) noexcept
 
 String::String(const String& other)
 {
-	if (other.bIsUsingHeap)
-	{
-		bIsUsingHeap = true;
+	//if (other.bIsUsingHeap)
+	//{
+	//	bIsUsingHeap = true;
 
-		heapBuffer.capacity = other.heapBuffer.capacity;
-		heapBuffer.length = other.heapBuffer.length;
+	//	heapBuffer.capacity = other.heapBuffer.capacity;
+	//	heapBuffer.length = other.heapBuffer.length;
 
-		heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
+	//	heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
 
-		memcpy(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
-		heapBuffer.ptr[heapBuffer.length] = '\0';
-	}
-	else
-	{
-		bIsUsingHeap = false;
+	//	memcpy(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
+	//	heapBuffer.ptr[heapBuffer.length] = '\0';
+	//}
+	//else
+	//{
+	//	bIsUsingHeap = false;
 
-		stackBuffer.length = other.stackBuffer.length;
+	//	stackBuffer.length = other.stackBuffer.length;
 
-		memcpy(stackBuffer.ptr, other.stackBuffer.ptr, stackBuffer.length);
-		stackBuffer.ptr[stackBuffer.length] = '\0';
-	}
+	//	memcpy(stackBuffer.ptr, other.stackBuffer.ptr, stackBuffer.length);
+	//	stackBuffer.ptr[stackBuffer.length] = '\0';
+	//}
 
 #ifdef MR_DEBUG
 	bIsInited = true;
 #endif // MR_DEBUG
 }
 
-String::String(const char* string, uint32_t length)
+String::String(const wchar_t* string, uint32_t length)
 {
 	MakeEmpty();
 
 	bIsUsingHeap = length <= SSO_MAX_CHARS ? false : true;
 	
-	if (bIsUsingHeap)
-	{
-		heapBuffer.capacity = (uint32_t)(length + 1);
-		heapBuffer.length = (uint32_t)length;
-		heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
+	//if (bIsUsingHeap)
+	//{
+	//	heapBuffer.capacity = (uint32_t)(length + 1);
+	//	heapBuffer.length = (uint32_t)length;
+	//	heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
 
-		memcpy(heapBuffer.ptr, string, length);
-		heapBuffer.ptr[heapBuffer.length] = '\0';
-	}
-	else
-	{
-		stackBuffer.length = (unsigned short)length;
+	//	memcpy(heapBuffer.ptr, string, length);
+	//	heapBuffer.ptr[heapBuffer.length] = '\0';
+	//}
+	//else
+	//{
+	//	stackBuffer.length = (unsigned short)length;
 
-		memcpy(stackBuffer.ptr, string, length);
-		stackBuffer.ptr[stackBuffer.length] = '\0';
-	}
+	//	memcpy(stackBuffer.ptr, string, length);
+	//	stackBuffer.ptr[stackBuffer.length] = '\0';
+	//}
 }
 
-String::~String() noexcept
-{
-	if (bIsUsingHeap && heapBuffer.ptr)
-	{
-		MemoryManager::Get().Deallocate(heapBuffer.ptr);
-		heapBuffer.ptr = nullptr;
-
-		heapBuffer.length = 0;
-		heapBuffer.capacity = 0;
-
-		bIsUsingHeap = false;
-	}
-
-#ifdef MR_DEBUG
-	bIsInited = false;
-#endif // MR_DEBUG
-}
 
 String String::operator+(const String& Other)
 {
-	const char* thisData = Data();
-	const char* otherData = Other.Chr();
+	//const char* thisData = Data();
+	//const char* otherData = Other.Chr();
 
-	const uint32_t thisSize = strlen(thisData);
-	const uint32_t otherSize = strlen(otherData);
+	//const uint32_t thisSize = strlen(thisData);
+	//const uint32_t otherSize = strlen(otherData);
 
-	this->bIsUsingHeap = thisSize + otherSize > SSO_MAX_CHARS ? true : false;
+	//this->bIsUsingHeap = thisSize + otherSize > SSO_MAX_CHARS ? true : false;
 
-	if (this->bIsUsingHeap)
-	{
-		ScopedPtr<char> newBuffer = MemoryManager::Get().Allocate<char>(thisSize + otherSize + 1u);
-		memcpy(newBuffer.Get(), thisData, thisSize);
-		memcpy(newBuffer.Get() + thisSize, otherData, otherSize);
+	//if (this->bIsUsingHeap)
+	//{
+	//	ScopedPtr<char> newBuffer = MemoryManager::Get().Allocate<char>(thisSize + otherSize + 1u);
+	//	memcpy(newBuffer.Get(), thisData, thisSize);
+	//	memcpy(newBuffer.Get() + thisSize, otherData, otherSize);
 
 
-		thisData = newBuffer.Get();
-	}
-	else
-	{
+	//	thisData = newBuffer.Get();
+	//}
+	//else
+	//{
 
-	}
+	//}
 
 	return *this;
 }
 
 String operator+(const String& OtherA, const String& OtherB)
 {
-	// Querry the buffers.
-	const char* otherABuffer = OtherA.Chr();
-	const char* otherBBuffer = OtherB.Chr();
+	//// Querry the buffers.
+	//const char* otherABuffer = OtherA.Chr();
+	//const char* otherBBuffer = OtherB.Chr();
 
-	const uint32_t size = (uint32_t)(strlen(otherABuffer) + strlen(otherBBuffer) + 1);
+	//const uint32_t size = (uint32_t)(strlen(otherABuffer) + strlen(otherBBuffer) + 1);
 
-	char* super = MemoryManager::Get().Allocate<char>(size);
+	//char* super = MemoryManager::Get().Allocate<char>(size);
 
-	if (super == nullptr)
-	{
-		delete[] super;
-		MR_LOG(LogTemp, Error, "String concencation failed!");
-		return String("");
-	}
+	//if (super == nullptr)
+	//{
+	//	delete[] super;
+	//	MR_LOG(LogTemp, Error, "String concencation failed!");
+	//	return String("");
+	//}
 
-	strcpy(super, otherABuffer);
-	strcat(super, otherBBuffer);
+	//strcpy(super, otherABuffer);
+	//strcat(super, otherBBuffer);
 
-	String newStringBuffer(super);
+	//String newStringBuffer(super);
 
-	return newStringBuffer;
+	return "newStringBuffer";
 }
 
-bool String::operator!=(const String& Other) const
+wchar_t* String::Allocate()
 {
-	return strcmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) != 0;
-}
-
-String::operator const char*() const
-{
-	return bIsUsingHeap ? (heapBuffer.ptr || heapBuffer.length != 0 ? heapBuffer.ptr : "") :
-		stackBuffer.ptr || stackBuffer.length != 0 ? stackBuffer.ptr : "";
-}
-
-char* String::Allocate()
-{
-	char* buffer = MemoryManager::Get().Allocate<char>(bIsUsingHeap ? heapBuffer.capacity : stackBuffer.length + 1);
-	memcpy(buffer, Chr(), bIsUsingHeap ? heapBuffer.length : stackBuffer.length);
+	wchar_t* buffer = MemoryManager::Get().Allocate<wchar_t>(bIsUsingHeap ? heapBuffer.capacity : stackBuffer.length + 1);
+	wmemcpy(buffer, Chr(), bIsUsingHeap ? heapBuffer.length : stackBuffer.length);
 	
 	return buffer;
 }
@@ -401,25 +259,10 @@ String String::Delim(const String character, bool first)
 	if (character.IsEmpty())
 		return "";
 
-	char* A = /*buffer*/nullptr;
-	char* B = strtok(A, character.Chr());
-
-	return first ? B : A;
-}
-
-bool String::IsEmpty() const noexcept
-{
-	return bIsUsingHeap ? heapBuffer.length == 0 : stackBuffer.length == 0;
-}
-
-int32_t String::ToInt() const noexcept
-{
-	return strtol(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, nullptr, 0);
-}
-
-float String::ToFloat() const noexcept
-{
-	return strtof(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, nullptr);
+	//char* A = /*buffer*/nullptr;
+	//char* B = strtok(A, character.Chr());
+	return "";
+	//return first ? B : A;
 }
 
 String String::Format(const String& format, ...)
@@ -427,16 +270,16 @@ String String::Format(const String& format, ...)
 	va_list a;
 	va_start(a, format.Chr());
 
-	const char* formattingBuffer = format.Chr();
+	const wchar_t* formattingBuffer = format.Chr();
 
 	va_list a_cpy;
 	va_copy(a_cpy, a);
-	const int sizeForVA = vsnprintf(nullptr, 0, formattingBuffer, a_cpy);
+	const int sizeForVA = vswprintf(nullptr, 0, formattingBuffer, a_cpy);
 	va_end(a_cpy);
 
-	char* newFormattedBuffer = MemoryManager::Get().Allocate<char>(sizeForVA + 1);
+	wchar_t* newFormattedBuffer = MemoryManager::Get().Allocate<wchar_t>(sizeForVA + 1);
 
-	const int result = vsnprintf(newFormattedBuffer, sizeForVA + 1 ,formattingBuffer, a);
+	const int result = vswprintf(newFormattedBuffer, sizeForVA + 1 ,formattingBuffer, a);
 	va_end(a);
 
 	String stringized(newFormattedBuffer);
@@ -474,7 +317,7 @@ void String::ResetBuffers()
 {
 	if (bIsUsingHeap)
 	{
-		MemoryManager::Get().Deallocate<char>(heapBuffer.ptr);
+		MemoryManager::Get().Deallocate<wchar_t>(heapBuffer.ptr);
 		heapBuffer.ptr = nullptr;
 
 		heapBuffer.capacity = 0;
@@ -487,72 +330,65 @@ void String::ResetBuffers()
 	}
 }
 
+wchar_t* String::DetermineLocation(uint32_t size)
+{
+	bIsUsingHeap = size > SSO_MAX_CHARS;
+	if (bIsUsingHeap)
+	{
+		heapBuffer.capacity = size * 2;
+		heapBuffer.ptr = MemoryManager::Get().Allocate<wchar_t>(heapBuffer.capacity * sizeof(wchar_t));
+		heapBuffer.length = size;
+
+		memset(heapBuffer.ptr, '\0', heapBuffer.capacity);
+		return heapBuffer.ptr;
+	}
+
+	stackBuffer.length = size;
+	return stackBuffer.ptr;
+}
+
 String& String::operator=(const String& other)
 {
 	if (this != &other)
 	{
 		ResetBuffers();
 
-		if (other.bIsUsingHeap)
-		{
-			bIsUsingHeap = true;
+		//if (other.bIsUsingHeap)
+		//{
+		//	bIsUsingHeap = true;
 
-			heapBuffer.capacity = other.heapBuffer.capacity;
-			heapBuffer.length = other.heapBuffer.length;
+		//	heapBuffer.capacity = other.heapBuffer.capacity;
+		//	heapBuffer.length = other.heapBuffer.length;
 
-			heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
-			strncpy(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
-			
-			heapBuffer.ptr[heapBuffer.length] = '\0';
+		//	heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
+		//	strncpy(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
+		//	
+		//	heapBuffer.ptr[heapBuffer.length] = '\0';
 
-			return *this;
-		}
-		else
-		{
-			bIsUsingHeap = false;
+		//	return *this;
+		//}
+		//else
+		//{
+		//	bIsUsingHeap = false;
 
-			stackBuffer.length = other.stackBuffer.length;
+		//	stackBuffer.length = other.stackBuffer.length;
 
-			strncpy(stackBuffer.ptr, other.stackBuffer.ptr, stackBuffer.length);
+		//	strncpy(stackBuffer.ptr, other.stackBuffer.ptr, stackBuffer.length);
 
-			stackBuffer.ptr[stackBuffer.length] = '\0';
+		//	stackBuffer.ptr[stackBuffer.length] = '\0';
 
-			return *this;
-		}
+		//	return *this;
+		//}
 	}
 
 	return *this;
-}
-
-bool String::IsWhitespace(const char* buffer)
-{
-	if (buffer[0] == '\n' || 
-		buffer[0] == '\t' ||
-		buffer[0] == '\f' ||
-		buffer[0] == '\r' ||
-		buffer[0] == '\v' )
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool String::IsSpace(const char* buffer)
-{
-	return buffer[0] == ' ' ? true : false;
-}
-
-bool String::IsAlpha(const char* buffer)
-{
-	return (buffer[0] >= 'a' && buffer[0] <= 'z' || buffer[0] >= 'A' && buffer[0] <= 'Z');
 }
 
 String& String::operator+=(const String& other)
 {
 	if (!other.IsEmpty())
 	{
-		const char* source = other.Chr();
+		/*const char* source = other.Chr();
 		char* destination = Data();
 
 		const uint32_t size = other.Length() + Length() + 1;
@@ -597,7 +433,7 @@ String& String::operator+=(const String& other)
 
 			heapBuffer.ptr = buffer;
 			bIsUsingHeap = true;
-		}
+		}*/
 	}
 	
 	return *this;

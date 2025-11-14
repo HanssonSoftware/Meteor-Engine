@@ -77,9 +77,8 @@ void WindowsLogger::Initialize()
 				if (!SetStdHandle(STD_OUTPUT_HANDLE, hConsole))
 					Application::RequestExit(-1);
 
-				ScopedPtr<wchar_t> buffer = Platform::ConvertToWide(String::Format("%s developer console (b%d)", Application::Get()->appName.Chr(), BUILD_NUMBER).Chr());
 
-				if (!SetConsoleTitleW(buffer.Get()))
+				if (!SetConsoleTitleW(String::Format("%s developer console (b%d)", Application::Get()->appName.Chr(), BUILD_NUMBER).Chr()))
 				{
 					Application::RequestExit(-1);
 				}
@@ -115,8 +114,6 @@ void WindowsLogger::SendToOutputBuffer(const String& Buffer)
 #ifdef MR_DEBUG
 	if (bIsRunningDebugMode && bHasConsoleWindow)
 	{
-		ScopedPtr<wchar_t> message = Platform::ConvertToWide(Buffer.Chr());
-
 		const LogDescriptor* actualDescriptor = ILogger::Get()->GetActualEntry();
 		if (!actualDescriptor)
 			return;
@@ -141,11 +138,11 @@ void WindowsLogger::SendToOutputBuffer(const String& Buffer)
 		}
 
 		DWORD written = 0;
-		if (!WriteConsoleW(hConsole, message.Get(), (DWORD)wcslen(message.Get()), &written, 0))
+		if (!WriteConsoleW(hConsole, Buffer, (DWORD)wcslen(Buffer), &written, 0))
 			return ILogger::SendToOutputBuffer(Buffer);
 
 		if (IsDebuggerAttached())
-			OutputDebugStringW(message.Get());
+			OutputDebugStringW(Buffer);
 
 	}
 #endif // MR_DEBUG
@@ -164,18 +161,14 @@ void WindowsLogger::HandleFatal()
 		return;
 	}
 
-	ScopedPtr<wchar_t> convertedFatalText = Platform::ConvertToWide(actualDescriptor->message);
-
-	MessageBoxW(nullptr, convertedFatalText.Get(), L"Engine Error!", MB_OK | MB_ICONERROR);
+	MessageBoxW(nullptr, actualDescriptor->message, L"Engine Error!", MB_OK | MB_ICONERROR);
 
 	TerminateProcess(GetCurrentProcess(), -1);
 }
 
 void WindowsLogger::TransmitAssertion(const LogAssertion* Info)
 {
-	ScopedPtr<wchar_t> converted = Platform::ConvertToWide(Info->assertMessage);
-
-	MessageBoxW(nullptr, converted, L"Engine Error - Assertion failed!", MB_OK | MB_ICONERROR);
+	MessageBoxW(nullptr, Info->assertMessage, L"Engine Error - Assertion failed!", MB_OK | MB_ICONERROR);
 
 	TerminateProcess(GetCurrentProcess(), -1);
 }

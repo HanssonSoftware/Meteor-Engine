@@ -16,22 +16,17 @@ void Utils::ListDirectory(String* name, Array<FoundScriptData>& container)
 		{
 			String exeDir = Paths::GetExecutableDirctory();
 
-			ScopedPtr<wchar_t> exeDirWide = Platform::ConvertToWide(exeDir);
-			PathCchRemoveFileSpec(exeDirWide.Get(), wcslen(exeDirWide));
-
-			ScopedPtr<wchar_t> nameWide = Platform::ConvertToWide(*name);
+			PathCchRemoveFileSpec(exeDir.Data(), exeDir.Length());
 
 			PWSTR combinedPathNonCanonicalized;
-			PathAllocCombine(exeDirWide, nameWide, PATHCCH_ALLOW_LONG_PATHS, &combinedPathNonCanonicalized);
+			PathAllocCombine(exeDir.Data(), *name, PATHCCH_ALLOW_LONG_PATHS, &combinedPathNonCanonicalized);
 
 			*name = combinedPathNonCanonicalized;
 			LocalFree(combinedPathNonCanonicalized);
 		}
 
 		WIN32_FIND_DATAW foundFile;
-		ScopedPtr<wchar_t> widePath = Platform::ConvertToWide(*String::Format("%s\\*", name->Chr()));
-
-		HANDLE fileHandle = FindFirstFileW(widePath, &foundFile);
+		HANDLE fileHandle = FindFirstFileW(String::Format("%s\\*", name->Chr()), &foundFile);
 
 		if (fileHandle != INVALID_HANDLE_VALUE)
 		{
