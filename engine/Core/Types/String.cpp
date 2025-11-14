@@ -31,6 +31,9 @@ String::String(const char* Input)
 {
 	NullOut();
 
+	if (!Input || *Input == '\0')
+		return;
+
 #ifdef MR_PLATFORM_WINDOWS
 	const uint32_t skinnyLength = (uint32_t)MultiByteToWideChar(CP_UTF8, 0, Input, -1, nullptr, 0);
 	if (skinnyLength > 0)
@@ -45,7 +48,8 @@ String::String(const char* Input)
 	}
 	else
 	{
-		int j = 5;
+		MR_LOG(LogStringSet, Error, "MultiByteToWideChar returned: %s", *Platform::GetError());
+		return;
 	}
 #endif // MR_PLATFORM_WINDOWS
 
@@ -56,38 +60,28 @@ String::String(const char* Input)
 
 String::String(const wchar_t* Input)
 {
-	if (!Input || Input[0] == L'\0')
-	{
-		MakeEmpty();
+	NullOut();
+
+	if (!Input || *Input == '\0')
 		return;
-	}
 
-	const uint32_t inputSize = (uint32_t)wcslen(Input);
-
-	if (inputSize <= SSO_MAX_CHARS)
-	{
-		stackBuffer.length = (unsigned short)inputSize;
-
-		ScopedPtr<char> ptr = Platform::ConvertToNarrow(Input);
-		memcpy(stackBuffer.ptr, ptr.Get(), stackBuffer.length);
-
-		stackBuffer.ptr[inputSize] = '\0';
+#ifdef MR_PLATFORM_WINDOWS
 	
-		bIsUsingHeap = false;
+#endif // MR_PLATFORM_WINDOWS
+
+	const uint32_t stringSize = wcslen(Input);
+	if (stringSize > SSO_MAX_CHARS)
+	{
+		heapBuffer.ptr = MemoryManager::Get().Allocate<wchar_t>((stringSize + 1) * sizeof(wchar_t));
+
+		wcsncpy(heapBuffer.ptr, Input, );
+		heapBuffer.ptr[stringSize] = L'\0';
+
+		heapBuffer.capacity
 	}
 	else
 	{
-		heapBuffer.length = inputSize;
-		heapBuffer.capacity = inputSize + 1;
 
-		heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
-
-		ScopedPtr<char> ptr = Platform::ConvertToNarrow(Input);
-		memcpy(heapBuffer.ptr, ptr.Get(), heapBuffer.length);
-
-		heapBuffer.ptr[inputSize] = '\0';
-
-		bIsUsingHeap = true;
 	}
 
 #ifdef MR_DEBUG

@@ -125,7 +125,7 @@ private:
 	{
 		bIsUsingHeap = false;
 
-		memset(heapBuffer.ptr, 0, heapBuffer.capacity);
+		if (heapBuffer.ptr) memset(heapBuffer.ptr, 0, heapBuffer.capacity);
 		heapBuffer.ptr = nullptr;
 		heapBuffer.capacity = 0;
 		heapBuffer.length = 0;
@@ -136,6 +136,20 @@ private:
 #ifdef MR_DEBUG
 		bIsInited = false;
 #endif // MR_DEBUG
+	}
+
+	wchar_t* DetermineLocation(uint32_t size)
+	{
+		bIsUsingHeap = size > SSO_MAX_CHARS;
+		if (bIsUsingHeap)
+		{
+			
+		}
+		else
+		{
+
+		}
+
 	}
 
 	wchar_t* Data() { return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr; };
@@ -154,7 +168,7 @@ private:
 
 		struct
 		{ 
-			wchar_t ptr[sizeof(heapBuffer) - sizeof(uint16_t)] = {'\0'};
+			wchar_t ptr[sizeof(heapBuffer) - sizeof(uint16_t)] = { L'\0' };
 
 			uint16_t length = 0;
 
