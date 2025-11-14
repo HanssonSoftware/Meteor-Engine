@@ -33,15 +33,19 @@ String::String(const char* Input)
 
 #ifdef MR_PLATFORM_WINDOWS
 	const uint32_t skinnyLength = (uint32_t)MultiByteToWideChar(CP_UTF8, 0, Input, -1, nullptr, 0);
-	if (skinnyLength != 0)
+	if (skinnyLength > 0)
 	{
 		ScopedPtr<wchar_t> buffer = MemoryManager::Get().Allocate<wchar_t>(skinnyLength + 1);
 
 		if (!MultiByteToWideChar(CP_UTF8, 0, Input, skinnyLength * sizeof(char), buffer.Get(), skinnyLength))
 		{
-			MR_LOG(LogStringSet, Error, "MultiByteToWideChar (Windows Specific) returned: %s", *Platform::GetError());
+			MR_LOG(LogStringSet, Error, "MultiByteToWideChar returned: %s", *Platform::GetError());
 			return;
 		}
+	}
+	else
+	{
+		int j = 5;
 	}
 #endif // MR_PLATFORM_WINDOWS
 
