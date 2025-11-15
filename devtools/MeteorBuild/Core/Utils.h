@@ -36,5 +36,5 @@ struct Utils
 
 	static void SkipWord(const char*& in);
 
-	static bool IsSpace(const char* str);
+	static bool IsSpace(const char* buffer);
 };

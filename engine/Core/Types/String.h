@@ -31,7 +31,9 @@ public:
 
 	String(uint32_t Input);
 
-	String(String& other);
+	String(const String& other);
+
+	String(const char* string, uint32_t length);
 
 	String(const wchar_t* string, uint32_t length);
 
@@ -86,9 +88,6 @@ public:
 			stackBuffer.ptr || stackBuffer.length != 0 ? stackBuffer.ptr : L"";
 	}
 
-	/** Creates an allocated string, straight from this container. Do not forget to delete! */
-	wchar_t* Allocate();
-
 	String Delim(const String character, bool first);
 
 	bool IsEmpty() const noexcept
@@ -119,21 +118,20 @@ public:
 	static bool Contains(const char* buffer, const char* target);
 
 	wchar_t* Data() { return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr; };
-private:
-	void MakeEmpty();
 
-	void ResetBuffers();
+private:
 
 	void NullOut()
 	{
+		// Advanced memory cleanup method required!
+
 		bIsUsingHeap = false;
 
-		//if (heapBuffer.ptr != nullptr) memset(heapBuffer.ptr, 0, heapBuffer.capacity);
 		heapBuffer.ptr = nullptr;
 		heapBuffer.capacity = 0;
 		heapBuffer.length = 0;
 
-		stackBuffer.ptr[0] = L'\0';
+		wmemset(stackBuffer.ptr, 0, SSO_MAX_CHARS);
 		stackBuffer.length = 0;
 
 #ifdef MR_DEBUG

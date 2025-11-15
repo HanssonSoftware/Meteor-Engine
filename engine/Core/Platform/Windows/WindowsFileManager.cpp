@@ -112,38 +112,28 @@ bool WindowsFileManager::IsEndingWith(const String& name, const String& extensio
     if (name.IsEmpty() && extension.IsEmpty())
         return false;
 
-    LPWSTR result = PathFindExtensionW(name);
-    if (wcslen(result) == 0)
-        return false;
+    String found = PathFindExtensionW(name.Chr());
+    wmemmove(found.Data() - 1, found.Data(), extension.Length() * sizeof(wchar_t));
 
-    memmove(result, result + 1, (wcslen(result) + 1) * sizeof(wchar_t));
-
-    bool bIsGood = false;
-
-    bIsGood = wcscmp(result, extension) == 0 ? true : false;
-
-    return bIsGood ? true : false;
+    return found == extension ? true : false;
 }
 
 void WindowsFileManager::NormalizeDirectory(String& input)
 {
-    uint32_t size = (int32_t)input.Length();
-
-    wchar_t* buffer = input.Data();
-    for (uint32_t i = 0; i < size; i++)
+    wchar_t* begin = input.Data();
+    for (wchar_t* p = begin; *p; p++)
     {
-        if (buffer[i] == L'/' || buffer[i] == L'//')
+        if (p == L"//")
         {
-            buffer[i] = L'\\';
+
+        }
+        else if (*p == L'/')
+        {
+
         }
     }
 
-    size = (uint32_t)wcslen(buffer);
-    buffer[size] = '\0';
-
-    input = String(buffer);
-
-    MemoryManager::Get().Deallocate(buffer);
+    input = begin;
 }
 
 IFile* WindowsFileManager::CreateFileOperation(String* pathToCreate, int32_t accessType, int32_t sharingMode, FileOverrideRules createType)

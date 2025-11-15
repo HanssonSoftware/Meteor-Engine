@@ -33,7 +33,7 @@ void WindowsFile::Close()
 	{
 		if (buffer)
 		{
-			MemoryManager::Get().Deallocate(buffer);
+			delete[] buffer;
 		}
 
 		FlushFileBuffers(fileHandle);
@@ -87,12 +87,13 @@ void WindowsFile::Read()
 		}
 
 		buffer = new char[lg.QuadPart > 0 ? lg.QuadPart + 1 : 1]();
+		memset(buffer, 0, lg.QuadPart + 1);
 
 		if (buffer)
 		{
 			DWORD write = 0;
 
-			if (!ReadFile(fileHandle, buffer, (DWORD)lg.QuadPart, &write, nullptr))
+			if (!ReadFile(fileHandle, (LPWSTR)buffer, lg.QuadPart, &write, nullptr))
 			{
 				MR_LOG(LogFileSystem, Error, "ReadFile returned: %s", *Platform::GetError());
 				return;

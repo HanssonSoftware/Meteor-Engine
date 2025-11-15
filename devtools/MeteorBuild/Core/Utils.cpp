@@ -37,7 +37,7 @@ void Utils::ListDirectory(String* name, Array<FoundScriptData>& container)
 
 				switch (foundFile.dwFileAttributes)
 				{
-					case FILE_ATTRIBUTE_DIRECTORY:
+				case FILE_ATTRIBUTE_DIRECTORY:
 					{
 						String nextDirectory = String::Format("%s\\%ls", name->Chr(), foundFile.cFileName);
 						ListDirectory(&nextDirectory, container);
@@ -153,7 +153,7 @@ String Utils::GetWord(const char*& in, bool bStep)
 		
 		end++;
 	}
-	else if (*begin == '$')
+	else if (*begin == L'$')
 	{
 		end = begin;
 		while (*end && !isspace(*end)) end++;

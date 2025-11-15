@@ -16,5 +16,7 @@ struct Commandlet
 	static bool Parse(const String& inParam, String* returnVal);
 
 protected:
+	static inline bool bIsInited = false;
+
 	static inline Array<String> parsedWords;
 };
