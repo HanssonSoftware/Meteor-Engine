@@ -12,7 +12,7 @@ static void AddVerbDetail(Module* moduleToWrite, const String& verb, const Strin
 	if (verb == "IncludePath" || verb == "IncludePaths") { moduleToWrite->includePaths.Add(value); return; }
 	if (verb == "Dependencies") { moduleToWrite->requires.Add(value); return; }
 
-	MR_LOG(LogParser, Error, "Unknown verb: %s", *verb);
+	MR_LOG(LogParser, Error, "Unknown verb: %ls", *verb);
 }
 
 bool Module::Parse(String* modulePath)
@@ -28,7 +28,7 @@ bool Module::Parse(String* modulePath)
 
 		if (Utils::GetWord(buffer, false) == "Module")
 		{
-			MR_LOG(LogParser, Verbose, "Opening %s as ModuleScript!", *module->GetName());
+			MR_LOG(LogParser, Verbose, "Opening %ls as ModuleScript!", *module->GetName());
 
 			Utils::SkipWord(buffer);  // Skip "Module"
 
@@ -62,7 +62,7 @@ bool Module::Parse(String* modulePath)
 										if (value)
 										{
 											AddVerbDetail(this, flagWord, value);
-											MR_LOG(LogParser, Verbose, "Adding %s property to %s", *value, *flagWord);
+											MR_LOG(LogParser, Verbose, "Adding %ls property to %ls", *value, *flagWord);
 										}
 
 										if (Utils::GetCharacterType(buffer) == Comma)
@@ -72,7 +72,7 @@ bool Module::Parse(String* modulePath)
 							}
 							else if (Utils::GetCharacterType(buffer) != Colon)
 							{
-								MR_LOG(LogParser, Fatal, "Missing colon after word %s!", flagWord.Chr());
+								MR_LOG(LogParser, Fatal, "Missing colon after word %ls!", flagWord.Chr());
 							}
 							else
 							{
@@ -87,7 +87,7 @@ bool Module::Parse(String* modulePath)
 					{
 						if (SUCCEEDED(CoCreateGuid(&identification)))
 						{
-							MR_LOG(LogParser, Verbose, "Successfully generated GUID, for module %s!", *moduleName);
+							MR_LOG(LogParser, Verbose, "Successfully generated GUID, for module %ls!", *moduleName);
 						}
 					}
 				}

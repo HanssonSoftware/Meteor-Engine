@@ -2,7 +2,7 @@
 
 #include "String.h"
 #include <Logging/Log.h>
-#include <stdio.h>
+//#include <stdio.h>
 
 #include <Layers/SystemLayer.h>
 
@@ -11,7 +11,7 @@
 #include <Windows/Windows.h>
 
 #include <MemoryManager.h>
-#include "Pointers.h"
+//#include "Pointers.h"
 
 #pragma warning(disable : 26495)
 
@@ -26,7 +26,8 @@ String::~String() noexcept
 	NullOut();
 
 #ifdef MR_DEBUG
-	bIsInited = false;
+	bIsInited = true;
+	functionWhereWasInited = __FUNCSIG__;
 #endif // MR_DEBUG
 }
 
@@ -44,19 +45,20 @@ String::String(const char* Input)
 		wchar_t* redirectedData = DetermineLocation(skinnyLength);
 		if (!MultiByteToWideChar(CP_UTF8, 0, Input, skinnyLength * sizeof(char), redirectedData, skinnyLength))
 		{
-			MR_LOG(LogStringSet, Error, "MultiByteToWideChar returned: %s", *Platform::GetError());
+			MR_LOG(LogStringSet, Error, "MultiByteToWideChar returned: %ls", *Platform::GetError());
 			return;
 		}
 	}
 	else
 	{
-		MR_LOG(LogStringSet, Error, "MultiByteToWideChar returned: %s", *Platform::GetError());
+		MR_LOG(LogStringSet, Error, "MultiByteToWideChar returned: %ls", *Platform::GetError());
 		return;
 	}
 #endif // MR_PLATFORM_WINDOWS
 
 #ifdef MR_DEBUG
 	bIsInited = true;
+	functionWhereWasInited = __FUNCSIG__;
 #endif // MR_DEBUG
 }
 
@@ -67,13 +69,14 @@ String::String(const wchar_t* Input)
 	if (!Input || *Input == L'\0')
 		return;
 
-	const uint32_t size = wcslen(Input);
+	const uint32_t size = (uint32_t)wcslen(Input);
 	wchar_t* target = DetermineLocation(size);
 	
 	wcsncpy(target, Input, size);
 
 #ifdef MR_DEBUG
 	bIsInited = true;
+	functionWhereWasInited = __FUNCSIG__;
 #endif // MR_DEBUG
 }
 
@@ -83,6 +86,7 @@ String::String(int Input)
 
 #ifdef MR_DEBUG
 	bIsInited = true;
+	functionWhereWasInited = __FUNCSIG__;
 #endif // MR_DEBUG
 }
 
@@ -92,6 +96,7 @@ String::String(uint32_t Input)
 
 #ifdef MR_DEBUG
 	bIsInited = true;
+	functionWhereWasInited = __FUNCSIG__;
 #endif // MR_DEBUG
 }
 
@@ -101,41 +106,32 @@ String::String(float Input)
 
 #ifdef MR_DEBUG
 	bIsInited = true;
-#endif // MR_DEBUG
-#ifdef MR_DEBUG
-	bIsInited = true;
+	functionWhereWasInited = __FUNCSIG__;
 #endif // MR_DEBUG
 }
 
 String::String(String&& other) noexcept
 {
-	
+	NullOut();
+
 	bIsUsingHeap = other.bIsUsingHeap;
 
-	//if (other.bIsUsingHeap)
-	//{
-	//	heapBuffer.capacity = other.heapBuffer.capacity;
-	//	heapBuffer.length = other.heapBuffer.length;
+	if (bIsUsingHeap)
+	{
+		heapBuffer.capacity = other.heapBuffer.capacity;
+		heapBuffer.length = other.heapBuffer.length;
+	}
+	else
+	{
+		stackBuffer.length = other.stackBuffer.length;
+	}
 
-	//	heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
-
-	//	memmove(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
-	//	heapBuffer.ptr[heapBuffer.length] = '\0';
-
-	//	other.ResetBuffers();
-	//}
-	//else
-	//{
-	//	stackBuffer.length = other.stackBuffer.length;
-
-	//	memmove(stackBuffer.ptr, other.stackBuffer.ptr, stackBuffer.length);
-	//	stackBuffer.ptr[stackBuffer.length] = '\0';
-
-	//	other.ResetBuffers();
-	//}
+	wchar_t* determined = DetermineLocation(Length());
+	wmemmove(determined, other, Length());
 
 #ifdef MR_DEBUG
 	bIsInited = true;
+	functionWhereWasInited = __FUNCSIG__;
 #endif // MR_DEBUG
 }
 
@@ -163,6 +159,7 @@ String::String(const String& other)
 
 #ifdef MR_DEBUG
 	bIsInited = true;
+	functionWhereWasInited = __FUNCSIG__;
 #endif // MR_DEBUG
 }
 
@@ -170,7 +167,7 @@ String::String(const char* Input, uint32_t length)
 {
 	NullOut();
 
-	if (!Input || *Input == '\0')
+	if (!Input || *Input == '\0' || length <= 0)
 		return;
 
 #ifdef MR_PLATFORM_WINDOWS
@@ -180,16 +177,21 @@ String::String(const char* Input, uint32_t length)
 		wchar_t* redirectedData = DetermineLocation(skinnyLength);
 		if (!MultiByteToWideChar(CP_UTF8, 0, Input, skinnyLength * sizeof(char), redirectedData, skinnyLength))
 		{
-			MR_LOG(LogStringSet, Error, "MultiByteToWideChar returned: %s", *Platform::GetError());
+			MR_LOG(LogStringSet, Error, "MultiByteToWideChar returned: %ls", *Platform::GetError());
 			return;
 		}
 	}
 	else
 	{
-		MR_LOG(LogStringSet, Error, "MultiByteToWideChar returned: %s", *Platform::GetError());
+		MR_LOG(LogStringSet, Error, "MultiByteToWideChar returned: %ls", *Platform::GetError());
 		return;
 	}
 #endif // MR_PLATFORM_WINDOWS
+
+#ifdef MR_DEBUG
+	bIsInited = true;
+	functionWhereWasInited = __FUNCSIG__;
+#endif // MR_DEBUG
 }
 
 String::String(const wchar_t* string, uint32_t length)
@@ -198,6 +200,11 @@ String::String(const wchar_t* string, uint32_t length)
 	
 	wchar_t* direct = DetermineLocation(length);
 	wcsncpy(direct, string, length);
+
+#ifdef MR_DEBUG
+	bIsInited = true;	
+	functionWhereWasInited = __FUNCSIG__;
+#endif // MR_DEBUG
 }
 
 
@@ -344,6 +351,11 @@ String& String::operator=(const String& other)
 			memset(stackBuffer.ptr, 0, stackBuffer.length);
 			wcsncpy(stackBuffer.ptr, other.stackBuffer.ptr, stackBuffer.length);
 		}
+
+#ifdef MR_DEBUG
+		bIsInited = true;
+		functionWhereWasInited = __FUNCSIG__;
+#endif // MR_DEBUG
 	}
 
 	return *this;

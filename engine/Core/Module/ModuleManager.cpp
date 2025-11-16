@@ -33,7 +33,7 @@ ModuleManager::~ModuleManager() noexcept
 #ifdef MR_PLATFORM_WINDOWS   
         if (!FreeLibrary(module->library))
         {
-            MR_LOG(LogModuleManager, Error, "FreeLibrary returned: %s (%s)", *Layer::GetSystemLayer()->GetError(), module->GetName().Chr());
+            MR_LOG(LogModuleManager, Error, "FreeLibrary returned: %ls (%ls)", *Layer::GetSystemLayer()->GetError(), module->GetName().Chr());
             continue;
         }
 #endif // MR_PLATFORM_WINDOWS
@@ -51,7 +51,7 @@ bool ModuleManager::LoadModule(const String& moduleName)
         return true;
 
 #ifdef MR_PLATFORM_WINDOWS
-    String libraryName = String::Format("%s-%s.dll", *Application::Get()->appNameNoSpaces, moduleName.Chr());
+    String libraryName = String::Format("%ls-%ls.dll", *GetApplication()->GetApplicationName(), moduleName.Chr());
 
     HMODULE module = LoadLibraryW(libraryName);
     if (module != nullptr)
@@ -74,7 +74,7 @@ bool ModuleManager::LoadModule(const String& moduleName)
     else
     {
         delete[] libraryName;
-        libraryName = String::Format("%s-%s.dll", defaultEngineName, moduleName.Chr());
+        libraryName = String::Format("%ls-%ls.dll", defaultEngineName, moduleName.Chr());
 
         module = LoadLibraryW(libraryName);
         if (module != nullptr)
@@ -120,7 +120,7 @@ bool ModuleManager::UnloadModule(const String& moduleName)
 #ifdef MR_PLATFORM_WINDOWS
             if (!FreeLibrary(module->library))
             {
-                MR_LOG(LogModuleManager, Error, "FreeLibrary returned: %s (%s)", *Layer::GetSystemLayer()->GetError(), moduleName.Chr());
+                MR_LOG(LogModuleManager, Error, "FreeLibrary returned: %ls (%ls)", *Layer::GetSystemLayer()->GetError(), moduleName.Chr());
                 return false;
             }
 #else

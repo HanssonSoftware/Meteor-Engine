@@ -22,6 +22,45 @@ struct Application
 {
 	enum class ECurrentApplicationState { NONE, STARTUP, RUNNING, RESTARTING, SHUTDOWN, DEAD };
 
+	Application();
+
+	Application(const Application& Nah) = delete;
+
+	virtual ~Application();
+
+	virtual void Init();
+
+	virtual void Run();
+
+	virtual void Shutdown();
+
+	static String GetApplicationDirectory();
+
+	const String GetApplicationName() const { return appName; };
+
+	const String GetApplicationCodeName() const { return appCodeName; };
+
+	const String GetApplicationNameNoSpaces() const { return appNameNoSpaces; };
+
+	static Application* Get();
+
+	static void RequestExit(int32_t Code);
+
+	int32_t GetRequestExitCode() const { return appFramework->exitCode; };
+
+	IWindowManager* GetWindowManager() const { return windowManager; };
+
+	void SetWindowManager(IWindowManager* NewValue) { windowManager = NewValue; };
+
+	LayerManager* GetLayerManager() const { return layerManager; };
+
+	void SetLayerManager(LayerManager* NewValue) { layerManager = NewValue; };
+
+	ECurrentApplicationState GetAppState() const { return state; };
+
+	void SetAppState(const ECurrentApplicationState& newState) { state = newState; };
+
+protected:
 	struct
 	{
 		/** Application name, this would be appearing on the created window. */
@@ -49,43 +88,7 @@ struct Application
 
 	};
 
-	Application();
-
-	Application(const Application& Nah) = delete;
-
-	virtual ~Application();
-
-	virtual void Init();
-
-	virtual void Run();
-
-	virtual void Shutdown();
-
-	static String GetApplicationDirectory();
-
-	static String GetApplicationName();
-
-	static Application* Get();
-
-	static void RequestExit(int32_t Code);
-
-	int32_t GetRequestExitCode() const { return appFramework->exitCode; };
-
-	IWindowManager* GetWindowManager() const { return windowManager; };
-
-	void SetWindowManager(IWindowManager* NewValue) { windowManager = NewValue; };
-
-	LayerManager* GetLayerManager() const { return layerManager; };
-
-	void SetLayerManager(LayerManager* NewValue) { layerManager = NewValue; };
-
-	ECurrentApplicationState GetAppState() const { return state; };
-
-	void SetAppState(const ECurrentApplicationState& newState) { state = newState; };
-
-protected:
-
-	int32_t exitCode = 0;
+	int exitCode = 0;
 
 	IWindowManager* windowManager;
 

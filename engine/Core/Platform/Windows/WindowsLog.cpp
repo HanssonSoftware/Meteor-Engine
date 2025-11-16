@@ -78,7 +78,7 @@ void WindowsLogger::Initialize()
 					Application::RequestExit(-1);
 
 
-				if (!SetConsoleTitleW(String::Format("%s developer console (b%d)", Application::Get()->appName.Chr(), BUILD_NUMBER).Chr()))
+				if (!SetConsoleTitleW(String::Format("%ls developer console (b%d)", *GetApplication()->GetApplicationName(), BUILD_NUMBER).Chr()))
 				{
 					Application::RequestExit(-1);
 				}

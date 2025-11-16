@@ -29,7 +29,7 @@ void MemoryManager::Initialize(const double& RequiredMinimum)
 
 	if (!GlobalMemoryStatusEx(&longlong))
 	{
-		MR_LOG(LogArena, Fatal, "GlobalMemoryStatusEx failed with: %s", *Platform::GetError());
+		MR_LOG(LogArena, Fatal, "GlobalMemoryStatusEx failed with: %ls", *Platform::GetError());
 	}
 
 	totalMemoryOnPC = longlong.ullTotalPhys;
@@ -53,7 +53,7 @@ void MemoryManager::Shutdown()
 {
 	if (!HeapFree(GetProcessHeap(), 0, begin))
 	{
-		MR_LOG(LogArena, Fatal, "VirtualFree failed with: %s", *Platform::GetError());
+		MR_LOG(LogArena, Fatal, "VirtualFree failed with: %ls", *Platform::GetError());
 	}
 
 	begin, end = nullptr;

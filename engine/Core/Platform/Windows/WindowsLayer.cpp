@@ -130,7 +130,7 @@ String WindowsLayer::GetMachineVersion()
     {
         RegCloseKey(versionKey);
 
-        MR_LOG(LogWindowsLayer, Error, "RegOpenKeyExW returned: %s", GetError().Chr());
+        MR_LOG(LogWindowsLayer, Error, "RegOpenKeyExW returned: %ls", GetError().Chr());
         return "";
     }
     
@@ -148,7 +148,7 @@ String WindowsLayer::GetMachineVersion()
         {
             RegCloseKey(versionKey);
 
-            MR_LOG(LogWindowsLayer, Error, "RegGetValueW returned: %s", GetError().Chr());
+            MR_LOG(LogWindowsLayer, Error, "RegGetValueW returned: %ls", GetError().Chr());
             return "";
         }
     }
@@ -160,7 +160,7 @@ String WindowsLayer::GetMachineVersion()
         {
             RegCloseKey(versionKey);
 
-            MR_LOG(LogWindowsLayer, Error, "RegGetValueW returned: %s", GetError().Chr());
+            MR_LOG(LogWindowsLayer, Error, "RegGetValueW returned: %ls", GetError().Chr());
             return "";
         }
     }
@@ -174,7 +174,7 @@ String WindowsLayer::GetMachineVersion()
 
 Vector3<float> WindowsLayer::InspectPixel(const Vector2<float> screenCoordinates)
 {
-    MR_LOG(LogWindowsLayer, Error, "This function is unimplemented! %s", __FUNCTION__);
+    MR_LOG(LogWindowsLayer, Error, "This function is unimplemented! %ls", __FUNCTION__);
     static const Vector3<float> colors(/*GetRValue(winColor), GetGValue(winColor), GetBValue(winColor)*/0);
 
     //if (ReleaseDC(0, screen) == 0)
@@ -233,7 +233,7 @@ MessageBoxDecision WindowsLayer::AddMessageBox(const MessageBoxDescriptor* Info)
     //delete[] bufferDesc, bufferTitle;
     //if (returnCode == 0)
     //{
-    //    MR_LOG(LogWindowsLayer, Error, "MessageBox returned: %s", GetError().Chr());
+    //    MR_LOG(LogWindowsLayer, Error, "MessageBox returned: %ls", GetError().Chr());
     //    return MESSAGEBOXDECISION_INVALID;
     //}
 
@@ -248,7 +248,7 @@ wchar_t* WindowsLayer::ConvertToWide(const char* Buffer)
         const int32_t requiredSize = MultiByteToWideChar(CP_UTF8, 0, Buffer, -1, 0, 0);
         if (requiredSize == 0)
         {
-            MR_LOG(LogWindowsLayer, Error, "MultiByteToWideChar said: %s", GetError().Chr());
+            MR_LOG(LogWindowsLayer, Error, "MultiByteToWideChar said: %ls", GetError().Chr());
             return nullptr;
         }
 
@@ -277,7 +277,7 @@ char* WindowsLayer::ConvertToNarrow(const wchar_t* Buffer)
     const int32_t requiredSize = WideCharToMultiByte(CP_UTF8, 0, Buffer, -1, 0, 0, 0, 0);
     if (requiredSize == 0)
     {
-        MR_LOG(LogWindowsLayer, Error, "WideCharToMultiByte said: %s", GetError().Chr());
+        MR_LOG(LogWindowsLayer, Error, "WideCharToMultiByte said: %ls", GetError().Chr());
         return nullptr;
     }
 

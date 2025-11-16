@@ -48,7 +48,7 @@ void WindowsFile::Delete()
 {	
 	if (!::DeleteFileW(fileName))
 	{
-		MR_LOG(LogFileSystem, Error, "Unable to delete file! %s", *Platform::GetError());
+		MR_LOG(LogFileSystem, Error, "Unable to delete file! %ls", *Platform::GetError());
 	}
 }
 
@@ -61,7 +61,7 @@ void WindowsFile::Write(const String* buffer) const
 			DWORD written = 0;
 			if (!WriteFile(fileHandle, buffer->Chr(), (DWORD)buffer->Length(), &written, nullptr))
 			{
-				MR_LOG(LogFileSystem, Error, "WriteFile error! %s", *Platform::GetError());
+				MR_LOG(LogFileSystem, Error, "WriteFile error! %ls", *Platform::GetError());
 				return;
 			}
 
@@ -82,7 +82,7 @@ void WindowsFile::Read()
 		LARGE_INTEGER lg;
 		if (!GetFileSizeEx(fileHandle, &lg))
 		{
-			MR_LOG(LogFileSystem, Error, "GetFileSizeEx returned: %s", *Platform::GetError());
+			MR_LOG(LogFileSystem, Error, "GetFileSizeEx returned: %ls", *Platform::GetError());
 			return;
 		}
 
@@ -95,7 +95,7 @@ void WindowsFile::Read()
 
 			if (!ReadFile(fileHandle, (LPWSTR)buffer, lg.QuadPart, &write, nullptr))
 			{
-				MR_LOG(LogFileSystem, Error, "ReadFile returned: %s", *Platform::GetError());
+				MR_LOG(LogFileSystem, Error, "ReadFile returned: %ls", *Platform::GetError());
 				return;
 			}
 

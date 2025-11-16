@@ -12,8 +12,10 @@
 #include <unordered_map>
 
 #include <PathCch.h>
+#include <Application.h>
 
 LOG_ADDCATEGORY(BuildSystemFramework);
+LOG_ADDCATEGORY(Assembler);
 
 bool BuildSystem::InitFramework()
 {
@@ -29,11 +31,11 @@ bool BuildSystem::InitFramework()
 			Utils::ListDirectory(&sourceDirectoryFromLaunchParameter, filesFoundInSources);
 			for (auto& pathToDiscoveredItemsIndexed : filesFoundInSources)
 			{
-				//const String combined = String::Format("%s\\%s", *pathToDiscoveredItemsIndexed.path, *pathToDiscoveredItemsIndexed.name);
+				//const String combined = String::Format("%ls\\%ls", *pathToDiscoveredItemsIndexed.path, *pathToDiscoveredItemsIndexed.name);
 				if (FileManager::IsEndingWith(pathToDiscoveredItemsIndexed.full, "mrbuild"))
 				{
 					scriptsFound.Add(pathToDiscoveredItemsIndexed);
-					MR_LOG(LogBuildSystemFramework, Verbose, "Found script: %s", *pathToDiscoveredItemsIndexed.full);
+					MR_LOG(LogBuildSystemFramework, Verbose, "Found script: %ls", *pathToDiscoveredItemsIndexed.full);
 				}
 			}
 
@@ -53,7 +55,7 @@ bool BuildSystem::InitFramework()
 					for (auto& temp : sd)
 					{
 						mdl.files.Add(indexed.full);
-						MR_LOG(LogBuildSystemFramework, Verbose, "%s script included file: %s", *mdl.moduleName, *temp.full);
+						MR_LOG(LogBuildSystemFramework, Verbose, "%ls module, new file added to include list: %ls", *mdl.moduleName, *temp.full);
 					}
 
 					loadedModules.Add(mdl);
@@ -134,7 +136,7 @@ void BuildSystem::OrderModules()
 		auto& m = loadedModules[i];
 		auto it = ordering.find(*m.moduleName);
 		uint32_t score = (it != ordering.end()) ? it->second : 0;
-		MR_LOG(LogBuildSystemFramework, Log, "%s (score %u)", *m.moduleName, score);
+		MR_LOG(LogBuildSystemFramework, Log, "%ls (score %u)", *m.moduleName, score);
 	}
 }
 
@@ -156,12 +158,36 @@ bool BuildSystem::BuildProjectFiles()
 			LocalFree(combinedPathNonCanonicalized);
 		}
 
-		FileManager::CreateDirectory(&intermediateLocation, true);
-
-		const uint32_t size = loadedModules.GetSize();
-		for (uint32_t i = 0; i < size; i++)
+		const String appNameAppendedIntermediate = String::Format("%ls\\%ls", *intermediateLocation, *GetApplication()->GetApplicationCodeName()); // C:\\Meteor-Engine\\Intermediate\\Apollo
+		FileManager::CreateDirectory(&appNameAppendedIntermediate);
+		if (GetLastError() == ERROR_ALREADY_EXISTS)
 		{
+			FileManager::DeleteDirectory(appNameAppendedIntermediate, true);		
+			FileManager::CreateDirectory(&appNameAppendedIntermediate);
+		}
 
+		for (auto& module : loadedModules)
+		{
+			const String directoryToCreateTheFolder = String::Format("%ls\\%ls", *appNameAppendedIntermediate, *module.moduleName);
+			FileManager::CreateDirectory(&directoryToCreateTheFolder);
+
+			String projectCreationDir = String::Format("%ls\\%ls-GEN.vcxproj", *directoryToCreateTheFolder, *module.moduleName);
+
+			HANDLE actual = CreateFileW(projectCreationDir, 0, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+			if (actual != INVALID_HANDLE_VALUE)
+			{
+				const String final = String::Format("%s %s %s %s", *module.moduleName, *module.dependsOn, *module.files[0], *module.includePaths[0]);
+
+				DWORD written = 0;
+				WriteFile(actual, (LPCWSTR)final.Chr(), final.Length() * sizeof(char), &written, nullptr);
+
+				FlushFileBuffers(actual);
+				CloseHandle(actual);
+			}
+			else
+			{
+				MR_LOG(LogAssembler, Fatal, "Failed to create project file at: %ls", *projectCreationDir);
+			}
 		}
 	}
 

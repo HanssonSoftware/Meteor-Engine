@@ -21,6 +21,8 @@ Application::Application()
 {
     appFramework = this;
 
+    MemoryManager::Get().Initialize(appFramework->Memory.memoryReservePercent);
+
 #ifdef _WIN64
     auto wm = new WindowsWindowManager();
 #else
@@ -47,8 +49,6 @@ void Application::Init()
 #ifdef MR_DEBUG
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF);
 #endif // MR_DEBUG
-
-    MemoryManager::Get().Initialize(appFramework->Memory.memoryReservePercent);
     
     windowManager->Init();
     ILogger::Get()->Initialize();
@@ -113,16 +113,6 @@ Application::~Application()
 
     if (layerManager)
         layerManager = nullptr;
-}
-
-String Application::GetApplicationName()
-{
-    //if (appFramework->appInfo.appName.IsEmpty())
-    //{
-    //    return appFramework->GetWindowManager()->GetFirstWindow()->windowData.windowName;
-    //}
-
-    return "appFramework->appInfo.appName";
 }
 
 Application* GetApplication()

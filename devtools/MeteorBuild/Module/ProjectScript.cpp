@@ -33,7 +33,7 @@ bool ProjectScript::Parse(String* input)
 		{
 			Utils::SkipWord(buffer);  // Skip "Project"
 
-			MR_LOG(LogProjectScriptParser, Verbose, "Opening %s as ProjectScript!", *module->GetName());
+			MR_LOG(LogProjectScriptParser, Verbose, "Opening %ls as ProjectScript!", *module->GetName());
 
 			projectName = Utils::GetWord(buffer, true);
 
@@ -62,7 +62,7 @@ bool ProjectScript::Parse(String* input)
 										if (!bHasBeenParsedOneWordAtLeast) bHasBeenParsedOneWordAtLeast = true;
 
 										AddVerbDetail(flagWord, value);
-										MR_LOG(LogProjectScriptParser, Verbose, "Adding %s property to %s", *value, *flagWord);
+										MR_LOG(LogProjectScriptParser, Verbose, "Adding %ls property to %ls", *value, *flagWord);
 									}
 
 									if (Utils::GetCharacterType(buffer) == Comma)
@@ -72,7 +72,7 @@ bool ProjectScript::Parse(String* input)
 						}
 						else if (Utils::GetCharacterType(buffer) != Colon)
 						{
-							MR_LOG(LogProjectScriptParser, Fatal, "Missing colon after word! %s", flagWord.Chr());
+							MR_LOG(LogProjectScriptParser, Fatal, "Missing colon after word! %ls", flagWord.Chr());
 						}
 						else
 						{

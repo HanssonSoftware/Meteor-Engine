@@ -131,7 +131,7 @@ private:
 		heapBuffer.capacity = 0;
 		heapBuffer.length = 0;
 
-		wmemset(stackBuffer.ptr, 0, SSO_MAX_CHARS);
+		wmemset(stackBuffer.ptr, 0, SSO_MAX_CHARS + 1);
 		stackBuffer.length = 0;
 
 #ifdef MR_DEBUG
@@ -155,19 +155,23 @@ private:
 
 		struct
 		{ 
-			wchar_t ptr[sizeof(heapBuffer) - sizeof(uint16_t)] = { L'\0' };
+			wchar_t ptr[sizeof(heapBuffer) - sizeof(uint8_t)] = {L'\0'};
 
-			uint16_t length = 0;
+			uint8_t length = 0;
 
 		} stackBuffer;
 	};
 
-	static constexpr uint16_t SSO_MAX_CHARS = sizeof(heapBuffer) - sizeof(uint16_t) - 1;
+	static constexpr uint32_t SSO_MAX_CHARS = sizeof(heapBuffer) - sizeof(uint8_t) - 1;
 
 	bool bIsUsingHeap = false;
 
 #ifdef MR_DEBUG
 	bool bIsInited = false;
+
+	// enum instantiationStatus { None, Valid, NeedsClean, Error, Empty } status = None;
+
+	const char* functionWhereWasInited = nullptr;
 #endif // MR_DEBUG
 };
 

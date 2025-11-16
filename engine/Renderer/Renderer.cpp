@@ -19,7 +19,7 @@ void Renderer::Update()
 
 Renderer* Renderer::InitModule(const String& name)
 {
-	ModuleManager::Get().LoadModule(String::Format("Renderer%s", *name));
+	ModuleManager::Get().LoadModule(String::Format("Renderer%ls", *name));
 
 
 	return nullptr;

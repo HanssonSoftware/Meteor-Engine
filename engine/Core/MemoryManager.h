@@ -41,7 +41,7 @@ struct MemoryManager
 		//data->~T();
 		if (/*!VirtualFree(data, sizeof(T), MEM_DECOMMIT)*/false)
 		{
-			//MR_LOG(LogArena, Fatal, "%s", *Platform::GetError());
+			//MR_LOG(LogArena, Fatal, "%ls", *Platform::GetError());
 		}
 
 		//memset(data, 0xCD, sizeof(T));

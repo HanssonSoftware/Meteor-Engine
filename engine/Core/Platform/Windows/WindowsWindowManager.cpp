@@ -78,7 +78,7 @@ bool WindowsWindowManager::CreateWindow(const String& name, const Vector2<uint32
 
     if (!instance->handle)
     {
-        MR_LOG(LogWindowManager, Error, "CreateWindowExW returned: %s", *Platform::GetError());
+        MR_LOG(LogWindowManager, Error, "CreateWindowExW returned: %ls", *Platform::GetError());
         return false;
     }
 

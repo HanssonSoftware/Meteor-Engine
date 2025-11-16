@@ -40,7 +40,7 @@ void ILogger::Shutdown()
 {
     if (bIsUsingFile && buffer)
     {
-        const String formatted = String::Format("Logging closed at %s.\n", *Timer::Format("yyyy-MM-dd HH:mm:ss"));
+        const String formatted = String::Format("Logging closed at %ls.\n", *Timer::Format("yyyy-MM-dd HH:mm:ss"));
 
         buffer->Write(&formatted);
         buffer->Close();
@@ -58,9 +58,9 @@ void ILogger::Initialize()
         auto b = Paths::GetExecutableDirctory();
         //buffer = FileManager::CreateFileOperation(
         //    String::Format(
-        //        "E:\\Logging\\%s-%s.txt", 
+        //        "E:\\Logging\\%ls-%ls.txt", 
         //        app->GetAppInfo().appName.Chr(), 
-        //        ITimer::Now("%H.%M.%S").Chr()),
+        //        ITimer::Now("%H.%M.%ls").Chr()),
 
         //    OPENMODE_WRITE | OPENMODE_READ, SHAREMODE_READ | SHAREMODE_WRITE, OVERRIDERULE_CREATE_NEW_DONT_MIND, 
         //    stat
@@ -95,7 +95,7 @@ void ILogger::TransmitMessage(LogDescriptor* Descriptor)
     if (Descriptor->severity == Fatal)
     {
         fullMessage = String::Format(
-            "=============[ Fatal error ]=============\nWhere:\t\t%s\nWhen:\t\t%s\nMessage:\t%s\n\nFile:\t%s\n",
+            "=============[ Fatal error ]=============\nWhere:\t\t%ls\nWhen:\t\t%ls\nMessage:\t%ls\n\nFile:\t%ls\n",
             Descriptor->function,
             *current,
             *Descriptor->message,
@@ -103,7 +103,7 @@ void ILogger::TransmitMessage(LogDescriptor* Descriptor)
     }
     else
     {
-        fullMessage = String::Format("[%s] %s: %s\n", 
+        fullMessage = String::Format("[%ls] %ls: %ls\n", 
             current.Chr(),
             Descriptor->team,
             *Descriptor->message);
@@ -118,7 +118,7 @@ void ILogger::TransmitAssertion(const LogAssertion* Info)
 
  //   MessageBoxDescriptor mbxInfo = {};
  //   mbxInfo.Description = String::Format(
- //       "Assertion failed: %s\tLine: %d\tFile: %s\n",
+ //       "Assertion failed: %ls\tLine: %d\tFile: %ls\n",
  //       Info->assertStatement,
  //       Info->assertLineInFile,
  //       Info->assertLocationInFile
@@ -170,7 +170,7 @@ void LogDescriptor::SetMessage(const wchar_t* message, ...)
     vswprintf(big, reqAmount + 1, message, d);
     va_end(d);
 
-    big[reqAmount] = '\0';
+    big[reqAmount] = L'\0';
 
     this->message = big;
     MemoryManager::Get().Deallocate(big);

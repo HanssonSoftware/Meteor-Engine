@@ -19,7 +19,7 @@ ScopedPtr<wchar_t> WindowsPlatform::ConvertToWide(const char* skinny)
 
 		if (!MultiByteToWideChar(CP_UTF8, 0, skinny, skinnyLength * sizeof(char), buffer.Get(), skinnyLength))
 		{
-			MR_LOG(LogPlatform, Error, "Failed to convert narrow characters: %s", *GetError());
+			MR_LOG(LogPlatform, Error, "Failed to convert narrow characters: %ls", *GetError());
 			return nullptr;
 		}
 
@@ -38,7 +38,7 @@ ScopedPtr<char> WindowsPlatform::ConvertToNarrow(const wchar_t* fat)
 
 		if (!WideCharToMultiByte(CP_UTF8, 0, fat, -1, buffer.Get(), fatLength * sizeof(char), 0, 0))
 		{
-			MR_LOG(LogPlatform, Error, "Failed to convert wide characters: %s", *GetError());
+			MR_LOG(LogPlatform, Error, "Failed to convert wide characters: %ls", *GetError());
 			return nullptr;
 		}
 
@@ -78,7 +78,7 @@ String WindowsPlatform::GetError()
 
 bool WindowsPlatform::IsRunningAnAnotherInstance()
 {
-	HANDLE appMtx = CreateMutexW(nullptr, 1, GetApplication()->appCodeName);
+	HANDLE appMtx = CreateMutexW(nullptr, 1, GetApplication()->GetApplicationCodeName());
 
 	if (GetLastError() == ERROR_ALREADY_EXISTS)
 	{

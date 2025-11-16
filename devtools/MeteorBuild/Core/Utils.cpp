@@ -26,7 +26,7 @@ void Utils::ListDirectory(String* name, Array<FoundScriptData>& container)
 		}
 
 		WIN32_FIND_DATAW foundFile;
-		HANDLE fileHandle = FindFirstFileW(String::Format("%s\\*", name->Chr()), &foundFile);
+		HANDLE fileHandle = FindFirstFileW(String::Format("%ls\\*", name->Chr()), &foundFile);
 
 		if (fileHandle != INVALID_HANDLE_VALUE)
 		{
@@ -39,7 +39,7 @@ void Utils::ListDirectory(String* name, Array<FoundScriptData>& container)
 				{
 				case FILE_ATTRIBUTE_DIRECTORY:
 					{
-						String nextDirectory = String::Format("%s\\%ls", name->Chr(), foundFile.cFileName);
+						String nextDirectory = String::Format("%ls\\%ls", name->Chr(), foundFile.cFileName);
 						ListDirectory(&nextDirectory, container);
 						break;
 					};
@@ -50,7 +50,7 @@ void Utils::ListDirectory(String* name, Array<FoundScriptData>& container)
 
 						fd.name = foundFile.cFileName;
 						fd.path = *name;
-						fd.full = String::Format("%s\\%s", *fd.path, *fd.name);
+						fd.full = String::Format("%ls\\%ls", *fd.path, *fd.name);
 
 						container.Add(fd);
 						break;

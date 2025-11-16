@@ -10,7 +10,7 @@ class IFile;
 
 struct WindowsFileManager : public IFileManager
 {
-	static bool CreateDirectory(const String* name, bool bToFullPath);
+	static bool CreateDirectory(const String* name);
 
 	static bool DeleteDirectory(const String& name, bool bToFullPath);
 
