@@ -23,12 +23,12 @@ public:
 	void OrderModules();
 
 	bool BuildProjectFiles();
+
 protected:
 	bool ReadArguments();
 
 	const ERequestedCommandToDo GetBuildCommand() const { return command; }
 
-protected:
 	ProjectScript ps;
 
 	Array<Module> loadedModules;

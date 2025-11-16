@@ -34,9 +34,7 @@ void WindowsWindowManager::Shutdown()
 
     if (bIsWinAPIClassRegistered)
     {
-        UnregisterClassW(
-            GetApplication()->appNameNoSpaces,
-            instance);
+        UnregisterClassW(GetApplication()->GetApplicationNameNoSpaces(), instance);
     }
 }
 
@@ -63,7 +61,7 @@ bool WindowsWindowManager::CreateWindow(const String& name, const Vector2<uint32
 
     instance->handle = ::CreateWindowExW(
         /*WS_EX_ACCEPTFILES*/ 0,
-        GetApplication()->appCodeName,
+        GetApplication()->GetApplicationNameNoSpaces(),
         name,
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT,
@@ -111,13 +109,15 @@ inline bool WindowsWindowManager::RegisterWindowClass()
 	instance = GetModuleHandle(nullptr);
 	HICON ico = (HICON)LoadImage(instance, MAKEINTRESOURCE(IDI_DEFAULTAPPICON), IMAGE_ICON, 64, 64, LR_DEFAULTCOLOR);
 
+    const String className = GetApplication()->GetApplicationNameNoSpaces();
+
 	WNDCLASSEXW windowClass = {};
 	windowClass.cbSize = sizeof(WNDCLASSEX);
 	windowClass.hInstance = instance;
 	windowClass.hIcon = ico;
 	windowClass.hIconSm = ico;
 	windowClass.lpfnWndProc = MeteorSpecifiedWindowProcedure;
-    windowClass.lpszClassName = GetApplication()->appNameNoSpaces;
+    windowClass.lpszClassName = className;
 
 	if (!RegisterClassExW(&windowClass))
 	{

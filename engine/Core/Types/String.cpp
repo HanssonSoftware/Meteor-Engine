@@ -26,8 +26,7 @@ String::~String() noexcept
 	NullOut();
 
 #ifdef MR_DEBUG
-	bIsInited = true;
-	functionWhereWasInited = __FUNCSIG__;
+	functionWhereWasInited = nullptr;
 #endif // MR_DEBUG
 }
 
@@ -235,29 +234,39 @@ String String::operator+(const String& Other)
 	return *this;
 }
 
-String operator+(const String& OtherA, const String& OtherB)
+String& String::operator+=(const char* other)
 {
-	//// Querry the buffers.
-	//const char* otherABuffer = OtherA.Chr();
-	//const char* otherBBuffer = OtherB.Chr();
+	// This function is not working properly!
 
-	//const uint32_t size = (uint32_t)(strlen(otherABuffer) + strlen(otherBBuffer) + 1);
+	if (other != nullptr)
+	{
+#ifdef MR_PLATFORM_WINDOWS
+		const uint32_t skinnyLength = (uint32_t)MultiByteToWideChar(CP_UTF8, 0, other, -1, nullptr, 0);
+		if (skinnyLength > 0)
+		{
+			bIsUsingHeap = skinnyLength > SSO_MAX_CHARS;
 
-	//char* super = MemoryManager::Get().Allocate<char>(size);
+			wchar_t* redirectedData = MemoryManager::Get().Allocate<wchar_t>(skinnyLength);
+			wmemset(redirectedData, 0, skinnyLength);
 
-	//if (super == nullptr)
-	//{
-	//	delete[] super;
-	//	MR_LOG(LogTemp, Error, "String concencation failed!");
-	//	return String("");
-	//}
+			if (!MultiByteToWideChar(CP_UTF8, 0, other, skinnyLength * sizeof(char), redirectedData, skinnyLength))
+			{
+				MR_LOG(LogStringSet, Error, "MultiByteToWideChar returned: %ls", *Platform::GetError());
+				return *this;
+			}
 
-	//strcpy(super, otherABuffer);
-	//strcat(super, otherBBuffer);
+			wcsncpy(Data() + Length(), redirectedData, skinnyLength);
+		}
+		else
+		{
+			MR_LOG(LogStringSet, Error, "MultiByteToWideChar returned: %ls", *Platform::GetError());
+			return *this;
+		}
 
-	//String newStringBuffer(super);
+#endif // MR_PLATFORM_WINDOWS
+	}
 
-	return "newStringBuffer";
+	return *this;
 }
 
 String String::Delim(const String character, bool first)
@@ -359,6 +368,21 @@ String& String::operator=(const String& other)
 	}
 
 	return *this;
+}
+
+void String::Refresh()
+{
+	if (heapBuffer.ptr != nullptr)
+	{
+		const wchar_t* begin = heapBuffer.ptr;
+		while (*begin)
+		{
+			heapBuffer.length++;
+			begin++;
+		}
+
+
+	}
 }
 
 String& String::operator+=(const String& other)

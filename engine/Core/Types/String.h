@@ -69,6 +69,8 @@ public:
 	}
 
 	String& operator+=(const String& other);
+
+	String& operator+=(const char* other);
 	
 	const wchar_t* operator*() const
 	{
@@ -112,6 +114,8 @@ public:
 		return bIsUsingHeap ? (uint32_t)heapBuffer.length : (uint32_t)stackBuffer.length;
 	}
 	
+	void Refresh();
+
 	/** */
 	static String Format(const String& format, ...);
 

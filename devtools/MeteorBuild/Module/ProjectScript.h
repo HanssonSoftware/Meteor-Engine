@@ -24,7 +24,7 @@ public:
 
 	Array<ProjectDependencies> projects;
 
-	bool Finalize(String& output);
+	bool Finalize(String* output);
 
 	bool Parse(String* input);
 };

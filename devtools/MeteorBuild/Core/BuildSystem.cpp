@@ -171,22 +171,62 @@ bool BuildSystem::BuildProjectFiles()
 			const String directoryToCreateTheFolder = String::Format("%ls\\%ls", *appNameAppendedIntermediate, *module.moduleName);
 			FileManager::CreateDirectory(&directoryToCreateTheFolder);
 
-			String projectCreationDir = String::Format("%ls\\%ls-GEN.vcxproj", *directoryToCreateTheFolder, *module.moduleName);
+			String projectCreationDir = String::Format("%ls\\%ls.vcxproj", *directoryToCreateTheFolder, *module.moduleName);
 
-			HANDLE actual = CreateFileW(projectCreationDir, 0, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+			HANDLE actual = CreateFileW(projectCreationDir, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 			if (actual != INVALID_HANDLE_VALUE)
 			{
-				const String final = String::Format("%s %s %s %s", *module.moduleName, *module.dependsOn, *module.files[0], *module.includePaths[0]);
+				String final;
+				if (module.ConstructProjectFile(&final))
+				{
+					ScopedPtr<char> skinnyBuffer = Platform::ConvertToNarrow(final);
 
-				DWORD written = 0;
-				WriteFile(actual, (LPCWSTR)final.Chr(), final.Length() * sizeof(char), &written, nullptr);
+					DWORD written = 0;
+					if (!WriteFile(actual, skinnyBuffer.Get(), final.Length(), &written, nullptr))
+					{
+						MR_LOG(LogAssembler, Error, "WriteFile returned: %ls", *Platform::GetError());
+					}
+				}
 
-				FlushFileBuffers(actual);
 				CloseHandle(actual);
 			}
 			else
 			{
 				MR_LOG(LogAssembler, Fatal, "Failed to create project file at: %ls", *projectCreationDir);
+			}
+		}
+
+		String sourceDir;
+		if (Commandlet::Parse("-source", &sourceDir))
+		{
+			String exeDir = Paths::GetExecutableDirctory();
+			PathCchRemoveFileSpec(exeDir.Data(), exeDir.Length());
+
+			PWSTR combinedPathNonCanonicalized;
+			PathAllocCombine(exeDir, sourceDir, PATHCCH_ALLOW_LONG_PATHS, &combinedPathNonCanonicalized);
+
+			PathCchRemoveFileSpec(combinedPathNonCanonicalized, wcslen(combinedPathNonCanonicalized));
+
+			sourceDir = combinedPathNonCanonicalized;
+			LocalFree(combinedPathNonCanonicalized);
+
+			HANDLE solution = CreateFileW(String::Format("%ls\\%ls.slnx", *sourceDir, *ps.projectName), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+			if (solution != INVALID_HANDLE_VALUE)
+			{
+				String buffer;
+				if (ps.Finalize(&buffer))
+				{
+					ScopedPtr<char> skinnyBuffer = Platform::ConvertToNarrow(buffer);
+
+					DWORD written = 0;
+					if (!WriteFile(solution, skinnyBuffer.Get(), buffer.Length(), &written, nullptr))
+					{
+						MR_LOG(LogAssembler, Error, "WriteFile returned: %ls", *Platform::GetError());
+					}
+				}
+
+				CloseHandle(solution);
+				return true;
 			}
 		}
 	}

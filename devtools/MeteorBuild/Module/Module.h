@@ -13,6 +13,8 @@ public:
 
 	bool Parse(String* modulePath);
 
+	bool ConstructProjectFile(String* output);
+
 	String moduleName;
 
 	String dependsOn;

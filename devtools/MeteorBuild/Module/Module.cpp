@@ -112,3 +112,24 @@ bool Module::Parse(String* modulePath)
 
 	return !bFailed;
 }
+
+bool Module::ConstructProjectFile(String* output)
+{
+	*output = "<!-- This file is generated with MeteorBuild(R) -->\n"
+	"<Project DefaultTargets=\"Build\" ToolsVersion=\"4.0\" xmlns=\'http://schemas.microsoft.com/developer/msbuild/2003\'>\n	<ItemGroup Label=\"ProjectConfigurations\" />\n"
+	"\t<PropertyGroup Label=\"Globals\" />\n"
+	"\t<Import Project=\"$(VCTargetsPath)\\Microsoft.Cpp.default.props\" />\n"
+	"\t<PropertyGroup Label=\"Configuration\" />\n"
+	"\t<Import Project=\"$(VCTargetsPath)\\Microsoft.Cpp.props\" />\n"
+	"\t<ImportGroup Label=\"ExtensionSettings\" />\n"
+	"\t<ImportGroup Label=\"PropertySheets\" />\n"
+	"\t<PropertyGroup Label=\"UserMacros\" />\n"
+	"\t<PropertyGroup />\n"
+	"\t<ItemDefinitionGroup />\n"
+	"\t<ItemGroup />\n"
+	"\t<Import Project=\"$(VCTargetsPath)\\Microsoft.Cpp.targets\" />\n"
+	"\t<ImportGroup Label=\"ExtensionTargets\" />\n"
+	"</Project>";
+
+	return true;
+}

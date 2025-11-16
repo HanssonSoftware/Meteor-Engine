@@ -12,11 +12,17 @@ static void AddVerbDetail(const String& verb, const String& value)
 
 }
 
-bool ProjectScript::Finalize(String& output)
+bool ProjectScript::Finalize(String* output)
 {
-	output += "# This file is generated with MeteorBuild(R)\nMicrosoft Visual Studio Solution File, Format Version 12.00\nVisualStudioVersion = 17.11.35327.3\nMinimumVisualStudioVersion = 10.0.40219.1";
+	*output = L"<!-- This file is generated with MeteorBuild(R) -->\n"
+		L"<Solution>\n"
+		L"\t<Configurations>\n"
+		L"\t\t<Platform Name = \"x64\" />\n"
+		L"\t</Configurations>\n"
+		L"\t<Project Path = \"PATHTOPROJECTS\" Id=\"PROJECTID\"/>\n"
+		L"</Solution>";
 	
-	return false;
+	return true;
 }
 
 bool ProjectScript::Parse(String* input)
