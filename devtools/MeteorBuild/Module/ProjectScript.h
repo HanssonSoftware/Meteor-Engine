@@ -3,29 +3,20 @@
 #pragma once
 #include <Types/String.h>
 #include <Types/Array.h>
-
-#include <rpc.h>
-
-struct ProjectDependencies
-{
-	String projectName;
-
-	String projectPath;
-
-	GUID projectGUID;
-
-	bool bIsFolder = false;
-};
+#include <Module/Module.h>
+#include <Core/Application.h>
 
 class ProjectScript
 {
 public:
 	String projectName;
 
-	Array<ProjectDependencies> projects;
-
 	bool Finalize(String* output);
 
 	bool Parse(String* input);
+
+	Array<Module>* modulesReference;
+
+	String intermediatePath;
 };
 

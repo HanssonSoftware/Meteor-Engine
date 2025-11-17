@@ -4,6 +4,7 @@
 
 #include <Commandlet.h>
 #include <FileManager.h>
+#include <Module/ProjectScript.h>
 
 #include "Utils.h"
 #include <Platform/Paths.h>
@@ -23,6 +24,8 @@ bool BuildSystem::InitFramework()
 	{
 		bool bHasProject = false, bAtLeastOneScriptParsed = false;
 		String sourceDirectoryFromLaunchParameter;
+
+		ps = new ProjectScript();
 		if (Commandlet::Parse("-source", &sourceDirectoryFromLaunchParameter))
 		{
 			Array<FoundScriptData> filesFoundInSources;
@@ -54,7 +57,7 @@ bool BuildSystem::InitFramework()
 
 					for (auto& temp : sd)
 					{
-						mdl.files.Add(indexed.full);
+						mdl.files.Add(*temp.full);
 						MR_LOG(LogBuildSystemFramework, Verbose, "%ls module, new file added to include list: %ls", *mdl.moduleName, *temp.full);
 					}
 
@@ -62,7 +65,7 @@ bool BuildSystem::InitFramework()
 				}
 				else
 				{
-					if (ps.Parse(&indexed.full))
+					if (ps->Parse(&indexed.full))
 						bHasProject = true;
 				}
 			}
@@ -158,17 +161,17 @@ bool BuildSystem::BuildProjectFiles()
 			LocalFree(combinedPathNonCanonicalized);
 		}
 
-		const String appNameAppendedIntermediate = String::Format("%ls\\%ls", *intermediateLocation, *GetApplication()->GetApplicationCodeName()); // C:\\Meteor-Engine\\Intermediate\\Apollo
-		FileManager::CreateDirectory(&appNameAppendedIntermediate);
+		intermediateLocation = String::Format("%ls\\%ls", *intermediateLocation, *GetApplication()->GetApplicationCodeName()); // C:\\Meteor-Engine\\Intermediate\\Apollo
+		FileManager::CreateDirectory(&intermediateLocation);
 		if (GetLastError() == ERROR_ALREADY_EXISTS)
 		{
-			FileManager::DeleteDirectory(appNameAppendedIntermediate, true);		
-			FileManager::CreateDirectory(&appNameAppendedIntermediate);
+			FileManager::DeleteDirectory(intermediateLocation, true);
+			FileManager::CreateDirectory(&intermediateLocation);
 		}
 
 		for (auto& module : loadedModules)
 		{
-			const String directoryToCreateTheFolder = String::Format("%ls\\%ls", *appNameAppendedIntermediate, *module.moduleName);
+			const String directoryToCreateTheFolder = String::Format("%ls\\%ls", *intermediateLocation, *module.moduleName);
 			FileManager::CreateDirectory(&directoryToCreateTheFolder);
 
 			String projectCreationDir = String::Format("%ls\\%ls.vcxproj", *directoryToCreateTheFolder, *module.moduleName);
@@ -210,11 +213,11 @@ bool BuildSystem::BuildProjectFiles()
 			sourceDir = combinedPathNonCanonicalized;
 			LocalFree(combinedPathNonCanonicalized);
 
-			HANDLE solution = CreateFileW(String::Format("%ls\\%ls.slnx", *sourceDir, *ps.projectName), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+			HANDLE solution = CreateFileW(String::Format("%ls\\%ls.slnx", *sourceDir, *ps->projectName), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 			if (solution != INVALID_HANDLE_VALUE)
 			{
 				String buffer;
-				if (ps.Finalize(&buffer))
+				if (ps->Finalize(&buffer))
 				{
 					ScopedPtr<char> skinnyBuffer = Platform::ConvertToNarrow(buffer);
 

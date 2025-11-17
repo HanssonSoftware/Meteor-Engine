@@ -7,15 +7,6 @@
 #include "Commandlet.h"
 #include <cstdint>
 
-
-class String;
-class IWindow;
-class Camera;
-class LayerManager;
-struct WindowCreateInfo;
-class IRHIRegistry;
-class InputManager;
-
 LOG_ADDCATEGORY(Application);
 
 struct Application
@@ -24,9 +15,9 @@ struct Application
 
 	Application();
 
-	Application(const Application& Nah) = delete;
+	Application(const Application&) = delete;
 
-	virtual ~Application();
+	virtual ~Application() noexcept = default;
 
 	virtual void Init();
 
@@ -34,32 +25,21 @@ struct Application
 
 	virtual void Shutdown();
 
-	static String GetApplicationDirectory();
-
 	const String GetApplicationName() const { return appName; };
 
 	const String GetApplicationCodeName() const { return appCodeName; };
 
 	const String GetApplicationNameNoSpaces() const { return appNameNoSpaces; };
 
-	static Application* Get();
-
 	static void RequestExit(int32_t Code);
 
 	int32_t GetRequestExitCode() const { return appFramework->exitCode; };
-
-	IWindowManager* GetWindowManager() const { return windowManager; };
-
-	void SetWindowManager(IWindowManager* NewValue) { windowManager = NewValue; };
-
-	LayerManager* GetLayerManager() const { return layerManager; };
-
-	void SetLayerManager(LayerManager* NewValue) { layerManager = NewValue; };
 
 	ECurrentApplicationState GetAppState() const { return state; };
 
 	void SetAppState(const ECurrentApplicationState& newState) { state = newState; };
 
+	static Application& Get() { return *appFramework; }
 protected:
 	struct
 	{
@@ -69,44 +49,27 @@ protected:
 
 		/** Useful for directories. */
 		String appCodeName;
-
-		struct
-		{
-			String name;
-
-			uint32_t x = 0, y = 0;
-
-		} WindowData;
-
-		union
-		{
-			double memoryReservePercent;
-
-			double memoryReserveInBytes;
-
-		} Memory;
-
 	};
 
 	int exitCode = 0;
-
-	IWindowManager* windowManager;
-
-	LayerManager* layerManager;
 
 	ECurrentApplicationState state = ECurrentApplicationState::NONE;
 
 	static inline Application* appFramework = nullptr;
 };
 
-Application* GetApplication();
+template<typename T = Application>
+static T* GetApplication()
+{
+	return (T*)&Application::Get();
+}
 
 #define IMPLEMENT_APPLICATION(ApplicationClass) \
-	/*extern "C" __declspec(dllexport)*/ int32_t LaunchApplication(int32_t ArgumentCount, char* Arguments[]) \
+	/*extern "C" __declspec(dllexport)*/ int LaunchApplication(int ArgumentCount, char* Arguments[]) \
 	{	\
 		static ApplicationClass instance; \
-        instance.Init(); \
 		Commandlet::Initialize(); \
+        instance.Init(); \
         instance.Run(); \
         instance.Shutdown(); \
         return instance.GetRequestExitCode(); \

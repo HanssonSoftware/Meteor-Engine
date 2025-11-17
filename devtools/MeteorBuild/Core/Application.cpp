@@ -16,8 +16,6 @@ BuildSystemApplication::BuildSystemApplication()
 	appName = "Meteor Build";
 	appNameNoSpaces = "MeteorBuild";
 	appCodeName = "Apollo";
-
-	Memory.memoryReserveInBytes = 100'000;
 }
 
 void BuildSystemApplication::Init()
@@ -41,13 +39,13 @@ void BuildSystemApplication::Run()
 {
 	// Application::RequestExit(0); should be added somewhere, if not the app will loop over this function
 
-	if (!buildSystemApp.InitFramework())
+	if (!GetBuildSystem().InitFramework())
 	{
 		MR_LOG(LogBuildSystemApplication, Fatal, "Build system error!");
 	}
 
-	buildSystemApp.OrderModules();
-	if (!buildSystemApp.BuildProjectFiles())
+	GetBuildSystem().OrderModules();
+	if (!GetBuildSystem().BuildProjectFiles())
 	{
 		MR_LOG(LogBuildSystemApplication, Fatal, "Failed to create project files!");
 	}
@@ -60,3 +58,4 @@ void BuildSystemApplication::Shutdown()
 	Application::Shutdown();
 }
 
+IMPLEMENT_APPLICATION(BuildSystemApplication);

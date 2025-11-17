@@ -5,7 +5,6 @@
 
 #include <Windows/Windows.h>
 #include <Types/String.h>
-#include <Layers/SystemLayer.h>
 #include <Application.h>
 
 LOG_ADDCATEGORY(Platform);

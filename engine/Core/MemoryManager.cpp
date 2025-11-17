@@ -3,8 +3,6 @@
 #include "MemoryManager.h"
 #include <Platform/PlatformLayout.h>
 
-#include <Layers/SystemLayer.h>
-
 #include <Platform/Platform.h>
 
 #include <vector>

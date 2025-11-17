@@ -6,8 +6,6 @@
 
 class Layer;
 class String;
-class SystemLayer;
-
 
 
 class LayerManager : public Object
@@ -26,17 +24,11 @@ public:
 
 	void UpdateLayer();
 
-	void PushSystemLayer();
-
 	virtual void Init() override;
 
 	virtual void Shutdown() override;
 
-	SystemLayer* GetSystemLayer() const { return systemLayer ? systemLayer : nullptr; }
-
 protected:
-	SystemLayer* systemLayer;
-
 	Array<Layer*> layers;
 };
 

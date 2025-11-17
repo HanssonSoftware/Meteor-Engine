@@ -4,18 +4,6 @@
 #include <Core/Application.h>
 #include <Layers/LayerManager.h>
 
-SystemLayer* Layer::GetSystemLayer()
-{
-	if (const Application* App = Application::Get())
-	{
-		if (!App->GetLayerManager()) 
-			return nullptr;
-
-		return App->GetLayerManager()->GetSystemLayer();
-	}
-
-	return nullptr;
-}
 
 Layer::Layer(const String& Name) noexcept
 	: name(Name)

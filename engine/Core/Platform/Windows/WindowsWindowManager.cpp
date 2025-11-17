@@ -4,7 +4,6 @@
 #include <../Resources/resource.h>
 #include <Core/Application.h>
 #include "WindowsWindow.h"
-#include <Layers/SystemLayer.h>
 #include <dwmapi.h>
 #include <Module/ModuleManager.h>
 

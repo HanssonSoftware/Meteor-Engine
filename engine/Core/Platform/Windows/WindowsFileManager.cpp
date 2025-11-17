@@ -125,7 +125,7 @@ bool WindowsFileManager::IsEndingWith(const String& name, const String& extensio
     wchar_t* pointed = PathFindExtensionW(name.Chr());
     pointed++; // (.)xy
 
-    String super(pointed, wcslen(pointed));
+    String super(pointed, (uint32_t)wcslen(pointed));
 
     return super == extension ? true : false;
 }

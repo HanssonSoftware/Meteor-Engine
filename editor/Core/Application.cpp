@@ -10,7 +10,6 @@
 #include <Commandlet.h>
 #include <Platform/FileManager.h>
 #include "EditorLayer.h"
-#include <Layers/SystemLayer.h>
 #include <Platform/PerformanceTimer.h>
 #include <Types/Pointers.h>
 #include <Platform/Paths.h>
@@ -23,10 +22,6 @@ EditorApplication::EditorApplication()
 	appNameNoSpaces = "MeteorEditor";
 	appCodeName = "Astronaut";
 
-	WindowData.x = 1280;
-	WindowData.y = 720;
-
-	Memory.memoryReservePercent = 0.15;
 }
 
 void EditorApplication::Init()
@@ -57,19 +52,6 @@ void EditorApplication::Init()
 	//MemoryManager::Deallocate(asd);
 
 	EditorLayer Super("Editor Layer");
-	Application::Get()->GetLayerManager()->PushLayer(&Super);
-
-	if (Platform::IsRunningAnAnotherInstance())
-	{
-		MessageBoxDescriptor info = {};
-		info.Title = "Multiple Instances found!";
-		info.Description = "";
-		info.Type = MESSAGEBOXTYPE_INFORMATION | MESSAGEBOXBUTTONS_OK;
-
-		Layer::GetSystemLayer()->AddMessageBox(&info);
-		
-		Shutdown();
-	}
 
 	Application::Run();
 }
@@ -83,3 +65,5 @@ void EditorApplication::Shutdown()
 {
 	Application::Shutdown();
 }
+
+IMPLEMENT_APPLICATION(EditorApplication);

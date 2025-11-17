@@ -3,8 +3,6 @@
 #include "WindowsWindow.h"
 #include <Logging/Log.h>
 #include <Windows/WindowsWindowManager.h>
-#include <Layers/SystemLayer.h>
-
 //#include <../Resources/resource.h>
 //#include <dwmapi.h>
 #include <winuser.h>

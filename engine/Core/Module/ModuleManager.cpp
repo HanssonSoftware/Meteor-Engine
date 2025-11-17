@@ -1,8 +1,8 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #include "ModuleManager.h"
-#include <Layers/SystemLayer.h>
 #include <PlatformLayout.h>
+#include <Platform/Platform.h>
 #include <Application.h>
 
 #ifdef MR_PLATFORM_WINDOWS
@@ -33,7 +33,7 @@ ModuleManager::~ModuleManager() noexcept
 #ifdef MR_PLATFORM_WINDOWS   
         if (!FreeLibrary(module->library))
         {
-            MR_LOG(LogModuleManager, Error, "FreeLibrary returned: %ls (%ls)", *Layer::GetSystemLayer()->GetError(), module->GetName().Chr());
+            MR_LOG(LogModuleManager, Error, "FreeLibrary returned: %ls (%ls)", *Platform::GetError(), module->GetName().Chr());
             continue;
         }
 #endif // MR_PLATFORM_WINDOWS
@@ -120,7 +120,7 @@ bool ModuleManager::UnloadModule(const String& moduleName)
 #ifdef MR_PLATFORM_WINDOWS
             if (!FreeLibrary(module->library))
             {
-                MR_LOG(LogModuleManager, Error, "FreeLibrary returned: %ls (%ls)", *Layer::GetSystemLayer()->GetError(), moduleName.Chr());
+                MR_LOG(LogModuleManager, Error, "FreeLibrary returned: %ls (%ls)", *Platform::GetError(), moduleName.Chr());
                 return false;
             }
 #else

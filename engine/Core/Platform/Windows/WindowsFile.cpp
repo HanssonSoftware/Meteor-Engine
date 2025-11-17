@@ -93,7 +93,7 @@ void WindowsFile::Read()
 		{
 			DWORD write = 0;
 
-			if (!ReadFile(fileHandle, (LPWSTR)buffer, lg.QuadPart, &write, nullptr))
+			if (!ReadFile(fileHandle, (LPWSTR)buffer, (DWORD)lg.QuadPart, &write, nullptr))
 			{
 				MR_LOG(LogFileSystem, Error, "ReadFile returned: %ls", *Platform::GetError());
 				return;

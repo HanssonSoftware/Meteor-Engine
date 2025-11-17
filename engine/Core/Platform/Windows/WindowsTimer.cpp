@@ -3,7 +3,6 @@
 #include "WindowsTimer.h"
 #include "Windows/Windows.h"
 #include <Logging/Log.h>
-#include <Layers/SystemLayer.h>
 #include <Platform/Platform.h>
 
 LOG_ADDCATEGORY(Timer);

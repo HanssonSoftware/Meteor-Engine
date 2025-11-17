@@ -4,7 +4,6 @@
 #include <Windows/Windows.h>
 #include <Types/String.h>
 #include <Application.h>
-#include <Layers/SystemLayer.h>
 #include <Version.h>
 #include "WindowsFile.h"
 #include <Platform/Platform.h>

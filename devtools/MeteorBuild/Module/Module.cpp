@@ -5,6 +5,9 @@
 #include <Platform/File.h>
 #include <Core/Utils.h>
 
+#include <rpc.h>
+#include <Objbase.h>
+
 LOG_ADDCATEGORY(Parser);
 
 static void AddVerbDetail(Module* moduleToWrite, const String& verb, const String& value)
@@ -23,6 +26,7 @@ bool Module::Parse(String* modulePath)
 	if (module != nullptr)
 	{
 		module->Read();
+		this->modulePath = *modulePath;
 
 		const char* buffer = module->GetBuffer();
 
@@ -85,8 +89,17 @@ bool Module::Parse(String* modulePath)
 
 					if (*buffer == '\0')
 					{
-						if (SUCCEEDED(CoCreateGuid(&identification)))
+						GUID id;
+						if (SUCCEEDED(CoCreateGuid(&id)))
 						{
+							wchar_t buffer[64];
+							if (!StringFromGUID2(id, buffer, 64))
+							{
+								module->Close();
+								return false;
+							}
+
+							identification = buffer;
 							MR_LOG(LogParser, Verbose, "Successfully generated GUID, for module %ls!", *moduleName);
 						}
 					}
@@ -115,21 +128,59 @@ bool Module::Parse(String* modulePath)
 
 bool Module::ConstructProjectFile(String* output)
 {
-	*output = "<!-- This file is generated with MeteorBuild(R) -->\n"
-	"<Project DefaultTargets=\"Build\" ToolsVersion=\"4.0\" xmlns=\'http://schemas.microsoft.com/developer/msbuild/2003\'>\n	<ItemGroup Label=\"ProjectConfigurations\" />\n"
-	"\t<PropertyGroup Label=\"Globals\" />\n"
-	"\t<Import Project=\"$(VCTargetsPath)\\Microsoft.Cpp.default.props\" />\n"
-	"\t<PropertyGroup Label=\"Configuration\" />\n"
-	"\t<Import Project=\"$(VCTargetsPath)\\Microsoft.Cpp.props\" />\n"
-	"\t<ImportGroup Label=\"ExtensionSettings\" />\n"
-	"\t<ImportGroup Label=\"PropertySheets\" />\n"
-	"\t<PropertyGroup Label=\"UserMacros\" />\n"
-	"\t<PropertyGroup />\n"
-	"\t<ItemDefinitionGroup />\n"
-	"\t<ItemGroup />\n"
-	"\t<Import Project=\"$(VCTargetsPath)\\Microsoft.Cpp.targets\" />\n"
-	"\t<ImportGroup Label=\"ExtensionTargets\" />\n"
-	"</Project>";
+	String compileList;
+	String includeList;
+
+	for (auto& cl : files)
+	{
+		if (FileManager::IsEndingWith(cl, "h"))
+		{
+			String actual = String::Format(L"\t\t<ClInclude Include=\"%ls\" />\n", *cl);
+
+			includeList = String::Format(L"%ls%ls", *includeList, *actual);
+		}
+		else if (FileManager::IsEndingWith(cl, "cpp"))
+		{
+			String actual = String::Format(L"\t\t<ClCompile Include=\"%ls\" />\n", *cl);
+			compileList = String::Format(L"%ls%ls", *compileList, *actual);
+		}
+	}
+
+	*output = String::Format(
+	L"<!-- This file is generated with MeteorBuild(R) -->\n"
+	L"<Project DefaultTargets=\"Build\" ToolsVersion=\"4.0\" xmlns=\'http://schemas.microsoft.com/developer/msbuild/2003\'>\n"
+	L"\t<ItemGroup Label = \"ProjectConfigurations\" />\n"
+	L"\t<PropertyGroup Label=\"Globals\" />\n"
+	L"\t<Import Project=\"$(VCTargetsPath)\\Microsoft.Cpp.default.props\" />\n"
+	L"\t<PropertyGroup Label=\"Configuration\" />\n"
+	L"\t<Import Project=\"$(VCTargetsPath)\\Microsoft.Cpp.props\" />\n"
+	L"\t<ImportGroup Label=\"ExtensionSettings\" />\n"
+	L"\t<ImportGroup Label=\"PropertySheets\" />\n"
+	L"\t<PropertyGroup Label=\"UserMacros\" />\n"
+	L"\t<PropertyGroup />\n"
+	L"\t<ItemDefinitionGroup />\n"
+	L"\t<ItemDefinitionGroup Condition=\"\'$(Configuration)|$(Platform)\' == \'Shipping|x64\'\">\n"
+	L"\t<ClCompile>\n"
+	L"\t\t<PreprocessorDefinitions>%%(PreprocessorDefinitions)</PreprocessorDefinitions>\n"
+	L"\t</ClCompile>\n"
+	L"\t</ItemDefinitionGroup>\n"
+	L"\t<ItemDefinitionGroup Condition=\"\'$(Configuration)|$(Platform)\' == \'Debug|x64\'\">\n"
+	L"\t<ClCompile>\n"
+	L"\t\t<PreprocessorDefinitions>MR_DEBUG;%%(PreprocessorDefinitions)</PreprocessorDefinitions>\n"
+	L"\t</ClCompile>\n"
+	L"\t</ItemDefinitionGroup>\n"
+	L"\t<ItemGroup>\n"
+	L"%ls"
+	L"\t</ItemGroup>\n"
+	L"\t<ItemGroup>\n"
+	L"%ls"
+	L"\t</ItemGroup>\n"
+	L"\t<Import Project=\"$(VCTargetsPath)\\Microsoft.Cpp.targets\" />\n"
+	L"\t<ImportGroup Label=\"ExtensionTargets\" />\n"
+	L"</Project>", 
+	*compileList,
+	*includeList
+	);
 
 	return true;
 }

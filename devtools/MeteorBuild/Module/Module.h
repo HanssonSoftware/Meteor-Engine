@@ -4,8 +4,6 @@
 #include <Types/String.h>
 #include <Types/Array.h>
 
-#include <rpc.h>
-
 class Module
 {
 public:
@@ -17,6 +15,8 @@ public:
 
 	String moduleName;
 
+	String modulePath;
+
 	String dependsOn;
 
 	Array<String> files;
@@ -25,6 +25,6 @@ public:
 
 	Array<String> requires;
 
-	GUID identification;
+	String identification;
 };
 

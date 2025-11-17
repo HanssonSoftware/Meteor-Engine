@@ -20,5 +20,3 @@ public:
 
 	virtual void Shutdown() override;
 }; 
-
-IMPLEMENT_APPLICATION(EditorApplication);

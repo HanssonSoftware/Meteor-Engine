@@ -1,0 +1,11 @@
+<!-- This file is generated with MeteorBuild(R) -->
+<Solution>
+	<Configurations>
+		<Platform Name = "x64" />
+	</Configurations>
+	<Folder Name = "/Modules/">
+		<Project Path = "Core" Id="{7D26BD50-70DC-4255-A81A-B8E5CCBE6F7F}"/>
+		<Project Path = "Renderer" Id="{E4D7EE9F-DF10-4323-A179-C24F49848CA0}"/>
+		<Project Path = "Vulkan" Id="{E79DB2F0-8FA9-472A-B123-EE27C7657887}"/>
+	</Folder>
+</Solution>

@@ -4,9 +4,6 @@
 #include <Types/String.h>
 #include <Logging/Log.h>
 
-class SystemLayer;
-
-
 
 LOG_ADDCATEGORY(Layers);
 
@@ -14,8 +11,6 @@ class Layer
 {
 	friend class LayerManager;
 public:
-	static SystemLayer* GetSystemLayer();
-
 	Layer(const String& Name) noexcept;
 
 	Layer() = delete;

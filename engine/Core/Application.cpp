@@ -5,7 +5,6 @@
 #include <Platform/FileManager.h>
 
 #include <MemoryManager.h>
-#include <Layers/SystemLayer.h>
 #include <Layers/LayerManager.h>
 //#include <GraphicsEngine/SceneGraph.h>
 #include <mutex>
@@ -21,22 +20,9 @@ Application::Application()
 {
     appFramework = this;
 
-    MemoryManager::Get().Initialize(appFramework->Memory.memoryReservePercent);
-
-#ifdef _WIN64
-    auto wm = new WindowsWindowManager();
-#else
-
-#endif // _WIN64
-
-    SetWindowManager(wm);
-    SetLayerManager(new LayerManager());
+    MemoryManager::Get().Initialize(0.15f);
 }
 
-Application* Application::Get()
-{
-    return appFramework;
-}
 
 void Application::RequestExit(int32_t Code)
 {
@@ -50,15 +36,9 @@ void Application::Init()
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF);
 #endif // MR_DEBUG
     
-    windowManager->Init();
     ILogger::Get()->Initialize();
 
     MR_LOG(LogApplication, Log, "Initializing application.");
-
-    if (windowManager->CreateWindow(appName, { WindowData.x, WindowData.y }, true))
-    {
-        //Renderer::InitModule("Vulkan");
-    }
 
 
     SetAppState(ECurrentApplicationState::RUNNING);
@@ -68,7 +48,6 @@ void Application::Run()
 {
     while (GetAppState() == ECurrentApplicationState::RUNNING)
     {
-        layerManager->UpdateLayer();
         appFramework->Run();
     }
 }
@@ -79,10 +58,6 @@ void Application::Shutdown()
     {
         MR_LOG(LogApplication, Log, "Restarting application!");
 
-        windowManager->Shutdown();
-
-        layerManager->Shutdown();
-
         ILogger::Get()->Shutdown();
 
         appFramework->Init();
@@ -91,31 +66,8 @@ void Application::Shutdown()
     {
         MR_LOG(LogApplication, Log, "Shutting down application!");
 
-        windowManager->Shutdown();
-
-        layerManager->Shutdown();
-
         ILogger::Get()->Shutdown();
 
         MemoryManager::Get().Shutdown();
     }
-}
-
-String Application::GetApplicationDirectory()
-{
-    return String();
-}
-
-Application::~Application()
-{
-    if (windowManager)
-        windowManager = nullptr;
-
-    if (layerManager)
-        layerManager = nullptr;
-}
-
-Application* GetApplication()
-{
-    return Application::Get();
 }

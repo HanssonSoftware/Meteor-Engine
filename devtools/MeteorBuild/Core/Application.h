@@ -22,8 +22,9 @@ public:
 
 	virtual void Shutdown() override;
 
-protected:
-	BuildSystem buildSystemApp;
+	BuildSystem& GetBuildSystem()
+	{
+		static BuildSystem instance;
+		return instance;
+	}
 };
-
-IMPLEMENT_APPLICATION(BuildSystemApplication);

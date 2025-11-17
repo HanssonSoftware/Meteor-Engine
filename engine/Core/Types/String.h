@@ -159,14 +159,14 @@ private:
 
 		struct
 		{ 
-			wchar_t ptr[sizeof(heapBuffer) - sizeof(uint8_t)] = {L'\0'};
+			wchar_t ptr[sizeof(heapBuffer) - sizeof(uint32_t)] = {L'\0'};
 
-			uint8_t length = 0;
+			uint32_t length = 0;
 
 		} stackBuffer;
 	};
 
-	static constexpr uint32_t SSO_MAX_CHARS = sizeof(heapBuffer) - sizeof(uint8_t) - 1;
+	static constexpr uint32_t SSO_MAX_CHARS = sizeof(heapBuffer) - sizeof(uint32_t) - 1;
 
 	bool bIsUsingHeap = false;
 

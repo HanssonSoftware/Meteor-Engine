@@ -5,6 +5,9 @@
 #include <FileManager.h>
 #include <File.h>
 
+
+#include "Module.h"
+
 LOG_ADDCATEGORY(ProjectScriptParser);
 
 static void AddVerbDetail(const String& verb, const String& value)
@@ -14,14 +17,29 @@ static void AddVerbDetail(const String& verb, const String& value)
 
 bool ProjectScript::Finalize(String* output)
 {
-	*output = L"<!-- This file is generated with MeteorBuild(R) -->\n"
-		L"<Solution>\n"
-		L"\t<Configurations>\n"
-		L"\t\t<Platform Name = \"x64\" />\n"
-		L"\t</Configurations>\n"
-		L"\t<Project Path = \"PATHTOPROJECTS\" Id=\"PROJECTID\"/>\n"
-		L"</Solution>";
-	
+	if (BuildSystemApplication* app = GetApplication<BuildSystemApplication>())
+	{
+		const Array<Module>* modules = app->GetBuildSystem().GetModules();
+		
+		String project;
+		for (auto& mdl : *modules)
+		{
+			String actualProject = String::Format(L"\t\t<Project Path = \"%ls\" Id=\"%ls\"/>\n", *mdl.moduleName, *mdl.identification);
+			project = String::Format(L"%ls%ls", *project, *actualProject);
+		}
+
+		*output = String::Format(L"<!-- This file is generated with MeteorBuild(R) -->\n"
+			L"<Solution>\n"
+			L"\t<Configurations>\n"
+			L"\t\t<Platform Name = \"x64\" />\n"
+			L"\t</Configurations>\n"
+			L"\t<Folder Name = \"/Modules/\">\n"
+			L"%ls" //
+			L"\t</Folder>\n"
+			L"</Solution>", 
+			*project);
+	}
+
 	return true;
 }
 

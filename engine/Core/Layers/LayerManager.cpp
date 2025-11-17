@@ -2,8 +2,6 @@
 
 #include "LayerManager.h"
 #include "Layer.h"
-#include "SystemLayer.h"
-#include <Windows/WindowsLayer.h>
 
 LayerManager::LayerManager()
 {
@@ -12,7 +10,7 @@ LayerManager::LayerManager()
 
 void LayerManager::Init()
 {
-	PushSystemLayer();
+
 }
 
 void LayerManager::Shutdown()
@@ -65,33 +63,13 @@ void LayerManager::RemoveLayer(const String Name)
 
 void LayerManager::UpdateLayer()
 {
-	//systemLayer->Update();
-
 	for (Layer*& indexed : layers)
 	{
 		if (indexed != nullptr) indexed->Update();
 	}
 }
 
-static bool bWasAdded = false;
-void LayerManager::PushSystemLayer()
-{
-	if (bWasAdded) 
-		return;
-
-#ifdef _WIN64
-	systemLayer = new WindowsLayer("Windows System Layer");
-	systemLayer->Init();
-#endif // _WIN64
-
-	bWasAdded = true;
-}
-
 LayerManager::~LayerManager()
 {
-	systemLayer->Removed();
-	delete systemLayer;
-
-	bWasAdded = false;
-	systemLayer = nullptr;
+	layers.Clear();
 }

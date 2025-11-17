@@ -6,7 +6,8 @@
 #include <Module/Module.h>
 
 #include <Platform/File.h>
-#include <Module/ProjectScript.h>
+
+class ProjectScript;
 
 class BuildSystem
 {
@@ -24,12 +25,15 @@ public:
 
 	bool BuildProjectFiles();
 
+	const Array<Module>* GetModules() const { return &loadedModules; };
+
+	ProjectScript& GetProjectScript() const { return *ps; }
 protected:
 	bool ReadArguments();
 
 	const ERequestedCommandToDo GetBuildCommand() const { return command; }
 
-	ProjectScript ps;
+	ProjectScript* ps;
 
 	Array<Module> loadedModules;
 };

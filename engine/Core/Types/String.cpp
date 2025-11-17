@@ -4,8 +4,6 @@
 #include <Logging/Log.h>
 //#include <stdio.h>
 
-#include <Layers/SystemLayer.h>
-
 #include <Platform/Platform.h>
 #include <Platform/PlatformLayout.h>
 #include <Windows/Windows.h>
@@ -236,37 +234,11 @@ String String::operator+(const String& Other)
 
 String& String::operator+=(const char* other)
 {
-	// This function is not working properly!
+	if (!other)
+		return *this;
 
-	if (other != nullptr)
-	{
-#ifdef MR_PLATFORM_WINDOWS
-		const uint32_t skinnyLength = (uint32_t)MultiByteToWideChar(CP_UTF8, 0, other, -1, nullptr, 0);
-		if (skinnyLength > 0)
-		{
-			bIsUsingHeap = skinnyLength > SSO_MAX_CHARS;
-
-			wchar_t* redirectedData = MemoryManager::Get().Allocate<wchar_t>(skinnyLength);
-			wmemset(redirectedData, 0, skinnyLength);
-
-			if (!MultiByteToWideChar(CP_UTF8, 0, other, skinnyLength * sizeof(char), redirectedData, skinnyLength))
-			{
-				MR_LOG(LogStringSet, Error, "MultiByteToWideChar returned: %ls", *Platform::GetError());
-				return *this;
-			}
-
-			wcsncpy(Data() + Length(), redirectedData, skinnyLength);
-		}
-		else
-		{
-			MR_LOG(LogStringSet, Error, "MultiByteToWideChar returned: %ls", *Platform::GetError());
-			return *this;
-		}
-
-#endif // MR_PLATFORM_WINDOWS
-	}
-
-	return *this;
+	String tmp(other);
+	return (*this += tmp);
 }
 
 String String::Delim(const String character, bool first)
@@ -387,55 +359,68 @@ void String::Refresh()
 
 String& String::operator+=(const String& other)
 {
-	if (!other.IsEmpty())
+	if (other.IsEmpty())
+		return *this;
+
+	const uint32_t thisLen = Length();
+	const uint32_t otherLen = other.Length();
+	const uint32_t newLen = thisLen + otherLen;
+
+	const wchar_t* otherData = other.bIsUsingHeap ? other.heapBuffer.ptr : other.stackBuffer.ptr;
+
+	if (bIsUsingHeap)
 	{
-		/*const char* source = other.Chr();
-		char* destination = Data();
-
-		const uint32_t size = other.Length() + Length() + 1;
-
-		if (bIsUsingHeap && heapBuffer.capacity < size)
+		if (heapBuffer.capacity <= newLen)
 		{
-			heapBuffer.capacity = size * 2;
-			char* newBuffer = MemoryManager::Get().Allocate<char>(heapBuffer.capacity);
-			memset(newBuffer, 0, heapBuffer.capacity);
+			const uint32_t newCap = newLen * 2;
+			wchar_t* newPtr = MemoryManager::Get().Allocate<wchar_t>(newCap * sizeof(wchar_t));
+			wmemset(newPtr, 0, newCap);
 
-			strncpy(newBuffer, destination, heapBuffer.length);
-			strncpy(newBuffer + Length(), source, other.Length());
-			heapBuffer.length = size - 1;
+			if (heapBuffer.ptr && thisLen > 0)
+				wmemcpy(newPtr, heapBuffer.ptr, thisLen);
 
-			delete[] heapBuffer.ptr;
-			heapBuffer.ptr = newBuffer;
+			wmemcpy(newPtr + thisLen, otherData, otherLen);
+
+			if (heapBuffer.ptr)
+				MemoryManager::Get().Deallocate<wchar_t>(heapBuffer.ptr);
+
+			heapBuffer.ptr = newPtr;
+			heapBuffer.capacity = newCap;
 		}
-		else if (bIsUsingHeap && heapBuffer.capacity >= size)
+		else
 		{
-			strncpy(heapBuffer.ptr + Length(), source, other.Length());
-			
-			int j = 434;
+			wmemcpy(heapBuffer.ptr + thisLen, otherData, otherLen);
 		}
-		else if (!bIsUsingHeap && SSO_MAX_CHARS >= size)
-		{
-			strncpy(stackBuffer.ptr + Length(), source, other.Length());
-			stackBuffer.length = size - 1;
-		}
-		else if (SSO_MAX_CHARS < size)
-		{
-			const uint32_t stackLength = Length();
 
-			heapBuffer.capacity = size * 2;
-			char* buffer = MemoryManager::Get().Allocate<char>(size);
-
-			memset(buffer, 0, size);
-
-			strncpy(buffer, destination, stackLength);
-			strncpy(buffer + stackLength, source, other.Length());
-		
-			heapBuffer.length = size - 1;
-
-			heapBuffer.ptr = buffer;
-			bIsUsingHeap = true;
-		}*/
+		heapBuffer.length = newLen;
+		heapBuffer.ptr[newLen] = L'\0';
 	}
-	
+	else
+	{
+		if (newLen <= SSO_MAX_CHARS)
+		{
+			wmemcpy(stackBuffer.ptr + thisLen, otherData, otherLen);
+			stackBuffer.length = newLen;
+			stackBuffer.ptr[newLen] = L'\0';
+		}
+		else
+		{
+			const uint32_t newCap = newLen * 2;
+			wchar_t* newPtr = MemoryManager::Get().Allocate<wchar_t>(newCap * sizeof(wchar_t));
+			wmemset(newPtr, 0, newCap);
+
+			if (thisLen > 0)
+				wmemcpy(newPtr, stackBuffer.ptr, thisLen);
+
+			wmemcpy(newPtr + thisLen, otherData, otherLen);
+
+			heapBuffer.ptr = newPtr;
+			heapBuffer.capacity = newCap;
+			heapBuffer.length = newLen;
+
+			bIsUsingHeap = true;
+		}
+	}
+
 	return *this;
 }

@@ -15,10 +15,6 @@
 
 #endif // MR_PLATFORM_WINDOWS
 
-//#include <Core/Application.h>
-//#include <Layers/SystemLayer.h>
-//#include "LogAssertion.h"
-
 LOG_ADDCATEGORY(Standard);
 
 
