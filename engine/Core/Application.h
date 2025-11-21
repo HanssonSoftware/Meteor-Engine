@@ -2,7 +2,6 @@
 
 #pragma once
 #include "Logging/Log.h"
-#include <WindowManager/WindowManager.h>
 
 #include "Commandlet.h"
 #include <cstdint>

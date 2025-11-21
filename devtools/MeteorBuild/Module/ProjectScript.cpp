@@ -24,7 +24,7 @@ bool ProjectScript::Finalize(String* output)
 		String project;
 		for (auto& mdl : *modules)
 		{
-			String actualProject = String::Format(L"\t\t<Project Path = \"%ls\" Id=\"%ls\"/>\n", *mdl.moduleName, *mdl.identification);
+			String actualProject = String::Format(L"\t\t<Project Path = \"%ls\" Id=\"%ls\"/>\n", *mdl.generatedProjectFile, *mdl.identification);
 			project = String::Format(L"%ls%ls", *project, *actualProject);
 		}
 

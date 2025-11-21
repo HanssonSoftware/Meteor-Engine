@@ -2,13 +2,14 @@ Module "Core" : "Meteor"
 {
 	IncludePath:
 	{
-		"C:\HanssonSoftware\Meteor-Engine\engine\Core\Common",
-		"C:\HanssonSoftware\Meteor-Engine\engine\Core\Layers",
-		"C:\HanssonSoftware\Meteor-Engine\engine\Core\Logging",
-		"C:\HanssonSoftware\Meteor-Engine\engine\Core\Module",
-		"C:\HanssonSoftware\Meteor-Engine\engine\Core\Object",
-		"C:\HanssonSoftware\Meteor-Engine\engine\Core\Platform",
-		"C:\HanssonSoftware\Meteor-Engine\engine\Core\Types"
+		"$(SolutionDir)\engine\Core\Common",
+		"$(SolutionDir)\engine\Core\Layers",
+		"$(SolutionDir)\engine\Core\Logging",
+		"$(SolutionDir)\engine\Core\Module",
+		"$(SolutionDir)\engine\Core\Object",
+		"$(SolutionDir)\engine\Core\Platform",
+		"$(SolutionDir)\engine\Core\Types",
+		"$(SolutionDir)\engine\Core"
 	}
 
 	Flags:

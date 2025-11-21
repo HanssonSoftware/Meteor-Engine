@@ -174,9 +174,9 @@ bool BuildSystem::BuildProjectFiles()
 			const String directoryToCreateTheFolder = String::Format("%ls\\%ls", *intermediateLocation, *module.moduleName);
 			FileManager::CreateDirectory(&directoryToCreateTheFolder);
 
-			String projectCreationDir = String::Format("%ls\\%ls.vcxproj", *directoryToCreateTheFolder, *module.moduleName);
+			module.generatedProjectFile = String::Format("%ls\\%ls.vcxproj", *directoryToCreateTheFolder, *module.moduleName);
 
-			HANDLE actual = CreateFileW(projectCreationDir, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+			HANDLE actual = CreateFileW(module.generatedProjectFile, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 			if (actual != INVALID_HANDLE_VALUE)
 			{
 				String final;
@@ -195,7 +195,7 @@ bool BuildSystem::BuildProjectFiles()
 			}
 			else
 			{
-				MR_LOG(LogAssembler, Fatal, "Failed to create project file at: %ls", *projectCreationDir);
+				MR_LOG(LogAssembler, Fatal, "Failed to create project file at: %ls", *module.generatedProjectFile);
 			}
 		}
 

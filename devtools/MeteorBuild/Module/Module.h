@@ -15,6 +15,8 @@ public:
 
 	String moduleName;
 
+	String generatedProjectFile;
+
 	String modulePath;
 
 	String dependsOn;
