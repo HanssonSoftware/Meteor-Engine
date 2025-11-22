@@ -1,11 +1,13 @@
 <!-- This file is generated with MeteorBuild(R) -->
 <Solution>
 	<Configurations>
+		<BuildType Name="Debug" />
+		<BuildType Name="Shipping" />
 		<Platform Name = "x64" />
 	</Configurations>
 	<Folder Name = "/Modules/">
-		<Project Path = "C:\HanssonSoftware\Meteor-Engine\Intermediate\Apollo\Core\Core.vcxproj" Id="{B40CA063-722E-4045-8C8E-306F664A3062}"/>
-		<Project Path = "C:\HanssonSoftware\Meteor-Engine\Intermediate\Apollo\Renderer\Renderer.vcxproj" Id="{DA7E69F2-4A25-44D4-B8A1-B51458881484}"/>
-		<Project Path = "C:\HanssonSoftware\Meteor-Engine\Intermediate\Apollo\Vulkan\Vulkan.vcxproj" Id="{3CEA23BB-C20E-46EE-93D1-7ABAA2837F7F}"/>
+		<Project Path = "C:\Meteor-Engine\Intermediate\Apollo\Core\Core.vcxproj" Id="{37C2A28F-3DF8-43A2-AEAD-DD01A444AADB}"/>
+		<Project Path = "C:\Meteor-Engine\Intermediate\Apollo\Renderer\Renderer.vcxproj" Id="{34210944-FAEE-4098-A4AF-7D4A72A6B60C}"/>
+		<Project Path = "C:\Meteor-Engine\Intermediate\Apollo\Vulkan\Vulkan.vcxproj" Id="{409A4066-B82B-4D3F-8549-4061D6237502}"/>
 	</Folder>
 </Solution>

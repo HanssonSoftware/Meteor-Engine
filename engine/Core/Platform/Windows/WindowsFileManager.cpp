@@ -77,7 +77,9 @@ bool WindowsFileManager::DeleteDirectory(const String& name, bool bToFullPath)
     sh.hNameMappings = nullptr;
     sh.lpszProgressTitle = nullptr;
 
-    if (SHFileOperationW(&sh) != 0)
+    SHFileOperationW(&sh);
+
+    if (sh.fAnyOperationsAborted != 0)
     {
         MR_LOG(LogFileManager, Error, "RemoveDirectoryW returned: %ls", *Platform::GetError());
         return false;

@@ -1,8 +1,8 @@
 ﻿/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #include "WindowsWindowManager.h"
-#include <../Resources/resource.h>
-#include <Core/Application.h>
+//#include <../Resources/resource.h>
+#include <Application.h>
 #include "WindowsWindow.h"
 #include <dwmapi.h>
 #include <Module/ModuleManager.h>
@@ -106,15 +106,15 @@ IWindow* WindowsWindowManager::FindHWNDCorresponding(const HWND hWnd)
 inline bool WindowsWindowManager::RegisterWindowClass()
 {
 	instance = GetModuleHandle(nullptr);
-	HICON ico = (HICON)LoadImage(instance, MAKEINTRESOURCE(IDI_DEFAULTAPPICON), IMAGE_ICON, 64, 64, LR_DEFAULTCOLOR);
+	//HICON ico = (HICON)LoadImage(instance, MAKEINTRESOURCE(IDI_DEFAULTAPPICON), IMAGE_ICON, 64, 64, LR_DEFAULTCOLOR);
 
     const String className = GetApplication()->GetApplicationNameNoSpaces();
 
 	WNDCLASSEXW windowClass = {};
 	windowClass.cbSize = sizeof(WNDCLASSEX);
 	windowClass.hInstance = instance;
-	windowClass.hIcon = ico;
-	windowClass.hIconSm = ico;
+	//windowClass.hIcon = ico;
+	//windowClass.hIconSm = ico;
 	windowClass.lpfnWndProc = MeteorSpecifiedWindowProcedure;
     windowClass.lpszClassName = className;
 

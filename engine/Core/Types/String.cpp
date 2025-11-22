@@ -280,18 +280,18 @@ bool String::Contains(const char* buffer, const char* target)
 	if (!buffer || !target)
 		return false;
 
-	char* dupedBuffer = _strdup(buffer);
+	//char* dupedBuffer = _strdup(buffer);
 
-	MR_ASSERT(strcmp(dupedBuffer, buffer) == 0, "Buffer duplication error!");
+	//MR_ASSERT(strcmp(dupedBuffer, buffer) == 0, "Buffer duplication error!");
 
-	char* deconstedParam = const_cast<char*>(target);
+	//char* deconstedParam = const_cast<char*>(target);
 
-	char* found = strstr(dupedBuffer, deconstedParam);
+	//char* found = strstr(dupedBuffer, deconstedParam);
 
-	const bool result = found ? true : false;
+	//const bool result = found ? true : false;
 
-	free(dupedBuffer);
-	return result;
+	//free(dupedBuffer);
+	return false;
 }
 
 wchar_t* String::DetermineLocation(uint32_t size)

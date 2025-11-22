@@ -14,7 +14,7 @@
 #endif // MR_DEBUG
 #include <Platform/PerformanceTimer.h>
 #include <Module/ModuleManager.h>
-#include <Renderer/Renderer.h>
+//#include <Renderer/Renderer.h>
 
 Application::Application()
 {

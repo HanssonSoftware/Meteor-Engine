@@ -20,7 +20,7 @@ bool ProjectScript::Finalize(String* output)
 	if (BuildSystemApplication* app = GetApplication<BuildSystemApplication>())
 	{
 		const Array<Module>* modules = app->GetBuildSystem().GetModules();
-		
+
 		String project;
 		for (auto& mdl : *modules)
 		{
@@ -31,6 +31,8 @@ bool ProjectScript::Finalize(String* output)
 		*output = String::Format(L"<!-- This file is generated with MeteorBuild(R) -->\n"
 			L"<Solution>\n"
 			L"\t<Configurations>\n"
+			L"\t\t<BuildType Name=\"Debug\" />\n"
+			L"\t\t<BuildType Name=\"Shipping\" />\n"
 			L"\t\t<Platform Name = \"x64\" />\n"
 			L"\t</Configurations>\n"
 			L"\t<Folder Name = \"/Modules/\">\n"

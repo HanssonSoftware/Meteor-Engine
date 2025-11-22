@@ -6,7 +6,7 @@
 //#include <../Resources/resource.h>
 //#include <dwmapi.h>
 #include <winuser.h>
-#include <Core/Application.h>
+#include <Application.h>
 
 #pragma comment(lib, "dwmapi.lib")
 #pragma comment(lib, "UxTheme.lib")

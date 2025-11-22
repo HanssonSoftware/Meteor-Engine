@@ -2,7 +2,7 @@ Module "Renderer" : "Meteor"
 {
 	IncludePaths:
 	{
-		""
+		"$(SolutionDir)\engine\Core"
 	}
 
 	Dependencies:

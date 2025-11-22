@@ -2,8 +2,8 @@
 
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
-#include <stdint.h>
 #include <string>
+#include <stdint.h>
 
 
 /** Human readable piece of text. */
@@ -45,17 +45,17 @@ public:
 
 	bool operator==(const String& Other) const
 	{
-		return wcscmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) == 0;
+		return std::wcscmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) == 0;
 	}
 
 	bool operator==(const wchar_t* Other) const
 	{
-		return wcscmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other) == 0;
+		return std::wcscmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other) == 0;
 	}
 		
 	bool operator!=(const String& Other) const
 	{
-		return wcscmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) != 0;
+		return std::wcscmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) != 0;
 	}
 
 	bool operator!() const
@@ -101,12 +101,12 @@ public:
 
 	int ToInt() const noexcept
 	{
-		return wcstol(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, nullptr, 0);
+		return std::wcstol(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, nullptr, 0);
 	}
 
 	float ToFloat() const noexcept
 	{
-		return wcstof(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, nullptr);
+		return std::wcstof(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, nullptr);
 	}
 
 	const uint32_t Length() const noexcept

@@ -67,13 +67,11 @@ bool ModuleManager::LoadModule(const String& moduleName)
 
             modules.Add(newModule);
 
-            delete[] libraryName;
             return true;
         }
     }
     else
     {
-        delete[] libraryName;
         libraryName = String::Format("%ls-%ls.dll", defaultEngineName, moduleName.Chr());
 
         module = LoadLibraryW(libraryName);
@@ -90,13 +88,11 @@ bool ModuleManager::LoadModule(const String& moduleName)
 
                 modules.Add(newModule);
 
-                delete[] libraryName;
                 return true;
             }
         }
     }
 
-    delete[] libraryName;
 #endif // MR_PLATFORM_WINDOWS
 
 

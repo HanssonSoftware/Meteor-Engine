@@ -1,7 +1,7 @@
 ﻿/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #include "Layer.h"
-#include <Core/Application.h>
+#include <Application.h>
 #include <Layers/LayerManager.h>
 
 
