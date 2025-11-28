@@ -1,7 +1,7 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #include "Module.h"
-#include <FileManager.h>
+#include <Platform/FileManager.h>
 #include <Platform/File.h>
 #include <Core/Utils.h>
 
@@ -9,14 +9,6 @@
 #include <Objbase.h>
 
 LOG_ADDCATEGORY(Parser);
-
-static void AddVerbDetail(Module* moduleToWrite, const String& verb, const String& value)
-{
-	if (verb == "IncludePath" || verb == "IncludePaths") { moduleToWrite->includePaths.Add(value); return; }
-	if (verb == "Dependencies") { moduleToWrite->requires.Add(value); return; }
-
-	MR_LOG(LogParser, Error, "Unknown verb: %ls", *verb);
-}
 
 bool Module::Parse(String* modulePath)
 {

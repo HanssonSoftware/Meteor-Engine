@@ -5,8 +5,6 @@
 #include <Platform/FileHelpers.h>
 #undef CreateDirectory
 
-#include <vector>
-
 class String;
 
 LOG_ADDCATEGORY(FileManager);

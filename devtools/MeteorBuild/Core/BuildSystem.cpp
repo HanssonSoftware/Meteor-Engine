@@ -3,8 +3,8 @@
 #include "BuildSystem.h"
 
 #include <Commandlet.h>
-#include <FileManager.h>
-#include <Module/ProjectScript.h>
+#include <Platform/FileManager.h>
+#include <Module/Project.h>
 
 #include "Utils.h"
 #include <Platform/Paths.h>
@@ -25,7 +25,7 @@ bool BuildSystem::InitFramework()
 		bool bHasProject = false, bAtLeastOneScriptParsed = false;
 		String sourceDirectoryFromLaunchParameter;
 
-		ps = new ProjectScript();
+		ps = new Project();
 		if (Commandlet::Parse("-source", &sourceDirectoryFromLaunchParameter))
 		{
 			Array<FoundScriptData> filesFoundInSources;
@@ -251,7 +251,7 @@ bool BuildSystem::ReadArguments()
 	}
 	else
 	{
-		MR_LOG(LogBuildSystemFramework, Fatal, "Main parameter is missing! build/rebuild");
+		MR_LOG(LogBuildSystemFramework, Fatal, "Main parameter is missing! Use -build or -rebuild");
 	}
 
 	return false;

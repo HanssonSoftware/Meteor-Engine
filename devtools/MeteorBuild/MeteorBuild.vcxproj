@@ -181,13 +181,15 @@
     <ClCompile Include="Core\Application.cpp" />
     <ClCompile Include="Module\Module.cpp" />
     <ClCompile Include="Core\Utils.cpp" />
-    <ClCompile Include="Module\ProjectScript.cpp" />
+    <ClCompile Include="Module\Project.cpp" />
+    <ClCompile Include="Core\Parser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\BuildSystem.h" />
     <ClInclude Include="Core\Application.h" />
     <ClInclude Include="Module\Module.h" />
-    <ClInclude Include="Module\ProjectScript.h" />
+    <ClInclude Include="Module\Project.h" />
+    <ClInclude Include="Core\Parser.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Core\Utils.h" />
   </ItemGroup>

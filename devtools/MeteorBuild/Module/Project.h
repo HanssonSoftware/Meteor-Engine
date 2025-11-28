@@ -6,7 +6,9 @@
 #include <Module/Module.h>
 #include <Core/Application.h>
 
-class ProjectScript
+
+
+class Project
 {
 public:
 	String projectName;

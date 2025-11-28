@@ -27,7 +27,10 @@
     <ClCompile Include="Core\Utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Module\ProjectScript.cpp">
+    <ClCompile Include="Module\Project.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Parser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -47,7 +50,10 @@
     <ClInclude Include="Core\Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Module\ProjectScript.h">
+    <ClInclude Include="Module\Project.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

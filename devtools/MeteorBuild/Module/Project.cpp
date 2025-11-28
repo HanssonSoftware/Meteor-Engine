@@ -1,10 +1,9 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
-#include "ProjectScript.h"
+#include "Project.h"
 #include <Core/Utils.h>
-#include <FileManager.h>
-#include <File.h>
-
+#include <Platform/FileManager.h>
+#include <Platform/File.h>
 
 #include "Module.h"
 
@@ -15,7 +14,7 @@ static void AddVerbDetail(const String& verb, const String& value)
 
 }
 
-bool ProjectScript::Finalize(String* output)
+bool Project::Finalize(String* output)
 {
 	if (BuildSystemApplication* app = GetApplication<BuildSystemApplication>())
 	{
@@ -36,7 +35,7 @@ bool ProjectScript::Finalize(String* output)
 			L"\t\t<Platform Name = \"x64\" />\n"
 			L"\t</Configurations>\n"
 			L"\t<Folder Name = \"/Modules/\">\n"
-			L"%ls" //
+			L"%ls"
 			L"\t</Folder>\n"
 			L"</Solution>", 
 			*project);
@@ -45,7 +44,7 @@ bool ProjectScript::Finalize(String* output)
 	return true;
 }
 
-bool ProjectScript::Parse(String* input)
+bool Project::Parse(String* input)
 {
 	IFile* module = FileManager::CreateFileOperation(input, FileAccessMode::OPENMODE_READ, FileShareMode::SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS);
 	if (module != nullptr)
