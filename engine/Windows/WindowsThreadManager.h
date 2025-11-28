@@ -1,8 +1,8 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <Thread/ThreadManager.h>
-#include <Thread/ThreadDescriptor.h>
+#include <Platform/Thread/ThreadManager.h>
+#include <Platform/Thread/ThreadDescriptor.h>
 
 class WindowsThread;
 

@@ -1,7 +1,7 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <Thread/Thread.h>
+#include <Platform/Thread/Thread.h>
 
 class WindowsThread : public IThread
 {

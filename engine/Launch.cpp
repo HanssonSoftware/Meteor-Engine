@@ -34,8 +34,8 @@ int main(int ArgumentCount, char* Arguments[])
 // DO NOT MAKE STATIC!!
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, int nCmdShow)
 {
-    wchar_t path[MAX_PATH] = { '\0' };
-    DWORD count = GetModuleFileNameW(GetModuleHandle(nullptr), path, MAX_PATH);
+    wchar_t path[512] = { '\0' };
+    DWORD count = GetModuleFileNameW(GetModuleHandleW(nullptr), path, 512);
     PathCchRemoveFileSpec(path, count);
 
     AddDllDirectory(wcscat(path, L"\\bin\0"));

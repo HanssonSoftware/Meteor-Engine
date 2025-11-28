@@ -51,7 +51,7 @@ struct LogDescriptor
     /* Generated log name! */ \
     struct Log##CategoryName : public LogEntry \
 	{ \
-        static constexpr const char* GetName() { return MERGE2(Log##CategoryName); }; \
+        static constexpr const char* GetName() { return #CategoryName; }; \
     }
 
 LOG_ADDCATEGORY(Temp);

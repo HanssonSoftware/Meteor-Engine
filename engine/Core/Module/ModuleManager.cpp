@@ -1,7 +1,7 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #include "ModuleManager.h"
-#include <PlatformLayout.h>
+#include <Platform/PlatformLayout.h>
 #include <Platform/Platform.h>
 #include <Application.h>
 

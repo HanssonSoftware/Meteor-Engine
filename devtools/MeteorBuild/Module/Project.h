@@ -15,8 +15,6 @@ public:
 
 	bool Finalize(String* output);
 
-	bool Parse(String* input);
-
 	Array<Module>* modulesReference;
 
 	String intermediatePath;

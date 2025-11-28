@@ -10,114 +10,6 @@
 
 LOG_ADDCATEGORY(Parser);
 
-bool Module::Parse(String* modulePath)
-{
-	bool bFailed = false;
-
-	IFile* module = FileManager::CreateFileOperation(modulePath, FileAccessMode::OPENMODE_READ, FileShareMode::SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS);
-	if (module != nullptr)
-	{
-		module->Read();
-		this->modulePath = *modulePath;
-
-		const char* buffer = module->GetBuffer();
-
-		if (Utils::GetWord(buffer, false) == "Module")
-		{
-			MR_LOG(LogParser, Verbose, "Opening %ls as ModuleScript!", *module->GetName());
-
-			Utils::SkipWord(buffer);  // Skip "Module"
-
-			moduleName = Utils::GetWord(buffer, true);
-
-			if (Utils::GetCharacterType(buffer) == Colon)
-			{
-				Utils::SkipCharacterType(buffer, Colon);
-				dependsOn = Utils::GetWord(buffer, true);
-
-				if (Utils::GetCharacterType(buffer) == OpenBrace)
-				{
-					Utils::SkipCharacterType(buffer, OpenBrace);
-
-					while (*buffer != '\0')
-					{
-						while (Utils::GetCharacterType(buffer) != ClosedBrace
-							&& Utils::GetCharacterType(buffer) != None)
-						{
-							const String flagWord = Utils::GetWord(buffer, true);
-							if (flagWord && Utils::GetCharacterType(buffer) == Colon)
-							{
-								Utils::SkipCharacterType(buffer, Colon);
-
-								if (Utils::GetCharacterType(buffer) == OpenBrace)
-								{
-									Utils::SkipCharacterType(buffer, OpenBrace);
-									while (Utils::GetCharacterType(buffer) != ClosedBrace)
-									{
-										const String value = Utils::GetWord(buffer, true);
-										if (value)
-										{
-											AddVerbDetail(this, flagWord, value);
-											MR_LOG(LogParser, Verbose, "Adding %ls property to %ls", *value, *flagWord);
-										}
-
-										if (Utils::GetCharacterType(buffer) == Comma)
-											Utils::SkipCharacterType(buffer, Comma);
-									}
-								}
-							}
-							else if (Utils::GetCharacterType(buffer) != Colon)
-							{
-								MR_LOG(LogParser, Fatal, "Missing colon after word %ls!", flagWord.Chr());
-							}
-							else
-							{
-								MR_LOG(LogParser, Fatal, "Unknown error!");
-							}
-						}
-
-						Utils::SkipCharacterType(buffer, ClosedBrace);
-					}
-
-					if (*buffer == '\0')
-					{
-						GUID id;
-						if (SUCCEEDED(CoCreateGuid(&id)))
-						{
-							wchar_t buffer[64];
-							if (!StringFromGUID2(id, buffer, 64))
-							{
-								module->Close();
-								return false;
-							}
-
-							identification = buffer;
-							MR_LOG(LogParser, Verbose, "Successfully generated GUID, for module %ls!", *moduleName);
-						}
-					}
-				}
-				else
-				{
-					bFailed = true;
-				}
-			}
-			else
-			{
-				bFailed = true;
-			}
-		}
-		else
-		{
-			bFailed = true;
-		}
-
-		module->Close();
-		return !bFailed;
-	}
-
-	return !bFailed;
-}
-
 bool Module::ConstructProjectFile(String* output)
 {
 	String compileList, includeList;
@@ -144,7 +36,7 @@ bool Module::ConstructProjectFile(String* output)
 	}
 
 	*output = String::Format(
-	L"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+	//L"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 	L"<!-- This file is generated with MeteorBuild(R) -->\n\n"
 	L"<Project DefaultTargets=\"Build\" xmlns=\'http://schemas.microsoft.com/developer/msbuild/2003\'>\n"
 	L"\t<ItemGroup Label = \"ProjectConfigurations\">\n"

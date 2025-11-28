@@ -5,25 +5,34 @@
 #include <Module/Project.h>
 
 #include <Platform/FileManager.h>
+#include <Types/Pointers.h>
 
 #include <rpc.h>
 #include <Objbase.h>
 
 LOG_ADDCATEGORY(Parser);
 
-static void AddVerbDetail(Module* moduleToWrite, const String& verb, const String& value)
+static bool AddVerbDetail(Module* moduleToWrite, const String& verb, const String& value)
 {
-	if (verb == "IncludePath" || verb == "IncludePaths") { moduleToWrite->includePaths.Add(value); return; }
-	if (verb == "Dependencies") { moduleToWrite->requires.Add(value); return; }
+	if (verb == "IncludePath" || verb == "IncludePaths") { moduleToWrite->includePaths.Add(value); return true; }
+	if (verb == "Dependencies") { moduleToWrite->requires.Add(value); return true; }
 
 	MR_LOG(LogParser, Error, "Unknown verb: %ls", *verb);
+	return false;
+}
+
+static bool AddVerbDetail(Project* projectToWrite, const String& verb, const String& value)
+{
+
+	MR_LOG(LogParser, Error, "Unknown verb: %ls", *verb);
+	return false;
 }
 
 Module* Parser::ParseModuleScript(String* moduleName)
 {
 	bool bFailed = false;
 
-	IFile* module = FileManager::CreateFileOperation(moduleName, FileAccessMode::OPENMODE_READ, FileShareMode::SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS);
+	ScopedPtr<IFile> module = FileManager::CreateFileOperation(moduleName, FileAccessMode::OPENMODE_READ, FileShareMode::SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS);
 	if (module != nullptr)
 	{
 		module->Read();
@@ -32,16 +41,18 @@ Module* Parser::ParseModuleScript(String* moduleName)
 		if (GetWord(buffer, false) == "Module")
 		{
 			MR_LOG(LogParser, Verbose, "Opening %ls as ModuleScript!", *module->GetName());
-			Module newModule;
+			Module* newModule = new Module();
+			if (!newModule)
+				return nullptr;
 
 			SkipWord(buffer);  // Skip "Module"
 
-			newModule.moduleName = GetWord(buffer, true);
+			newModule->moduleName = GetWord(buffer, true);
 
 			if (GetCharacterType(buffer) == Colon)
 			{
 				SkipCharacterType(buffer, Colon);
-				newModule.dependsOn = GetWord(buffer, true);
+				newModule->dependsOn = GetWord(buffer, true);
 
 				if (GetCharacterType(buffer) == OpenBrace)
 				{
@@ -65,8 +76,8 @@ Module* Parser::ParseModuleScript(String* moduleName)
 										const String value = GetWord(buffer, true);
 										if (value)
 										{
-											AddVerbDetail(&newModule, flagWord, value);
-											MR_LOG(LogParser, Verbose, "Adding %ls property to %ls", *value, *flagWord);
+											if (AddVerbDetail(newModule, flagWord, value))
+												MR_LOG(LogParser, Verbose, "Added %ls property to %ls", *value, *flagWord);
 										}
 
 										if (GetCharacterType(buffer) == Comma)
@@ -96,13 +107,17 @@ Module* Parser::ParseModuleScript(String* moduleName)
 							if (!StringFromGUID2(id, buffer, 64))
 							{
 								module->Close();
-								return false;
+								return nullptr;
 							}
 
-							newModule.identification = buffer;
-							MR_LOG(LogParser, Verbose, "Successfully generated GUID, for module %ls!", *moduleName);
+							newModule->identification = buffer;
+							MR_LOG(LogParser, Verbose, "Successfully generated GUID, for module %ls!", *newModule->moduleName);
 						}
 					}
+
+					module->Close();
+					newModule->SetIsParsed(true);
+					return newModule;
 				}
 				else
 				{
@@ -117,6 +132,83 @@ Module* Parser::ParseModuleScript(String* moduleName)
 		else
 		{
 			bFailed = true;
+		}
+
+		return nullptr;
+	}
+
+	return nullptr;
+}
+
+Project* Parser::ParseProjectScript(String* projectPath)
+{
+	ScopedPtr<IFile> module = FileManager::CreateFileOperation(projectPath, FileAccessMode::OPENMODE_READ, FileShareMode::SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS);
+	if (module != nullptr)
+	{
+		module->Read();
+
+		const char* buffer = module->GetBuffer();
+
+		bool bHasBeenParsedOneWordAtLeast = false;
+		if (GetWord(buffer, false) == "Project")
+		{
+			SkipWord(buffer);  // Skip "Project"
+			Project* newProject = new Project();
+			if (!newProject)
+				return nullptr;
+
+			MR_LOG(LogParser, Verbose, "Opening %ls as ProjectScript!", *module->GetName());
+
+			newProject->projectName = GetWord(buffer, true);
+
+			if (GetCharacterType(buffer) == OpenBrace)
+			{
+				SkipCharacterType(buffer, OpenBrace);
+
+				while (*buffer != '\0')
+				{
+					while (GetCharacterType(buffer) != ClosedBrace
+						&& GetCharacterType(buffer) != None)
+					{
+						const String flagWord = GetWord(buffer, true);
+						if (flagWord && GetCharacterType(buffer) == Colon)
+						{
+							SkipCharacterType(buffer, Colon);
+
+							if (GetCharacterType(buffer) == OpenBrace)
+							{
+								SkipCharacterType(buffer, OpenBrace);
+								while (GetCharacterType(buffer) != ClosedBrace)
+								{
+									const String value = GetWord(buffer, true);
+									if (value)
+									{
+										if (!bHasBeenParsedOneWordAtLeast) bHasBeenParsedOneWordAtLeast = true;
+
+										AddVerbDetail(newProject, flagWord, value);
+										MR_LOG(LogParser, Verbose, "Adding %ls property to %ls", *value, *flagWord);
+									}
+
+									if (GetCharacterType(buffer) == Comma)
+										SkipCharacterType(buffer, Comma);
+								}
+							}
+						}
+						else if (GetCharacterType(buffer) != Colon)
+						{
+							MR_LOG(LogParser, Fatal, "Missing colon after word! %ls", flagWord.Chr());
+						}
+						else
+						{
+							MR_LOG(LogParser, Fatal, "Unknown error!");
+						}
+					}
+
+					SkipCharacterType(buffer, ClosedBrace);
+				}
+			}
+
+
 		}
 
 		module->Close();

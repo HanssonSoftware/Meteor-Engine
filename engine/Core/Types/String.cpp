@@ -342,21 +342,6 @@ String& String::operator=(const String& other)
 	return *this;
 }
 
-void String::Refresh()
-{
-	if (heapBuffer.ptr != nullptr)
-	{
-		const wchar_t* begin = heapBuffer.ptr;
-		while (*begin)
-		{
-			heapBuffer.length++;
-			begin++;
-		}
-
-
-	}
-}
-
 String& String::operator+=(const String& other)
 {
 	if (other.IsEmpty())

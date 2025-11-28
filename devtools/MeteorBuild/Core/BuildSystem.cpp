@@ -14,6 +14,7 @@
 
 #include <PathCch.h>
 #include <Application.h>
+#include "Parser.h"
 
 LOG_ADDCATEGORY(BuildSystemFramework);
 LOG_ADDCATEGORY(Assembler);
@@ -25,48 +26,50 @@ bool BuildSystem::InitFramework()
 		bool bHasProject = false, bAtLeastOneScriptParsed = false;
 		String sourceDirectoryFromLaunchParameter;
 
-		ps = new Project();
 		if (Commandlet::Parse("-source", &sourceDirectoryFromLaunchParameter))
 		{
-			Array<FoundScriptData> filesFoundInSources;
-			Array<FoundScriptData> scriptsFound;
+			Array<String> filesFoundInSources;
+			Array<String> scriptsFound;
 
 			Utils::ListDirectory(&sourceDirectoryFromLaunchParameter, filesFoundInSources);
 			for (auto& pathToDiscoveredItemsIndexed : filesFoundInSources)
 			{
 				//const String combined = String::Format("%ls\\%ls", *pathToDiscoveredItemsIndexed.path, *pathToDiscoveredItemsIndexed.name);
-				if (FileManager::IsEndingWith(pathToDiscoveredItemsIndexed.full, "mrbuild"))
+				if (FileManager::IsEndingWith(pathToDiscoveredItemsIndexed, "mrbuild"))
 				{
 					scriptsFound.Add(pathToDiscoveredItemsIndexed);
-					MR_LOG(LogBuildSystemFramework, Verbose, "Found script: %ls", *pathToDiscoveredItemsIndexed.full);
+					MR_LOG(LogBuildSystemFramework, Verbose, "Found script: %ls", *pathToDiscoveredItemsIndexed);
 				}
 			}
 
 			const uint32_t max = scriptsFound.GetSize() /* Be aware! The last one is always should be the project script!*/;
 			for (uint32_t i = 0; i < max; i++)
 			{
-				FoundScriptData indexed = scriptsFound[i];
+				String indexed = scriptsFound[i];
 
-				Module mdl;
-				if (mdl.Parse(&indexed.full))
+				Module* mdl = Parser::ParseModuleScript(&indexed);
+				if (mdl != nullptr)
 				{
 					if (!bAtLeastOneScriptParsed) bAtLeastOneScriptParsed = true;
 
-					Array<FoundScriptData> sd;
-					Utils::ListDirectory(&indexed.path, sd);
+					Array<String> sd;
+					Utils::ListDirectory(&indexed, sd);
 
 					for (auto& temp : sd)
 					{
-						mdl.files.Add(*temp.full);
-						MR_LOG(LogBuildSystemFramework, Verbose, "%ls module, new file added to include list: %ls", *mdl.moduleName, *temp.full);
+						mdl->files.Add(*temp);
+						MR_LOG(LogBuildSystemFramework, Verbose, "%ls module, new file added to include list: %ls", *mdl->moduleName, *temp);
 					}
 
-					loadedModules.Add(mdl);
+					loadedModules.Add(*mdl);
 				}
 				else
 				{
-					if (ps->Parse(&indexed.full))
-						bHasProject = true;
+					ps = Parser::ParseProjectScript(&indexed);
+					if (ps != nullptr)
+					{
+
+					}
 				}
 			}
 		}
@@ -153,6 +156,7 @@ bool BuildSystem::BuildProjectFiles()
 			String exeDir = Paths::GetExecutableDirctory();
 
 			PathCchRemoveFileSpec(exeDir.Data(), exeDir.Length());
+			exeDir.Refresh();
 
 			PWSTR combinedPathNonCanonicalized;
 			PathAllocCombine(exeDir, intermediateLocation, PATHCCH_ALLOW_LONG_PATHS, &combinedPathNonCanonicalized);

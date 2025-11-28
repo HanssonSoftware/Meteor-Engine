@@ -1,7 +1,8 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
-class String;
+#include <Types/String.h>
+
 class Module;
 class Project;
 
@@ -29,6 +30,8 @@ struct FoundScriptData
 struct Parser
 {
 	static Module* ParseModuleScript(String* moduleName);
+
+	static Project* ParseProjectScript(String* projectPath);
 
 	static ECharacterType GetCharacterType(const char*& str);
 

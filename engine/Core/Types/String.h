@@ -45,17 +45,17 @@ public:
 
 	bool operator==(const String& Other) const
 	{
-		return std::wcscmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) == 0;
+		return wcscmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) == 0;
 	}
 
 	bool operator==(const wchar_t* Other) const
 	{
-		return std::wcscmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other) == 0;
+		return wcscmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other) == 0;
 	}
 		
 	bool operator!=(const String& Other) const
 	{
-		return std::wcscmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) != 0;
+		return wcscmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) != 0;
 	}
 
 	bool operator!() const
@@ -114,7 +114,13 @@ public:
 		return bIsUsingHeap ? (uint32_t)heapBuffer.length : (uint32_t)stackBuffer.length;
 	}
 	
-	void Refresh();
+	void Refresh() noexcept
+	{
+		if (heapBuffer.ptr != nullptr)
+			heapBuffer.length = (uint32_t)wcslen(heapBuffer.ptr);
+
+		stackBuffer.length = (uint32_t)wcslen(stackBuffer.ptr);
+	}
 
 	/** */
 	static String Format(const String& format, ...);

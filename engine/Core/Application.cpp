@@ -1,7 +1,7 @@
 ﻿/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #include "Application.h"
-#include <Platform/WindowManager/WindowManager.h>
+#include <WindowManager/WindowManager.h>
 #include <Platform/FileManager.h>
 
 #include <MemoryManager.h>

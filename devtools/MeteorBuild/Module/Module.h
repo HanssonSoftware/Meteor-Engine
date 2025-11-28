@@ -9,9 +9,13 @@ class Module
 public:
 	Module() = default;
 
-	bool Parse(String* modulePath);
+	virtual	~Module() noexcept = default;
 
 	bool ConstructProjectFile(String* output);
+
+	bool GetIsParsed() const { return bIsParsed; }
+
+	void SetIsParsed(bool newVal) { bIsParsed = newVal; }
 
 	String moduleName;
 
@@ -28,5 +32,8 @@ public:
 	Array<String> requires;
 
 	String identification;
+
+protected:
+	bool bIsParsed = false;
 };
 

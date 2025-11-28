@@ -5,5 +5,5 @@
 
 struct Utils
 {
-	static void ListDirectory(String* name, Array<FoundScriptData>& container);
+	static void ListDirectory(String* name, Array<String>& container);
 };

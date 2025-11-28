@@ -3,9 +3,9 @@
 #include "Application.h"
 #include <Types/String.h>
 #include <MemoryManager.h>
-#include <FileManager.h>
+#include <Platform/FileManager.h>
 
-#include <Platform.h>
+#include <Platform/Platform.h>
 
 //#pragma comment(lib, "Shell32.lib")
 

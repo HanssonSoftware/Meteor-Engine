@@ -29,7 +29,7 @@ protected:
 	String windowTitle;
 };
 
-#include <PlatformLayout.h>
+#include <Platform/PlatformLayout.h>
 
 #ifdef MR_PLATFORM_WINDOWS
 #include <Windows/WindowsWindow.h>
