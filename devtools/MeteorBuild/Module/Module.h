@@ -4,6 +4,8 @@
 #include <Types/String.h>
 #include <Types/Array.h>
 
+class Project;
+
 class Module
 {
 public:
@@ -13,26 +15,33 @@ public:
 
 	bool ConstructProjectFile(String* output);
 
+	bool GenerateProxyHeader(String* output);
+
+	bool GenerateBootstrapHeader(String* output);
+
 	bool GetIsParsed() const { return bIsParsed; }
 
 	void SetIsParsed(bool newVal) { bIsParsed = newVal; }
 
-	String moduleName;
+	String moduleName; // "Core"
 
-	String generatedProjectFile;
+	String defineName; // "CORE(_EXPORTS)"
 
-	String modulePath;
+	String generatedProjectFile; // ..\\Core.vcxproj
 
-	String dependsOn;
+	String modulePath; // ..\\Core.mrbuild
 
-	Array<String> files;
+	String dependsOn; // "Meteor"
 
-	Array<String> includePaths;
+	Array<String> files; // Detected sources
 
-	Array<String> requires;
+	Array<String> includePaths; // Includepaths
 
-	String identification;
+	Array<String> requires; // Dependency modules: Core, Platform, etc.
 
+	String identification; // Guid
+
+	Project* parent = nullptr;
 protected:
 	bool bIsParsed = false;
 };

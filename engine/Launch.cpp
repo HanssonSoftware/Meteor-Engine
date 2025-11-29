@@ -10,7 +10,7 @@
 #include <Platform/PlatformLayout.h>
 
 #ifdef MR_PLATFORM_WINDOWS
-#include <Windows/Windows.h>
+#include <WindowsOS.h>
 #include <PathCch.h>
 
 #pragma comment (lib, "Pathcch.lib")

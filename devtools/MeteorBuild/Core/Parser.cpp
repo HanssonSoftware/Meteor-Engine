@@ -5,8 +5,10 @@
 #include <Module/Project.h>
 
 #include <Platform/FileManager.h>
+#include <Platform/File.h>
 #include <Types/Pointers.h>
 
+#include <PathCch.h>
 #include <rpc.h>
 #include <Objbase.h>
 
@@ -23,6 +25,8 @@ static bool AddVerbDetail(Module* moduleToWrite, const String& verb, const Strin
 
 static bool AddVerbDetail(Project* projectToWrite, const String& verb, const String& value)
 {
+	if (verb == "GlobalDefine" || verb == "GlobalDefines") { projectToWrite->globalDefines.Add(value); return true; }
+	if (verb == "Executable") { projectToWrite->launcher = value; return true; }
 
 	MR_LOG(LogParser, Error, "Unknown verb: %ls", *verb);
 	return false;
@@ -40,6 +44,9 @@ Module* Parser::ParseModuleScript(String* moduleName)
 		const char* buffer = module->GetBuffer();
 		if (GetWord(buffer, false) == "Module")
 		{
+			PathCchRemoveFileSpec(moduleName->Data(), moduleName->Length());
+			moduleName->Refresh();
+
 			MR_LOG(LogParser, Verbose, "Opening %ls as ModuleScript!", *module->GetName());
 			Module* newModule = new Module();
 			if (!newModule)
@@ -117,6 +124,11 @@ Module* Parser::ParseModuleScript(String* moduleName)
 
 					module->Close();
 					newModule->SetIsParsed(true);
+
+					newModule->defineName = *newModule->moduleName;
+					for (wchar_t* ptr = newModule->defineName.Data(); *ptr; ptr++)
+						*ptr = towupper(*ptr);
+
 					return newModule;
 				}
 				else
@@ -145,6 +157,9 @@ Project* Parser::ParseProjectScript(String* projectPath)
 	ScopedPtr<IFile> module = FileManager::CreateFileOperation(projectPath, FileAccessMode::OPENMODE_READ, FileShareMode::SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS);
 	if (module != nullptr)
 	{
+		PathCchRemoveFileSpec(projectPath->Data(), projectPath->Length());
+		projectPath->Refresh();
+
 		module->Read();
 
 		const char* buffer = module->GetBuffer();
@@ -208,7 +223,8 @@ Project* Parser::ParseProjectScript(String* projectPath)
 				}
 			}
 
-
+			module->Close();
+			return newProject;
 		}
 
 		module->Close();
@@ -228,7 +244,6 @@ ECharacterType Parser::GetCharacterType(const char*& str)
 	const char* constStr = str;
 	if (isalpha(*constStr))
 	{
-
 		while (!isspace(*constStr))
 			constStr++;
 
@@ -310,8 +325,17 @@ String Parser::GetWord(const char*& in, bool bStep)
 	else if (*begin == '$')
 	{
 		end = begin;
-		while (*end && !isspace(*end)) end++;
-		chars = (uint32_t)(end - begin);
+
+		end++;
+		if (isspace(*end))
+		{
+			while (*end && !isspace(*end)) end++;
+			chars = (uint32_t)(end - begin);
+		}
+		else
+		{
+
+		}
 	}
 	else
 	{

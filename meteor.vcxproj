@@ -169,7 +169,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG;MR_CORE_ENABLED;MR_PLATFORM_WINDOWS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\include;$(ProjectDir)engine\Core\Platform;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Intermediate\Apollo\Core;$(VULKAN_SDK)\include;$(ProjectDir)engine\Core\Platform;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
       <UseFullPaths>false</UseFullPaths>
     </ClCompile>
@@ -205,7 +205,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_CORE_ENABLED;MR_PLATFORM_WINDOWS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\include;$(ProjectDir)engine\Core\Platform;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Intermediate\Apollo\Core;$(VULKAN_SDK)\include;$(ProjectDir)engine\Core\Platform;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
       <UseFullPaths>false</UseFullPaths>
     </ClCompile>
@@ -273,6 +273,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\Core\Common\Maths.h" />
+    <ClInclude Include="engine\Core\WindowsOS.h" />
     <ClInclude Include="engine\Platform\Platform.h" />
     <ClInclude Include="engine\Platform\Thread\ThreadDescriptor.h" />
     <ClInclude Include="engine\Platform\FileHelpers.h" />
@@ -391,6 +392,7 @@
     <ClInclude Include="engine\Core\Types\Iterator.h" />
     <ClInclude Include="engine\Platform\Paths.h" />
     <ClInclude Include="engine\Core\Module\Module.h" />
+    <ClInclude Include="resources\DefaultDll.h" />
     <ClInclude Include="resources\assertbox.h" />
     <ClInclude Include="resources\resource.h" />
     <ClInclude Include="engine\Windows\WindowsWindowManager.h" />
@@ -421,6 +423,7 @@
     <None Include="Resources\d1.bin" />
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="resources\DefaultDll.rc" />
     <ResourceCompile Include="resources\assertbox.rc" />
     <ResourceCompile Include="resources\sampleapp.rc" />
   </ItemGroup>

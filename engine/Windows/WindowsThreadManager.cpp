@@ -2,7 +2,7 @@
 
 #include "WindowsThreadManager.h"
 
-#include <Windows/Windows.h>
+#include <WindowsOS.h>
 
 DWORD inputFunction(LPVOID param)
 {

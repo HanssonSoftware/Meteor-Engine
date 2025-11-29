@@ -7,7 +7,6 @@ Project "Meteor"
 
 	GlobalDefines:
 	{
-		"MR_DEBUG",
-		$(WIN): "MR_PLATFORM_WINDOWS"
+		"MR_PLATFORM_WINDOWS"
 	}
 }

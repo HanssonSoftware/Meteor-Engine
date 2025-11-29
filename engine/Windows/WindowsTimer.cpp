@@ -1,7 +1,7 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #include "WindowsTimer.h"
-#include "Windows/Windows.h"
+#include "WindowsOS.h"
 #include <Logging/Log.h>
 #include <Platform/Platform.h>
 

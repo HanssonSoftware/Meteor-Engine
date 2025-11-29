@@ -4,7 +4,9 @@
 #include <Types/Vector.h>
 #include <stdint.h>
 
-class IRHISwapChain
+#include "Renderer.proxy.h"
+
+class RENDERER_API IRHISwapChain
 {
 public:
 	IRHISwapChain() = default;

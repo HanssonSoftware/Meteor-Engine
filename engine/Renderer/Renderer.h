@@ -3,7 +3,9 @@
 #pragma once
 #include <Module/Module.h>
 
-class Renderer : public Module
+#include "Renderer.proxy.h"
+
+class RENDERER_API Renderer : public Module
 {
 public:
 	virtual void StartupModule() override;

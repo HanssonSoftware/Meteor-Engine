@@ -16,6 +16,7 @@
 #include <Application.h>
 #include "Parser.h"
 
+
 LOG_ADDCATEGORY(BuildSystemFramework);
 LOG_ADDCATEGORY(Assembler);
 
@@ -68,7 +69,7 @@ bool BuildSystem::InitFramework()
 					ps = Parser::ParseProjectScript(&indexed);
 					if (ps != nullptr)
 					{
-
+						bHasProject = true;
 					}
 				}
 			}
@@ -81,7 +82,7 @@ bool BuildSystem::InitFramework()
 	return false;
 }
 
-/** WARNING! This function uses, std::string from C++ standard. */
+/** WARNING! This function uses, C++ standard. */
 void BuildSystem::OrderModules()
 {
 	std::unordered_map<std::wstring, uint32_t> ordering;
@@ -201,6 +202,52 @@ bool BuildSystem::BuildProjectFiles()
 			{
 				MR_LOG(LogAssembler, Fatal, "Failed to create project file at: %ls", *module.generatedProjectFile);
 			}
+
+			HANDLE header = CreateFileW(String::Format("%ls\\%ls.proxy.h", *directoryToCreateTheFolder, *module.moduleName), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+			if (header != INVALID_HANDLE_VALUE)
+			{
+				String final;
+				if (module.GenerateProxyHeader(&final))
+				{
+					ScopedPtr<char> skinnyBuffer = Platform::ConvertToNarrow(final);
+
+					DWORD written = 0;
+					if (!WriteFile(header, skinnyBuffer.Get(), final.Length(), &written, nullptr))
+					{
+						MR_LOG(LogAssembler, Error, "WriteFile returned: %ls", *Platform::GetError());
+					}
+				}
+
+				CloseHandle(header);
+			}
+			else
+			{
+				MR_LOG(LogAssembler, Fatal, "Failed to create proxy header file at: %ls", *directoryToCreateTheFolder);
+			}
+
+			HANDLE bootstrap = CreateFileW(String::Format("%ls\\%ls.bootstrap.cpp", *directoryToCreateTheFolder, *module.moduleName), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+			if (bootstrap != INVALID_HANDLE_VALUE)
+			{
+				String final;
+				if (module.GenerateBootstrapHeader(&final))
+				{
+					ScopedPtr<char> skinnyBuffer = Platform::ConvertToNarrow(final);
+
+					DWORD written = 0;
+					if (!WriteFile(bootstrap, skinnyBuffer.Get(), final.Length(), &written, nullptr))
+					{
+						MR_LOG(LogAssembler, Error, "WriteFile returned: %ls", *Platform::GetError());
+					}
+				}
+
+				CloseHandle(bootstrap);
+			}
+			else
+			{
+				MR_LOG(LogAssembler, Fatal, "Failed to create bootstrap header file at: %ls", *directoryToCreateTheFolder);
+			}
+
+
 		}
 
 		String sourceDir;

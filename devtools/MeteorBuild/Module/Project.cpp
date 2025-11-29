@@ -6,6 +6,7 @@
 #include <Platform/File.h>
 
 #include "Module.h"
+#include <Core/Application.h>
 
 LOG_ADDCATEGORY(ProjectScriptParser);
 
@@ -34,7 +35,9 @@ bool Project::Finalize(String* output)
 			L"\t</Folder>\n"
 			L"</Solution>", 
 			*project);
+
+		return true;
 	}
 
-	return true;
+	return false;
 }

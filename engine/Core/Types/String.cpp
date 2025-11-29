@@ -2,14 +2,13 @@
 
 #include "String.h"
 #include <Logging/Log.h>
-//#include <stdio.h>
 
-#include <Platform/Platform.h>
-#include <Platform/PlatformLayout.h>
-#include <Windows/Windows.h>
+#ifdef MR_PLATFORM_WINDOWS
+#include <WindowsOS.h>
+#endif
 
 #include <MemoryManager.h>
-//#include "Pointers.h"
+#include <cstdarg>
 
 #pragma warning(disable : 26495)
 
@@ -42,13 +41,13 @@ String::String(const char* Input)
 		wchar_t* redirectedData = DetermineLocation(skinnyLength);
 		if (!MultiByteToWideChar(CP_UTF8, 0, Input, skinnyLength * sizeof(char), redirectedData, skinnyLength))
 		{
-			MR_LOG(LogStringSet, Error, "MultiByteToWideChar returned: %ls", *Platform::GetError());
+			MR_LOG(LogStringSet, Error, "MultiByteToWideChar returned: %d", GetLastError());
 			return;
 		}
 	}
 	else
 	{
-		MR_LOG(LogStringSet, Error, "MultiByteToWideChar returned: %ls", *Platform::GetError());
+		MR_LOG(LogStringSet, Error, "MultiByteToWideChar returned: %d", GetLastError());
 		return;
 	}
 #endif // MR_PLATFORM_WINDOWS
@@ -174,13 +173,13 @@ String::String(const char* Input, uint32_t length)
 		wchar_t* redirectedData = DetermineLocation(skinnyLength);
 		if (!MultiByteToWideChar(CP_UTF8, 0, Input, skinnyLength * sizeof(char), redirectedData, skinnyLength))
 		{
-			MR_LOG(LogStringSet, Error, "MultiByteToWideChar returned: %ls", *Platform::GetError());
+			MR_LOG(LogStringSet, Error, "MultiByteToWideChar returned: %d", GetLastError());
 			return;
 		}
 	}
 	else
 	{
-		MR_LOG(LogStringSet, Error, "MultiByteToWideChar returned: %ls", *Platform::GetError());
+		MR_LOG(LogStringSet, Error, "MultiByteToWideChar returned: %d", GetLastError());
 		return;
 	}
 #endif // MR_PLATFORM_WINDOWS

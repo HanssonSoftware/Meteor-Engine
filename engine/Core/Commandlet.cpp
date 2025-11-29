@@ -5,10 +5,9 @@
 #include "Commandlet.h"
 #include <Types/Array.h>
 #include <Types/String.h>
-#include <Platform/PlatformLayout.h>
 
 #ifdef MR_PLATFORM_WINDOWS
-#include <Windows/Windows.h>
+#include <WindowsOS.h>
 #endif // MR_PLATFORM_WINDOWS
 #include <MemoryManager.h>
 

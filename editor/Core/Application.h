@@ -3,7 +3,7 @@
 #pragma once
 #include <Application.h>
 #include <Types/Vector.h>
-#include <Platform/WindowManager/WindowManager.h>
+#include <WindowManager/WindowManager.h>
 #include <Commandlet.h>
 //#include <Types/Pointers.h>
 

@@ -5,7 +5,7 @@ Module "Windows" : "Meteor"
 		"$(SolutionDir)\engine\Windows",
 	}
 
-	Dependecies:
+	Dependencies:
 	{
 		"Core",
 		"Platform"

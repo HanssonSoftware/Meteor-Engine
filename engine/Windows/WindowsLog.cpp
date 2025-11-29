@@ -1,7 +1,7 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #include "WindowsLog.h"
-#include <Windows/Windows.h>
+#include <WindowsOS.h>
 #include <Types/String.h>
 #include <Application.h>
 #include "../Version.h"

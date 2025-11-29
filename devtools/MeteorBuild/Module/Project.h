@@ -4,9 +4,6 @@
 #include <Types/String.h>
 #include <Types/Array.h>
 #include <Module/Module.h>
-#include <Core/Application.h>
-
-
 
 class Project
 {
@@ -16,6 +13,10 @@ public:
 	bool Finalize(String* output);
 
 	Array<Module>* modulesReference;
+
+	Array<String> globalDefines;
+
+	String launcher;
 
 	String intermediatePath;
 };

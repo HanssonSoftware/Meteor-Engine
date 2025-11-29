@@ -1,20 +1,14 @@
 ﻿/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #include "Application.h"
-#include <WindowManager/WindowManager.h>
-#include <Platform/FileManager.h>
-
 #include <MemoryManager.h>
 #include <Layers/LayerManager.h>
-//#include <GraphicsEngine/SceneGraph.h>
-#include <mutex>
 #include "Commandlet.h"
+
 #ifdef MR_DEBUG
 #include <crtdbg.h>
 #endif // MR_DEBUG
-#include <Platform/PerformanceTimer.h>
 #include <Module/ModuleManager.h>
-//#include <Renderer/Renderer.h>
 
 Application::Application()
 {

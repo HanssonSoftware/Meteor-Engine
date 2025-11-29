@@ -5,7 +5,7 @@ Module "Platform" : "Meteor"
 		"$(SolutionDir)\engine\Platform",
 	}
 
-	Dependecies:
+	Dependencies:
 	{
 		"Core"
 	}

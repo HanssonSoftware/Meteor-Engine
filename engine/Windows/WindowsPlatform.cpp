@@ -3,7 +3,7 @@
 #include "WindowsPlatform.h"
 #include <cstdint>
 
-#include <Windows/Windows.h>
+#include <WindowsOS.h>
 #include <Types/String.h>
 #include <Application.h>
 

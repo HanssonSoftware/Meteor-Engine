@@ -30,9 +30,6 @@
     <ClCompile Include="engine\Core\Logging\Log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Platform\Timer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\Core\Types\String.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -45,9 +42,6 @@
     <ClCompile Include="engine\Core\Object\Object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Platform\PerformanceTimer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\Core\Layers\ThreadPool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -58,9 +52,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Module\ModuleManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Core\Platform\Paths.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Module\Module.cpp">
@@ -437,9 +428,6 @@
     <ClInclude Include="resources\assertbox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Common\Math.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\Core\MemoryManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -539,6 +527,12 @@
     <ClInclude Include="engine\Core\Common\Maths.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resources\DefaultDll.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\WindowsOS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\d1.bin">
@@ -575,6 +569,9 @@
       <Filter>Resource Files</Filter>
     </ResourceCompile>
     <ResourceCompile Include="resources\assertbox.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="resources\DefaultDll.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

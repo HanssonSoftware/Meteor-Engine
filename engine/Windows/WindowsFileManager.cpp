@@ -9,7 +9,7 @@
 #include <Windows/WindowsFile.h>
 #include <Platform/Platform.h>
 
-#include <Windows/Windows.h>
+#include <WindowsOS.h>
 #undef CreateDirectory
 
 #include <shlwapi.h>
@@ -170,7 +170,7 @@ IFile* WindowsFileManager::CreateFileOperation(String* pathToCreate, int32_t acc
 
         if (file == INVALID_HANDLE_VALUE)
         {
-            MR_LOG(LogFileManager, Error, "CreateFileW returned: %ls", *Platform::GetError());
+            MR_LOG(LogFileManager, Error, "CreateFileW returned: %ls (%s)", *Platform::GetError(), **pathToCreate);
             return nullptr;
         }
 

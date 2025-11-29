@@ -4,7 +4,7 @@
 #include <Types/String.h>
 #include <Logging/Log.h>
 
-#include <Windows/Windows.h>
+#include <WindowsOS.h>
 #include <Shlobj.h>
 
 #undef GetSystemDirectory

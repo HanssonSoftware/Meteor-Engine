@@ -7,8 +7,12 @@ Module "Core" : "Meteor"
 		"$(SolutionDir)\engine\Core\Logging",
 		"$(SolutionDir)\engine\Core\Module",
 		"$(SolutionDir)\engine\Core\Object",
-		"$(SolutionDir)\engine\Core\Platform",
 		"$(SolutionDir)\engine\Core"
+	}
+
+	Dependencies:
+	{
+		"Core"
 	}
 
 	Flags:

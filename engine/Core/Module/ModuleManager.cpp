@@ -1,12 +1,10 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #include "ModuleManager.h"
-#include <Platform/PlatformLayout.h>
-#include <Platform/Platform.h>
 #include <Application.h>
 
 #ifdef MR_PLATFORM_WINDOWS
-#include <Windows/Windows.h>
+#include <WindowsOS.h>
 #endif // MR_PLATFORM_WINDOWS
 
 #pragma warning(disable : 6387)
@@ -31,9 +29,9 @@ ModuleManager::~ModuleManager() noexcept
         module->ShutdownModule(); 
 
 #ifdef MR_PLATFORM_WINDOWS   
-        if (!FreeLibrary(module->library))
+        if (!FreeLibrary((HMODULE)module->library))
         {
-            MR_LOG(LogModuleManager, Error, "FreeLibrary returned: %ls (%ls)", *Platform::GetError(), module->GetName().Chr());
+            //MR_LOG(LogModuleManager, Error, "FreeLibrary returned: %ls (%ls)", *Platform::GetError(), module->GetName().Chr());
             continue;
         }
 #endif // MR_PLATFORM_WINDOWS
@@ -114,9 +112,9 @@ bool ModuleManager::UnloadModule(const String& moduleName)
             module->ShutdownModule();
 
 #ifdef MR_PLATFORM_WINDOWS
-            if (!FreeLibrary(module->library))
+            if (!FreeLibrary((HMODULE)module->library))
             {
-                MR_LOG(LogModuleManager, Error, "FreeLibrary returned: %ls (%ls)", *Platform::GetError(), moduleName.Chr());
+                //MR_LOG(LogModuleManager, Error, "FreeLibrary returned: %ls (%ls)", *Platform::GetError(), moduleName.Chr());
                 return false;
             }
 #else

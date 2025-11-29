@@ -4,7 +4,7 @@
 #include <Types/String.h>
 #include <type_traits>
 
-#include <Windows/Windows.h>
+//#include <WindowsOS.h>
 
 enum class ELoadState
 {
@@ -28,9 +28,7 @@ public:
 	String GetName() const { return name; }
 
 protected:
-#ifdef MR_PLATFORM_WINDOWS
-	HMODULE library;
-#endif // MR_PLATFORM_WINDOWS
+	void* library;
 
 	ELoadState moduleState;
 
