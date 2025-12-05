@@ -15,4 +15,4 @@ struct WindowsPlatform : public IPlatform
 };
 
 
-using Platform = WindowsPlatform;
+//using Platform = WindowsPlatform;

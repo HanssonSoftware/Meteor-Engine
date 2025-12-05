@@ -3,8 +3,7 @@
 #pragma once
 #include <Types/String.h>
 #include <type_traits>
-
-//#include <WindowsOS.h>
+#include "Core.proxy.h"
 
 enum class ELoadState
 {
@@ -15,7 +14,7 @@ enum class ELoadState
 	UNLOADED
 };
 
-class Module
+class CORE_API Module
 {
 	friend class ModuleManager;
 public:
@@ -37,7 +36,7 @@ protected:
 
 #define IMPLEMENT_MODULE(ModuleClass)																		 \
 	static_assert(std::is_base_of<Module, ModuleClass>::value, "ModuleClass does not inherit from Module!"); \
-	extern "C" /*__declspec(dllimport)*/ Module* InitialiseModule()												 \
+	extern "C" __declspec(dllimport) Module* InitialiseModule()												 \
 	{																										 \
 		return new ModuleClass();																			 \
 	}

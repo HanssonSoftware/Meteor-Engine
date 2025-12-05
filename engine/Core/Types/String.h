@@ -5,10 +5,10 @@
 #include <string>
 #include <stdint.h>
 
-//#include "Core.proxy.h"
+#include "Core.proxy.h"
 
 /** Human readable piece of text. */
-class /*CORE_API*/ String
+class CORE_API String
 {
 public:
 	String() noexcept

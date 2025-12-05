@@ -20,10 +20,3 @@ struct IPaths
 
 	static String GetExecutableDirctory();
 };
-
-
-#include <Platform/PlatformLayout.h>
-
-#ifdef MR_PLATFORM_WINDOWS
-#include <Windows/WindowsPaths.h>
-#endif // MR_PLATFORM_WINDOWS

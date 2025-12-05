@@ -18,4 +18,4 @@ public:
 };
 
 
-//IMPLEMENT_MODULE(Renderer);
+IMPLEMENT_MODULE(Renderer);

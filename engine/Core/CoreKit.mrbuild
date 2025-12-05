@@ -12,7 +12,7 @@ Module "Core" : "Meteor"
 
 	Dependencies:
 	{
-		"Core"
+		"Platform"
 	}
 
 	Flags:

@@ -27,9 +27,6 @@
     <ClCompile Include="engine\Core\Layers\LayerManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Logging\Log.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\Core\Types\String.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -43,9 +40,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Layers\ThreadPool.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Core\Logging\LogAssertion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\MemoryManager.cpp">
@@ -120,6 +114,12 @@
     <ClCompile Include="engine\Platform\PerformanceTimer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="engine\Core\Logging\Log.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\Logging\LogAssertion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\Core\Application.h">
@@ -138,12 +138,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Types\Delegate.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Core\Logging\Log.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Core\Logging\LogMacros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Types\Cast.h">
@@ -533,6 +527,12 @@
     <ClInclude Include="engine\Core\WindowsOS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="engine\Core\Logging\Log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Logging\LogMacros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\d1.bin">
@@ -579,5 +579,8 @@
     <Image Include="resources\mr1.ico">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="engine\Core\Core.natvis" />
   </ItemGroup>
 </Project>

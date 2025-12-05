@@ -28,6 +28,10 @@ public:
 	const Array<Module>* GetModules() const { return &loadedModules; };
 
 	Project& GetProjectScript() const { return *ps; }
+
+	bool GenerateImportExportDefinitions(String* path);
+
+	Module* FindModule(const String* name);
 protected:
 	bool ReadArguments();
 

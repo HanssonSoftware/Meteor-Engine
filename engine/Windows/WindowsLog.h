@@ -20,12 +20,14 @@ public:
 
 	void TransmitAssertion(const LogAssertion* Info);
 
-	virtual void SendToOutputBuffer(const String& Buffer) override;
+	virtual void SendToOutputBuffer(const String* Buffer) override;
 
 	static inline bool IsDebuggerAttached();
 
 protected:
 	WindowsLogger();
+
+	bool bHasConsoleWindow = false;
 
 	IFile* consoleBuffer = nullptr;
 };

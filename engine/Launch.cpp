@@ -18,12 +18,12 @@
 
 #pragma warning (disable : 28251)
 
-//typedef int (*LaunchApplication)(int ArgumentCount, char* Arguments[]);
+//typedef int (WINAPI *LaunchApplication)(int ArgumentCount, char* Arguments[]);
 extern int LaunchApplication(int ArgumentCount, char* Arguments[]);
 
 int main(int ArgumentCount, char* Arguments[])
 {
-    //int32_t Result = LaunchApplication(ArgumentCount, Arguments);
+    //int Result = LaunchApplication(ArgumentCount, Arguments);
 #ifdef MR_DEBUG
     _CrtDumpMemoryLeaks();
 #endif // MR_DEBUG
@@ -38,7 +38,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
     DWORD count = GetModuleFileNameW(GetModuleHandleW(nullptr), path, 512);
     PathCchRemoveFileSpec(path, count);
 
-    AddDllDirectory(wcscat(path, L"\\bin\0"));
+    AddDllDirectory(/*wcscat(path, L"\\Product\0")*/ path);
 
     LaunchApplication(0, &lpCmdLine); // fixme
 #if 0
@@ -46,6 +46,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
     if (!entryPoint) 
         return -1;
 
+    auto a = GetLastError();
     LaunchApplication app = (LaunchApplication)GetProcAddress(entryPoint, "LaunchApplication");
     if (app)
     {
@@ -60,6 +61,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
         return Result;
     }
 
+    auto b = GetLastError();
     MessageBoxW(nullptr, L"Unable to reach engine code!", L"Engine Error!", MB_OK);
 #endif // 0
     return -1;

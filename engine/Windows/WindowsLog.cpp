@@ -108,45 +108,45 @@ void WindowsLogger::Shutdown()
 }
 
 
-void WindowsLogger::SendToOutputBuffer(const String& Buffer)
+void WindowsLogger::SendToOutputBuffer(const String* Buffer)
 {
-#ifdef MR_DEBUG
-	if (bIsRunningDebugMode && bHasConsoleWindow)
-	{
-		const LogDescriptor* actualDescriptor = ILogger::Get()->GetActualEntry();
-		if (!actualDescriptor)
-			return;
+//#ifdef MR_DEBUG
+//	if (bIsRunningDebugMode && bHasConsoleWindow)
+//	{
+//		const LogDescriptor* actualDescriptor = ILogger::Get()->GetActualEntry();
+//		if (!actualDescriptor)
+//			return;
+//
+//		switch (actualDescriptor->severity)
+//		{
+//		case Log:
+//			SetConsoleTextAttribute(hConsole, 0x7);
+//			break;
+//		case Verbose:
+//			SetConsoleTextAttribute(hConsole, 0x9);
+//			break;
+//		case Error:
+//			SetConsoleTextAttribute(hConsole, 0xC);
+//			break;
+//		case Warn:
+//			SetConsoleTextAttribute(hConsole, 0x6);
+//			break;
+//		case Fatal:
+//			SetConsoleTextAttribute(hConsole, 0x4);
+//			break;
+//		}
+//
+//		DWORD written = 0;
+//		if (!WriteConsoleW(hConsole, Buffer, (DWORD)wcslen(Buffer), &written, 0))
+//			return ILogger::SendToOutputBuffer(Buffer);
+//
+//		if (IsDebuggerAttached())
+//			OutputDebugStringW(Buffer);
+//
+//	}
+//#endif // MR_DEBUG
 
-		switch (actualDescriptor->severity)
-		{
-		case Log:
-			SetConsoleTextAttribute(hConsole, 0x7);
-			break;
-		case Verbose:
-			SetConsoleTextAttribute(hConsole, 0x9);
-			break;
-		case Error:
-			SetConsoleTextAttribute(hConsole, 0xC);
-			break;
-		case Warn:
-			SetConsoleTextAttribute(hConsole, 0x6);
-			break;
-		case Fatal:
-			SetConsoleTextAttribute(hConsole, 0x4);
-			break;
-		}
-
-		DWORD written = 0;
-		if (!WriteConsoleW(hConsole, Buffer, (DWORD)wcslen(Buffer), &written, 0))
-			return ILogger::SendToOutputBuffer(Buffer);
-
-		if (IsDebuggerAttached())
-			OutputDebugStringW(Buffer);
-
-	}
-#endif // MR_DEBUG
-
-	ILogger::SendToOutputBuffer(Buffer);
+	//ILogger::SendToOutputBuffer(Buffer);
 }
 
 void WindowsLogger::HandleFatal()

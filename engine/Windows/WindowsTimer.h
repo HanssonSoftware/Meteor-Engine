@@ -24,4 +24,3 @@ private:
 	HANDLE timer;
 };
 
-using Timer = WindowsTimer;

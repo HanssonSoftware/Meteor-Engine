@@ -2,8 +2,7 @@
 
 #pragma once
 #include <stdint.h>
-
-class String;
+#include <Types/String.h>
 
 struct Time
 {
@@ -33,7 +32,7 @@ public:
 
     static Time Now() noexcept;
 
-    static String Format(const String& formatting);
+    static String Format(const String* formatting);
 protected:
     uint64_t begin = 0;
 
@@ -42,8 +41,4 @@ protected:
     bool bRunning = false;
 };
 
-#include "PlatformLayout.h"
-
-#ifdef MR_PLATFORM_WINDOWS
-#include <Windows/WindowsTimer.h>
-#endif // MR_PLATFORM_WINDOWS
+typedef ITimer Timer;

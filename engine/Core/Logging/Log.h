@@ -1,11 +1,14 @@
 ﻿/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
+#include <stdint.h>
+
+#include "Core.proxy.h"
 
 #ifdef MR_DEBUG
-static constexpr const bool bIsRunningDebugMode = true;
+static constexpr bool bIsRunningDebugMode = true;
 #else
-static constexpr const bool bIsRunningDebugMode = false;
+static constexpr bool bIsRunningDebugMode = false;
 #endif // MR_DEBUG
 
 class String;
@@ -14,48 +17,51 @@ struct LogAssertion;
 class IFile;
 
 
+
 struct LogEntry {};
 
-class ILogger
+class CORE_API ILogger
 {
-	friend class WindowsLogger;
 public:
 	static ILogger* Get();
 
+	template<typename T>
+	static T* Get();
+
 	virtual void Initialize();
 
-	virtual void Shutdown();
-
-	virtual ~ILogger() noexcept;
+	virtual void Shutdown() {};
 
 	const LogDescriptor* GetActualEntry() const { return Get()->actualDescriptor; };
 
-	void SetActualLog(LogDescriptor* newDescriptor);
+	void SetActualLog(const LogDescriptor* newDescriptor) { actualDescriptor = newDescriptor; }
 
-	virtual void TransmitMessage(LogDescriptor* Descriptor);
+	virtual void ProcessMessage(const LogDescriptor* Descriptor) {};
 
-	virtual void TransmitAssertion(const LogAssertion* Info);
+	virtual void ProcessAssertion(const LogAssertion* Info) {};
 
-	static inline bool IsDebuggerAttached();
+	virtual bool IsDebuggerAttached() { return false; };
 
-	virtual void SendToOutputBuffer(const String& Buffer);
+	virtual void SendToOutputBuffer(const String* Buffer) {};
 
-	virtual void HandleFatal();
-
+	virtual void HandleFatal() {};
 protected:
-	ILogger();
+	static constexpr const wchar_t* FormatSeverity(uint8_t Severity) noexcept;
 
-	LogDescriptor* actualDescriptor = nullptr;
+	ILogger() = default;
+
+	virtual ~ILogger() noexcept
+	{
+		Shutdown();
+	};
+
+	const LogDescriptor* actualDescriptor = nullptr;
 		
 	bool bIsUsingVerbose = false;
 
 	bool bIsInitialized = false;
 
-	bool bHasConsoleWindow = false;
-
-	bool bIsUsingFile = true;
-
-	IFile* buffer = nullptr;
+	static inline ILogger* object;
 };
 
 #include "LogMacros.h"

@@ -120,7 +120,7 @@ public:
 		if (newCap <= capacity) return;
 		T* dst = new T[newCap];
 		for (uint32_t i = 0; i < size; ++i) dst[i] = std::move(container[i]);
-		delete[] container;
+		//delete[] container;
 		container = dst;
 		capacity = newCap;
 	}

@@ -6,18 +6,13 @@
 
 struct IPlatform
 {
-	static ScopedPtr<wchar_t> ConvertToWide(const char* skinny) {};
+	static ScopedPtr<wchar_t> ConvertToWide(const char* skinny) { return ScopedPtr<wchar_t>(); };
 
-	static ScopedPtr<char> ConvertToNarrow(const wchar_t* fat) {};
+	static ScopedPtr<char> ConvertToNarrow(const wchar_t* fat) { return ScopedPtr<char>(); };
 
-	static String GetError() {};
+	static String GetError() { return ""; };
 
 	static bool IsRunningAnAnotherInstance() {};
 };
 
-
-#include "PlatformLayout.h"
-
-#ifdef MR_PLATFORM_WINDOWS
-#include <Windows/WindowsPlatform.h>
-#endif // MR_PLATFORM_WINDOWS
+typedef IPlatform Platform;

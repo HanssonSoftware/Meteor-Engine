@@ -6,11 +6,11 @@
 		<Platform Name = "x64" />
 	</Configurations>
 	<Folder Name = "/Modules/">
-		<Project Path = "C:\Meteor-Engine\Intermediate\Apollo\Core\Core.vcxproj" Id="{F3316C4B-1E8C-44BE-984A-EBC78B43CC7C}"/>
-		<Project Path = "C:\Meteor-Engine\Intermediate\Apollo\Platform\Platform.vcxproj" Id="{C9DD6EA3-D38B-4F85-A52A-EFE5C19D998D}"/>
-		<Project Path = "C:\Meteor-Engine\Intermediate\Apollo\Renderer\Renderer.vcxproj" Id="{95FDD304-EA8D-40A5-9933-D31D3D56B959}"/>
-		<Project Path = "C:\Meteor-Engine\Intermediate\Apollo\Vulkan\Vulkan.vcxproj" Id="{A69796F6-BDFE-4735-87D6-97D0A9EA8043}"/>
-		<Project Path = "C:\Meteor-Engine\Intermediate\Apollo\WindowManager\WindowManager.vcxproj" Id="{275C543A-0E68-4906-A6E9-76204B70DF44}"/>
-		<Project Path = "C:\Meteor-Engine\Intermediate\Apollo\Windows\Windows.vcxproj" Id="{0116A898-9D3B-4BD2-9F2E-9C5972DA80D6}"/>
+		<Project Path = "C:\HanssonSoftware\Meteor-Engine\Intermediate\Apollo\Core\Core.vcxproj" Id="{AC4A0CC2-8FD3-490C-9013-0400E95A0214}"/>
+		<Project Path = "C:\HanssonSoftware\Meteor-Engine\Intermediate\Apollo\Platform\Platform.vcxproj" Id="{B8FA0261-A98A-42B8-8068-6EE319A116E8}"/>
+		<Project Path = "C:\HanssonSoftware\Meteor-Engine\Intermediate\Apollo\Renderer\Renderer.vcxproj" Id="{8FD81E3F-CE9D-448A-8ED4-B50B9E91899F}"/>
+		<Project Path = "C:\HanssonSoftware\Meteor-Engine\Intermediate\Apollo\Vulkan\Vulkan.vcxproj" Id="{D9D04108-FC1B-4FB0-95EE-C4D8B31C685E}"/>
+		<Project Path = "C:\HanssonSoftware\Meteor-Engine\Intermediate\Apollo\WindowManager\WindowManager.vcxproj" Id="{AB3E095B-44FA-4C79-B2EF-6DA4AC3388ED}"/>
+		<Project Path = "C:\HanssonSoftware\Meteor-Engine\Intermediate\Apollo\Windows\Windows.vcxproj" Id="{20ED329A-CE1E-4319-97F3-44D156C8845E}"/>
 	</Folder>
 </Solution>

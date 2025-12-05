@@ -8,7 +8,7 @@
 #define MERGE2(x) #x
 
 
-enum LogSeverity : short
+enum LogSeverity : uint8_t
 {
     Log,
     Verbose,
@@ -32,17 +32,17 @@ struct LogDescriptor
 
     void SetMessage(const wchar_t* message, ...);
 
-    const wchar_t* team;
-
     int severity;
 
-    String message;
+    int line;
+
+    const wchar_t* team;
 
     const wchar_t* function;
 
     const wchar_t* file;
 
-    int line;
+    String message;
 };
 
 
@@ -66,7 +66,7 @@ LOG_ADDCATEGORY(Temp);
     {\
         do { \
             \
-                LogDescriptor Log##LINE; Log##LINE.SetValues(Lize(#CategoryName), Severity, __FUNCTIONW__, __FILEW__, __LINE__);Log##LINE.SetMessage(Lize(Message), __VA_ARGS__); ILogger::Get()->TransmitMessage(&Log##LINE); \
+                LogDescriptor Log##LINE; Log##LINE.SetValues(Lize(#CategoryName), Severity, __FUNCTIONW__, __FILEW__, __LINE__);Log##LINE.SetMessage(Lize(Message), __VA_ARGS__); ILogger::Get()->ProcessMessage(&Log##LINE); \
                 if constexpr (Severity == Fatal) \
                 { \
                     ILogger::Get()->HandleFatal(); \

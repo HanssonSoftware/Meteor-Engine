@@ -7,6 +7,7 @@
 #include <Types/Pointers.h>
 #include <Platform/Platform.h>
 
+#include "Windows/WindowsPaths.h"
 #include <PathCch.h>
 
 void Utils::ListDirectory(String* name, Array<String>& container)
@@ -15,7 +16,7 @@ void Utils::ListDirectory(String* name, Array<String>& container)
 	{
 		if (FileManager::IsPathRelative(name))
 		{
-			String exeDir = Paths::GetExecutableDirctory();
+			String exeDir = WindowsPaths::GetExecutableDirctory();
 
 			PathCchRemoveFileSpec(exeDir.Data(), exeDir.Length());
 			exeDir.Refresh();

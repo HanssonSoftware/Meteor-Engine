@@ -77,10 +77,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(Solutiondir)product\</OutDir>
     <IntDir>$(SolutionDir)intermediate\$(ProjectName)\</IntDir>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(SolutionDir)Product\</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(Solutiondir)product\</OutDir>
     <IntDir>$(SolutionDir)intermediate\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(SolutionDir)Product\</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -129,13 +133,13 @@
       <PreprocessorDefinitions>MR_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)engine\Core\Platform;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\Core</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Intermediate\Apollo\Core;$(ProjectDir);$(SolutionDir)engine\Core\Platform;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate</AdditionalIncludeDirectories>
       <PreprocessToFile>false</PreprocessToFile>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(CoreLibraryDependencies);$(SolutionDir)product\MeteorEngine-Core.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);MeteorEngine-Core.lib</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)engine;$(SolutionDir)resources;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -169,16 +173,17 @@
     </ResourceCompile>
     <ClCompile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)engine\Core\Platform;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\Core</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Intermediate\Apollo\Core;$(ProjectDir);$(SolutionDir)engine\Core\Platform;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(CoreLibraryDependencies);$(SolutionDir)product\MeteorEngine-Core.lib</AdditionalDependencies>
-      <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>$(CoreLibraryDependencies);MeteorEngine-Core.lib</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core\BuildSystem.cpp" />
     <ClCompile Include="Core\Application.cpp" />
+    <ClCompile Include="Module\Launcher.cpp" />
     <ClCompile Include="Module\Module.cpp" />
     <ClCompile Include="Core\Utils.cpp" />
     <ClCompile Include="Module\Project.cpp" />
@@ -187,6 +192,7 @@
   <ItemGroup>
     <ClInclude Include="Core\BuildSystem.h" />
     <ClInclude Include="Core\Application.h" />
+    <ClInclude Include="Module\Launcher.h" />
     <ClInclude Include="Module\Module.h" />
     <ClInclude Include="Module\Project.h" />
     <ClInclude Include="Core\Parser.h" />

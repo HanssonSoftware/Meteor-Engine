@@ -169,7 +169,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG;MR_CORE_ENABLED;MR_PLATFORM_WINDOWS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Intermediate\Apollo\Core;$(VULKAN_SDK)\include;$(ProjectDir)engine\Core\Platform;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Intermediate\;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate\Apollo\Core;$(VULKAN_SDK)\include;$(ProjectDir)engine\Core\Platform;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
       <UseFullPaths>false</UseFullPaths>
     </ClCompile>
@@ -205,7 +205,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_CORE_ENABLED;MR_PLATFORM_WINDOWS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Intermediate\Apollo\Core;$(VULKAN_SDK)\include;$(ProjectDir)engine\Core\Platform;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Intermediate\;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate\Apollo\Core;$(VULKAN_SDK)\include;$(ProjectDir)engine\Core\Platform;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
       <UseFullPaths>false</UseFullPaths>
     </ClCompile>
@@ -235,6 +235,8 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="engine\Core\Logging\Log.cpp" />
+    <ClCompile Include="engine\Core\Logging\LogAssertion.cpp" />
     <ClCompile Include="engine\Core\Object\Object.cpp" />
     <ClCompile Include="engine\Core\Application.cpp" />
     <ClCompile Include="engine\Core\Commandlet.cpp" />
@@ -245,7 +247,6 @@
     <ClCompile Include="engine\Platform\PerformanceTimer.cpp" />
     <ClCompile Include="engine\Platform\Timer.cpp" />
     <ClCompile Include="engine\Windows\WindowsPlatform.cpp" />
-    <ClCompile Include="engine\Core\Logging\Log.cpp" />
     <ClCompile Include="engine\Core\Types\String.cpp" />
     <ClCompile Include="engine\Core\Types\Vector.cpp" />
     <ClCompile Include="engine\WindowManager\Window.cpp" />
@@ -261,7 +262,6 @@
     <ClCompile Include="engine\Windows\WindowsFileManager.cpp" />
     <ClCompile Include="engine\WindowManager\WindowMenu.cpp" />
     <ClCompile Include="engine\WindowManager\WindowExtender.cpp" />
-    <ClCompile Include="engine\Core\Logging\LogAssertion.cpp" />
     <ClCompile Include="engine\Windows\WindowsThread.cpp" />
     <ClCompile Include="engine\Platform\Thread\ThreadManager.cpp" />
     <ClCompile Include="engine\Windows\WindowsThreadManager.cpp" />
@@ -273,6 +273,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\Core\Common\Maths.h" />
+    <ClInclude Include="engine\Core\Logging\Log.h" />
+    <ClInclude Include="engine\Core\Logging\LogMacros.h" />
     <ClInclude Include="engine\Core\WindowsOS.h" />
     <ClInclude Include="engine\Platform\Platform.h" />
     <ClInclude Include="engine\Platform\Thread\ThreadDescriptor.h" />
@@ -290,8 +292,6 @@
     <ClInclude Include="engine\Core\Types\Array.h" />
     <ClInclude Include="engine\Core\Types\Delegate.h" />
     <ClInclude Include="engine\Platform\File.h" />
-    <ClInclude Include="engine\Core\Logging\Log.h" />
-    <ClInclude Include="engine\Core\Logging\LogMacros.h" />
     <ClInclude Include="engine\Platform\Timer.h" />
     <ClInclude Include="engine\Core\Types\Cast.h" />
     <ClInclude Include="engine\Core\Types\String.h" />
@@ -429,6 +429,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\mr1.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="engine\Core\Core.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
