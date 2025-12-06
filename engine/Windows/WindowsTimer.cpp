@@ -1,7 +1,7 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #include "WindowsTimer.h"
-#include "WindowsOS.h"
+#include "Windows.h"
 #include <Logging/Log.h>
 #include <Platform/Platform.h>
 
@@ -59,7 +59,7 @@ Time WindowsTimer::Now() noexcept
 String WindowsTimer::Format(const String& formatting)
 {
 	wchar_t fixed[128] = {};
-	if (!GetDateFormatEx(LOCALE_NAME_USER_DEFAULT, 0, nullptr, formatting, fixed, 128, nullptr))
+	//if (!GetDateFormatEx(LOCALE_NAME_USER_DEFAULT, 0, nullptr, formatting, fixed, 128, nullptr))
 	{
 		const String err = Platform::GetError();
 
@@ -74,6 +74,6 @@ String WindowsTimer::Format(const String& formatting)
 		int j = 325;
 	}
 
-	return fixed;
+	return "fixed";
 }
 

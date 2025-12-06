@@ -21,7 +21,7 @@ struct LogDescriptor
 {
     LogDescriptor() = default;
 
-    constexpr void SetValues(const wchar_t* category, int severity, const wchar_t* function, const wchar_t* file, const int line) noexcept
+    constexpr void SetValues(const char* category, int severity, const char* function, const char* file, const int line) noexcept
     {
         this->team = category;
         this->severity = severity;
@@ -30,17 +30,17 @@ struct LogDescriptor
         this->file = file;
     }
 
-    void SetMessage(const wchar_t* message, ...);
+    void SetMessage(const char* message, ...);
 
-    int severity;
+    int severity = -1;
 
-    int line;
+    int line = -1;
 
-    const wchar_t* team;
+    const char* team = nullptr;
 
-    const wchar_t* function;
+    const char* function = nullptr;
 
-    const wchar_t* file;
+    const char* file = nullptr;
 
     String message;
 };
@@ -57,20 +57,22 @@ struct LogDescriptor
 LOG_ADDCATEGORY(Temp);
 
 #define LINE _CRT_WIDE(__LINE__)
-#define Lize(x) L##x
 
 #define MR_LOG(CategoryName, Severity, Message, ...) \
 	/*static_assert(!std::is_same<decltype(_exception::retval), const wchar_t*>::value, "Formatting must be either TEXT() or L'Text'"); */\
     static_assert(std::is_base_of<LogEntry, CategoryName>::value, "Category must inherit from LogEntry (Use LOG_ADDCATEGORY() macro)"); \
     if constexpr (bIsRunningDebugMode || Severity != Fatal) \
     {\
-        do { \
+        do \
+        { \
             \
-                LogDescriptor Log##LINE; Log##LINE.SetValues(Lize(#CategoryName), Severity, __FUNCTIONW__, __FILEW__, __LINE__);Log##LINE.SetMessage(Lize(Message), __VA_ARGS__); ILogger::Get()->ProcessMessage(&Log##LINE); \
-                if constexpr (Severity == Fatal) \
-                { \
-                    ILogger::Get()->HandleFatal(); \
-                } \
+            static constexpr LogDescriptor desc = {}; \
+                
+            if constexpr (Severity == Fatal) \
+            { \
+                ILogger::Get()->HandleFatal(); \
+            } \
+
         } while (0); \
     }
 

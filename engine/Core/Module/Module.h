@@ -3,7 +3,7 @@
 #pragma once
 #include <Types/String.h>
 #include <type_traits>
-#include "Core.proxy.h"
+//#include "Core.proxy.h"
 
 enum class ELoadState
 {
@@ -14,7 +14,7 @@ enum class ELoadState
 	UNLOADED
 };
 
-class CORE_API Module
+class /*CORE_API*/ Module
 {
 	friend class ModuleManager;
 public:

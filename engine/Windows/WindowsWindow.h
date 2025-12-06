@@ -2,7 +2,7 @@
 
 #pragma once
 #include <WindowManager/Window.h>
-#include <WindowsOS.h>
+#include <Windows.h>
 
 //class WindowsWindowManager;
 

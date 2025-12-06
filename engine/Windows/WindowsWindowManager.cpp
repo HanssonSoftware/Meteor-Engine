@@ -33,7 +33,8 @@ void WindowsWindowManager::Shutdown()
 
     if (bIsWinAPIClassRegistered)
     {
-        UnregisterClassW(GetApplication()->GetApplicationNameNoSpaces(), instance);
+        //GetApplication()->GetApplicationNameNoSpaces();
+        UnregisterClassW(nullptr, instance);
     }
 }
 
@@ -58,20 +59,20 @@ bool WindowsWindowManager::CreateWindow(const String& name, const Vector2<uint32
     RECT windowRect = { 0, 0, (LONG)size.x, (LONG)size.y };
     AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, 0);
 
-    instance->handle = ::CreateWindowExW(
-        /*WS_EX_ACCEPTFILES*/ 0,
-        GetApplication()->GetApplicationNameNoSpaces(),
-        name,
-        WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT,
-        CW_USEDEFAULT,
-        windowRect.right - windowRect.left,
-        windowRect.bottom - windowRect.top,
-        0,
-        0,
-        Inst,
-        0
-    );
+    //instance->handle = ::CreateWindowExW(
+    //    /*WS_EX_ACCEPTFILES*/ 0,
+    //    GetApplication()->GetApplicationNameNoSpaces(),
+    //    name,
+    //    WS_OVERLAPPEDWINDOW,
+    //    CW_USEDEFAULT,
+    //    CW_USEDEFAULT,
+    //    windowRect.right - windowRect.left,
+    //    windowRect.bottom - windowRect.top,
+    //    0,
+    //    0,
+    //    Inst,
+    //    0
+    //);
 
     if (!instance->handle)
     {
@@ -116,7 +117,7 @@ inline bool WindowsWindowManager::RegisterWindowClass()
 	//windowClass.hIcon = ico;
 	//windowClass.hIconSm = ico;
 	windowClass.lpfnWndProc = MeteorSpecifiedWindowProcedure;
-    windowClass.lpszClassName = className;
+    //windowClass.lpszClassName = className;
 
 	if (!RegisterClassExW(&windowClass))
 	{

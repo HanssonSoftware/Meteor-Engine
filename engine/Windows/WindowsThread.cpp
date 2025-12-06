@@ -1,7 +1,7 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #include "WindowsThread.h"
-#include <WindowsOS.h>
+#include <Windows.h>
 
 
 void WindowsThread::Init()

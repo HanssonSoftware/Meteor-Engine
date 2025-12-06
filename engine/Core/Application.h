@@ -6,11 +6,11 @@
 #include "Commandlet.h"
 #include <cstdint>
 
-#include "Core.proxy.h"
+//#include "Core.proxy.h"
 
 LOG_ADDCATEGORY(Application);
 
-struct CORE_API Application
+struct /*CORE_API*/ Application
 {
 	enum class ECurrentApplicationState { NONE, STARTUP, RUNNING, RESTARTING, SHUTDOWN, DEAD };
 

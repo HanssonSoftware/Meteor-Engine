@@ -28,11 +28,8 @@ void EditorApplication::Init()
 {
 	Application::Init();
 	
-	Paths::GetSystemDirectory();
-	Paths::GetDocumentsDirectory();
-
 	int32_t j = 76;
-
+	String ad = "fasz";
 	Array<int32_t> is(4);
 	for (uint32_t i = 0; i < is.GetSize(); i++)
 	{

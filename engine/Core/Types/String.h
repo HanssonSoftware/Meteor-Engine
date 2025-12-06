@@ -5,10 +5,10 @@
 #include <string>
 #include <stdint.h>
 
-#include "Core.proxy.h"
+//#include "Core.proxy.h"
 
 /** Human readable piece of text. */
-class CORE_API String
+class /*CORE_API*/ String
 {
 public:
 	String() noexcept
@@ -16,15 +16,13 @@ public:
 		NullOut();
 
 #ifdef MR_DEBUG
-		bIsInited = true;
+		Stats.bIsInited = true;
 #endif // MR_DEBUG
 	}
 
 	virtual ~String() noexcept;
 
 	String(const char* Input);
-
-	String(const wchar_t* Input);
 
 	String(int Input);
 
@@ -46,17 +44,17 @@ public:
 
 	bool operator==(const String& Other) const
 	{
-		return wcscmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) == 0;
+		return strcmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) == 0;
 	}
 
-	bool operator==(const wchar_t* Other) const
+	bool operator==(const char* Other) const
 	{
-		return wcscmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other) == 0;
+		return strcmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other) == 0;
 	}
 		
 	bool operator!=(const String& Other) const
 	{
-		return wcscmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) != 0;
+		return strcmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) != 0;
 	}
 
 	bool operator!() const
@@ -73,22 +71,22 @@ public:
 
 	String& operator+=(const char* other);
 	
-	const wchar_t* operator*() const
+	const char* operator*() const
 	{
-		return bIsUsingHeap ? (heapBuffer.ptr || heapBuffer.length != 0 ? heapBuffer.ptr : L"") :
-			stackBuffer.ptr || stackBuffer.length != 0 ? stackBuffer.ptr : L"";
+		return bIsUsingHeap ? (heapBuffer.ptr || heapBuffer.length != 0 ? heapBuffer.ptr : "") :
+			stackBuffer.ptr || stackBuffer.length != 0 ? stackBuffer.ptr : "";
 	}
 
-	operator const wchar_t*() const
+	operator const char*() const
 	{
-		return bIsUsingHeap ? (heapBuffer.ptr || heapBuffer.length != 0 ? heapBuffer.ptr : L"") :
-			stackBuffer.ptr || stackBuffer.length != 0 ? stackBuffer.ptr : L"";
+		return bIsUsingHeap ? (heapBuffer.ptr || heapBuffer.length != 0 ? heapBuffer.ptr : "") :
+			stackBuffer.ptr || stackBuffer.length != 0 ? stackBuffer.ptr : "";
 	}
 
-	const wchar_t* Chr() const
+	const char* Chr() const
 	{
-		return bIsUsingHeap ? (heapBuffer.ptr || heapBuffer.length != 0 ? heapBuffer.ptr : L"") :
-			stackBuffer.ptr || stackBuffer.length != 0 ? stackBuffer.ptr : L"";
+		return bIsUsingHeap ? (heapBuffer.ptr || heapBuffer.length != 0 ? heapBuffer.ptr : "") :
+			stackBuffer.ptr || stackBuffer.length != 0 ? stackBuffer.ptr : "";
 	}
 
 	String Delim(const String character, bool first);
@@ -102,12 +100,12 @@ public:
 
 	int ToInt() const noexcept
 	{
-		return std::wcstol(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, nullptr, 0);
+		return std::stol(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, nullptr, 0);
 	}
 
 	float ToFloat() const noexcept
 	{
-		return std::wcstof(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, nullptr);
+		return std::stof(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, nullptr);
 	}
 
 	const uint32_t Length() const noexcept
@@ -118,9 +116,9 @@ public:
 	void Refresh() noexcept
 	{
 		if (heapBuffer.ptr != nullptr)
-			heapBuffer.length = (uint32_t)wcslen(heapBuffer.ptr);
+			heapBuffer.length = (uint32_t)strlen(heapBuffer.ptr);
 
-		stackBuffer.length = (uint32_t)wcslen(stackBuffer.ptr);
+		stackBuffer.length = (uint32_t)strlen(stackBuffer.ptr);
 	}
 
 	/** */
@@ -128,7 +126,7 @@ public:
 
 	static bool Contains(const char* buffer, const char* target);
 
-	wchar_t* Data() { return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr; };
+	char* Data() { return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr; };
 
 private:
 
@@ -142,21 +140,21 @@ private:
 		heapBuffer.capacity = 0;
 		heapBuffer.length = 0;
 
-		wmemset(stackBuffer.ptr, 0, SSO_MAX_CHARS + 1);
+		memset(stackBuffer.ptr, 0, SSO_MAX_CHARS + 1);
 		stackBuffer.length = 0;
 
 #ifdef MR_DEBUG
-		bIsInited = false;
+		Stats.bIsInited = false;
 #endif // MR_DEBUG
 	}
 
-	wchar_t* DetermineLocation(uint32_t size);
+	char* DetermineLocation(uint32_t size);
 
 	union
 	{
 		struct
 		{
-			wchar_t* ptr = nullptr;
+			char* ptr = nullptr;
 
 			uint32_t length = 0;
 
@@ -166,7 +164,7 @@ private:
 
 		struct
 		{ 
-			wchar_t ptr[sizeof(heapBuffer) - sizeof(uint32_t)] = {L'\0'};
+			char ptr[sizeof(heapBuffer) - sizeof(uint32_t)] = {L'\0'};
 
 			uint32_t length = 0;
 
@@ -178,12 +176,16 @@ private:
 	bool bIsUsingHeap = false;
 
 #ifdef MR_DEBUG
-	bool bIsInited = false;
+	struct
+	{
+		bool bIsInited = false;
 
-	// enum instantiationStatus { None, Valid, NeedsClean, Error, Empty } status = None;
-
-	const char* functionWhereWasInited = nullptr;
+		const char* functionWhereWasInited = nullptr;
+		
+		// enum instantiationStatus { None, Valid, NeedsClean, Error, Empty } status = None;
+	} Stats;
 #endif // MR_DEBUG
+
 };
 
-String operator+(const String& OtherA, const String& OtherB);
+//String operator+(const String& OtherA, const String& OtherB);

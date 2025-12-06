@@ -7,7 +7,7 @@
 #include <Types/String.h>
 
 #ifdef MR_PLATFORM_WINDOWS
-#include <WindowsOS.h>
+#include <Windows.h>
 #endif // MR_PLATFORM_WINDOWS
 #include <MemoryManager.h>
 
@@ -17,14 +17,14 @@ void Commandlet::Initialize()
 {
 	String commandLine;
 #ifdef MR_PLATFORM_WINDOWS
-	commandLine = GetCommandLineW();
+	commandLine = GetCommandLineA();
 #endif // MR_PLATFORM_WINDOWS
 	
-	wchar_t* token = wcstok(commandLine.Data(), L" ");
+	char* token = strtok(commandLine.Data(), " ");
 	while (token != nullptr)
 	{
 		parsedWords.Add(String(token));
-		token = wcstok(nullptr, L" ");
+		token = strtok(nullptr, " ");
 	}
 
 	bIsInited = true;

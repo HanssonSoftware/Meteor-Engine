@@ -4,7 +4,7 @@
 #include <Application.h>
 
 #ifdef MR_PLATFORM_WINDOWS
-#include <WindowsOS.h>
+#include <Windows.h>
 #endif // MR_PLATFORM_WINDOWS
 
 #pragma warning(disable : 6387)
@@ -51,7 +51,7 @@ bool ModuleManager::LoadModule(const String& moduleName)
 #ifdef MR_PLATFORM_WINDOWS
     String libraryName = String::Format("%ls-%ls.dll", *GetApplication()->GetApplicationName(), moduleName.Chr());
 
-    HMODULE module = LoadLibraryW(libraryName);
+    HMODULE module = /*LoadLibraryW(libraryName)*/ nullptr;
     if (module != nullptr)
     {
         fv moduleInstantiation = (fv)GetProcAddress(module, "InitialiseModule");
@@ -72,7 +72,7 @@ bool ModuleManager::LoadModule(const String& moduleName)
     {
         libraryName = String::Format("%ls-%ls.dll", defaultEngineName, moduleName.Chr());
 
-        module = LoadLibraryW(libraryName);
+        //module = LoadLibraryW(libraryName);
         if (module != nullptr)
         {
             fv moduleInstantiation = (fv)GetProcAddress(module, "InitialiseModule");

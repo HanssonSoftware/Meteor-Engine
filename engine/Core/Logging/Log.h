@@ -3,7 +3,7 @@
 #pragma once
 #include <stdint.h>
 
-#include "Core.proxy.h"
+//#include "Core.proxy.h"
 
 #ifdef MR_DEBUG
 static constexpr bool bIsRunningDebugMode = true;
@@ -20,7 +20,7 @@ class IFile;
 
 struct LogEntry {};
 
-class CORE_API ILogger
+class /*CORE_API*/ ILogger
 {
 public:
 	static ILogger* Get();
@@ -39,14 +39,8 @@ public:
 	virtual void ProcessMessage(const LogDescriptor* Descriptor) {};
 
 	virtual void ProcessAssertion(const LogAssertion* Info) {};
-
-	virtual bool IsDebuggerAttached() { return false; };
-
-	virtual void SendToOutputBuffer(const String* Buffer) {};
-
-	virtual void HandleFatal() {};
 protected:
-	static constexpr const wchar_t* FormatSeverity(uint8_t Severity) noexcept;
+	static constexpr const char* FormatSeverity(uint8_t Severity) noexcept;
 
 	ILogger() = default;
 
@@ -61,7 +55,7 @@ protected:
 
 	bool bIsInitialized = false;
 
-	static inline ILogger* object;
+
 };
 
 #include "LogMacros.h"

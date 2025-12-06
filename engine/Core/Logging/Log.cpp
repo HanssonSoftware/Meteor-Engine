@@ -10,13 +10,15 @@
 //#include <Platform/Timer.h>
 //#include <Platform/FileManager.h>
 //
-//#ifdef MR_PLATFORM_WINDOWS
-//#include <Windows/WindowsLog.h>
-//#else
-//
-//#endif // MR_PLATFORM_WINDOWS
+#ifdef MR_PLATFORM_WINDOWS
+#include <Windows/WindowsLog.h>
+#else
+
+#endif // MR_PLATFORM_WINDOWS
 
 LOG_ADDCATEGORY(Standard);
+
+static ILogger* object;
 
 ILogger* ILogger::Get()
 {
@@ -70,37 +72,37 @@ void ILogger::Initialize()
 //    SendToOutputBuffer(&fullMessage);
 //}
 
-constexpr const wchar_t* ILogger::FormatSeverity(uint8_t Severity) noexcept
+constexpr const char* ILogger::FormatSeverity(uint8_t Severity) noexcept
 {
 	switch (Severity)
 	{
 	case Log:
-		return L"Log";
+		return "Log";
 	case Warn:
-		return L"Warning";
+		return "Warning";
 	case Error:
-		return L"Error";
+		return "Error";
 	case Fatal:
-		return L"Fatal";
+		return "Fatal";
 	case Verbose:
-		return L"Verbose";
+		return "Verbose";
 	}
 
-	return L"";
+	return "";
 }
 
 
-void LogDescriptor::SetMessage(const wchar_t* message, ...)
+void LogDescriptor::SetMessage(const char* message, ...)
 {
     va_list d = nullptr;
     va_start(d, message);
-    const int reqAmount = vswprintf(nullptr, 0, message, d);
+    const int reqAmount = vsnprintf(nullptr, 0, message, d);
 
-    wchar_t* big = MemoryManager::Get().Allocate<wchar_t>(reqAmount + 1);
-    vswprintf(big, reqAmount + 1, message, d);
+    char* big = MemoryManager::Get().Allocate<char>(reqAmount + 1);
+    vsnprintf(big, reqAmount + 1, message, d);
     va_end(d);
 
-    big[reqAmount] = L'\0';
+    big[reqAmount] = '\0';
 
     this->message = big;
     MemoryManager::Get().Deallocate(big);

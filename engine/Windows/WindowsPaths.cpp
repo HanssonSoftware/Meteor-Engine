@@ -4,7 +4,7 @@
 #include <Types/String.h>
 #include <Logging/Log.h>
 
-#include <WindowsOS.h>
+#include <Windows.h>
 #include <Shlobj.h>
 
 #undef GetSystemDirectory
@@ -18,9 +18,9 @@ String WindowsPaths::GetSystemDirectory()
 	wchar_t* buffer = new wchar_t[num + 1]();
 	if (GetWindowsDirectoryW(buffer, num) > 0)
 	{
-		String super(buffer);
+		//String super(buffer);
 		delete[] buffer;
-		return super;
+		return "super";
 	}
 
 	delete[] buffer;
@@ -37,7 +37,7 @@ String WindowsPaths::GetDocumentsDirectory()
 		return "";
 	}
 
-	return path;
+	return "path";
 }
 
 String WindowsPaths::GetUserDirectory()
@@ -50,7 +50,7 @@ String WindowsPaths::GetUserDirectory()
 		return "";
 	}
 
-	return path;
+	return "path";
 }
 
 String WindowsPaths::GetEngineDirectory()
@@ -74,5 +74,5 @@ String WindowsPaths::GetExecutableDirctory()
 	wchar_t path[MAX_PATH] = { L'\0' };
 	GetModuleFileNameW(GetModuleHandle(nullptr), path, MAX_PATH);
 
-	return path;
+	return "path";
 }

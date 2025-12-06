@@ -9,7 +9,7 @@
 #include <Windows/WindowsFile.h>
 #include <Platform/Platform.h>
 
-#include <WindowsOS.h>
+#include <Windows.h>
 #undef CreateDirectory
 
 #include <shlwapi.h>
@@ -26,35 +26,35 @@ bool WindowsFileManager::CreateDirectory(const String* name)
 {
     if (name != nullptr)
     {
-        String newName = *name;
-        if (IsPathRelative(name))
-        {
-            String dirAbsoluteConvert = Paths::GetExecutableDirctory();
-            PathCchRemoveFileSpec(dirAbsoluteConvert.Data(), wcslen(dirAbsoluteConvert));
+        //String newName = *name;
+        //if (IsPathRelative(name))
+        //{
+        //    String dirAbsoluteConvert = Paths::GetExecutableDirctory();
+        //    PathCchRemoveFileSpec(dirAbsoluteConvert.Data(), wcslen(dirAbsoluteConvert));
 
-            wchar_t* combined = nullptr;
-            if (FAILED(PathAllocCombine(dirAbsoluteConvert, newName, PATHCCH_ALLOW_LONG_PATHS, &combined)))
-            {
-                MR_LOG(LogFileManager, Error, "Failed to convert to full path: %ls", *Platform::GetError());
-                return false;
-            }
+        //    wchar_t* combined = nullptr;
+        //    if (FAILED(PathAllocCombine(dirAbsoluteConvert, newName, PATHCCH_ALLOW_LONG_PATHS, &combined)))
+        //    {
+        //        MR_LOG(LogFileManager, Error, "Failed to convert to full path: %ls", *Platform::GetError());
+        //        return false;
+        //    }
 
-            newName = combined;
-            LocalFree(combined);
-        }
+        //    newName = combined;
+        //    LocalFree(combined);
+        //}
 
-        for (wchar_t* p = newName.Data(); *p; ++p)
-        {
-            if (*p == L'/')
-                *p = L'\\';
-        }
+        //for (wchar_t* p = newName.Data(); *p; ++p)
+        //{
+        //    if (*p == L'/')
+        //        *p = L'\\';
+        //}
 
-        const int32_t result = SHCreateDirectoryExW(nullptr, newName, nullptr);
-        if (result != ERROR_SUCCESS && result != ERROR_ALREADY_EXISTS)
-        {
-            MR_LOG(LogFileManager, Error, "SHCreateDirectory returned: %ls", *Platform::GetError());
-            return false;
-        }
+        //const int32_t result = SHCreateDirectoryExW(nullptr, newName, nullptr);
+        //if (result != ERROR_SUCCESS && result != ERROR_ALREADY_EXISTS)
+        //{
+        //    MR_LOG(LogFileManager, Error, "SHCreateDirectory returned: %ls", *Platform::GetError());
+        //    return false;
+        //}
 
         return true;
     }
@@ -65,12 +65,12 @@ bool WindowsFileManager::CreateDirectory(const String* name)
 
 bool WindowsFileManager::DeleteDirectory(const String& name, bool bToFullPath)
 {
-    const wchar_t* doubleTerminated = String::Format("%ls\0", name.Chr()).Chr();
+    //const wchar_t* doubleTerminated = String::Format("%ls\0", name.Chr()).Chr();
 
     SHFILEOPSTRUCTW sh = {};
     sh.hwnd = nullptr;
     sh.wFunc = FO_DELETE;
-    sh.pFrom = doubleTerminated;
+    //sh.pFrom = doubleTerminated;
     sh.pTo = nullptr;
     sh.fFlags = FOF_MULTIDESTFILES | FOF_NO_UI;
     sh.fAnyOperationsAborted = false;
@@ -92,7 +92,7 @@ bool WindowsFileManager::IsPathExists(const String* name)
 {
     if (name != nullptr)
     {
-        if (!::PathFileExistsW(*name))
+        //if (!::PathFileExistsW(*name))
         {
             if (GetLastError() != ERROR_FILE_NOT_FOUND)
             {
@@ -113,7 +113,7 @@ bool WindowsFileManager::IsPathRelative(const String* path)
 {
     if (path != nullptr)
     {
-        return PathIsRelativeW(*path) ? true : false;
+        //return PathIsRelativeW(*path) ? true : false;
     }
     
     return false;
@@ -124,30 +124,30 @@ bool WindowsFileManager::IsEndingWith(const String& name, const String& extensio
     if (name.IsEmpty() && extension.IsEmpty())
         return false;
 
-    wchar_t* pointed = PathFindExtensionW(name.Chr());
-    pointed++; // (.)xy
+    //wchar_t* pointed = PathFindExtensionW(name.Chr());
+    //pointed++; // (.)xy
 
-    String super(pointed, (uint32_t)wcslen(pointed));
+    //String super(pointed, (uint32_t)wcslen(pointed));
 
-    return super == extension ? true : false;
+    return "super == extension ? true : false";
 }
 
 void WindowsFileManager::NormalizeDirectory(String& input)
 {
-    wchar_t* begin = input.Data();
-    for (wchar_t* p = begin; *p; p++)
-    {
-        if (p == L"//")
-        {
+    //wchar_t* begin = input.Data();
+    //for (wchar_t* p = begin; *p; p++)
+    //{
+    //    if (p == L"//")
+    //    {
 
-        }
-        else if (*p == L'/')
-        {
+    //    }
+    //    else if (*p == L'/')
+    //    {
 
-        }
-    }
+    //    }
+    //}
 
-    input = begin;
+    //input = begin;
 }
 
 IFile* WindowsFileManager::CreateFileOperation(String* pathToCreate, int32_t accessType, int32_t sharingMode, FileOverrideRules createType)
@@ -158,24 +158,24 @@ IFile* WindowsFileManager::CreateFileOperation(String* pathToCreate, int32_t acc
 
         if (!IsPathExists(pathToCreate)) FileManager::CreateDirectory(pathToCreate);
 
-        HANDLE file = CreateFileW(
-            *pathToCreate,
-            evaluateAccessTypeForCreateFileOperation(accessType),
-            evaluateSharingModeForCreateFileOperation(sharingMode),
-            nullptr,
-            evaluateCreateTypeForCreateFileOperation(createType),
-            FILE_ATTRIBUTE_NORMAL,
-            nullptr
-        );
+        //HANDLE file = CreateFileW(
+        //    *pathToCreate,
+        //    evaluateAccessTypeForCreateFileOperation(accessType),
+        //    evaluateSharingModeForCreateFileOperation(sharingMode),
+        //    nullptr,
+        //    evaluateCreateTypeForCreateFileOperation(createType),
+        //    FILE_ATTRIBUTE_NORMAL,
+        //    nullptr
+        //);
 
-        if (file == INVALID_HANDLE_VALUE)
+        //if (file == INVALID_HANDLE_VALUE)
         {
             MR_LOG(LogFileManager, Error, "CreateFileW returned: %ls (%s)", *Platform::GetError(), **pathToCreate);
             return nullptr;
         }
 
         WindowsFile* newWindowsFile = new WindowsFile();
-        newWindowsFile->fileHandle = file;
+        //newWindowsFile->fileHandle = file;
         newWindowsFile->fileName = *pathToCreate;
 
         return newWindowsFile;

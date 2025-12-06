@@ -10,7 +10,7 @@
 #include <Platform/PlatformLayout.h>
 
 #ifdef MR_PLATFORM_WINDOWS
-#include <WindowsOS.h>
+#include <Windows.h>
 #include <PathCch.h>
 
 #pragma comment (lib, "Pathcch.lib")
@@ -23,7 +23,7 @@ extern int LaunchApplication(int ArgumentCount, char* Arguments[]);
 
 int main(int ArgumentCount, char* Arguments[])
 {
-    //int Result = LaunchApplication(ArgumentCount, Arguments);
+    int Result = LaunchApplication(ArgumentCount, Arguments);
 #ifdef MR_DEBUG
     _CrtDumpMemoryLeaks();
 #endif // MR_DEBUG

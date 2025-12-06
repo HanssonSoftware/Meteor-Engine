@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="String">
+
+		<DisplayString Condition="bIsUsingHeap">
+			Length = {heapBuffer.length} ({heapBuffer.capacity}), {heapBuffer.ptr,s}
+		</DisplayString>
+
+		<DisplayString Condition="!bIsUsingHeap">
+			Length = {stackBuffer.length} (Small), {stackBuffer.ptr,s}
+		</DisplayString>
+
+		<StringView Condition="bIsUsingHeap">heapBuffer.ptr,s</StringView>
+		<StringView Condition="!bIsUsingHeap">stackBuffer.ptr,s</StringView>
+		<Expand>
+			<Item Name="Content" Condition="bIsUsingHeap">heapBuffer.ptr,s</Item>
+			<Item Name="Content" Condition="!bIsUsingHeap">stackBuffer.ptr,s</Item>
+
+			<Item Name="Length" Condition="bIsUsingHeap">heapBuffer.length</Item>
+			<Item Name="Length" Condition="!bIsUsingHeap">stackBuffer.length</Item>
+
+			<Item Name="Capacity" Condition="bIsUsingHeap">heapBuffer.capacity</Item>
+			<Item Name="Heap?">bIsUsingHeap</Item>
+		</Expand>
+
+	</Type>
+</AutoVisualizer>

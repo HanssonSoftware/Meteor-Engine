@@ -19,21 +19,21 @@ bool Project::Finalize(String* output)
 		String project;
 		for (auto& mdl : *modules)
 		{
-			String actualProject = String::Format(L"\t\t<Project Path = \"%ls\" Id=\"%ls\"/>\n", *mdl.generatedProjectFile, *mdl.identification);
-			project = String::Format(L"%ls%ls", *project, *actualProject);
+			String actualProject = String::Format("\t\t<Project Path = \"%ls\" Id=\"%ls\"/>\n", *mdl.generatedProjectFile, *mdl.identification);
+			project = String::Format("%ls%ls", *project, *actualProject);
 		}
 
-		*output = String::Format(L"<!-- This file is generated with MeteorBuild(R) -->\n"
-			L"<Solution>\n"
-			L"\t<Configurations>\n"
-			L"\t\t<BuildType Name=\"Debug\" />\n"
-			L"\t\t<BuildType Name=\"Shipping\" />\n"
-			L"\t\t<Platform Name = \"x64\" />\n"
-			L"\t</Configurations>\n"
-			L"\t<Folder Name = \"/Modules/\">\n"
-			L"%ls"
-			L"\t</Folder>\n"
-			L"</Solution>", 
+		*output = String::Format("<!-- This file is generated with MeteorBuild(R) -->\n"
+			"<Solution>\n"
+			"\t<Configurations>\n"
+			"\t\t<BuildType Name=\"Debug\" />\n"
+			"\t\t<BuildType Name=\"Shipping\" />\n"
+			"\t\t<Platform Name = \"x64\" />\n"
+			"\t</Configurations>\n"
+			"\t<Folder Name = \"/Modules/\">\n"
+			"%ls"
+			"\t</Folder>\n"
+			"</Solution>", 
 			*project);
 
 		return true;

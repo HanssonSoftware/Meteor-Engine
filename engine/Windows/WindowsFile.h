@@ -3,7 +3,7 @@
 #pragma once
 #include <Platform/File.h>
 
-#include <WindowsOS.h>
+#include <Windows.h>
 
 class WindowsFile : public IFile
 {

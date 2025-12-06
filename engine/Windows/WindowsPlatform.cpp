@@ -3,7 +3,7 @@
 #include "WindowsPlatform.h"
 #include <cstdint>
 
-#include <WindowsOS.h>
+#include <Windows.h>
 #include <Types/String.h>
 #include <Application.h>
 
@@ -69,19 +69,19 @@ String WindowsPlatform::GetError()
 		return "";
 
 	str[returned - 2] = L'\0';
-	String end(str);
+	//String end(str);
 
 	LocalFree(str);
-	return end;
+	return "end";
 }
 
 bool WindowsPlatform::IsRunningAnAnotherInstance()
 {
-	HANDLE appMtx = CreateMutexW(nullptr, 1, GetApplication()->GetApplicationCodeName());
+	//HANDLE appMtx = CreateMutexW(nullptr, 1, GetApplication()->GetApplicationCodeName());
 
 	if (GetLastError() == ERROR_ALREADY_EXISTS)
 	{
-		if (appMtx) CloseHandle(appMtx);	
+		//if (appMtx) CloseHandle(appMtx);	
 		return true;
 	}
 

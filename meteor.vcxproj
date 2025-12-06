@@ -250,7 +250,6 @@
     <ClCompile Include="engine\Core\Types\String.cpp" />
     <ClCompile Include="engine\Core\Types\Vector.cpp" />
     <ClCompile Include="engine\WindowManager\Window.cpp" />
-    <ClCompile Include="engine\Core\Common\Guid.cpp" />
     <ClCompile Include="engine\Windows\WindowsWindowManager.cpp" />
     <ClCompile Include="engine\Windows\WindowsWindow.cpp" />
     <ClCompile Include="engine\Windows\WindowsFile.cpp" />
@@ -275,7 +274,6 @@
     <ClInclude Include="engine\Core\Common\Maths.h" />
     <ClInclude Include="engine\Core\Logging\Log.h" />
     <ClInclude Include="engine\Core\Logging\LogMacros.h" />
-    <ClInclude Include="engine\Core\WindowsOS.h" />
     <ClInclude Include="engine\Platform\Platform.h" />
     <ClInclude Include="engine\Platform\Thread\ThreadDescriptor.h" />
     <ClInclude Include="engine\Platform\FileHelpers.h" />
@@ -383,7 +381,6 @@
     <ClInclude Include="engine\ThirdParty\assimp\ZipArchiveIOSystem.h" />
     <ClInclude Include="engine\Version.h" />
     <ClInclude Include="engine\Core\Types\Pointers.h" />
-    <ClInclude Include="engine\Core\Common\Guid.h" />
     <ClInclude Include="engine\Platform\PerformanceTimer.h" />
     <ClInclude Include="engine\Platform\FileManager.h" />
     <ClInclude Include="engine\Core\Logging\LogAssertion.h" />
@@ -431,7 +428,7 @@
     <Image Include="resources\mr1.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="engine\Core\Core.natvis" />
+    <Natvis Include="engine\Core\Default.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

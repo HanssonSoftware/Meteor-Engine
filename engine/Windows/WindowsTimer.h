@@ -2,7 +2,7 @@
 
 #pragma once
 #include <Platform/Timer.h>
-#include <WindowsOS.h>
+#include <Windows.h>
 
 class WindowsTimer : public ITimer
 {

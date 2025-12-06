@@ -46,7 +46,7 @@ void WindowsFile::Close()
 
 void WindowsFile::Delete()
 {	
-	if (!::DeleteFileW(fileName))
+	//if (!::DeleteFileW(fileName))
 	{
 		MR_LOG(LogFileSystem, Error, "Unable to delete file! %ls", *Platform::GetError());
 	}

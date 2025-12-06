@@ -22,19 +22,19 @@ bool Module::ConstructProjectFile(String* output)
 	{
 		if (FileManager::IsEndingWith(cl, "h"))
 		{
-			String actual = String::Format(L"\t\t<ClInclude Include=\"%ls\" />\n", *cl);
+			String actual = String::Format("\t\t<ClInclude Include=\"%ls\" />\n", *cl);
 
-			includeList = String::Format(L"%ls%ls", *includeList, *actual);
+			includeList = String::Format("%ls%ls", *includeList, *actual);
 		}
 		else if (FileManager::IsEndingWith(cl, "cpp"))
 		{
-			String actual = String::Format(L"\t\t<ClCompile Include=\"%ls\" />\n", *cl);
-			compileList = String::Format(L"%ls%ls", *compileList, *actual);
+			String actual = String::Format("\t\t<ClCompile Include=\"%ls\" />\n", *cl);
+			compileList = String::Format("%ls%ls", *compileList, *actual);
 		}
 		else
 		{
-			//String actual = String::Format(L"\t\t<ClCompile Include=\"%ls\" />\n", *cl);
-			//compileList = String::Format(L"%ls%ls", *compileList, *actual);
+			//String actual = String::Format("\t\t<ClCompile Include=\"%ls\" />\n", *cl);
+			//compileList = String::Format("%ls%ls", *compileList, *actual);
 		}
 	}
 
@@ -45,10 +45,10 @@ bool Module::ConstructProjectFile(String* output)
 		const Project* projectScript = &app->GetBuildSystem().GetProjectScript();
 		for (auto& df : projectScript->globalDefines)
 		{
-			defines = String::Format(L"%ls;%ls", *defines, *df);
+			defines = String::Format("%ls;%ls", *defines, *df);
 		}
 
-		defines += L";%(PreprocessorDefinitions)";
+		defines += ";%(PreprocessorDefinitions)";
 
 		const Array<Module>* mdls = app->GetBuildSystem().GetModules();
 		for (auto& mdl : *mdls)
@@ -59,7 +59,7 @@ bool Module::ConstructProjectFile(String* output)
 				{
 					for (auto& ic : mdl.includePaths)
 					{
-						includePath = String::Format(L"%ls;%ls", *includePath, *ic);
+						includePath = String::Format("%ls;%ls", *includePath, *ic);
 					}
 				}
 			}			
@@ -67,103 +67,103 @@ bool Module::ConstructProjectFile(String* output)
 
 		for (auto& ic : includePaths)
 		{
-			includePath = String::Format(L"%ls;%ls", *includePath, *ic);
+			includePath = String::Format("%ls;%ls", *includePath, *ic);
 		}
 	}
 
 	*output = String::Format(
-	L"<!-- This file is generated with MeteorBuild(R) -->\n\n"
-	L"<Project DefaultTargets=\"Build\" xmlns=\'http://schemas.microsoft.com/developer/msbuild/2003\'>\n"
-	L"\t<ItemGroup Label = \"ProjectConfigurations\">\n"
-	L"\t\t<ProjectConfiguration Include=\"Debug|x64\">\n"
-	L"\t\t\t<Configuration>Debug</Configuration>\n"
-	L"\t\t\t<Platform>x64</Platform>\n"
-	L"\t\t</ProjectConfiguration>\n"
-	L"\t\t<ProjectConfiguration Include=\"Shipping|x64\">\n"
-	L"\t\t\t<Configuration>Shipping</Configuration>\n"
-	L"\t\t\t<Platform>x64</Platform>\n"
-	L"\t\t</ProjectConfiguration>\n"
-	L"\t</ItemGroup>\n"
-	L"\t<PropertyGroup Label=\"Globals\">\n"
-	L"\t\t<VCProjectVersion>18.0</VCProjectVersion>\n"
-	L"\t\t<Keyword>Win32Proj</Keyword>\n"
-	L"\t\t<ProjectGuid>%ls</ProjectGuid>\n" // 1 project GUID
-	L"\t\t<RootNamespace>%ls</RootNamespace>\n" // 2 namespace
-	L"\t\t<WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>\n"
-	L"\t\t<ProjectName>%ls</ProjectName>\n" // 3 project Name
+	"<!-- This file is generated with MeteorBuild(R) -->\n\n"
+	"<Project DefaultTargets=\"Build\" xmlns=\'http://schemas.microsoft.com/developer/msbuild/2003\'>\n"
+	"\t<ItemGroup Label = \"ProjectConfigurations\">\n"
+	"\t\t<ProjectConfiguration Include=\"Debug|x64\">\n"
+	"\t\t\t<Configuration>Debug</Configuration>\n"
+	"\t\t\t<Platform>x64</Platform>\n"
+	"\t\t</ProjectConfiguration>\n"
+	"\t\t<ProjectConfiguration Include=\"Shipping|x64\">\n"
+	"\t\t\t<Configuration>Shipping</Configuration>\n"
+	"\t\t\t<Platform>x64</Platform>\n"
+	"\t\t</ProjectConfiguration>\n"
+	"\t</ItemGroup>\n"
+	"\t<PropertyGroup Label=\"Globals\">\n"
+	"\t\t<VCProjectVersion>18.0</VCProjectVersion>\n"
+	"\t\t<Keyword>Win32Proj</Keyword>\n"
+	"\t\t<ProjectGuid>%ls</ProjectGuid>\n" // 1 project GUID
+	"\t\t<RootNamespace>%ls</RootNamespace>\n" // 2 namespace
+	"\t\t<WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>\n"
+	"\t\t<ProjectName>%ls</ProjectName>\n" // 3 project Name
 
-	L"\t</PropertyGroup>\n"
-	L"\t<Import Project=\"$(VCTargetsPath)\\Microsoft.Cpp.Default.props\" />\n"
-	L"\t<PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\" Label=\"Configuration\">\n"
-	L"\t\t<ConfigurationType>DynamicLibrary</ConfigurationType>\n"
-	L"\t\t<PlatformToolset>v145</PlatformToolset>\n"
-	L"\t\t<CharacterSet>Unicode</CharacterSet>\n"
-	L"\t\t<UseDebugLibraries>true</UseDebugLibraries>\n"
-	L"\t</PropertyGroup>\n"
-	L"\t<PropertyGroup Condition = \"'$(Configuration)|$(Platform)'=='Shipping|x64'\" Label = \"Configuration\">\n"
-	L"\t\t<ConfigurationType>DynamicLibrary</ConfigurationType>\n"
-	L"\t\t<PlatformToolset>v145</PlatformToolset>\n"
-	L"\t\t<CharacterSet>Unicode</CharacterSet>\n"
-	L"\t\t<WholeProgramOptimization>true</WholeProgramOptimization>\n"
-	L"\t</PropertyGroup>\n"
+	"\t</PropertyGroup>\n"
+	"\t<Import Project=\"$(VCTargetsPath)\\Microsoft.Cpp.Default.props\" />\n"
+	"\t<PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\" Label=\"Configuration\">\n"
+	"\t\t<ConfigurationType>DynamicLibrary</ConfigurationType>\n"
+	"\t\t<PlatformToolset>v145</PlatformToolset>\n"
+	"\t\t<CharacterSet>Unicode</CharacterSet>\n"
+	"\t\t<UseDebugLibraries>true</UseDebugLibraries>\n"
+	"\t</PropertyGroup>\n"
+	"\t<PropertyGroup Condition = \"'$(Configuration)|$(Platform)'=='Shipping|x64'\" Label = \"Configuration\">\n"
+	"\t\t<ConfigurationType>DynamicLibrary</ConfigurationType>\n"
+	"\t\t<PlatformToolset>v145</PlatformToolset>\n"
+	"\t\t<CharacterSet>Unicode</CharacterSet>\n"
+	"\t\t<WholeProgramOptimization>true</WholeProgramOptimization>\n"
+	"\t</PropertyGroup>\n"
 
-	L"\t<Import Project=\"$(VCTargetsPath)\\Microsoft.Cpp.props\"/>\n"
-	L"\t<ImportGroup Label=\"ExtensionSettings\">\n"
-	L"\t</ImportGroup>\n"
-	L"\t<ImportGroup Label=\"Shared\">\n"
-	L"\t</ImportGroup>\n"
-	L"\t<ImportGroup Label=\"PropertySheets\" Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\">\n"
-    L"\t\t<Import Project=\"$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props\" Condition=\"exists('$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props')\" Label=\"LocalAppDataPlatform\"/>\n"
-	L"\t</ImportGroup>\n"
-	L"\t<ImportGroup Label=\"PropertySheets\" Condition=\"'$(Configuration)|$(Platform)'=='Shipping|x64'\">\n"
-    L"\t\t<Import Project=\"$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props\" Condition=\"exists('$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props')\" Label=\"LocalAppDataPlatform\"/>\n"
-	L"\t</ImportGroup>\n"
-	L"\t<PropertyGroup Label=\"UserMacros\" />\n"
+	"\t<Import Project=\"$(VCTargetsPath)\\Microsoft.Cpp.props\"/>\n"
+	"\t<ImportGroup Label=\"ExtensionSettings\">\n"
+	"\t</ImportGroup>\n"
+	"\t<ImportGroup Label=\"Shared\">\n"
+	"\t</ImportGroup>\n"
+	"\t<ImportGroup Label=\"PropertySheets\" Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\">\n"
+    "\t\t<Import Project=\"$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props\" Condition=\"exists('$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props')\" Label=\"LocalAppDataPlatform\"/>\n"
+	"\t</ImportGroup>\n"
+	"\t<ImportGroup Label=\"PropertySheets\" Condition=\"'$(Configuration)|$(Platform)'=='Shipping|x64'\">\n"
+    "\t\t<Import Project=\"$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props\" Condition=\"exists('$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props')\" Label=\"LocalAppDataPlatform\"/>\n"
+	"\t</ImportGroup>\n"
+	"\t<PropertyGroup Label=\"UserMacros\" />\n"
 	
-	L"\t<PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\">\n"
-	L"\t\t<OutDir>$(SolutionDir)Product\\</OutDir>\n"
-	L"\t\t<IntDir>$(SolutionDir)Intermediate\\$(ProjectName)\\</IntDir>\n"
-	L"\t\t<TargetName>MeteorEngine-%ls</TargetName>\n" // 4 module name
-	L"\t</PropertyGroup>\n"
-	L"\t<PropertyGroup Condition = \"'$(Configuration)|$(Platform)'=='Shipping|x64'\">\n"
-	L"\t\t<OutDir>$(SolutionDir)Product\\</OutDir>\n"
-	L"\t\t<IntDir>$(SolutionDir)Intermediate\\$(ProjectName)\\</IntDir>\n"
-	L"\t\t<TargetName>MeteorEngine-%ls</TargetName>\n" // 4 module name
-	L"\t</PropertyGroup>\n"
+	"\t<PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\">\n"
+	"\t\t<OutDir>$(SolutionDir)Product\\</OutDir>\n"
+	"\t\t<IntDir>$(SolutionDir)Intermediate\\$(ProjectName)\\</IntDir>\n"
+	"\t\t<TargetName>MeteorEngine-%ls</TargetName>\n" // 4 module name
+	"\t</PropertyGroup>\n"
+	"\t<PropertyGroup Condition = \"'$(Configuration)|$(Platform)'=='Shipping|x64'\">\n"
+	"\t\t<OutDir>$(SolutionDir)Product\\</OutDir>\n"
+	"\t\t<IntDir>$(SolutionDir)Intermediate\\$(ProjectName)\\</IntDir>\n"
+	"\t\t<TargetName>MeteorEngine-%ls</TargetName>\n" // 4 module name
+	"\t</PropertyGroup>\n"
 
-	L"\t<ItemDefinitionGroup Condition=\"\'$(Configuration)|$(Platform)\'==\'Debug|x64\'\">\n"
-	L"\t\t<ClCompile>\n"
-	L"\t\t\t<PreprocessorDefinitions>%ls_EXPORTS;MR_DEBUG;%ls</PreprocessorDefinitions>\n"
-	L"\t\t\t<RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>\n"
-	L"\t\t\t<LanguageStandard>stdcpp17</LanguageStandard>\n"
-	L"\t\t\t<Optimization>Disabled</Optimization>\n"
-	L"\t\t\t<BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>\n"
-	L"\t\t\t<AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Intermediate\\;$(SolutionDir)Intermediate\\%ls;%ls</AdditionalIncludeDirectories>\n" // 5 include paths
-	L"\t\t</ClCompile>\n"
-	L"\t</ItemDefinitionGroup>\n"
+	"\t<ItemDefinitionGroup Condition=\"\'$(Configuration)|$(Platform)\'==\'Debug|x64\'\">\n"
+	"\t\t<ClCompile>\n"
+	"\t\t\t<PreprocessorDefinitions>%ls_EXPORTS;MR_DEBUG;%ls</PreprocessorDefinitions>\n"
+	"\t\t\t<RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>\n"
+	"\t\t\t<LanguageStandard>stdcpp17</LanguageStandard>\n"
+	"\t\t\t<Optimization>Disabled</Optimization>\n"
+	"\t\t\t<BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>\n"
+	"\t\t\t<AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Intermediate\\;$(SolutionDir)Intermediate\\%ls;%ls</AdditionalIncludeDirectories>\n" // 5 include paths
+	"\t\t</ClCompile>\n"
+	"\t</ItemDefinitionGroup>\n"
 
-	L"\t<ItemDefinitionGroup Condition=\"\'$(Configuration)|$(Platform)\'==\'Shipping|x64\'\">\n"
-	L"\t\t<ClCompile>\n"
-	L"\t\t\t<PreprocessorDefinitions>%ls_EXPORTS;%ls</PreprocessorDefinitions>\n"
-	L"\t\t\t<RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>\n"
-	L"\t\t\t<LanguageStandard>stdcpp17</LanguageStandard>\n"
-	L"\t\t\t<Optimization>MaxSpeed</Optimization>\n"
-	L"\t\t\t<AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Intermediate\\;$(SolutionDir)Intermediate\\%ls;%ls</AdditionalIncludeDirectories>\n" // 5 include paths
-	L"\t\t</ClCompile>\n"
-	L"\t</ItemDefinitionGroup>\n"
+	"\t<ItemDefinitionGroup Condition=\"\'$(Configuration)|$(Platform)\'==\'Shipping|x64\'\">\n"
+	"\t\t<ClCompile>\n"
+	"\t\t\t<PreprocessorDefinitions>%ls_EXPORTS;%ls</PreprocessorDefinitions>\n"
+	"\t\t\t<RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>\n"
+	"\t\t\t<LanguageStandard>stdcpp17</LanguageStandard>\n"
+	"\t\t\t<Optimization>MaxSpeed</Optimization>\n"
+	"\t\t\t<AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Intermediate\\;$(SolutionDir)Intermediate\\%ls;%ls</AdditionalIncludeDirectories>\n" // 5 include paths
+	"\t\t</ClCompile>\n"
+	"\t</ItemDefinitionGroup>\n"
 
-	L"\t<ItemGroup>\n"
-	L"\t\t<ClInclude Include=\"%ls.bootstrap.cpp\" />\n"
-	L"%ls"
-	L"\t</ItemGroup>\n"
-	L"\t<ItemGroup>\n"
-	L"\t\t<ClInclude Include=\"%ls.proxy.h\" />\n"
-	L"%ls"
-	L"\t</ItemGroup>\n"
-	L"\t<Import Project=\"$(VCTargetsPath)\\Microsoft.Cpp.targets\" />\n"
-	L"\t<ImportGroup Label=\"ExtensionTargets\" >\n"
-	L"\t</ImportGroup>\n"
-	L"</Project>",
+	"\t<ItemGroup>\n"
+	"\t\t<ClInclude Include=\"%ls.bootstrap.cpp\" />\n"
+	"%ls"
+	"\t</ItemGroup>\n"
+	"\t<ItemGroup>\n"
+	"\t\t<ClInclude Include=\"%ls.proxy.h\" />\n"
+	"%ls"
+	"\t</ItemGroup>\n"
+	"\t<Import Project=\"$(VCTargetsPath)\\Microsoft.Cpp.targets\" />\n"
+	"\t<ImportGroup Label=\"ExtensionTargets\" >\n"
+	"\t</ImportGroup>\n"
+	"</Project>",
 	*identification,
 	*moduleName,
 	*moduleName,
@@ -198,7 +198,7 @@ bool Module::GenerateProxyHeader(String* output)
 	{
 		//if (module.moduleName == moduleName)
 		//{
-		//	defineLists = String::Format("%ls#define %ls_API %ls\n", *defineLists, *module.defineName, L"DLLEXPORT");
+		//	defineLists = String::Format("%ls#define %ls_API %ls\n", *defineLists, *module.defineName, "DLLEXPORT");
 		//	continue;
 		//}
 
@@ -207,14 +207,14 @@ bool Module::GenerateProxyHeader(String* output)
 	}
 
 	*output = String::Format(
-	L"/* Copyright 2020 - 2025, Hansson Software. All rights reserved. Automatically generated by MeteorBuild(R), edit the corresponding .mrbuild file instead! */\n"
-	L"#pragma once\n#include \"%ls/%lsDefs.h\"\n\n"
-	L"%ls"
-	//L"#ifdef %ls_EXPORTS\n"
-	//L"#define %ls_API __declspec(dllexport)\n"
-	//L"#else\n"
-	//L"#define %ls_API __declspec(dllimport)\n"
-	//L"#endif\n"
+	"/* Copyright 2020 - 2025, Hansson Software. All rights reserved. Automatically generated by MeteorBuild(R), edit the corresponding .mrbuild file instead! */\n"
+	"#pragma once\n#include \"%ls/%lsDefs.h\"\n\n"
+	"%ls"
+	//"#ifdef %ls_EXPORTS\n"
+	//"#define %ls_API __declspec(dllexport)\n"
+	//"#else\n"
+	//"#define %ls_API __declspec(dllimport)\n"
+	//"#endif\n"
 	,
 	*GetApplication<BuildSystemApplication>()->GetApplicationCodeName(),
 	*GetApplication<BuildSystemApplication>()->GetApplicationCodeName(),
@@ -227,23 +227,23 @@ bool Module::GenerateProxyHeader(String* output)
 bool Module::GenerateBootstrapHeader(String* output)
 {
 	*output =
-		L"/* Copyright 2020 - 2025, Hansson Software. All rights reserved. Automatically generated by MeteorBuild(R), edit the corresponding .mrbuild file instead! */\n\n"
-		L"#pragma once\n\n#include <Windows.h>\n"
-		L"BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)\n"
-		L"{\n"
-		L"\tswitch (fdwReason)\n"
-		L"\t{\n"
-		L"\t\tcase DLL_PROCESS_ATTACH:\n"
-		L"\t\t\tbreak;\n"
-		L"\t\tcase DLL_PROCESS_DETACH:\n"
-		L"\t\t\tbreak;\n"
-		L"\t\tcase DLL_THREAD_ATTACH:\n"
-		L"\t\t\tbreak;\n"
-		L"\t\tcase DLL_THREAD_DETACH:\n"
-		L"\t\t\tbreak;\n"
-		L"\t}\n\n"
-		L"\treturn 0;\n"
-		L"}\n";
+		"/* Copyright 2020 - 2025, Hansson Software. All rights reserved. Automatically generated by MeteorBuild(R), edit the corresponding .mrbuild file instead! */\n\n"
+		"#pragma once\n\n#include <Windows.h>\n"
+		"BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)\n"
+		"{\n"
+		"\tswitch (fdwReason)\n"
+		"\t{\n"
+		"\t\tcase DLL_PROCESS_ATTACH:\n"
+		"\t\t\tbreak;\n"
+		"\t\tcase DLL_PROCESS_DETACH:\n"
+		"\t\t\tbreak;\n"
+		"\t\tcase DLL_THREAD_ATTACH:\n"
+		"\t\t\tbreak;\n"
+		"\t\tcase DLL_THREAD_DETACH:\n"
+		"\t\t\tbreak;\n"
+		"\t}\n\n"
+		"\treturn 0;\n"
+		"}\n";
 
 	return true;
 }

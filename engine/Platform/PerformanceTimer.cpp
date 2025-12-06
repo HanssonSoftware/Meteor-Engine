@@ -1,7 +1,7 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #include "PerformanceTimer.h"
-#include <WindowsOS.h>
+#include <Windows.h>
 
 LARGE_INTEGER lg;
 #include <Logging/Log.h>
